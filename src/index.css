@@ -1,0 +1,374 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: 'Press Start 2P';
+  src: url('/fonts/PressStart2P-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'VT323';
+  src: url('/fonts/VT323-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@custom-variant cool ([data-theme="retrocool"] &);
+
+@theme {
+  --font-pixel: "Press Start 2P", system-ui;
+  --font-vt323: "VT323", monospace;
+
+  --color-vga-black: #000000;
+  --color-vga-blue: #0000aa;
+  --color-vga-green: #00aa00;
+  --color-vga-cyan: #00aaaa;
+  --color-vga-red: #aa0000;
+  --color-vga-magenta: #aa00aa;
+  --color-vga-brown: #aa5500;
+  --color-vga-white: #aaaaaa;
+  --color-vga-gray: #555555;
+  --color-vga-light-blue: #5555ff;
+  --color-vga-light-green: #55ff55;
+  --color-vga-light-cyan: #55ffff;
+  --color-vga-light-red: #ff5555;
+  --color-vga-light-magenta: #ff55ff;
+  --color-vga-yellow: #ffff55;
+  --color-vga-bright-white: #ffffff;
+
+  /* Retrocool: same VGA hues, enhanced */
+  --color-rc-bg: #000008;
+  --color-rc-panel: #0000cc;
+  --color-rc-panel-alt: #0004e0;
+  --color-rc-border: #aaaaaa;
+  --color-rc-primary: #ffff55;
+  --color-rc-accent: #55ffff;
+  --color-rc-hot: #ff55ff;
+  --color-rc-dim: #7777aa;
+  --color-rc-text: #ffffff;
+  --color-rc-gold: #ffff55;
+}
+
+@layer base {
+  body {
+    @apply font-pixel bg-vga-black text-vga-white;
+  }
+}
+
+/* ── Base ───────────────────────────────────────────── */
+body[data-theme="retrocool"] {
+  background-color: var(--color-rc-bg);
+  /* same font family as retrocutre — just bigger */
+  font-family: var(--font-pixel);
+}
+
+/* ── Responsive text — scales with viewport ─────────── */
+/* Retrocool uses the same font but sizes grow on large screens */
+body[data-theme="retrocool"] .text-\[6px\],
+body[data-theme="retrocool"] .text-\[7px\] {
+  font-size: clamp(7px, 0.6vw, 9px);
+}
+body[data-theme="retrocool"] .text-\[8px\],
+body[data-theme="retrocool"] .text-\[9px\] {
+  font-size: clamp(8px, 0.7vw, 11px);
+}
+body[data-theme="retrocool"] .text-\[10px\],
+body[data-theme="retrocool"] .text-\[11px\],
+body[data-theme="retrocool"] .text-\[12px\] {
+  font-size: clamp(9px, 0.8vw, 12px);
+}
+body[data-theme="retrocool"] .text-xs   { font-size: clamp(10px, 0.9vw, 14px); }
+body[data-theme="retrocool"] .text-sm   { font-size: clamp(11px, 1vw,   16px); }
+body[data-theme="retrocool"] .text-base { font-size: clamp(12px, 1.15vw, 18px); }
+body[data-theme="retrocool"] .text-lg   { font-size: clamp(14px, 1.3vw, 21px); }
+body[data-theme="retrocool"] .text-xl   { font-size: clamp(16px, 1.55vw, 24px); }
+body[data-theme="retrocool"] .text-2xl  { font-size: clamp(20px, 1.9vw, 30px); }
+
+/* ── Responsive spacing ─────────────────────────────── */
+body[data-theme="retrocool"] .gap-1  { gap: clamp(0.3rem,  0.4vw, 0.7rem); }
+body[data-theme="retrocool"] .gap-2  { gap: clamp(0.5rem,  0.6vw, 1.2rem); }
+body[data-theme="retrocool"] .gap-3  { gap: clamp(0.75rem, 0.9vw, 1.8rem); }
+body[data-theme="retrocool"] .gap-4  { gap: clamp(1rem,    1.2vw, 2.4rem); }
+body[data-theme="retrocool"] .gap-6  { gap: clamp(1.5rem,  1.8vw, 3.5rem); }
+body[data-theme="retrocool"] .p-1    { padding: clamp(0.25rem, 0.3vw,  0.6rem); }
+body[data-theme="retrocool"] .p-2    { padding: clamp(0.5rem,  0.6vw,  1.2rem); }
+body[data-theme="retrocool"] .p-3    { padding: clamp(0.75rem, 0.9vw,  1.8rem); }
+body[data-theme="retrocool"] .p-4    { padding: clamp(1rem,    1.2vw,  2.4rem); }
+body[data-theme="retrocool"] .p-6    { padding: clamp(1.5rem,  1.8vw,  3.5rem); }
+body[data-theme="retrocool"] .px-1   { padding-inline: clamp(0.25rem, 0.3vw,  0.6rem); }
+body[data-theme="retrocool"] .px-2   { padding-inline: clamp(0.5rem,  0.6vw,  1.2rem); }
+body[data-theme="retrocool"] .px-3   { padding-inline: clamp(0.75rem, 0.9vw,  1.8rem); }
+body[data-theme="retrocool"] .px-4   { padding-inline: clamp(1rem,    1.2vw,  2.4rem); }
+body[data-theme="retrocool"] .py-1   { padding-block:  clamp(0.25rem, 0.3vw,  0.6rem); }
+body[data-theme="retrocool"] .py-2   { padding-block:  clamp(0.5rem,  0.6vw,  1.2rem); }
+body[data-theme="retrocool"] .py-3   { padding-block:  clamp(0.75rem, 0.9vw,  1.8rem); }
+body[data-theme="retrocool"] .py-4   { padding-block:  clamp(1rem,    1.2vw,  2.4rem); }
+
+/* ── Full-screen layout ─────────────────────────────── */
+body[data-theme="retrocool"] #rc-screen .max-w-4xl,
+body[data-theme="retrocool"] #rc-screen .max-w-5xl,
+body[data-theme="retrocool"] #rc-screen .max-w-3xl,
+body[data-theme="retrocool"] #rc-screen .max-w-2xl {
+  max-width: min(100%, 1600px);
+}
+
+body[data-theme="retrocool"] .rc-nav-tabs {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+body[data-theme="retrocool"] .rc-nav-tabs::-webkit-scrollbar { display: none; }
+
+/* ── Enhanced VGA panels — same blue, with depth + glow ── */
+[data-theme="retrocool"] .vga-panel {
+  background: linear-gradient(160deg, #0004e0 0%, #0000aa 100%);
+  box-shadow:
+    inset 2px 2px 0 0 #5555ff,
+    inset -2px -2px 0 0 #000077,
+    0 0 18px rgba(85, 85, 255, 0.45),
+    4px 4px 0 0 rgba(0, 0, 0, 0.6);
+}
+
+[data-theme="retrocool"] .vga-panel-inset {
+  background: rgba(0, 0, 20, 0.7);
+  box-shadow:
+    inset 2px 2px 0 0 #000055,
+    inset -2px -2px 0 0 #3333aa,
+    inset 0 0 12px rgba(0, 0, 80, 0.8);
+}
+
+/* ── Stat bars — taller in retrocool ───────────────── */
+body[data-theme="retrocool"] .h-1\.5 { height: clamp(0.45rem, 0.8vw, 1.4rem); }
+body[data-theme="retrocool"] .h-2    { height: clamp(0.55rem, 1vw,   1.8rem); }
+
+@layer utilities {
+  .vga-panel {
+    box-shadow:
+      inset 2px 2px 0 0 var(--color-vga-white),
+      inset -2px -2px 0 0 var(--color-vga-gray),
+      4px 4px 0 0 #000;
+  }
+  .vga-panel-inset {
+    box-shadow:
+      inset 2px 2px 0 0 var(--color-vga-gray),
+      inset -2px -2px 0 0 var(--color-vga-white);
+  }
+
+  .rc-panel {
+    background: linear-gradient(160deg, #0004e0 0%, #0000aa 100%);
+    border: 1px solid var(--color-rc-border);
+    box-shadow:
+      0 0 18px rgba(85, 85, 255, 0.35),
+      inset 2px 2px 0 0 #5555ff,
+      inset -2px -2px 0 0 #000077;
+  }
+}
+
+/* ── Screen wrapper ─────────────────────────────────── */
+#rc-screen {
+  width: 100%;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ── Main menu ──────────────────────────────────────── */
+body[data-theme="retrocool"] .rc-menu {
+  max-width: 560px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+body[data-theme="retrocool"] .rc-menu-title {
+  background: linear-gradient(160deg, #0004e0 0%, #0000aa 100%);
+  border: 4px solid var(--color-vga-white) !important;
+  box-shadow:
+    inset 2px 2px 0 0 #5555ff,
+    inset -2px -2px 0 0 #000077,
+    0 0 20px rgba(85, 85, 255, 0.4);
+}
+
+body[data-theme="retrocool"] .rc-menu button {
+  background: var(--color-rc-panel);
+  color: var(--color-vga-bright-white);
+  border: 1px solid var(--color-vga-white) !important;
+  border-bottom-width: 1px !important;
+  border-right-width: 1px !important;
+  box-shadow:
+    inset 1px 1px 0 0 #5555ff,
+    inset -1px -1px 0 0 #000077,
+    0 0 8px rgba(85, 85, 255, 0.2);
+  transition: box-shadow 0.15s;
+}
+
+body[data-theme="retrocool"] .rc-menu button:hover {
+  background: var(--color-rc-panel-alt);
+  box-shadow:
+    inset 1px 1px 0 0 #5555ff,
+    inset -1px -1px 0 0 #000077,
+    0 0 16px rgba(85, 85, 255, 0.45);
+  opacity: 1;
+}
+
+body[data-theme="retrocool"] .rc-menu .rc-btn-play {
+  background: var(--color-vga-green);
+  color: var(--color-vga-bright-white);
+  border-color: var(--color-vga-bright-white) !important;
+  box-shadow:
+    inset 1px 1px 0 0 #55ff55,
+    inset -1px -1px 0 0 #005500,
+    0 0 16px rgba(85, 255, 85, 0.4);
+}
+
+body[data-theme="retrocool"] .rc-menu .rc-btn-play:hover {
+  background: var(--color-vga-light-green);
+  box-shadow: 0 0 24px rgba(85, 255, 85, 0.55);
+  opacity: 1;
+}
+
+body[data-theme="retrocool"] .rc-menu .rc-btn-fantasy {
+  background: var(--color-vga-yellow);
+  color: var(--color-vga-black);
+  border-color: var(--color-vga-black) !important;
+  box-shadow:
+    inset 1px 1px 0 0 #ffff99,
+    inset -1px -1px 0 0 #888800,
+    0 0 16px rgba(255, 255, 85, 0.35);
+}
+
+body[data-theme="retrocool"] .rc-menu .rc-btn-fantasy:hover {
+  background: var(--color-vga-yellow);
+  box-shadow: 0 0 24px rgba(255, 255, 85, 0.5);
+  opacity: 1;
+}
+
+/* ── Primary CTA (JUGAR PARTIDO etc.) ───────────────── */
+body[data-theme="retrocool"] .rc-btn-primary {
+  background: var(--color-vga-green) !important;
+  color: var(--color-vga-bright-white) !important;
+  border: 1px solid var(--color-vga-bright-white) !important;
+  border-bottom-width: 1px !important;
+  border-right-width: 1px !important;
+  box-shadow:
+    inset 1px 1px 0 0 #55ff55,
+    inset -1px -1px 0 0 #005500,
+    0 0 14px rgba(85, 255, 85, 0.35) !important;
+}
+
+/* ── Re-assert cool: overrides so they beat VGA remaps ── */
+[data-theme="retrocool"] .cool\:bg-rc-primary  { background-color: var(--color-rc-primary) !important; }
+[data-theme="retrocool"] .cool\:bg-rc-panel    { background-color: var(--color-rc-panel) !important; }
+[data-theme="retrocool"] .cool\:text-rc-bg     { color: var(--color-rc-bg) !important; }
+[data-theme="retrocool"] .cool\:text-rc-accent { color: var(--color-rc-accent) !important; }
+[data-theme="retrocool"] .cool\:text-rc-primary{ color: var(--color-rc-primary) !important; }
+[data-theme="retrocool"] .cool\:border-rc-primary { border-color: var(--color-rc-primary) !important; }
+[data-theme="retrocool"] .cool\:border-rc-border  { border-color: var(--color-rc-border) !important; }
+
+/* ── Phase C/D: VGA color remaps for dark retrocool bg ─── */
+[data-theme="retrocool"] .bg-vga-gray {
+  background-color: #080820;
+}
+
+[data-theme="retrocool"] .bg-vga-black {
+  background-color: #00000f;
+}
+
+/* Blue text is unreadable on dark bg — lift to light-blue */
+[data-theme="retrocool"] .text-vga-blue {
+  color: #5555ff;
+}
+
+/* Gray text — lift to a readable dim purple-white */
+[data-theme="retrocool"] .text-vga-gray {
+  color: var(--color-rc-dim);
+}
+
+/* Global remap: black text is invisible on dark retrocool bg */
+[data-theme="retrocool"] .text-vga-black {
+  color: #aaaaaa;
+}
+
+/* Restore true black on every bright background (both same-element and descendant).
+   Specificity (0,3,0) beats global remap (0,2,0) so these always win. */
+[data-theme="retrocool"] .bg-vga-bright-white .text-vga-black,
+[data-theme="retrocool"] .bg-vga-bright-white.text-vga-black,
+[data-theme="retrocool"] .bg-vga-white .text-vga-black,
+[data-theme="retrocool"] .bg-vga-white.text-vga-black,
+[data-theme="retrocool"] .bg-vga-yellow .text-vga-black,
+[data-theme="retrocool"] .bg-vga-yellow.text-vga-black,
+[data-theme="retrocool"] .bg-vga-light-green .text-vga-black,
+[data-theme="retrocool"] .bg-vga-light-green.text-vga-black,
+[data-theme="retrocool"] .bg-vga-light-cyan .text-vga-black,
+[data-theme="retrocool"] .bg-vga-light-cyan.text-vga-black,
+[data-theme="retrocool"] .bg-vga-light-magenta .text-vga-black,
+[data-theme="retrocool"] .bg-vga-light-magenta.text-vga-black,
+[data-theme="retrocool"] .bg-vga-light-red .text-vga-black,
+[data-theme="retrocool"] .bg-vga-light-red.text-vga-black {
+  color: #000000;
+}
+
+/* Thick blue borders get a glow on section containers */
+[data-theme="retrocool"] .border-2.border-vga-blue,
+[data-theme="retrocool"] .border-4.border-vga-blue {
+  border-color: #5555ff;
+  box-shadow: 0 0 12px rgba(85, 85, 255, 0.3);
+}
+
+/* Thin blue borders just get the lighter color, no glow */
+[data-theme="retrocool"] .border-vga-blue {
+  border-color: #3333cc;
+}
+
+/* Gray borders — remap for event log and match panels */
+[data-theme="retrocool"] .border-vga-gray {
+  border-color: #333366;
+}
+
+[data-theme="retrocool"] .border-2.border-vga-gray {
+  border-color: #3333aa;
+  box-shadow: 0 0 6px rgba(85, 85, 255, 0.15);
+}
+
+/* Cyan and red section borders */
+[data-theme="retrocool"] .border-2.border-vga-cyan,
+[data-theme="retrocool"] .border-4.border-vga-cyan {
+  border-color: #55ffff;
+  box-shadow: 0 0 10px rgba(85, 255, 255, 0.25);
+}
+
+[data-theme="retrocool"] .border-4.border-vga-red {
+  border-color: #ff5555;
+  box-shadow: 0 0 10px rgba(255, 85, 85, 0.25);
+}
+
+/* Magenta — VGA dark magenta (#aa00aa) is near-invisible on black bg */
+[data-theme="retrocool"] .text-vga-magenta {
+  color: #ff55ff;
+}
+
+[data-theme="retrocool"] .border-vga-magenta {
+  border-color: #ff55ff;
+  box-shadow: 0 0 8px rgba(255, 85, 255, 0.25);
+}
+
+/* Champion panel: bg-vga-yellow.vga-panel must stay yellow
+   (vga-panel override would otherwise turn it dark blue) */
+[data-theme="retrocool"] .bg-vga-yellow.vga-panel {
+  background: linear-gradient(160deg, #ffff77 0%, #ffff55 100%);
+}
+
+/* Yellow borders — modal frames, retires panel, champion inner box */
+[data-theme="retrocool"] .border-4.border-vga-yellow,
+[data-theme="retrocool"] .border-2.border-vga-yellow {
+  border-color: #ffff55;
+  box-shadow: 0 0 14px rgba(255, 255, 85, 0.35);
+}
+
+/* EndOfSeason table zebra — give bg-vga-black rows a hint of blue */
+[data-theme="retrocool"] tr.bg-vga-black {
+  background-color: #00001a;
+}

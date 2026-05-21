@@ -1,0 +1,1032 @@
+[
+  {
+    "id": "b45bb7df-f125-4b35-bb7e-ff92c21ad61d",
+    "country": "test",
+    "seasons": [
+      {
+        "year": 2024,
+        "manager": "",
+        "stadiumCapacity": 34000,
+        "ticketPrice": 19,
+        "budget": 90000000,
+        "players": [
+          {
+            "player_id": "90dadace-3961-4389-91dc-ad0f6413abfe",
+            "number": 1
+          },
+          {
+            "player_id": "2f59a1aa-2d74-410e-a358-962a9a1e7b7e",
+            "number": 2
+          },
+          {
+            "player_id": "b6d0dc48-5a0c-49bd-82d2-9f581114ff99",
+            "number": 3
+          },
+          {
+            "player_id": "e3d2e672-90bf-4782-a9c8-ee821ed3469f",
+            "number": 4
+          },
+          {
+            "player_id": "49c5d208-0210-4b42-baa7-f80382ded84a",
+            "number": 5
+          },
+          {
+            "player_id": "02ca4cbe-9880-498e-a88a-d99bc4e2c030",
+            "number": 6
+          },
+          {
+            "player_id": "0cf017d2-8bab-4c89-a6e3-fdba1ef7d27e",
+            "number": 7
+          },
+          {
+            "player_id": "095cd46f-fa63-467a-937b-203c63b24fa1",
+            "number": 8
+          },
+          {
+            "player_id": "230183df-0610-43bc-b3ff-17f0b9fd1624",
+            "number": 9
+          },
+          {
+            "player_id": "25772532-2663-4611-a3b1-5c00d738c682",
+            "number": 10
+          },
+          {
+            "player_id": "e51c3a63-6a94-45b3-a61e-01b2319b6d26",
+            "number": 11
+          },
+          {
+            "player_id": "2ffb3905-177e-4495-8a4e-3b022c34f071",
+            "number": 12
+          },
+          {
+            "player_id": "9df15315-fd66-4f7c-8b56-4ec8f76a01c9",
+            "number": 13
+          },
+          {
+            "player_id": "0c6c35d9-d290-4b12-882f-fb1818721942",
+            "number": 14
+          },
+          {
+            "player_id": "278e9997-c1ad-4223-8a6a-5b9be6b76616",
+            "number": 15
+          },
+          {
+            "player_id": "ed3c9896-e0d9-419f-986c-5e7cd0adc518",
+            "number": 16
+          },
+          {
+            "player_id": "4df69c1a-2b8d-460f-b655-8bd864765ba4",
+            "number": 17
+          },
+          {
+            "player_id": "74cbb9b4-532f-4cf9-8dbb-1b492aa891b1",
+            "number": 18
+          },
+          {
+            "player_id": "7443ca45-d455-4f5e-8891-bf6b8dc6bff1",
+            "number": 19
+          },
+          {
+            "player_id": "6403cdde-4e1b-415c-a8d6-7028ee48dc97",
+            "number": 20
+          },
+          {
+            "player_id": "91e57e18-8c72-49bd-8767-63d24da40428",
+            "number": 21
+          },
+          {
+            "player_id": "1739d88a-9873-4d7b-b51d-fec9366e5cdf",
+            "number": 22
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "d6509181-1939-4d93-a570-cf5c9c671251",
+    "country": "test",
+    "seasons": [
+      {
+        "year": 2024,
+        "manager": "",
+        "stadiumCapacity": 31000,
+        "ticketPrice": 24,
+        "budget": 120000000,
+        "players": [
+          {
+            "player_id": "30c7edb3-574d-4a6e-acbd-cd7287706b77",
+            "number": 1
+          },
+          {
+            "player_id": "30d6efca-cae9-4b62-affe-ae6446ff0add",
+            "number": 2
+          },
+          {
+            "player_id": "9a4517de-50f6-4db7-a781-d8205ece44f3",
+            "number": 3
+          },
+          {
+            "player_id": "78c99b28-0696-42ba-8760-e92c68e7106b",
+            "number": 4
+          },
+          {
+            "player_id": "2860f772-0d07-4306-9281-8191d45d8242",
+            "number": 5
+          },
+          {
+            "player_id": "f39bfe35-8966-4056-8216-80b49cfa8499",
+            "number": 6
+          },
+          {
+            "player_id": "b1745676-e1b5-4dee-a2cb-79770ca2adf5",
+            "number": 7
+          },
+          {
+            "player_id": "81146360-762d-4061-b7fe-044a833c35d2",
+            "number": 8
+          },
+          {
+            "player_id": "6fd9018f-e07b-489a-bf6f-88bb6e0e66a6",
+            "number": 9
+          },
+          {
+            "player_id": "11f2c48e-f254-43d6-b295-9e05b461ff46",
+            "number": 10
+          },
+          {
+            "player_id": "70e59ba1-c500-4ef7-a990-ec8f18e128dd",
+            "number": 11
+          },
+          {
+            "player_id": "aea1abe7-c557-417e-9271-eb2c7f2b27b0",
+            "number": 12
+          },
+          {
+            "player_id": "6e988d4a-1aad-4b1f-9dda-05b8c9ef0c29",
+            "number": 13
+          },
+          {
+            "player_id": "3338b7f9-3b10-4389-9690-81d561b6ffcb",
+            "number": 14
+          },
+          {
+            "player_id": "99685680-b3da-4973-89a3-f1a259a39fdd",
+            "number": 15
+          },
+          {
+            "player_id": "4954fdca-62a6-4cdf-b4d3-d0ca9430da67",
+            "number": 16
+          },
+          {
+            "player_id": "2dfeea1d-4de1-45a1-b26c-1a03f0c96493",
+            "number": 17
+          },
+          {
+            "player_id": "3787c1bf-cd58-4f36-9dee-adfb7906b0e2",
+            "number": 18
+          },
+          {
+            "player_id": "09301954-6cb1-4882-8c46-40907fc7e68f",
+            "number": 19
+          },
+          {
+            "player_id": "aba9cf7c-6a28-4d78-9957-0b6f674e65be",
+            "number": 20
+          },
+          {
+            "player_id": "1cd7447c-74c3-4071-8245-5856351f7438",
+            "number": 21
+          },
+          {
+            "player_id": "3b594c06-4341-4dd9-9201-5b3335d3ebdb",
+            "number": 22
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "3d3b157a-fb4e-4e9e-935c-1b244fa38b62",
+    "country": "test",
+    "seasons": [
+      {
+        "year": 2024,
+        "manager": "",
+        "stadiumCapacity": 33000,
+        "ticketPrice": 15,
+        "budget": 80000000,
+        "players": [
+          {
+            "player_id": "350ccafd-125b-4e7c-842a-d4092910c900",
+            "number": 1
+          },
+          {
+            "player_id": "d731f60c-130b-49aa-95cb-0ddcd8a6a549",
+            "number": 2
+          },
+          {
+            "player_id": "a5b79710-2b13-4e30-a113-b5746217d272",
+            "number": 3
+          },
+          {
+            "player_id": "a18a092c-895f-4450-945c-320d26a3c407",
+            "number": 4
+          },
+          {
+            "player_id": "f2280c27-e390-444b-b631-63539b80c489",
+            "number": 5
+          },
+          {
+            "player_id": "1f521259-09db-4151-8969-a5a439907e6c",
+            "number": 6
+          },
+          {
+            "player_id": "35cc6914-815f-4bc8-8cf1-9d122378dbe4",
+            "number": 7
+          },
+          {
+            "player_id": "47c56cc8-d0d8-4c75-a510-ab6a2b9a788f",
+            "number": 8
+          },
+          {
+            "player_id": "cb458d33-a18c-4657-b55e-de11668d1af6",
+            "number": 9
+          },
+          {
+            "player_id": "dcdb60b9-750f-409b-88cd-6f5543c4bdb7",
+            "number": 10
+          },
+          {
+            "player_id": "6219a9f1-7436-48a1-bdb8-834b0f891aaf",
+            "number": 11
+          },
+          {
+            "player_id": "64a9198b-0804-4add-8ace-49f8bc4379b0",
+            "number": 12
+          },
+          {
+            "player_id": "e0ac1005-cb0e-4d86-a1d6-29855a6a82bb",
+            "number": 13
+          },
+          {
+            "player_id": "79aa729d-7fa1-4ac4-a59c-6f6d558be6b3",
+            "number": 14
+          },
+          {
+            "player_id": "78b1050f-f6b1-4af8-9a46-84cb6bc1feeb",
+            "number": 15
+          },
+          {
+            "player_id": "3934bce0-456c-4b27-af8c-b7a3dcb8b0bd",
+            "number": 16
+          },
+          {
+            "player_id": "83ffa918-c542-4835-aca9-dcd527c3b27e",
+            "number": 17
+          },
+          {
+            "player_id": "24bdc70f-e9a1-4002-a561-f6a018ab1bb2",
+            "number": 18
+          },
+          {
+            "player_id": "1ba692e9-da6a-45b2-a014-810ed51170f4",
+            "number": 19
+          },
+          {
+            "player_id": "bf37b35b-5066-4c55-b266-829add78a41a",
+            "number": 20
+          },
+          {
+            "player_id": "4231cfd1-328a-4f32-9db3-cb8618ff2c23",
+            "number": 21
+          },
+          {
+            "player_id": "eae4290e-0c07-4682-834e-7fd09ebb5d9b",
+            "number": 22
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "707f570d-ba46-42eb-a6f9-7b2fafc69e3f",
+    "country": "test",
+    "seasons": [
+      {
+        "year": 2024,
+        "manager": "",
+        "stadiumCapacity": 40000,
+        "ticketPrice": 19,
+        "budget": 130000000,
+        "players": [
+          {
+            "player_id": "2f1d16cf-64ce-4e2d-ad1e-2362c6bd64b8",
+            "number": 1
+          },
+          {
+            "player_id": "8bfda6c2-72a8-41c3-80de-89a5f0b30581",
+            "number": 2
+          },
+          {
+            "player_id": "0c75a3f1-7f25-48ac-a5fa-8b4959891f6d",
+            "number": 3
+          },
+          {
+            "player_id": "8c416d2d-fbab-4762-a5fd-2bc20829bc0d",
+            "number": 4
+          },
+          {
+            "player_id": "23a8ad8e-3102-47b0-8f3f-2d3c8baf31b1",
+            "number": 5
+          },
+          {
+            "player_id": "412d2dc2-e2f9-49ad-85b2-93d3cb15adaf",
+            "number": 6
+          },
+          {
+            "player_id": "13b29f8b-5122-4df8-9f02-575b208dbd82",
+            "number": 7
+          },
+          {
+            "player_id": "f20afd73-1e0f-44ab-940a-93b039dae114",
+            "number": 8
+          },
+          {
+            "player_id": "178cb2c5-74a7-417e-84ab-f31c85a11a81",
+            "number": 9
+          },
+          {
+            "player_id": "fb2a68ea-6996-46e8-a514-eb8f2638ff96",
+            "number": 10
+          },
+          {
+            "player_id": "d17c3ad2-65d7-4d77-a29b-66f21c39a9c0",
+            "number": 11
+          },
+          {
+            "player_id": "59a6ff92-2ac5-476e-934a-f37ab3c9badb",
+            "number": 12
+          },
+          {
+            "player_id": "85034943-ba87-4741-8084-91ecf5abc739",
+            "number": 13
+          },
+          {
+            "player_id": "03533f87-7e62-44a1-aeb3-d17f28561936",
+            "number": 14
+          },
+          {
+            "player_id": "fe6fabbb-61f2-45a7-a893-431bc649301f",
+            "number": 15
+          },
+          {
+            "player_id": "52fc00c4-509f-4fe5-b6b1-004a1f0fafc5",
+            "number": 16
+          },
+          {
+            "player_id": "7674ba07-3170-4cb0-a232-a2087d5e1cab",
+            "number": 17
+          },
+          {
+            "player_id": "8c2293f9-9bc7-4cbb-8af8-acc8257a231f",
+            "number": 18
+          },
+          {
+            "player_id": "44828144-8a73-4d88-b292-22bb7588efab",
+            "number": 19
+          },
+          {
+            "player_id": "7cfa6a12-557d-45b6-95f6-5799c56ea5c8",
+            "number": 20
+          },
+          {
+            "player_id": "bb29c92f-ee03-40f2-bc86-e1954a13933f",
+            "number": 21
+          },
+          {
+            "player_id": "9e3fda1c-b889-4395-b087-07c7d027dc9b",
+            "number": 22
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "38982f9a-4483-463a-8e75-27823b0457ad",
+    "country": "test",
+    "seasons": [
+      {
+        "year": 2024,
+        "manager": "",
+        "stadiumCapacity": 37000,
+        "ticketPrice": 19,
+        "budget": 90000000,
+        "players": [
+          {
+            "player_id": "6d2fe9a0-2a28-4271-b97b-28839fc48f6b",
+            "number": 1
+          },
+          {
+            "player_id": "0d0e73c2-5898-484f-98f9-698f7741342b",
+            "number": 2
+          },
+          {
+            "player_id": "c90b8d9c-6c27-415d-97b6-c1651810a647",
+            "number": 3
+          },
+          {
+            "player_id": "728ae28e-657c-401a-a07f-db09dfe59c16",
+            "number": 4
+          },
+          {
+            "player_id": "a6c5b7bd-fe8d-44e5-b559-476f26e64de5",
+            "number": 5
+          },
+          {
+            "player_id": "06df142b-f01b-42c5-bf5f-d9c7006e227c",
+            "number": 6
+          },
+          {
+            "player_id": "83a06f69-215d-4b1c-b5fc-29d447c79f59",
+            "number": 7
+          },
+          {
+            "player_id": "2a39e5e7-c221-4bc3-a1f1-a420314ae668",
+            "number": 8
+          },
+          {
+            "player_id": "f7498390-e79b-4270-92c8-01333f2504a9",
+            "number": 9
+          },
+          {
+            "player_id": "e3365376-018d-4c4d-8c6e-490194493256",
+            "number": 10
+          },
+          {
+            "player_id": "d6a5d524-d3a7-44cf-a39d-a2c4357bf47f",
+            "number": 11
+          },
+          {
+            "player_id": "4db9c3f0-8353-4fcd-8e42-8c79065a4f34",
+            "number": 12
+          },
+          {
+            "player_id": "a98c39ba-aad4-4e35-9b6f-165d76f3b7e0",
+            "number": 13
+          },
+          {
+            "player_id": "862ec147-1ef1-4c7a-8938-0b3dd9345d64",
+            "number": 14
+          },
+          {
+            "player_id": "ee98eed8-888b-4f0f-ad79-96f442b30d8f",
+            "number": 15
+          },
+          {
+            "player_id": "c448bc69-544b-49dc-aca3-bfe7c01d0e81",
+            "number": 16
+          },
+          {
+            "player_id": "35429967-74f6-47dd-8eb9-edbc2cb774aa",
+            "number": 17
+          },
+          {
+            "player_id": "807abe57-a1fb-4c82-a6f5-1364c49da484",
+            "number": 18
+          },
+          {
+            "player_id": "a1d1d88f-f979-461d-b824-d14f8d52cddf",
+            "number": 19
+          },
+          {
+            "player_id": "64981be4-3eb7-4184-a887-3cecb47464f3",
+            "number": 20
+          },
+          {
+            "player_id": "e8ff0a3d-09bd-4ae2-a867-eb2769a5eea6",
+            "number": 21
+          },
+          {
+            "player_id": "b5578c04-6879-4cc2-bd83-f1581bd75c30",
+            "number": 22
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "5d6d9a23-6037-441b-8282-a063df511207",
+    "country": "test",
+    "seasons": [
+      {
+        "year": 2024,
+        "manager": "",
+        "stadiumCapacity": 45000,
+        "ticketPrice": 24,
+        "budget": 110000000,
+        "players": [
+          {
+            "player_id": "be2c90af-77a6-481a-b35b-4e3eb71e1a84",
+            "number": 1
+          },
+          {
+            "player_id": "de28e212-c9f6-4020-8a3a-74e62dc378ac",
+            "number": 2
+          },
+          {
+            "player_id": "4515febe-655d-4325-a992-556dbb1daf2b",
+            "number": 3
+          },
+          {
+            "player_id": "8e20dd3e-6774-43a0-8e04-af9e39fa0c80",
+            "number": 4
+          },
+          {
+            "player_id": "3bc9daef-ef10-447b-bbab-59b4cafef1fb",
+            "number": 5
+          },
+          {
+            "player_id": "3a03f5e4-6896-4cb7-b58c-3cc679aa7d7a",
+            "number": 6
+          },
+          {
+            "player_id": "48dc3648-ae2e-467b-9ce3-c8d06bf344cb",
+            "number": 7
+          },
+          {
+            "player_id": "a9401e46-5e44-4209-bce2-abed50ccce42",
+            "number": 8
+          },
+          {
+            "player_id": "1ee3d510-202b-41ff-855b-e736a731bf46",
+            "number": 9
+          },
+          {
+            "player_id": "48e54991-e509-4a10-a680-f5a44bc1a114",
+            "number": 10
+          },
+          {
+            "player_id": "20d591b0-d437-411c-80f0-d0f1601b679d",
+            "number": 11
+          },
+          {
+            "player_id": "a2502d25-532b-49cc-bc80-0f3417199d79",
+            "number": 12
+          },
+          {
+            "player_id": "f9986be3-2ae8-485c-9b21-443cd60e0f60",
+            "number": 13
+          },
+          {
+            "player_id": "fe13a7c3-df5e-4e1d-850e-94e3d5b267d0",
+            "number": 14
+          },
+          {
+            "player_id": "0cde01c2-77c4-41a2-bd1a-db9be2da874f",
+            "number": 15
+          },
+          {
+            "player_id": "bb8f9710-253f-4113-9746-b83b8ea0746e",
+            "number": 16
+          },
+          {
+            "player_id": "3accdcbe-974e-4877-9345-ad03cf1b02d4",
+            "number": 17
+          },
+          {
+            "player_id": "628838ea-dcb0-4c4f-aea2-cd5e859ae8ce",
+            "number": 18
+          },
+          {
+            "player_id": "24675d2e-40fc-458c-aa4a-47dec9dc80a8",
+            "number": 19
+          },
+          {
+            "player_id": "065ea89e-65ad-4fc4-9c4e-0454dc97c895",
+            "number": 20
+          },
+          {
+            "player_id": "8dbca6b1-1633-47f1-81d7-74ae0659bd1b",
+            "number": 21
+          },
+          {
+            "player_id": "9faebb4e-9325-4818-a0fb-20b4de218dbe",
+            "number": 22
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "cc9c865d-2b60-4aa3-8506-9e7c3ca3857b",
+    "country": "test",
+    "seasons": [
+      {
+        "year": 2024,
+        "manager": "",
+        "stadiumCapacity": 49000,
+        "ticketPrice": 16,
+        "budget": 50000000,
+        "players": [
+          {
+            "player_id": "40feefe4-925f-4e20-a3f2-02cc372fb62b",
+            "number": 1
+          },
+          {
+            "player_id": "bfc7a590-9d28-4ebb-9c5b-8639dd8fe486",
+            "number": 2
+          },
+          {
+            "player_id": "4039a996-8e1c-47ca-a410-def83fc6ad89",
+            "number": 3
+          },
+          {
+            "player_id": "08f5d146-ef0d-49a2-9b34-72711ae572d8",
+            "number": 4
+          },
+          {
+            "player_id": "24f44ac0-5d23-48d9-9744-958bd55d2f86",
+            "number": 5
+          },
+          {
+            "player_id": "05e5f356-635b-4139-bfd4-dda93d0b3844",
+            "number": 6
+          },
+          {
+            "player_id": "10acc3c7-f5f8-4719-9586-9a1db8093ef3",
+            "number": 7
+          },
+          {
+            "player_id": "a6b2562f-2c63-478b-8a9f-57b8dc22c010",
+            "number": 8
+          },
+          {
+            "player_id": "a61a4d8b-a387-4029-8e52-9ddf45b717ff",
+            "number": 9
+          },
+          {
+            "player_id": "d35de116-56c4-4a76-a881-8c8105f8e0cd",
+            "number": 10
+          },
+          {
+            "player_id": "12e8bca7-e122-470a-9f12-b5446c688a60",
+            "number": 11
+          },
+          {
+            "player_id": "cfb98a7c-a01e-4a22-84e7-7fac12d392cd",
+            "number": 12
+          },
+          {
+            "player_id": "69d1971d-fd01-4ff7-b926-d50bde945bfb",
+            "number": 13
+          },
+          {
+            "player_id": "781e5e32-6d90-4d6a-9c69-82f106dee64d",
+            "number": 14
+          },
+          {
+            "player_id": "fb4da9df-2326-48e5-b391-81f58ce55c06",
+            "number": 15
+          },
+          {
+            "player_id": "43becfb0-3d63-4354-a509-dde4e271cc69",
+            "number": 16
+          },
+          {
+            "player_id": "5047d1fb-efac-4949-bece-68d6e892399f",
+            "number": 17
+          },
+          {
+            "player_id": "5fae813f-8815-4ec1-a993-a9cef39d5063",
+            "number": 18
+          },
+          {
+            "player_id": "d292978a-462a-4e73-8654-90a9e6558995",
+            "number": 19
+          },
+          {
+            "player_id": "fadd7a03-1a74-4b0e-b7d6-b4dd4488aac3",
+            "number": 20
+          },
+          {
+            "player_id": "df0dd68a-049c-48d7-8ced-d9c0df5f8116",
+            "number": 21
+          },
+          {
+            "player_id": "1995d678-d96f-4505-8ac7-0d9cff15b350",
+            "number": 22
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "c3c4d1ef-44c3-40f9-83be-e5cc0a7c1210",
+    "country": "test",
+    "seasons": [
+      {
+        "year": 2024,
+        "manager": "",
+        "stadiumCapacity": 46000,
+        "ticketPrice": 15,
+        "budget": 60000000,
+        "players": [
+          {
+            "player_id": "0cce15cf-9126-400f-a6ec-873c78b18b70",
+            "number": 1
+          },
+          {
+            "player_id": "6358d615-0366-4a45-9e42-952f15b51da3",
+            "number": 2
+          },
+          {
+            "player_id": "c50c5b50-8f28-4653-b286-1a7b6b657781",
+            "number": 3
+          },
+          {
+            "player_id": "84d43d1e-4cfe-4d51-b3d5-8a196409532d",
+            "number": 4
+          },
+          {
+            "player_id": "40b280d0-659c-48b4-a44e-8d686206fe97",
+            "number": 5
+          },
+          {
+            "player_id": "cc151842-0dd3-4a54-a954-1fca03d9ed79",
+            "number": 6
+          },
+          {
+            "player_id": "09bc89ea-de00-4bbe-856c-e480d9cd0a1c",
+            "number": 7
+          },
+          {
+            "player_id": "c0ae3a41-a0b3-4353-886a-14335fc16aa9",
+            "number": 8
+          },
+          {
+            "player_id": "536518d5-9f78-4c1f-991a-9300ab5db6f3",
+            "number": 9
+          },
+          {
+            "player_id": "7e5e70e8-48aa-4f5a-8142-dc3bac8dafc7",
+            "number": 10
+          },
+          {
+            "player_id": "36b7411e-a1ba-4ce3-86f5-a8c8420ae53c",
+            "number": 11
+          },
+          {
+            "player_id": "dd319626-275a-4818-a318-10329a9c5559",
+            "number": 12
+          },
+          {
+            "player_id": "727c3196-dc16-453a-9f38-c4c69cb161da",
+            "number": 13
+          },
+          {
+            "player_id": "e4be2c21-cb54-4790-b743-40dddeecbd41",
+            "number": 14
+          },
+          {
+            "player_id": "124456ee-d466-4c67-bdee-53e7afd4e5d0",
+            "number": 15
+          },
+          {
+            "player_id": "bbda0d40-1272-4639-aa4b-c707dd2a6ed9",
+            "number": 16
+          },
+          {
+            "player_id": "20f3d33e-3ca4-4c2a-a3e8-e0704078d142",
+            "number": 17
+          },
+          {
+            "player_id": "dc8b31d1-29f4-48e0-8481-439cb4dbe64b",
+            "number": 18
+          },
+          {
+            "player_id": "1d5b55e9-1380-4e77-b3a6-1852eb88266f",
+            "number": 19
+          },
+          {
+            "player_id": "11371d00-8769-47be-858c-b20ca5c80ba4",
+            "number": 20
+          },
+          {
+            "player_id": "f69319fb-70a5-447a-8df0-7969e5e85780",
+            "number": 21
+          },
+          {
+            "player_id": "72eb34d0-e5a9-4167-a604-e54a7921442a",
+            "number": 22
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "8d182e00-cff4-4ae7-b4d5-9afd147599bd",
+    "country": "test",
+    "seasons": [
+      {
+        "year": 2024,
+        "manager": "",
+        "stadiumCapacity": 42000,
+        "ticketPrice": 17,
+        "budget": 60000000,
+        "players": [
+          {
+            "player_id": "c34e0c72-2840-4994-9807-5156fdf84456",
+            "number": 1
+          },
+          {
+            "player_id": "28d254c4-ed34-435f-bc1a-75a9e1fc0c03",
+            "number": 2
+          },
+          {
+            "player_id": "a1ebe9cd-620d-4d62-8961-bf2d00f7e453",
+            "number": 3
+          },
+          {
+            "player_id": "c04b001f-7c01-47b7-a840-ab9d00cfeb8e",
+            "number": 4
+          },
+          {
+            "player_id": "9801ac44-d7db-4982-8351-ffecc7313d2e",
+            "number": 5
+          },
+          {
+            "player_id": "4891e80a-7341-4979-b092-320e96d1a5c6",
+            "number": 6
+          },
+          {
+            "player_id": "c0126616-b37c-4614-b5f1-70b8ea06c9f7",
+            "number": 7
+          },
+          {
+            "player_id": "4ba7d3cb-b954-420d-a328-47423fe8515f",
+            "number": 8
+          },
+          {
+            "player_id": "65a5d4e9-eb84-43ce-81a9-4aef85b36df6",
+            "number": 9
+          },
+          {
+            "player_id": "53f8128a-ce28-4c17-a08b-b49200a25015",
+            "number": 10
+          },
+          {
+            "player_id": "8a09f76f-eb85-4bec-bf8e-cd0e00bfc1f6",
+            "number": 11
+          },
+          {
+            "player_id": "dfbf7f29-e880-49fa-8f37-e95e326a82c4",
+            "number": 12
+          },
+          {
+            "player_id": "b97c4882-136d-4f5d-bc28-d27c68d27230",
+            "number": 13
+          },
+          {
+            "player_id": "a9b2cfb5-1076-4f15-a0fb-00e8178bf58e",
+            "number": 14
+          },
+          {
+            "player_id": "4d9ced2a-c2fe-4357-baec-b406a4bcd32f",
+            "number": 15
+          },
+          {
+            "player_id": "1eea43c0-149a-4297-a66d-ead4602eaa37",
+            "number": 16
+          },
+          {
+            "player_id": "9c52557e-f8ea-4599-8cc4-24f483aeeb41",
+            "number": 17
+          },
+          {
+            "player_id": "8030fccf-ac55-4819-b331-874bb1964301",
+            "number": 18
+          },
+          {
+            "player_id": "3b1931da-d1f2-4c6e-b7e8-b3de2c6ecc0b",
+            "number": 19
+          },
+          {
+            "player_id": "2125bf20-457e-419c-a296-7f61b28b0ad1",
+            "number": 20
+          },
+          {
+            "player_id": "77511ad4-61cc-4108-a7b5-e4794139ace6",
+            "number": 21
+          },
+          {
+            "player_id": "1745083e-4e0d-4da8-ad6a-333aab9259b1",
+            "number": 22
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "690bb6c5-ae38-4e2f-83e6-0f39c1a5d299",
+    "country": "test",
+    "seasons": [
+      {
+        "year": 2024,
+        "manager": "",
+        "stadiumCapacity": 49000,
+        "ticketPrice": 20,
+        "budget": 100000000,
+        "players": [
+          {
+            "player_id": "9b41f3a2-2351-4e12-a245-5d9e24f2033a",
+            "number": 1
+          },
+          {
+            "player_id": "f7664c50-6291-467d-910b-dbbe39f42d30",
+            "number": 2
+          },
+          {
+            "player_id": "e57c3ab0-4c63-43d2-a998-f72a1bad4b82",
+            "number": 3
+          },
+          {
+            "player_id": "dddfcfe3-d702-45d1-a651-4a880511a8df",
+            "number": 4
+          },
+          {
+            "player_id": "10d1ea89-e77a-4bc8-9270-ef7ed29d0bb2",
+            "number": 5
+          },
+          {
+            "player_id": "5baf4ecc-7de9-4bcc-895d-b8dd9ebdc678",
+            "number": 6
+          },
+          {
+            "player_id": "38338bcd-b718-42e2-8be5-85792f949b60",
+            "number": 7
+          },
+          {
+            "player_id": "3b4d13c6-e60a-4435-aae0-9f979455ed51",
+            "number": 8
+          },
+          {
+            "player_id": "d96e5574-d1d3-475f-8621-dcd08d137148",
+            "number": 9
+          },
+          {
+            "player_id": "5d8fe9b8-b701-495c-b3a7-1684ab5064ea",
+            "number": 10
+          },
+          {
+            "player_id": "f7347e3c-f426-4dfe-aa29-ec3f56e41570",
+            "number": 11
+          },
+          {
+            "player_id": "3d071bd6-b2f0-48d1-91de-fe89bfc31485",
+            "number": 12
+          },
+          {
+            "player_id": "ae100aab-7ff0-4b85-abe8-5eb6732ba368",
+            "number": 13
+          },
+          {
+            "player_id": "68c644f0-3729-4fa0-be6e-7f2f6ccdd50d",
+            "number": 14
+          },
+          {
+            "player_id": "8ace6841-a006-401c-a0c8-e4e19bf68cf7",
+            "number": 15
+          },
+          {
+            "player_id": "3e85409d-ab38-4aa2-96b5-c4218e7b6e7f",
+            "number": 16
+          },
+          {
+            "player_id": "d635717e-6970-4945-b24c-6d558238c2aa",
+            "number": 17
+          },
+          {
+            "player_id": "8e00295b-7942-468c-becc-9d1ae6ce848d",
+            "number": 18
+          },
+          {
+            "player_id": "d179ec9c-6f85-4bbe-ac24-4fdfa0961240",
+            "number": 19
+          },
+          {
+            "player_id": "449da6d5-0ccc-4d3f-bed1-48355d11a574",
+            "number": 20
+          },
+          {
+            "player_id": "6907461a-e107-45d1-8db4-165e4ef14ae1",
+            "number": 21
+          },
+          {
+            "player_id": "679354d3-7885-4cef-a556-5653154a1354",
+            "number": 22
+          }
+        ]
+      }
+    ]
+  }
+]
