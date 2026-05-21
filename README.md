@@ -1,6 +1,8 @@
 # OpenFutbol
 
-Open-source retro football management game inspired by PC Fútbol (1990s). 
+Open-source retro football management game inspired by PC Fútbol (1990s).
+
+Game is live at: https://x1010x.github.io/openfutbol-public/
 
 ## Features
 
