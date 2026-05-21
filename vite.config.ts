@@ -15,7 +15,7 @@ writeFileSync(resolve('./public/version.json'), JSON.stringify({ ts: buildTimest
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: '/',
+  base: './',
   define: {
     __BUILD_TIMESTAMP__: JSON.stringify(buildTimestamp),
   },

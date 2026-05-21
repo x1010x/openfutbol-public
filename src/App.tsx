@@ -169,7 +169,7 @@ function App() {
   useEffect(() => {
     const check = async () => {
       try {
-        const res = await fetch('/version.json?t=' + Date.now());
+        const res = await fetch('version.json?t=' + Date.now());
         const data = await res.json();
         if (String(data.ts) !== __BUILD_TIMESTAMP__) setUpdateAvailable(true);
       } catch {}
