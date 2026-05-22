@@ -6,13 +6,13 @@
     "preferred_pos": "POR",
     "positions": {
       "POR": {
-        "speed": 82,
-        "dribbling": 78,
-        "passing": 67,
-        "shooting": 69,
+        "speed": 67,
+        "dribbling": 48,
+        "passing": 59,
+        "shooting": 40,
         "defending": 69,
-        "physical": 63,
-        "goalkeeping": 83
+        "physical": 78,
+        "goalkeeping": 85
       }
     }
   },
@@ -23,13 +23,13 @@
     "preferred_pos": "POR",
     "positions": {
       "POR": {
-        "speed": 68,
-        "dribbling": 63,
-        "passing": 60,
-        "shooting": 65,
-        "defending": 77,
-        "physical": 83,
-        "goalkeeping": 83
+        "speed": 58,
+        "dribbling": 45,
+        "passing": 46,
+        "shooting": 34,
+        "defending": 68,
+        "physical": 75,
+        "goalkeeping": 84
       }
     }
   },
@@ -40,13 +40,13 @@
     "preferred_pos": "POR",
     "positions": {
       "POR": {
-        "speed": 63,
-        "dribbling": 60,
-        "passing": 63,
-        "shooting": 64,
-        "defending": 61,
-        "physical": 70,
-        "goalkeeping": 95
+        "speed": 61,
+        "dribbling": 49,
+        "passing": 56,
+        "shooting": 40,
+        "defending": 67,
+        "physical": 78,
+        "goalkeeping": 86
       }
     }
   },
@@ -57,13 +57,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 87,
-        "dribbling": 64,
-        "passing": 70,
-        "shooting": 77,
-        "defending": 60,
+        "speed": 81,
+        "dribbling": 59,
+        "passing": 72,
+        "shooting": 55,
+        "defending": 90,
         "physical": 87,
-        "goalkeeping": 11
+        "goalkeeping": 12
       }
     }
   },
@@ -74,12 +74,12 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 90,
-        "dribbling": 85,
+        "speed": 69,
+        "dribbling": 62,
         "passing": 66,
-        "shooting": 66,
-        "defending": 77,
-        "physical": 67,
+        "shooting": 47,
+        "defending": 83,
+        "physical": 76,
         "goalkeeping": 9
       }
     }
@@ -91,13 +91,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 75,
-        "dribbling": 79,
-        "passing": 66,
-        "shooting": 83,
-        "defending": 68,
-        "physical": 73,
-        "goalkeeping": 8
+        "speed": 77,
+        "dribbling": 57,
+        "passing": 72,
+        "shooting": 51,
+        "defending": 84,
+        "physical": 78,
+        "goalkeeping": 10
       }
     }
   },
@@ -108,13 +108,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 64,
-        "dribbling": 85,
-        "passing": 61,
-        "shooting": 79,
-        "defending": 63,
-        "physical": 84,
-        "goalkeeping": 9
+        "speed": 75,
+        "dribbling": 59,
+        "passing": 67,
+        "shooting": 51,
+        "defending": 85,
+        "physical": 83,
+        "goalkeeping": 8
       }
     }
   },
@@ -125,13 +125,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 70,
-        "dribbling": 60,
+        "speed": 68,
+        "dribbling": 53,
         "passing": 65,
-        "shooting": 70,
-        "defending": 70,
+        "shooting": 41,
+        "defending": 78,
         "physical": 73,
-        "goalkeeping": 14
+        "goalkeeping": 7
       }
     }
   },
@@ -142,13 +142,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 61,
-        "dribbling": 67,
-        "passing": 62,
-        "shooting": 63,
-        "defending": 74,
-        "physical": 77,
-        "goalkeeping": 12
+        "speed": 78,
+        "dribbling": 59,
+        "passing": 77,
+        "shooting": 58,
+        "defending": 84,
+        "physical": 86,
+        "goalkeeping": 11
       }
     }
   },
@@ -159,13 +159,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 60,
-        "dribbling": 71,
-        "passing": 69,
-        "shooting": 85,
-        "defending": 84,
-        "physical": 62,
-        "goalkeeping": 7
+        "speed": 72,
+        "dribbling": 73,
+        "passing": 84,
+        "shooting": 60,
+        "defending": 64,
+        "physical": 67,
+        "goalkeeping": 8
       }
     }
   },
@@ -176,12 +176,12 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 74,
-        "dribbling": 77,
-        "passing": 86,
-        "shooting": 79,
-        "defending": 89,
-        "physical": 76,
+        "speed": 77,
+        "dribbling": 88,
+        "passing": 88,
+        "shooting": 66,
+        "defending": 74,
+        "physical": 72,
         "goalkeeping": 11
       }
     }
@@ -193,13 +193,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 70,
-        "dribbling": 77,
-        "passing": 78,
-        "shooting": 60,
-        "defending": 71,
-        "physical": 65,
-        "goalkeeping": 11
+        "speed": 72,
+        "dribbling": 85,
+        "passing": 87,
+        "shooting": 65,
+        "defending": 72,
+        "physical": 70,
+        "goalkeeping": 9
       }
     }
   },
@@ -210,13 +210,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 89,
-        "dribbling": 69,
-        "passing": 86,
-        "shooting": 65,
-        "defending": 69,
-        "physical": 81,
-        "goalkeeping": 6
+        "speed": 77,
+        "dribbling": 82,
+        "passing": 83,
+        "shooting": 64,
+        "defending": 66,
+        "physical": 67,
+        "goalkeeping": 10
       }
     }
   },
@@ -227,13 +227,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 75,
-        "dribbling": 85,
-        "passing": 90,
+        "speed": 82,
+        "dribbling": 78,
+        "passing": 86,
         "shooting": 69,
-        "defending": 70,
-        "physical": 79,
-        "goalkeeping": 6
+        "defending": 71,
+        "physical": 69,
+        "goalkeeping": 10
       }
     }
   },
@@ -244,13 +244,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 85,
-        "dribbling": 71,
-        "passing": 61,
-        "shooting": 71,
-        "defending": 65,
-        "physical": 81,
-        "goalkeeping": 6
+        "speed": 82,
+        "dribbling": 87,
+        "passing": 91,
+        "shooting": 72,
+        "defending": 78,
+        "physical": 71,
+        "goalkeeping": 12
       }
     }
   },
@@ -261,13 +261,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 65,
-        "dribbling": 71,
-        "passing": 66,
-        "shooting": 64,
-        "defending": 85,
-        "physical": 66,
-        "goalkeeping": 11
+        "speed": 84,
+        "dribbling": 83,
+        "passing": 56,
+        "shooting": 83,
+        "defending": 47,
+        "physical": 65,
+        "goalkeeping": 9
       }
     }
   },
@@ -278,13 +278,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 78,
-        "dribbling": 62,
-        "passing": 82,
-        "shooting": 64,
-        "defending": 85,
-        "physical": 63,
-        "goalkeeping": 13
+        "speed": 91,
+        "dribbling": 88,
+        "passing": 74,
+        "shooting": 92,
+        "defending": 56,
+        "physical": 78,
+        "goalkeeping": 14
       }
     }
   },
@@ -295,13 +295,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 80,
-        "dribbling": 64,
-        "passing": 89,
-        "shooting": 64,
-        "defending": 65,
-        "physical": 76,
-        "goalkeeping": 13
+        "speed": 82,
+        "dribbling": 74,
+        "passing": 54,
+        "shooting": 77,
+        "defending": 41,
+        "physical": 56,
+        "goalkeeping": 7
       }
     }
   },
@@ -312,13 +312,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 82,
-        "dribbling": 74,
-        "passing": 65,
-        "shooting": 76,
-        "defending": 74,
-        "physical": 61,
-        "goalkeeping": 13
+        "speed": 80,
+        "dribbling": 82,
+        "passing": 61,
+        "shooting": 85,
+        "defending": 45,
+        "physical": 65,
+        "goalkeeping": 10
       }
     }
   },
@@ -329,13 +329,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 79,
-        "dribbling": 85,
-        "passing": 71,
-        "shooting": 82,
-        "defending": 69,
-        "physical": 81,
-        "goalkeeping": 13
+        "speed": 87,
+        "dribbling": 75,
+        "passing": 63,
+        "shooting": 87,
+        "defending": 42,
+        "physical": 65,
+        "goalkeeping": 8
       }
     }
   },
@@ -346,13 +346,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 76,
-        "dribbling": 65,
-        "passing": 67,
-        "shooting": 65,
-        "defending": 62,
-        "physical": 90,
-        "goalkeeping": 5
+        "speed": 86,
+        "dribbling": 81,
+        "passing": 66,
+        "shooting": 87,
+        "defending": 50,
+        "physical": 70,
+        "goalkeeping": 9
       }
     }
   },
@@ -363,12 +363,12 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 82,
-        "dribbling": 87,
-        "passing": 85,
-        "shooting": 83,
-        "defending": 66,
-        "physical": 67,
+        "speed": 86,
+        "dribbling": 83,
+        "passing": 62,
+        "shooting": 85,
+        "defending": 50,
+        "physical": 69,
         "goalkeeping": 11
       }
     }
@@ -380,13 +380,13 @@
     "preferred_pos": "POR",
     "positions": {
       "POR": {
-        "speed": 70,
-        "dribbling": 81,
-        "passing": 74,
-        "shooting": 62,
-        "defending": 60,
-        "physical": 72,
-        "goalkeeping": 94
+        "speed": 67,
+        "dribbling": 52,
+        "passing": 70,
+        "shooting": 47,
+        "defending": 72,
+        "physical": 80,
+        "goalkeeping": 90
       }
     }
   },
@@ -397,13 +397,13 @@
     "preferred_pos": "POR",
     "positions": {
       "POR": {
-        "speed": 68,
-        "dribbling": 73,
-        "passing": 75,
-        "shooting": 75,
-        "defending": 60,
-        "physical": 83,
-        "goalkeeping": 84
+        "speed": 60,
+        "dribbling": 51,
+        "passing": 56,
+        "shooting": 37,
+        "defending": 70,
+        "physical": 73,
+        "goalkeeping": 89
       }
     }
   },
@@ -414,13 +414,13 @@
     "preferred_pos": "POR",
     "positions": {
       "POR": {
-        "speed": 85,
-        "dribbling": 89,
-        "passing": 79,
-        "shooting": 79,
-        "defending": 82,
-        "physical": 72,
-        "goalkeeping": 86
+        "speed": 61,
+        "dribbling": 43,
+        "passing": 57,
+        "shooting": 35,
+        "defending": 59,
+        "physical": 78,
+        "goalkeeping": 83
       }
     }
   },
@@ -431,13 +431,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 68,
-        "dribbling": 72,
-        "passing": 63,
-        "shooting": 79,
-        "defending": 74,
-        "physical": 68,
-        "goalkeeping": 14
+        "speed": 72,
+        "dribbling": 61,
+        "passing": 70,
+        "shooting": 44,
+        "defending": 86,
+        "physical": 78,
+        "goalkeeping": 10
       }
     }
   },
@@ -448,13 +448,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 81,
-        "dribbling": 68,
-        "passing": 72,
-        "shooting": 74,
-        "defending": 65,
-        "physical": 68,
-        "goalkeeping": 14
+        "speed": 70,
+        "dribbling": 60,
+        "passing": 67,
+        "shooting": 52,
+        "defending": 85,
+        "physical": 77,
+        "goalkeeping": 8
       }
     }
   },
@@ -465,13 +465,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 89,
-        "dribbling": 73,
-        "passing": 78,
-        "shooting": 80,
-        "defending": 63,
-        "physical": 89,
-        "goalkeeping": 13
+        "speed": 70,
+        "dribbling": 60,
+        "passing": 69,
+        "shooting": 53,
+        "defending": 84,
+        "physical": 79,
+        "goalkeeping": 9
       }
     }
   },
@@ -482,12 +482,12 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 71,
-        "dribbling": 74,
-        "passing": 85,
-        "shooting": 80,
-        "defending": 77,
-        "physical": 66,
+        "speed": 75,
+        "dribbling": 64,
+        "passing": 70,
+        "shooting": 55,
+        "defending": 86,
+        "physical": 85,
         "goalkeeping": 13
       }
     }
@@ -499,13 +499,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 65,
+        "speed": 82,
         "dribbling": 63,
-        "passing": 62,
-        "shooting": 82,
-        "defending": 84,
-        "physical": 80,
-        "goalkeeping": 15
+        "passing": 74,
+        "shooting": 53,
+        "defending": 86,
+        "physical": 86,
+        "goalkeeping": 13
       }
     }
   },
@@ -516,13 +516,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 83,
-        "dribbling": 90,
-        "passing": 86,
-        "shooting": 72,
-        "defending": 86,
-        "physical": 81,
-        "goalkeeping": 6
+        "speed": 79,
+        "dribbling": 55,
+        "passing": 67,
+        "shooting": 47,
+        "defending": 82,
+        "physical": 80,
+        "goalkeeping": 9
       }
     }
   },
@@ -533,13 +533,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 81,
-        "dribbling": 81,
+        "speed": 80,
+        "dribbling": 85,
         "passing": 82,
-        "shooting": 84,
-        "defending": 89,
-        "physical": 69,
-        "goalkeeping": 8
+        "shooting": 68,
+        "defending": 78,
+        "physical": 73,
+        "goalkeeping": 11
       }
     }
   },
@@ -550,13 +550,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 90,
-        "dribbling": 81,
-        "passing": 68,
+        "speed": 74,
+        "dribbling": 80,
+        "passing": 84,
         "shooting": 64,
-        "defending": 61,
-        "physical": 68,
-        "goalkeeping": 12
+        "defending": 65,
+        "physical": 70,
+        "goalkeeping": 9
       }
     }
   },
@@ -567,13 +567,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 86,
-        "dribbling": 63,
-        "passing": 84,
-        "shooting": 69,
-        "defending": 84,
-        "physical": 77,
-        "goalkeeping": 6
+        "speed": 69,
+        "dribbling": 81,
+        "passing": 89,
+        "shooting": 63,
+        "defending": 65,
+        "physical": 65,
+        "goalkeeping": 9
       }
     }
   },
@@ -584,12 +584,12 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 65,
-        "dribbling": 67,
-        "passing": 84,
-        "shooting": 79,
-        "defending": 73,
-        "physical": 86,
+        "speed": 66,
+        "dribbling": 71,
+        "passing": 79,
+        "shooting": 52,
+        "defending": 60,
+        "physical": 63,
         "goalkeeping": 5
       }
     }
@@ -601,13 +601,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 69,
-        "dribbling": 89,
-        "passing": 88,
-        "shooting": 68,
-        "defending": 90,
-        "physical": 73,
-        "goalkeeping": 7
+        "speed": 72,
+        "dribbling": 86,
+        "passing": 85,
+        "shooting": 67,
+        "defending": 78,
+        "physical": 74,
+        "goalkeeping": 11
       }
     }
   },
@@ -618,13 +618,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 73,
-        "dribbling": 89,
-        "passing": 62,
-        "shooting": 70,
-        "defending": 76,
-        "physical": 83,
-        "goalkeeping": 6
+        "speed": 64,
+        "dribbling": 74,
+        "passing": 82,
+        "shooting": 55,
+        "defending": 61,
+        "physical": 62,
+        "goalkeeping": 7
       }
     }
   },
@@ -635,13 +635,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 77,
-        "dribbling": 66,
-        "passing": 75,
-        "shooting": 89,
-        "defending": 76,
-        "physical": 75,
-        "goalkeeping": 15
+        "speed": 75,
+        "dribbling": 72,
+        "passing": 58,
+        "shooting": 82,
+        "defending": 42,
+        "physical": 64,
+        "goalkeeping": 7
       }
     }
   },
@@ -652,13 +652,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 69,
-        "dribbling": 64,
+        "speed": 87,
+        "dribbling": 80,
         "passing": 67,
-        "shooting": 70,
-        "defending": 86,
+        "shooting": 83,
+        "defending": 53,
         "physical": 70,
-        "goalkeeping": 9
+        "goalkeeping": 10
       }
     }
   },
@@ -669,13 +669,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 63,
-        "dribbling": 85,
-        "passing": 63,
-        "shooting": 64,
-        "defending": 86,
-        "physical": 88,
-        "goalkeeping": 5
+        "speed": 87,
+        "dribbling": 75,
+        "passing": 61,
+        "shooting": 84,
+        "defending": 52,
+        "physical": 64,
+        "goalkeeping": 10
       }
     }
   },
@@ -686,13 +686,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 68,
-        "dribbling": 76,
-        "passing": 68,
-        "shooting": 84,
-        "defending": 63,
-        "physical": 69,
-        "goalkeeping": 13
+        "speed": 91,
+        "dribbling": 86,
+        "passing": 67,
+        "shooting": 92,
+        "defending": 56,
+        "physical": 74,
+        "goalkeeping": 12
       }
     }
   },
@@ -703,13 +703,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 84,
-        "dribbling": 72,
-        "passing": 69,
-        "shooting": 77,
-        "defending": 67,
-        "physical": 75,
-        "goalkeeping": 9
+        "speed": 75,
+        "dribbling": 75,
+        "passing": 61,
+        "shooting": 83,
+        "defending": 40,
+        "physical": 64,
+        "goalkeeping": 8
       }
     }
   },
@@ -720,13 +720,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 60,
-        "dribbling": 78,
-        "passing": 82,
-        "shooting": 64,
-        "defending": 83,
-        "physical": 88,
-        "goalkeeping": 14
+        "speed": 87,
+        "dribbling": 82,
+        "passing": 66,
+        "shooting": 89,
+        "defending": 57,
+        "physical": 67,
+        "goalkeeping": 9
       }
     }
   },
@@ -737,13 +737,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 71,
-        "dribbling": 80,
-        "passing": 73,
-        "shooting": 64,
-        "defending": 77,
-        "physical": 64,
-        "goalkeeping": 9
+        "speed": 70,
+        "dribbling": 84,
+        "passing": 91,
+        "shooting": 66,
+        "defending": 66,
+        "physical": 70,
+        "goalkeeping": 11
       }
     }
   },
@@ -754,13 +754,13 @@
     "preferred_pos": "POR",
     "positions": {
       "POR": {
-        "speed": 71,
-        "dribbling": 74,
-        "passing": 87,
-        "shooting": 61,
-        "defending": 84,
-        "physical": 65,
-        "goalkeeping": 88
+        "speed": 72,
+        "dribbling": 60,
+        "passing": 64,
+        "shooting": 48,
+        "defending": 80,
+        "physical": 87,
+        "goalkeeping": 94
       }
     }
   },
@@ -771,13 +771,13 @@
     "preferred_pos": "POR",
     "positions": {
       "POR": {
-        "speed": 65,
-        "dribbling": 84,
-        "passing": 74,
-        "shooting": 78,
-        "defending": 86,
-        "physical": 86,
-        "goalkeeping": 80
+        "speed": 57,
+        "dribbling": 43,
+        "passing": 53,
+        "shooting": 32,
+        "defending": 64,
+        "physical": 75,
+        "goalkeeping": 84
       }
     }
   },
@@ -788,13 +788,13 @@
     "preferred_pos": "POR",
     "positions": {
       "POR": {
-        "speed": 70,
-        "dribbling": 76,
-        "passing": 63,
-        "shooting": 75,
-        "defending": 79,
-        "physical": 63,
-        "goalkeeping": 85
+        "speed": 64,
+        "dribbling": 52,
+        "passing": 65,
+        "shooting": 40,
+        "defending": 71,
+        "physical": 78,
+        "goalkeeping": 89
       }
     }
   },
@@ -805,13 +805,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 84,
-        "dribbling": 76,
-        "passing": 81,
-        "shooting": 67,
-        "defending": 64,
-        "physical": 85,
-        "goalkeeping": 9
+        "speed": 81,
+        "dribbling": 63,
+        "passing": 69,
+        "shooting": 53,
+        "defending": 92,
+        "physical": 83,
+        "goalkeeping": 12
       }
     }
   },
@@ -822,13 +822,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 85,
-        "dribbling": 89,
-        "passing": 60,
-        "shooting": 64,
-        "defending": 63,
-        "physical": 78,
-        "goalkeeping": 5
+        "speed": 77,
+        "dribbling": 62,
+        "passing": 75,
+        "shooting": 56,
+        "defending": 90,
+        "physical": 86,
+        "goalkeeping": 13
       }
     }
   },
@@ -839,13 +839,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 82,
-        "dribbling": 68,
-        "passing": 74,
-        "shooting": 61,
-        "defending": 89,
-        "physical": 72,
-        "goalkeeping": 6
+        "speed": 77,
+        "dribbling": 61,
+        "passing": 71,
+        "shooting": 47,
+        "defending": 88,
+        "physical": 82,
+        "goalkeeping": 10
       }
     }
   },
@@ -856,13 +856,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 72,
-        "dribbling": 76,
+        "speed": 83,
+        "dribbling": 61,
         "passing": 82,
-        "shooting": 84,
-        "defending": 64,
-        "physical": 61,
-        "goalkeeping": 7
+        "shooting": 50,
+        "defending": 88,
+        "physical": 85,
+        "goalkeeping": 12
       }
     }
   },
@@ -873,13 +873,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 61,
-        "dribbling": 77,
-        "passing": 70,
-        "shooting": 88,
-        "defending": 67,
-        "physical": 88,
-        "goalkeeping": 15
+        "speed": 75,
+        "dribbling": 60,
+        "passing": 78,
+        "shooting": 52,
+        "defending": 92,
+        "physical": 85,
+        "goalkeeping": 12
       }
     }
   },
@@ -890,13 +890,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 71,
-        "dribbling": 70,
-        "passing": 74,
-        "shooting": 63,
-        "defending": 65,
-        "physical": 63,
-        "goalkeeping": 9
+        "speed": 73,
+        "dribbling": 61,
+        "passing": 72,
+        "shooting": 49,
+        "defending": 89,
+        "physical": 84,
+        "goalkeeping": 10
       }
     }
   },
@@ -907,13 +907,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 83,
+        "speed": 79,
         "dribbling": 89,
-        "passing": 71,
-        "shooting": 66,
-        "defending": 78,
-        "physical": 74,
-        "goalkeeping": 5
+        "passing": 89,
+        "shooting": 69,
+        "defending": 71,
+        "physical": 71,
+        "goalkeeping": 11
       }
     }
   },
@@ -924,13 +924,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 84,
-        "dribbling": 67,
-        "passing": 83,
-        "shooting": 86,
-        "defending": 63,
-        "physical": 67,
-        "goalkeeping": 11
+        "speed": 61,
+        "dribbling": 73,
+        "passing": 79,
+        "shooting": 57,
+        "defending": 58,
+        "physical": 61,
+        "goalkeeping": 9
       }
     }
   },
@@ -941,12 +941,12 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 75,
-        "dribbling": 88,
-        "passing": 69,
-        "shooting": 65,
-        "defending": 82,
-        "physical": 76,
+        "speed": 73,
+        "dribbling": 85,
+        "passing": 82,
+        "shooting": 58,
+        "defending": 71,
+        "physical": 66,
         "goalkeeping": 11
       }
     }
@@ -958,13 +958,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 88,
-        "dribbling": 90,
-        "passing": 65,
-        "shooting": 86,
-        "defending": 65,
-        "physical": 85,
-        "goalkeeping": 5
+        "speed": 75,
+        "dribbling": 74,
+        "passing": 78,
+        "shooting": 61,
+        "defending": 64,
+        "physical": 65,
+        "goalkeeping": 8
       }
     }
   },
@@ -975,13 +975,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 67,
-        "dribbling": 73,
-        "passing": 78,
-        "shooting": 87,
-        "defending": 60,
-        "physical": 74,
-        "goalkeeping": 7
+        "speed": 77,
+        "dribbling": 81,
+        "passing": 81,
+        "shooting": 62,
+        "defending": 71,
+        "physical": 65,
+        "goalkeeping": 12
       }
     }
   },
@@ -992,13 +992,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 75,
-        "dribbling": 66,
-        "passing": 65,
-        "shooting": 82,
-        "defending": 89,
-        "physical": 83,
-        "goalkeeping": 15
+        "speed": 64,
+        "dribbling": 76,
+        "passing": 81,
+        "shooting": 63,
+        "defending": 62,
+        "physical": 64,
+        "goalkeeping": 8
       }
     }
   },
@@ -1009,12 +1009,12 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 85,
+        "speed": 79,
         "dribbling": 79,
-        "passing": 61,
-        "shooting": 68,
-        "defending": 71,
-        "physical": 89,
+        "passing": 65,
+        "shooting": 85,
+        "defending": 47,
+        "physical": 67,
         "goalkeeping": 8
       }
     }
@@ -1026,13 +1026,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 70,
-        "dribbling": 60,
-        "passing": 66,
-        "shooting": 82,
-        "defending": 66,
-        "physical": 80,
-        "goalkeeping": 10
+        "speed": 77,
+        "dribbling": 71,
+        "passing": 51,
+        "shooting": 78,
+        "defending": 38,
+        "physical": 61,
+        "goalkeeping": 7
       }
     }
   },
@@ -1043,13 +1043,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 89,
-        "dribbling": 86,
-        "passing": 90,
-        "shooting": 78,
-        "defending": 66,
+        "speed": 77,
+        "dribbling": 71,
+        "passing": 58,
+        "shooting": 79,
+        "defending": 41,
         "physical": 63,
-        "goalkeeping": 15
+        "goalkeeping": 7
       }
     }
   },
@@ -1060,13 +1060,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 71,
-        "dribbling": 66,
-        "passing": 88,
-        "shooting": 76,
-        "defending": 74,
-        "physical": 66,
-        "goalkeeping": 13
+        "speed": 88,
+        "dribbling": 83,
+        "passing": 66,
+        "shooting": 86,
+        "defending": 49,
+        "physical": 73,
+        "goalkeeping": 12
       }
     }
   },
@@ -1077,13 +1077,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 79,
-        "dribbling": 85,
-        "passing": 79,
-        "shooting": 87,
-        "defending": 85,
-        "physical": 84,
-        "goalkeeping": 10
+        "speed": 86,
+        "dribbling": 82,
+        "passing": 63,
+        "shooting": 86,
+        "defending": 49,
+        "physical": 70,
+        "goalkeeping": 12
       }
     }
   },
@@ -1094,13 +1094,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 71,
-        "dribbling": 74,
-        "passing": 67,
-        "shooting": 85,
-        "defending": 90,
+        "speed": 77,
+        "dribbling": 73,
+        "passing": 64,
+        "shooting": 84,
+        "defending": 45,
         "physical": 61,
-        "goalkeeping": 12
+        "goalkeeping": 8
       }
     }
   },
@@ -1111,12 +1111,12 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 90,
-        "dribbling": 81,
-        "passing": 69,
-        "shooting": 79,
-        "defending": 87,
-        "physical": 72,
+        "speed": 86,
+        "dribbling": 83,
+        "passing": 66,
+        "shooting": 90,
+        "defending": 53,
+        "physical": 71,
         "goalkeeping": 12
       }
     }
@@ -1128,13 +1128,13 @@
     "preferred_pos": "POR",
     "positions": {
       "POR": {
-        "speed": 79,
-        "dribbling": 75,
-        "passing": 80,
-        "shooting": 89,
-        "defending": 79,
-        "physical": 71,
-        "goalkeeping": 86
+        "speed": 52,
+        "dribbling": 39,
+        "passing": 48,
+        "shooting": 25,
+        "defending": 58,
+        "physical": 67,
+        "goalkeeping": 78
       }
     }
   },
@@ -1146,12 +1146,12 @@
     "positions": {
       "POR": {
         "speed": 64,
-        "dribbling": 84,
-        "passing": 74,
-        "shooting": 72,
-        "defending": 68,
-        "physical": 78,
-        "goalkeeping": 82
+        "dribbling": 47,
+        "passing": 57,
+        "shooting": 37,
+        "defending": 73,
+        "physical": 80,
+        "goalkeeping": 91
       }
     }
   },
@@ -1162,13 +1162,13 @@
     "preferred_pos": "POR",
     "positions": {
       "POR": {
-        "speed": 72,
-        "dribbling": 68,
-        "passing": 61,
-        "shooting": 72,
-        "defending": 78,
-        "physical": 66,
-        "goalkeeping": 92
+        "speed": 56,
+        "dribbling": 43,
+        "passing": 53,
+        "shooting": 34,
+        "defending": 64,
+        "physical": 71,
+        "goalkeeping": 83
       }
     }
   },
@@ -1179,13 +1179,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 90,
-        "dribbling": 62,
-        "passing": 69,
-        "shooting": 75,
-        "defending": 71,
-        "physical": 72,
-        "goalkeeping": 10
+        "speed": 76,
+        "dribbling": 60,
+        "passing": 72,
+        "shooting": 52,
+        "defending": 88,
+        "physical": 89,
+        "goalkeeping": 11
       }
     }
   },
@@ -1196,13 +1196,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 75,
-        "dribbling": 74,
-        "passing": 79,
-        "shooting": 90,
-        "defending": 77,
-        "physical": 75,
-        "goalkeeping": 5
+        "speed": 69,
+        "dribbling": 59,
+        "passing": 67,
+        "shooting": 47,
+        "defending": 82,
+        "physical": 79,
+        "goalkeeping": 10
       }
     }
   },
@@ -1213,12 +1213,12 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 84,
-        "dribbling": 69,
-        "passing": 87,
-        "shooting": 62,
-        "defending": 79,
-        "physical": 77,
+        "speed": 73,
+        "dribbling": 55,
+        "passing": 69,
+        "shooting": 50,
+        "defending": 83,
+        "physical": 80,
         "goalkeeping": 9
       }
     }
@@ -1230,13 +1230,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 64,
+        "speed": 78,
         "dribbling": 62,
-        "passing": 89,
-        "shooting": 66,
-        "defending": 84,
-        "physical": 87,
-        "goalkeeping": 12
+        "passing": 74,
+        "shooting": 50,
+        "defending": 90,
+        "physical": 85,
+        "goalkeeping": 13
       }
     }
   },
@@ -1247,13 +1247,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 87,
-        "dribbling": 84,
-        "passing": 76,
-        "shooting": 85,
-        "defending": 68,
-        "physical": 87,
-        "goalkeeping": 11
+        "speed": 74,
+        "dribbling": 59,
+        "passing": 69,
+        "shooting": 48,
+        "defending": 82,
+        "physical": 78,
+        "goalkeeping": 10
       }
     }
   },
@@ -1264,13 +1264,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 64,
-        "dribbling": 71,
-        "passing": 67,
-        "shooting": 87,
-        "defending": 61,
-        "physical": 87,
-        "goalkeeping": 11
+        "speed": 75,
+        "dribbling": 59,
+        "passing": 72,
+        "shooting": 51,
+        "defending": 84,
+        "physical": 81,
+        "goalkeeping": 9
       }
     }
   },
@@ -1282,12 +1282,12 @@
     "positions": {
       "MED": {
         "speed": 72,
-        "dribbling": 85,
-        "passing": 82,
-        "shooting": 81,
-        "defending": 63,
-        "physical": 68,
-        "goalkeeping": 6
+        "dribbling": 84,
+        "passing": 85,
+        "shooting": 61,
+        "defending": 72,
+        "physical": 69,
+        "goalkeeping": 9
       }
     }
   },
@@ -1298,13 +1298,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 88,
-        "dribbling": 69,
-        "passing": 65,
-        "shooting": 63,
-        "defending": 75,
-        "physical": 84,
-        "goalkeeping": 15
+        "speed": 68,
+        "dribbling": 85,
+        "passing": 87,
+        "shooting": 64,
+        "defending": 65,
+        "physical": 72,
+        "goalkeeping": 10
       }
     }
   },
@@ -1315,12 +1315,12 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 84,
-        "dribbling": 90,
-        "passing": 78,
-        "shooting": 89,
-        "defending": 90,
-        "physical": 87,
+        "speed": 78,
+        "dribbling": 92,
+        "passing": 93,
+        "shooting": 70,
+        "defending": 75,
+        "physical": 78,
         "goalkeeping": 12
       }
     }
@@ -1332,12 +1332,12 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 78,
-        "dribbling": 67,
-        "passing": 84,
-        "shooting": 61,
-        "defending": 74,
-        "physical": 82,
+        "speed": 81,
+        "dribbling": 85,
+        "passing": 93,
+        "shooting": 72,
+        "defending": 78,
+        "physical": 80,
         "goalkeeping": 12
       }
     }
@@ -1350,12 +1350,12 @@
     "positions": {
       "MED": {
         "speed": 74,
-        "dribbling": 88,
-        "passing": 63,
-        "shooting": 80,
-        "defending": 82,
-        "physical": 83,
-        "goalkeeping": 7
+        "dribbling": 81,
+        "passing": 86,
+        "shooting": 67,
+        "defending": 69,
+        "physical": 73,
+        "goalkeeping": 11
       }
     }
   },
@@ -1366,13 +1366,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 63,
-        "dribbling": 71,
-        "passing": 85,
-        "shooting": 62,
-        "defending": 76,
-        "physical": 84,
-        "goalkeeping": 5
+        "speed": 64,
+        "dribbling": 81,
+        "passing": 80,
+        "shooting": 65,
+        "defending": 68,
+        "physical": 65,
+        "goalkeeping": 8
       }
     }
   },
@@ -1383,13 +1383,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 87,
-        "dribbling": 63,
-        "passing": 87,
-        "shooting": 86,
-        "defending": 86,
-        "physical": 66,
-        "goalkeeping": 15
+        "speed": 77,
+        "dribbling": 72,
+        "passing": 55,
+        "shooting": 81,
+        "defending": 42,
+        "physical": 58,
+        "goalkeeping": 6
       }
     }
   },
@@ -1400,13 +1400,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 86,
-        "dribbling": 63,
-        "passing": 74,
-        "shooting": 67,
-        "defending": 80,
-        "physical": 82,
-        "goalkeeping": 13
+        "speed": 85,
+        "dribbling": 80,
+        "passing": 62,
+        "shooting": 88,
+        "defending": 46,
+        "physical": 71,
+        "goalkeeping": 9
       }
     }
   },
@@ -1417,13 +1417,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 84,
-        "dribbling": 79,
-        "passing": 74,
-        "shooting": 89,
-        "defending": 75,
-        "physical": 60,
-        "goalkeeping": 6
+        "speed": 81,
+        "dribbling": 78,
+        "passing": 67,
+        "shooting": 84,
+        "defending": 48,
+        "physical": 66,
+        "goalkeeping": 11
       }
     }
   },
@@ -1434,13 +1434,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 61,
-        "dribbling": 71,
-        "passing": 89,
-        "shooting": 82,
-        "defending": 63,
-        "physical": 87,
-        "goalkeeping": 5
+        "speed": 86,
+        "dribbling": 82,
+        "passing": 64,
+        "shooting": 84,
+        "defending": 48,
+        "physical": 69,
+        "goalkeeping": 9
       }
     }
   },
@@ -1451,13 +1451,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 86,
-        "dribbling": 72,
-        "passing": 67,
-        "shooting": 90,
-        "defending": 62,
-        "physical": 88,
-        "goalkeeping": 11
+        "speed": 88,
+        "dribbling": 89,
+        "passing": 72,
+        "shooting": 95,
+        "defending": 55,
+        "physical": 77,
+        "goalkeeping": 14
       }
     }
   },
@@ -1468,13 +1468,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 66,
-        "dribbling": 61,
-        "passing": 73,
-        "shooting": 72,
-        "defending": 67,
-        "physical": 72,
-        "goalkeeping": 8
+        "speed": 81,
+        "dribbling": 82,
+        "passing": 63,
+        "shooting": 82,
+        "defending": 42,
+        "physical": 62,
+        "goalkeeping": 10
       }
     }
   },
@@ -1485,13 +1485,13 @@
     "preferred_pos": "POR",
     "positions": {
       "POR": {
-        "speed": 76,
-        "dribbling": 75,
-        "passing": 89,
-        "shooting": 89,
-        "defending": 86,
-        "physical": 86,
-        "goalkeeping": 84
+        "speed": 65,
+        "dribbling": 55,
+        "passing": 61,
+        "shooting": 45,
+        "defending": 75,
+        "physical": 82,
+        "goalkeeping": 90
       }
     }
   },
@@ -1502,13 +1502,13 @@
     "preferred_pos": "POR",
     "positions": {
       "POR": {
-        "speed": 86,
-        "dribbling": 76,
-        "passing": 68,
-        "shooting": 81,
-        "defending": 74,
-        "physical": 82,
-        "goalkeeping": 94
+        "speed": 60,
+        "dribbling": 46,
+        "passing": 54,
+        "shooting": 37,
+        "defending": 61,
+        "physical": 67,
+        "goalkeeping": 80
       }
     }
   },
@@ -1519,13 +1519,13 @@
     "preferred_pos": "POR",
     "positions": {
       "POR": {
-        "speed": 70,
-        "dribbling": 75,
-        "passing": 88,
-        "shooting": 69,
-        "defending": 64,
+        "speed": 54,
+        "dribbling": 48,
+        "passing": 54,
+        "shooting": 35,
+        "defending": 60,
         "physical": 68,
-        "goalkeeping": 88
+        "goalkeeping": 84
       }
     }
   },
@@ -1536,13 +1536,13 @@
     "preferred_pos": "POR",
     "positions": {
       "POR": {
-        "speed": 79,
-        "dribbling": 76,
-        "passing": 60,
-        "shooting": 87,
-        "defending": 67,
-        "physical": 68,
-        "goalkeeping": 87
+        "speed": 60,
+        "dribbling": 52,
+        "passing": 56,
+        "shooting": 31,
+        "defending": 66,
+        "physical": 74,
+        "goalkeeping": 85
       }
     }
   },
@@ -1553,13 +1553,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 71,
-        "dribbling": 81,
-        "passing": 70,
-        "shooting": 68,
-        "defending": 71,
-        "physical": 82,
-        "goalkeeping": 12
+        "speed": 78,
+        "dribbling": 68,
+        "passing": 74,
+        "shooting": 54,
+        "defending": 86,
+        "physical": 86,
+        "goalkeeping": 11
       }
     }
   },
@@ -1570,13 +1570,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 68,
-        "dribbling": 87,
-        "passing": 69,
-        "shooting": 86,
-        "defending": 74,
-        "physical": 79,
-        "goalkeeping": 9
+        "speed": 76,
+        "dribbling": 54,
+        "passing": 65,
+        "shooting": 53,
+        "defending": 84,
+        "physical": 78,
+        "goalkeeping": 10
       }
     }
   },
@@ -1587,13 +1587,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 63,
-        "dribbling": 70,
-        "passing": 89,
-        "shooting": 68,
-        "defending": 73,
-        "physical": 70,
-        "goalkeeping": 6
+        "speed": 69,
+        "dribbling": 54,
+        "passing": 63,
+        "shooting": 43,
+        "defending": 78,
+        "physical": 77,
+        "goalkeeping": 9
       }
     }
   },
@@ -1604,13 +1604,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 61,
-        "dribbling": 70,
-        "passing": 87,
-        "shooting": 67,
-        "defending": 75,
-        "physical": 72,
-        "goalkeeping": 11
+        "speed": 71,
+        "dribbling": 63,
+        "passing": 71,
+        "shooting": 52,
+        "defending": 86,
+        "physical": 81,
+        "goalkeeping": 8
       }
     }
   },
@@ -1622,12 +1622,12 @@
     "positions": {
       "DEF": {
         "speed": 77,
-        "dribbling": 82,
-        "passing": 75,
-        "shooting": 82,
-        "defending": 66,
-        "physical": 88,
-        "goalkeeping": 14
+        "dribbling": 53,
+        "passing": 70,
+        "shooting": 46,
+        "defending": 85,
+        "physical": 75,
+        "goalkeeping": 8
       }
     }
   },
@@ -1638,13 +1638,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 77,
-        "dribbling": 81,
-        "passing": 70,
-        "shooting": 87,
-        "defending": 81,
-        "physical": 85,
-        "goalkeeping": 12
+        "speed": 76,
+        "dribbling": 63,
+        "passing": 72,
+        "shooting": 49,
+        "defending": 89,
+        "physical": 83,
+        "goalkeeping": 8
       }
     }
   },
@@ -1655,13 +1655,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 60,
-        "dribbling": 89,
-        "passing": 73,
-        "shooting": 89,
-        "defending": 90,
-        "physical": 68,
-        "goalkeeping": 14
+        "speed": 82,
+        "dribbling": 85,
+        "passing": 91,
+        "shooting": 67,
+        "defending": 75,
+        "physical": 70,
+        "goalkeeping": 13
       }
     }
   },
@@ -1673,12 +1673,12 @@
     "positions": {
       "MED": {
         "speed": 74,
-        "dribbling": 64,
+        "dribbling": 80,
         "passing": 88,
-        "shooting": 70,
-        "defending": 66,
-        "physical": 90,
-        "goalkeeping": 11
+        "shooting": 68,
+        "defending": 68,
+        "physical": 70,
+        "goalkeeping": 10
       }
     }
   },
@@ -1689,13 +1689,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 71,
-        "dribbling": 69,
-        "passing": 72,
-        "shooting": 90,
-        "defending": 65,
-        "physical": 68,
-        "goalkeeping": 8
+        "speed": 80,
+        "dribbling": 81,
+        "passing": 84,
+        "shooting": 65,
+        "defending": 70,
+        "physical": 70,
+        "goalkeeping": 10
       }
     }
   },
@@ -1706,13 +1706,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 75,
-        "dribbling": 87,
-        "passing": 61,
-        "shooting": 67,
-        "defending": 87,
-        "physical": 88,
-        "goalkeeping": 14
+        "speed": 74,
+        "dribbling": 84,
+        "passing": 87,
+        "shooting": 61,
+        "defending": 66,
+        "physical": 65,
+        "goalkeeping": 10
       }
     }
   },
@@ -1723,13 +1723,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 82,
-        "dribbling": 77,
-        "passing": 68,
-        "shooting": 88,
-        "defending": 83,
-        "physical": 60,
-        "goalkeeping": 10
+        "speed": 72,
+        "dribbling": 82,
+        "passing": 84,
+        "shooting": 61,
+        "defending": 69,
+        "physical": 71,
+        "goalkeeping": 9
       }
     }
   },
@@ -1740,13 +1740,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 77,
-        "dribbling": 66,
-        "passing": 78,
-        "shooting": 62,
-        "defending": 61,
-        "physical": 72,
-        "goalkeeping": 7
+        "speed": 78,
+        "dribbling": 86,
+        "passing": 89,
+        "shooting": 70,
+        "defending": 76,
+        "physical": 78,
+        "goalkeeping": 12
       }
     }
   },
@@ -1757,12 +1757,12 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 65,
-        "dribbling": 67,
-        "passing": 76,
-        "shooting": 87,
-        "defending": 68,
-        "physical": 61,
+        "speed": 86,
+        "dribbling": 86,
+        "passing": 69,
+        "shooting": 96,
+        "defending": 61,
+        "physical": 75,
         "goalkeeping": 11
       }
     }
@@ -1774,13 +1774,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 85,
-        "dribbling": 75,
-        "passing": 71,
-        "shooting": 60,
-        "defending": 66,
-        "physical": 63,
-        "goalkeeping": 15
+        "speed": 91,
+        "dribbling": 83,
+        "passing": 69,
+        "shooting": 90,
+        "defending": 54,
+        "physical": 75,
+        "goalkeeping": 12
       }
     }
   },
@@ -1792,11 +1792,11 @@
     "positions": {
       "DEL": {
         "speed": 79,
-        "dribbling": 82,
-        "passing": 61,
-        "shooting": 72,
-        "defending": 82,
-        "physical": 64,
+        "dribbling": 77,
+        "passing": 65,
+        "shooting": 89,
+        "defending": 45,
+        "physical": 68,
         "goalkeeping": 10
       }
     }
@@ -1808,13 +1808,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 69,
-        "dribbling": 67,
-        "passing": 81,
-        "shooting": 68,
-        "defending": 88,
-        "physical": 69,
-        "goalkeeping": 9
+        "speed": 80,
+        "dribbling": 74,
+        "passing": 59,
+        "shooting": 80,
+        "defending": 45,
+        "physical": 64,
+        "goalkeeping": 7
       }
     }
   },
@@ -1825,13 +1825,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 71,
-        "dribbling": 75,
-        "passing": 77,
-        "shooting": 60,
-        "defending": 69,
-        "physical": 64,
-        "goalkeeping": 11
+        "speed": 72,
+        "dribbling": 73,
+        "passing": 54,
+        "shooting": 76,
+        "defending": 42,
+        "physical": 61,
+        "goalkeeping": 8
       }
     }
   },
@@ -1842,13 +1842,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 76,
-        "dribbling": 61,
-        "passing": 90,
-        "shooting": 67,
-        "defending": 61,
-        "physical": 60,
-        "goalkeeping": 12
+        "speed": 92,
+        "dribbling": 88,
+        "passing": 73,
+        "shooting": 94,
+        "defending": 55,
+        "physical": 77,
+        "goalkeeping": 14
       }
     }
   },
@@ -1860,12 +1860,12 @@
     "positions": {
       "DEF": {
         "speed": 82,
-        "dribbling": 61,
-        "passing": 88,
-        "shooting": 77,
-        "defending": 65,
-        "physical": 83,
-        "goalkeeping": 8
+        "dribbling": 63,
+        "passing": 80,
+        "shooting": 53,
+        "defending": 87,
+        "physical": 88,
+        "goalkeeping": 12
       }
     }
   },
@@ -1876,12 +1876,12 @@
     "preferred_pos": "POR",
     "positions": {
       "POR": {
-        "speed": 85,
-        "dribbling": 72,
-        "passing": 76,
-        "shooting": 71,
-        "defending": 87,
-        "physical": 89,
+        "speed": 67,
+        "dribbling": 51,
+        "passing": 57,
+        "shooting": 41,
+        "defending": 72,
+        "physical": 80,
         "goalkeeping": 89
       }
     }
@@ -1893,13 +1893,13 @@
     "preferred_pos": "POR",
     "positions": {
       "POR": {
-        "speed": 79,
-        "dribbling": 81,
-        "passing": 84,
-        "shooting": 77,
-        "defending": 75,
-        "physical": 86,
-        "goalkeeping": 91
+        "speed": 57,
+        "dribbling": 47,
+        "passing": 49,
+        "shooting": 34,
+        "defending": 67,
+        "physical": 78,
+        "goalkeeping": 87
       }
     }
   },
@@ -1910,13 +1910,13 @@
     "preferred_pos": "POR",
     "positions": {
       "POR": {
-        "speed": 64,
-        "dribbling": 70,
-        "passing": 64,
-        "shooting": 76,
-        "defending": 76,
-        "physical": 73,
-        "goalkeeping": 84
+        "speed": 62,
+        "dribbling": 48,
+        "passing": 56,
+        "shooting": 42,
+        "defending": 63,
+        "physical": 76,
+        "goalkeeping": 86
       }
     }
   },
@@ -1927,12 +1927,12 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 73,
-        "dribbling": 62,
-        "passing": 64,
-        "shooting": 76,
-        "defending": 60,
-        "physical": 69,
+        "speed": 72,
+        "dribbling": 58,
+        "passing": 71,
+        "shooting": 55,
+        "defending": 84,
+        "physical": 83,
         "goalkeeping": 10
       }
     }
@@ -1944,13 +1944,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 78,
-        "dribbling": 76,
-        "passing": 65,
-        "shooting": 85,
-        "defending": 90,
-        "physical": 89,
-        "goalkeeping": 13
+        "speed": 72,
+        "dribbling": 60,
+        "passing": 72,
+        "shooting": 49,
+        "defending": 89,
+        "physical": 83,
+        "goalkeeping": 11
       }
     }
   },
@@ -1961,13 +1961,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 74,
-        "dribbling": 86,
-        "passing": 88,
-        "shooting": 89,
-        "defending": 70,
-        "physical": 67,
-        "goalkeeping": 6
+        "speed": 75,
+        "dribbling": 55,
+        "passing": 63,
+        "shooting": 43,
+        "defending": 82,
+        "physical": 78,
+        "goalkeeping": 10
       }
     }
   },
@@ -1978,13 +1978,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 64,
-        "dribbling": 84,
-        "passing": 62,
-        "shooting": 66,
+        "speed": 77,
+        "dribbling": 62,
+        "passing": 68,
+        "shooting": 52,
         "defending": 86,
-        "physical": 65,
-        "goalkeeping": 7
+        "physical": 85,
+        "goalkeeping": 10
       }
     }
   },
@@ -1995,13 +1995,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 65,
-        "dribbling": 81,
-        "passing": 82,
-        "shooting": 66,
-        "defending": 69,
-        "physical": 72,
-        "goalkeeping": 8
+        "speed": 74,
+        "dribbling": 58,
+        "passing": 66,
+        "shooting": 47,
+        "defending": 84,
+        "physical": 82,
+        "goalkeeping": 10
       }
     }
   },
@@ -2012,13 +2012,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 64,
-        "dribbling": 65,
-        "passing": 64,
-        "shooting": 83,
-        "defending": 68,
-        "physical": 62,
-        "goalkeeping": 7
+        "speed": 81,
+        "dribbling": 66,
+        "passing": 77,
+        "shooting": 60,
+        "defending": 91,
+        "physical": 86,
+        "goalkeeping": 12
       }
     }
   },
@@ -2029,13 +2029,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 82,
-        "dribbling": 78,
+        "speed": 77,
+        "dribbling": 82,
         "passing": 83,
-        "shooting": 70,
-        "defending": 63,
-        "physical": 88,
-        "goalkeeping": 13
+        "shooting": 60,
+        "defending": 65,
+        "physical": 68,
+        "goalkeeping": 7
       }
     }
   },
@@ -2046,13 +2046,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 77,
-        "dribbling": 61,
-        "passing": 69,
+        "speed": 79,
+        "dribbling": 84,
+        "passing": 85,
         "shooting": 64,
-        "defending": 77,
-        "physical": 82,
-        "goalkeeping": 5
+        "defending": 71,
+        "physical": 72,
+        "goalkeeping": 10
       }
     }
   },
@@ -2063,13 +2063,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 67,
-        "dribbling": 83,
-        "passing": 62,
-        "shooting": 68,
-        "defending": 82,
-        "physical": 65,
-        "goalkeeping": 8
+        "speed": 85,
+        "dribbling": 94,
+        "passing": 93,
+        "shooting": 70,
+        "defending": 78,
+        "physical": 75,
+        "goalkeeping": 13
       }
     }
   },
@@ -2080,13 +2080,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 73,
+        "speed": 66,
         "dribbling": 75,
-        "passing": 89,
-        "shooting": 60,
-        "defending": 82,
-        "physical": 89,
-        "goalkeeping": 12
+        "passing": 74,
+        "shooting": 55,
+        "defending": 64,
+        "physical": 60,
+        "goalkeeping": 6
       }
     }
   },
@@ -2097,13 +2097,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 72,
-        "dribbling": 90,
-        "passing": 71,
-        "shooting": 69,
-        "defending": 89,
-        "physical": 83,
-        "goalkeeping": 13
+        "speed": 62,
+        "dribbling": 72,
+        "passing": 75,
+        "shooting": 56,
+        "defending": 61,
+        "physical": 58,
+        "goalkeeping": 5
       }
     }
   },
@@ -2114,13 +2114,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 68,
-        "dribbling": 90,
-        "passing": 83,
-        "shooting": 69,
-        "defending": 89,
-        "physical": 76,
-        "goalkeeping": 7
+        "speed": 74,
+        "dribbling": 84,
+        "passing": 85,
+        "shooting": 72,
+        "defending": 73,
+        "physical": 71,
+        "goalkeeping": 10
       }
     }
   },
@@ -2131,13 +2131,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 65,
-        "dribbling": 71,
-        "passing": 87,
-        "shooting": 78,
-        "defending": 66,
-        "physical": 87,
-        "goalkeeping": 9
+        "speed": 78,
+        "dribbling": 77,
+        "passing": 60,
+        "shooting": 84,
+        "defending": 47,
+        "physical": 68,
+        "goalkeeping": 10
       }
     }
   },
@@ -2148,13 +2148,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 72,
-        "dribbling": 61,
-        "passing": 74,
-        "shooting": 79,
-        "defending": 88,
-        "physical": 69,
-        "goalkeeping": 7
+        "speed": 81,
+        "dribbling": 81,
+        "passing": 62,
+        "shooting": 85,
+        "defending": 49,
+        "physical": 68,
+        "goalkeeping": 12
       }
     }
   },
@@ -2165,13 +2165,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 66,
+        "speed": 88,
         "dribbling": 78,
-        "passing": 70,
-        "shooting": 82,
-        "defending": 88,
-        "physical": 83,
-        "goalkeeping": 8
+        "passing": 66,
+        "shooting": 83,
+        "defending": 55,
+        "physical": 69,
+        "goalkeeping": 13
       }
     }
   },
@@ -2182,13 +2182,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 60,
-        "dribbling": 87,
-        "passing": 87,
-        "shooting": 68,
-        "defending": 82,
-        "physical": 69,
-        "goalkeeping": 12
+        "speed": 73,
+        "dribbling": 76,
+        "passing": 60,
+        "shooting": 74,
+        "defending": 36,
+        "physical": 59,
+        "goalkeeping": 6
       }
     }
   },
@@ -2199,13 +2199,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 71,
-        "dribbling": 76,
-        "passing": 89,
-        "shooting": 66,
-        "defending": 64,
-        "physical": 80,
-        "goalkeeping": 8
+        "speed": 81,
+        "dribbling": 78,
+        "passing": 63,
+        "shooting": 84,
+        "defending": 46,
+        "physical": 68,
+        "goalkeeping": 9
       }
     }
   },
@@ -2216,13 +2216,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 61,
-        "dribbling": 64,
-        "passing": 81,
-        "shooting": 73,
-        "defending": 81,
-        "physical": 63,
-        "goalkeeping": 9
+        "speed": 88,
+        "dribbling": 89,
+        "passing": 70,
+        "shooting": 90,
+        "defending": 58,
+        "physical": 72,
+        "goalkeeping": 13
       }
     }
   },
@@ -2233,13 +2233,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 66,
-        "dribbling": 78,
-        "passing": 73,
-        "shooting": 65,
-        "defending": 72,
-        "physical": 67,
-        "goalkeeping": 9
+        "speed": 77,
+        "dribbling": 80,
+        "passing": 88,
+        "shooting": 66,
+        "defending": 74,
+        "physical": 73,
+        "goalkeeping": 11
       }
     }
   },
@@ -2250,13 +2250,13 @@
     "preferred_pos": "POR",
     "positions": {
       "POR": {
-        "speed": 66,
-        "dribbling": 75,
-        "passing": 62,
-        "shooting": 77,
-        "defending": 85,
-        "physical": 67,
-        "goalkeeping": 85
+        "speed": 60,
+        "dribbling": 53,
+        "passing": 56,
+        "shooting": 37,
+        "defending": 72,
+        "physical": 77,
+        "goalkeeping": 87
       }
     }
   },
@@ -2267,13 +2267,13 @@
     "preferred_pos": "POR",
     "positions": {
       "POR": {
-        "speed": 85,
-        "dribbling": 69,
-        "passing": 77,
-        "shooting": 61,
-        "defending": 76,
-        "physical": 71,
-        "goalkeeping": 93
+        "speed": 70,
+        "dribbling": 51,
+        "passing": 62,
+        "shooting": 48,
+        "defending": 75,
+        "physical": 82,
+        "goalkeeping": 89
       }
     }
   },
@@ -2284,13 +2284,13 @@
     "preferred_pos": "POR",
     "positions": {
       "POR": {
-        "speed": 71,
-        "dribbling": 70,
-        "passing": 88,
-        "shooting": 68,
-        "defending": 73,
-        "physical": 69,
-        "goalkeeping": 84
+        "speed": 60,
+        "dribbling": 45,
+        "passing": 51,
+        "shooting": 34,
+        "defending": 67,
+        "physical": 76,
+        "goalkeeping": 86
       }
     }
   },
@@ -2301,13 +2301,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 81,
-        "dribbling": 73,
-        "passing": 83,
-        "shooting": 63,
-        "defending": 67,
-        "physical": 79,
-        "goalkeeping": 14
+        "speed": 80,
+        "dribbling": 63,
+        "passing": 78,
+        "shooting": 55,
+        "defending": 90,
+        "physical": 86,
+        "goalkeeping": 12
       }
     }
   },
@@ -2318,13 +2318,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 81,
-        "dribbling": 71,
-        "passing": 89,
-        "shooting": 85,
-        "defending": 88,
-        "physical": 67,
-        "goalkeeping": 5
+        "speed": 71,
+        "dribbling": 63,
+        "passing": 65,
+        "shooting": 47,
+        "defending": 84,
+        "physical": 78,
+        "goalkeeping": 9
       }
     }
   },
@@ -2335,13 +2335,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 70,
-        "dribbling": 62,
-        "passing": 75,
-        "shooting": 65,
-        "defending": 74,
-        "physical": 84,
-        "goalkeeping": 7
+        "speed": 78,
+        "dribbling": 58,
+        "passing": 70,
+        "shooting": 50,
+        "defending": 86,
+        "physical": 80,
+        "goalkeeping": 10
       }
     }
   },
@@ -2352,13 +2352,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 79,
-        "dribbling": 67,
-        "passing": 76,
-        "shooting": 63,
-        "defending": 64,
-        "physical": 84,
-        "goalkeeping": 10
+        "speed": 68,
+        "dribbling": 52,
+        "passing": 69,
+        "shooting": 47,
+        "defending": 85,
+        "physical": 83,
+        "goalkeeping": 9
       }
     }
   },
@@ -2369,13 +2369,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 75,
-        "dribbling": 77,
-        "passing": 79,
-        "shooting": 79,
+        "speed": 70,
+        "dribbling": 57,
+        "passing": 67,
+        "shooting": 43,
         "defending": 78,
-        "physical": 63,
-        "goalkeeping": 14
+        "physical": 77,
+        "goalkeeping": 9
       }
     }
   },
@@ -2386,13 +2386,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 87,
-        "dribbling": 67,
-        "passing": 78,
-        "shooting": 66,
+        "speed": 70,
+        "dribbling": 56,
+        "passing": 71,
+        "shooting": 46,
         "defending": 82,
-        "physical": 65,
-        "goalkeeping": 11
+        "physical": 80,
+        "goalkeeping": 10
       }
     }
   },
@@ -2403,13 +2403,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 84,
-        "dribbling": 82,
-        "passing": 60,
+        "speed": 80,
+        "dribbling": 90,
+        "passing": 89,
         "shooting": 72,
-        "defending": 78,
-        "physical": 86,
-        "goalkeeping": 13
+        "defending": 77,
+        "physical": 74,
+        "goalkeeping": 11
       }
     }
   },
@@ -2420,13 +2420,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 88,
-        "dribbling": 67,
-        "passing": 81,
-        "shooting": 66,
-        "defending": 67,
+        "speed": 69,
+        "dribbling": 77,
+        "passing": 80,
+        "shooting": 54,
+        "defending": 62,
         "physical": 62,
-        "goalkeeping": 14
+        "goalkeeping": 7
       }
     }
   },
@@ -2437,13 +2437,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 81,
-        "dribbling": 77,
-        "passing": 84,
-        "shooting": 74,
-        "defending": 74,
-        "physical": 86,
-        "goalkeeping": 5
+        "speed": 78,
+        "dribbling": 86,
+        "passing": 91,
+        "shooting": 64,
+        "defending": 73,
+        "physical": 71,
+        "goalkeeping": 10
       }
     }
   },
@@ -2454,13 +2454,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 65,
-        "dribbling": 72,
-        "passing": 79,
-        "shooting": 61,
-        "defending": 60,
-        "physical": 69,
-        "goalkeeping": 5
+        "speed": 80,
+        "dribbling": 92,
+        "passing": 93,
+        "shooting": 75,
+        "defending": 73,
+        "physical": 78,
+        "goalkeeping": 14
       }
     }
   },
@@ -2471,13 +2471,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 80,
-        "dribbling": 60,
-        "passing": 74,
-        "shooting": 69,
-        "defending": 72,
-        "physical": 77,
-        "goalkeeping": 9
+        "speed": 73,
+        "dribbling": 82,
+        "passing": 82,
+        "shooting": 64,
+        "defending": 71,
+        "physical": 67,
+        "goalkeeping": 11
       }
     }
   },
@@ -2488,13 +2488,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 79,
-        "dribbling": 68,
-        "passing": 67,
-        "shooting": 80,
-        "defending": 82,
-        "physical": 79,
-        "goalkeeping": 13
+        "speed": 74,
+        "dribbling": 85,
+        "passing": 91,
+        "shooting": 64,
+        "defending": 73,
+        "physical": 69,
+        "goalkeeping": 12
       }
     }
   },
@@ -2505,13 +2505,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 72,
-        "dribbling": 89,
-        "passing": 66,
-        "shooting": 77,
-        "defending": 76,
-        "physical": 83,
-        "goalkeeping": 14
+        "speed": 94,
+        "dribbling": 84,
+        "passing": 67,
+        "shooting": 87,
+        "defending": 56,
+        "physical": 72,
+        "goalkeeping": 11
       }
     }
   },
@@ -2522,13 +2522,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 60,
-        "dribbling": 68,
-        "passing": 67,
-        "shooting": 84,
-        "defending": 88,
-        "physical": 63,
-        "goalkeeping": 9
+        "speed": 80,
+        "dribbling": 78,
+        "passing": 65,
+        "shooting": 87,
+        "defending": 47,
+        "physical": 71,
+        "goalkeeping": 12
       }
     }
   },
@@ -2539,13 +2539,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 72,
-        "dribbling": 69,
-        "passing": 63,
-        "shooting": 82,
-        "defending": 78,
-        "physical": 90,
-        "goalkeeping": 5
+        "speed": 77,
+        "dribbling": 75,
+        "passing": 65,
+        "shooting": 83,
+        "defending": 43,
+        "physical": 63,
+        "goalkeeping": 9
       }
     }
   },
@@ -2556,13 +2556,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 63,
-        "dribbling": 70,
-        "passing": 80,
-        "shooting": 78,
-        "defending": 76,
-        "physical": 83,
-        "goalkeeping": 7
+        "speed": 78,
+        "dribbling": 74,
+        "passing": 62,
+        "shooting": 80,
+        "defending": 48,
+        "physical": 68,
+        "goalkeeping": 8
       }
     }
   },
@@ -2573,13 +2573,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 73,
-        "dribbling": 74,
-        "passing": 64,
-        "shooting": 77,
-        "defending": 67,
-        "physical": 62,
-        "goalkeeping": 14
+        "speed": 80,
+        "dribbling": 79,
+        "passing": 63,
+        "shooting": 82,
+        "defending": 53,
+        "physical": 65,
+        "goalkeeping": 9
       }
     }
   },
@@ -2590,13 +2590,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 72,
-        "dribbling": 63,
-        "passing": 84,
-        "shooting": 90,
-        "defending": 65,
-        "physical": 62,
-        "goalkeeping": 9
+        "speed": 79,
+        "dribbling": 82,
+        "passing": 62,
+        "shooting": 86,
+        "defending": 46,
+        "physical": 68,
+        "goalkeeping": 10
       }
     }
   },
@@ -2607,13 +2607,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 72,
-        "dribbling": 67,
-        "passing": 81,
-        "shooting": 61,
-        "defending": 77,
-        "physical": 84,
-        "goalkeeping": 8
+        "speed": 81,
+        "dribbling": 78,
+        "passing": 83,
+        "shooting": 64,
+        "defending": 74,
+        "physical": 75,
+        "goalkeeping": 10
       }
     }
   },
@@ -2624,13 +2624,13 @@
     "preferred_pos": "POR",
     "positions": {
       "POR": {
-        "speed": 87,
-        "dribbling": 75,
-        "passing": 62,
-        "shooting": 67,
-        "defending": 79,
-        "physical": 79,
-        "goalkeeping": 83
+        "speed": 59,
+        "dribbling": 46,
+        "passing": 52,
+        "shooting": 35,
+        "defending": 65,
+        "physical": 77,
+        "goalkeeping": 85
       }
     }
   },
@@ -2641,13 +2641,13 @@
     "preferred_pos": "POR",
     "positions": {
       "POR": {
-        "speed": 87,
-        "dribbling": 72,
-        "passing": 75,
-        "shooting": 75,
-        "defending": 86,
-        "physical": 66,
-        "goalkeeping": 89
+        "speed": 65,
+        "dribbling": 51,
+        "passing": 57,
+        "shooting": 37,
+        "defending": 67,
+        "physical": 71,
+        "goalkeeping": 85
       }
     }
   },
@@ -2658,13 +2658,13 @@
     "preferred_pos": "POR",
     "positions": {
       "POR": {
-        "speed": 74,
-        "dribbling": 88,
-        "passing": 79,
-        "shooting": 74,
-        "defending": 78,
-        "physical": 74,
-        "goalkeeping": 93
+        "speed": 70,
+        "dribbling": 49,
+        "passing": 63,
+        "shooting": 36,
+        "defending": 68,
+        "physical": 77,
+        "goalkeeping": 87
       }
     }
   },
@@ -2675,13 +2675,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 70,
-        "dribbling": 65,
-        "passing": 66,
-        "shooting": 64,
-        "defending": 89,
-        "physical": 84,
-        "goalkeeping": 7
+        "speed": 76,
+        "dribbling": 51,
+        "passing": 67,
+        "shooting": 46,
+        "defending": 82,
+        "physical": 83,
+        "goalkeeping": 9
       }
     }
   },
@@ -2692,13 +2692,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 86,
-        "dribbling": 63,
-        "passing": 86,
-        "shooting": 80,
-        "defending": 87,
-        "physical": 74,
-        "goalkeeping": 13
+        "speed": 80,
+        "dribbling": 55,
+        "passing": 69,
+        "shooting": 50,
+        "defending": 84,
+        "physical": 84,
+        "goalkeeping": 10
       }
     }
   },
@@ -2709,13 +2709,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 60,
-        "dribbling": 71,
-        "passing": 76,
-        "shooting": 87,
-        "defending": 63,
-        "physical": 84,
-        "goalkeeping": 10
+        "speed": 78,
+        "dribbling": 63,
+        "passing": 68,
+        "shooting": 50,
+        "defending": 90,
+        "physical": 86,
+        "goalkeeping": 12
       }
     }
   },
@@ -2726,13 +2726,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 74,
-        "dribbling": 88,
-        "passing": 84,
-        "shooting": 79,
-        "defending": 69,
-        "physical": 75,
-        "goalkeeping": 10
+        "speed": 73,
+        "dribbling": 60,
+        "passing": 66,
+        "shooting": 52,
+        "defending": 81,
+        "physical": 83,
+        "goalkeeping": 11
       }
     }
   },
@@ -2743,13 +2743,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 90,
-        "dribbling": 85,
-        "passing": 70,
-        "shooting": 70,
-        "defending": 83,
-        "physical": 64,
-        "goalkeeping": 9
+        "speed": 68,
+        "dribbling": 51,
+        "passing": 62,
+        "shooting": 36,
+        "defending": 78,
+        "physical": 77,
+        "goalkeeping": 7
       }
     }
   },
@@ -2760,13 +2760,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 67,
-        "dribbling": 70,
-        "passing": 61,
-        "shooting": 81,
-        "defending": 76,
-        "physical": 65,
-        "goalkeeping": 15
+        "speed": 76,
+        "dribbling": 61,
+        "passing": 71,
+        "shooting": 51,
+        "defending": 88,
+        "physical": 88,
+        "goalkeeping": 10
       }
     }
   },
@@ -2777,13 +2777,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 90,
-        "dribbling": 61,
-        "passing": 73,
-        "shooting": 66,
-        "defending": 68,
-        "physical": 68,
-        "goalkeeping": 15
+        "speed": 71,
+        "dribbling": 76,
+        "passing": 84,
+        "shooting": 60,
+        "defending": 69,
+        "physical": 71,
+        "goalkeeping": 8
       }
     }
   },
@@ -2794,13 +2794,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 77,
-        "dribbling": 66,
-        "passing": 61,
-        "shooting": 80,
-        "defending": 89,
-        "physical": 72,
-        "goalkeeping": 11
+        "speed": 83,
+        "dribbling": 92,
+        "passing": 95,
+        "shooting": 72,
+        "defending": 83,
+        "physical": 78,
+        "goalkeeping": 14
       }
     }
   },
@@ -2811,13 +2811,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 67,
-        "dribbling": 64,
-        "passing": 84,
-        "shooting": 84,
-        "defending": 63,
-        "physical": 75,
-        "goalkeeping": 15
+        "speed": 71,
+        "dribbling": 77,
+        "passing": 86,
+        "shooting": 64,
+        "defending": 67,
+        "physical": 68,
+        "goalkeeping": 8
       }
     }
   },
@@ -2828,13 +2828,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 80,
-        "dribbling": 84,
-        "passing": 73,
-        "shooting": 87,
-        "defending": 69,
-        "physical": 61,
-        "goalkeeping": 5
+        "speed": 69,
+        "dribbling": 80,
+        "passing": 83,
+        "shooting": 58,
+        "defending": 70,
+        "physical": 62,
+        "goalkeeping": 9
       }
     }
   },
@@ -2845,13 +2845,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 77,
-        "dribbling": 78,
-        "passing": 69,
-        "shooting": 69,
-        "defending": 63,
-        "physical": 65,
-        "goalkeeping": 8
+        "speed": 66,
+        "dribbling": 73,
+        "passing": 83,
+        "shooting": 54,
+        "defending": 66,
+        "physical": 62,
+        "goalkeeping": 9
       }
     }
   },
@@ -2862,13 +2862,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 79,
-        "dribbling": 85,
-        "passing": 90,
-        "shooting": 90,
-        "defending": 64,
-        "physical": 77,
-        "goalkeeping": 8
+        "speed": 78,
+        "dribbling": 86,
+        "passing": 83,
+        "shooting": 65,
+        "defending": 65,
+        "physical": 71,
+        "goalkeeping": 10
       }
     }
   },
@@ -2879,12 +2879,12 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 83,
-        "dribbling": 71,
-        "passing": 65,
-        "shooting": 74,
-        "defending": 89,
-        "physical": 77,
+        "speed": 81,
+        "dribbling": 82,
+        "passing": 62,
+        "shooting": 85,
+        "defending": 46,
+        "physical": 63,
         "goalkeeping": 10
       }
     }
@@ -2896,13 +2896,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 68,
-        "dribbling": 67,
-        "passing": 85,
-        "shooting": 82,
-        "defending": 82,
-        "physical": 80,
-        "goalkeeping": 5
+        "speed": 82,
+        "dribbling": 77,
+        "passing": 59,
+        "shooting": 81,
+        "defending": 47,
+        "physical": 62,
+        "goalkeeping": 7
       }
     }
   },
@@ -2913,12 +2913,12 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 85,
-        "dribbling": 81,
-        "passing": 83,
-        "shooting": 88,
-        "defending": 65,
-        "physical": 79,
+        "speed": 76,
+        "dribbling": 73,
+        "passing": 58,
+        "shooting": 76,
+        "defending": 43,
+        "physical": 60,
         "goalkeeping": 9
       }
     }
@@ -2930,13 +2930,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 73,
-        "dribbling": 67,
-        "passing": 78,
-        "shooting": 71,
-        "defending": 62,
-        "physical": 76,
-        "goalkeeping": 14
+        "speed": 83,
+        "dribbling": 83,
+        "passing": 64,
+        "shooting": 84,
+        "defending": 56,
+        "physical": 68,
+        "goalkeeping": 11
       }
     }
   },
@@ -2947,12 +2947,12 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 77,
-        "dribbling": 67,
-        "passing": 68,
-        "shooting": 80,
-        "defending": 81,
-        "physical": 88,
+        "speed": 90,
+        "dribbling": 83,
+        "passing": 70,
+        "shooting": 90,
+        "defending": 59,
+        "physical": 67,
         "goalkeeping": 12
       }
     }
@@ -2964,12 +2964,12 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 83,
-        "dribbling": 65,
-        "passing": 88,
-        "shooting": 86,
-        "defending": 89,
-        "physical": 72,
+        "speed": 82,
+        "dribbling": 76,
+        "passing": 60,
+        "shooting": 84,
+        "defending": 50,
+        "physical": 63,
         "goalkeeping": 9
       }
     }
@@ -2981,13 +2981,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 63,
-        "dribbling": 61,
+        "speed": 80,
+        "dribbling": 77,
         "passing": 62,
-        "shooting": 73,
-        "defending": 69,
+        "shooting": 81,
+        "defending": 42,
         "physical": 66,
-        "goalkeeping": 7
+        "goalkeeping": 8
       }
     }
   },
@@ -2998,13 +2998,13 @@
     "preferred_pos": "POR",
     "positions": {
       "POR": {
-        "speed": 74,
-        "dribbling": 74,
-        "passing": 66,
-        "shooting": 74,
-        "defending": 84,
-        "physical": 86,
-        "goalkeeping": 94
+        "speed": 63,
+        "dribbling": 42,
+        "passing": 52,
+        "shooting": 38,
+        "defending": 65,
+        "physical": 74,
+        "goalkeeping": 81
       }
     }
   },
@@ -3015,13 +3015,13 @@
     "preferred_pos": "POR",
     "positions": {
       "POR": {
-        "speed": 80,
-        "dribbling": 73,
-        "passing": 62,
-        "shooting": 65,
-        "defending": 84,
-        "physical": 82,
-        "goalkeeping": 87
+        "speed": 54,
+        "dribbling": 47,
+        "passing": 51,
+        "shooting": 33,
+        "defending": 66,
+        "physical": 73,
+        "goalkeeping": 86
       }
     }
   },
@@ -3032,12 +3032,12 @@
     "preferred_pos": "POR",
     "positions": {
       "POR": {
-        "speed": 84,
-        "dribbling": 73,
-        "passing": 88,
-        "shooting": 85,
-        "defending": 87,
-        "physical": 81,
+        "speed": 59,
+        "dribbling": 42,
+        "passing": 61,
+        "shooting": 32,
+        "defending": 69,
+        "physical": 70,
         "goalkeeping": 87
       }
     }
@@ -3049,13 +3049,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 61,
-        "dribbling": 89,
-        "passing": 77,
-        "shooting": 72,
-        "defending": 61,
-        "physical": 68,
-        "goalkeeping": 10
+        "speed": 75,
+        "dribbling": 55,
+        "passing": 64,
+        "shooting": 42,
+        "defending": 83,
+        "physical": 82,
+        "goalkeeping": 9
       }
     }
   },
@@ -3066,13 +3066,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 69,
-        "dribbling": 65,
-        "passing": 75,
-        "shooting": 69,
-        "defending": 61,
-        "physical": 71,
-        "goalkeeping": 14
+        "speed": 62,
+        "dribbling": 51,
+        "passing": 62,
+        "shooting": 40,
+        "defending": 75,
+        "physical": 79,
+        "goalkeeping": 7
       }
     }
   },
@@ -3083,13 +3083,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 78,
-        "dribbling": 64,
-        "passing": 65,
-        "shooting": 69,
-        "defending": 67,
-        "physical": 89,
-        "goalkeeping": 13
+        "speed": 67,
+        "dribbling": 59,
+        "passing": 74,
+        "shooting": 47,
+        "defending": 86,
+        "physical": 82,
+        "goalkeeping": 9
       }
     }
   },
@@ -3100,12 +3100,12 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 65,
-        "dribbling": 88,
-        "passing": 72,
-        "shooting": 66,
-        "defending": 87,
-        "physical": 63,
+        "speed": 81,
+        "dribbling": 65,
+        "passing": 82,
+        "shooting": 53,
+        "defending": 88,
+        "physical": 86,
         "goalkeeping": 12
       }
     }
@@ -3117,13 +3117,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 66,
-        "dribbling": 80,
-        "passing": 87,
-        "shooting": 89,
-        "defending": 62,
-        "physical": 88,
-        "goalkeeping": 5
+        "speed": 79,
+        "dribbling": 61,
+        "passing": 69,
+        "shooting": 53,
+        "defending": 86,
+        "physical": 86,
+        "goalkeeping": 12
       }
     }
   },
@@ -3134,13 +3134,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 89,
-        "dribbling": 66,
-        "passing": 73,
-        "shooting": 86,
-        "defending": 67,
-        "physical": 80,
-        "goalkeeping": 15
+        "speed": 70,
+        "dribbling": 54,
+        "passing": 64,
+        "shooting": 43,
+        "defending": 78,
+        "physical": 75,
+        "goalkeeping": 8
       }
     }
   },
@@ -3151,12 +3151,12 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 61,
-        "dribbling": 68,
-        "passing": 74,
-        "shooting": 60,
-        "defending": 61,
-        "physical": 71,
+        "speed": 64,
+        "dribbling": 75,
+        "passing": 80,
+        "shooting": 54,
+        "defending": 66,
+        "physical": 64,
         "goalkeeping": 9
       }
     }
@@ -3168,13 +3168,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 67,
-        "dribbling": 73,
-        "passing": 89,
-        "shooting": 62,
-        "defending": 83,
-        "physical": 68,
-        "goalkeeping": 9
+        "speed": 76,
+        "dribbling": 85,
+        "passing": 83,
+        "shooting": 60,
+        "defending": 73,
+        "physical": 70,
+        "goalkeeping": 10
       }
     }
   },
@@ -3185,13 +3185,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 82,
-        "dribbling": 70,
-        "passing": 62,
-        "shooting": 86,
-        "defending": 69,
-        "physical": 66,
-        "goalkeeping": 15
+        "speed": 77,
+        "dribbling": 81,
+        "passing": 87,
+        "shooting": 65,
+        "defending": 70,
+        "physical": 69,
+        "goalkeeping": 10
       }
     }
   },
@@ -3202,13 +3202,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 85,
-        "dribbling": 78,
-        "passing": 79,
-        "shooting": 62,
-        "defending": 84,
-        "physical": 70,
-        "goalkeeping": 11
+        "speed": 66,
+        "dribbling": 81,
+        "passing": 83,
+        "shooting": 57,
+        "defending": 69,
+        "physical": 68,
+        "goalkeeping": 10
       }
     }
   },
@@ -3219,13 +3219,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 80,
-        "dribbling": 72,
-        "passing": 64,
-        "shooting": 78,
-        "defending": 83,
-        "physical": 80,
-        "goalkeeping": 5
+        "speed": 70,
+        "dribbling": 76,
+        "passing": 86,
+        "shooting": 65,
+        "defending": 63,
+        "physical": 68,
+        "goalkeeping": 9
       }
     }
   },
@@ -3236,13 +3236,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 83,
-        "dribbling": 60,
-        "passing": 75,
-        "shooting": 79,
-        "defending": 67,
-        "physical": 62,
-        "goalkeeping": 10
+        "speed": 73,
+        "dribbling": 81,
+        "passing": 85,
+        "shooting": 61,
+        "defending": 72,
+        "physical": 73,
+        "goalkeeping": 11
       }
     }
   },
@@ -3253,13 +3253,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 78,
-        "dribbling": 64,
-        "passing": 60,
-        "shooting": 77,
-        "defending": 89,
-        "physical": 65,
-        "goalkeeping": 11
+        "speed": 72,
+        "dribbling": 74,
+        "passing": 57,
+        "shooting": 74,
+        "defending": 39,
+        "physical": 58,
+        "goalkeeping": 6
       }
     }
   },
@@ -3270,13 +3270,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 85,
-        "dribbling": 62,
-        "passing": 80,
-        "shooting": 61,
-        "defending": 66,
-        "physical": 87,
-        "goalkeeping": 5
+        "speed": 81,
+        "dribbling": 77,
+        "passing": 63,
+        "shooting": 86,
+        "defending": 44,
+        "physical": 70,
+        "goalkeeping": 11
       }
     }
   },
@@ -3287,13 +3287,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 77,
-        "dribbling": 68,
-        "passing": 70,
-        "shooting": 61,
-        "defending": 66,
-        "physical": 79,
-        "goalkeeping": 15
+        "speed": 81,
+        "dribbling": 77,
+        "passing": 61,
+        "shooting": 86,
+        "defending": 49,
+        "physical": 65,
+        "goalkeeping": 10
       }
     }
   },
@@ -3304,13 +3304,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 70,
-        "dribbling": 62,
-        "passing": 90,
-        "shooting": 67,
-        "defending": 75,
-        "physical": 68,
-        "goalkeeping": 6
+        "speed": 88,
+        "dribbling": 84,
+        "passing": 67,
+        "shooting": 89,
+        "defending": 55,
+        "physical": 73,
+        "goalkeeping": 12
       }
     }
   },
@@ -3321,13 +3321,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 84,
-        "dribbling": 73,
-        "passing": 81,
-        "shooting": 86,
-        "defending": 79,
-        "physical": 60,
-        "goalkeeping": 13
+        "speed": 86,
+        "dribbling": 78,
+        "passing": 65,
+        "shooting": 90,
+        "defending": 54,
+        "physical": 73,
+        "goalkeeping": 10
       }
     }
   },
@@ -3338,13 +3338,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 90,
-        "dribbling": 89,
-        "passing": 66,
-        "shooting": 62,
-        "defending": 69,
-        "physical": 63,
-        "goalkeeping": 12
+        "speed": 87,
+        "dribbling": 82,
+        "passing": 70,
+        "shooting": 88,
+        "defending": 55,
+        "physical": 74,
+        "goalkeeping": 11
       }
     }
   },
@@ -3355,13 +3355,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 73,
-        "dribbling": 85,
-        "passing": 70,
-        "shooting": 74,
-        "defending": 61,
-        "physical": 83,
-        "goalkeeping": 6
+        "speed": 77,
+        "dribbling": 58,
+        "passing": 67,
+        "shooting": 45,
+        "defending": 77,
+        "physical": 80,
+        "goalkeeping": 10
       }
     }
   },
@@ -3372,13 +3372,13 @@
     "preferred_pos": "POR",
     "positions": {
       "POR": {
-        "speed": 66,
-        "dribbling": 81,
-        "passing": 63,
-        "shooting": 79,
-        "defending": 82,
-        "physical": 65,
-        "goalkeeping": 80
+        "speed": 54,
+        "dribbling": 42,
+        "passing": 51,
+        "shooting": 34,
+        "defending": 68,
+        "physical": 71,
+        "goalkeeping": 79
       }
     }
   },
@@ -3389,12 +3389,12 @@
     "preferred_pos": "POR",
     "positions": {
       "POR": {
-        "speed": 71,
-        "dribbling": 65,
-        "passing": 81,
-        "shooting": 82,
-        "defending": 76,
-        "physical": 69,
+        "speed": 65,
+        "dribbling": 45,
+        "passing": 56,
+        "shooting": 38,
+        "defending": 69,
+        "physical": 78,
         "goalkeeping": 86
       }
     }
@@ -3406,13 +3406,13 @@
     "preferred_pos": "POR",
     "positions": {
       "POR": {
-        "speed": 87,
-        "dribbling": 78,
-        "passing": 77,
-        "shooting": 67,
-        "defending": 71,
-        "physical": 60,
-        "goalkeeping": 87
+        "speed": 64,
+        "dribbling": 45,
+        "passing": 60,
+        "shooting": 37,
+        "defending": 64,
+        "physical": 78,
+        "goalkeeping": 86
       }
     }
   },
@@ -3423,13 +3423,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 77,
-        "dribbling": 90,
-        "passing": 77,
-        "shooting": 62,
-        "defending": 76,
-        "physical": 86,
-        "goalkeeping": 9
+        "speed": 82,
+        "dribbling": 66,
+        "passing": 76,
+        "shooting": 59,
+        "defending": 88,
+        "physical": 85,
+        "goalkeeping": 11
       }
     }
   },
@@ -3440,13 +3440,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 86,
-        "dribbling": 79,
-        "passing": 85,
-        "shooting": 68,
-        "defending": 66,
-        "physical": 80,
-        "goalkeeping": 13
+        "speed": 71,
+        "dribbling": 64,
+        "passing": 79,
+        "shooting": 53,
+        "defending": 90,
+        "physical": 88,
+        "goalkeeping": 12
       }
     }
   },
@@ -3457,13 +3457,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 65,
-        "dribbling": 89,
-        "passing": 76,
-        "shooting": 60,
-        "defending": 89,
-        "physical": 87,
-        "goalkeeping": 12
+        "speed": 76,
+        "dribbling": 57,
+        "passing": 67,
+        "shooting": 48,
+        "defending": 86,
+        "physical": 77,
+        "goalkeeping": 9
       }
     }
   },
@@ -3474,13 +3474,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 62,
-        "dribbling": 86,
-        "passing": 60,
-        "shooting": 66,
-        "defending": 89,
-        "physical": 79,
-        "goalkeeping": 9
+        "speed": 76,
+        "dribbling": 63,
+        "passing": 75,
+        "shooting": 54,
+        "defending": 84,
+        "physical": 81,
+        "goalkeeping": 11
       }
     }
   },
@@ -3491,13 +3491,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 70,
-        "dribbling": 66,
-        "passing": 76,
-        "shooting": 74,
-        "defending": 73,
-        "physical": 68,
-        "goalkeeping": 6
+        "speed": 71,
+        "dribbling": 60,
+        "passing": 64,
+        "shooting": 54,
+        "defending": 87,
+        "physical": 81,
+        "goalkeeping": 8
       }
     }
   },
@@ -3508,13 +3508,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 80,
-        "dribbling": 70,
-        "passing": 81,
-        "shooting": 63,
-        "defending": 75,
-        "physical": 83,
-        "goalkeeping": 12
+        "speed": 76,
+        "dribbling": 54,
+        "passing": 66,
+        "shooting": 52,
+        "defending": 85,
+        "physical": 81,
+        "goalkeeping": 11
       }
     }
   },
@@ -3525,13 +3525,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 82,
-        "dribbling": 72,
-        "passing": 73,
-        "shooting": 77,
-        "defending": 84,
-        "physical": 86,
-        "goalkeeping": 12
+        "speed": 69,
+        "dribbling": 74,
+        "passing": 81,
+        "shooting": 58,
+        "defending": 62,
+        "physical": 62,
+        "goalkeeping": 7
       }
     }
   },
@@ -3542,13 +3542,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 72,
-        "dribbling": 65,
-        "passing": 66,
-        "shooting": 88,
-        "defending": 64,
-        "physical": 88,
-        "goalkeeping": 12
+        "speed": 75,
+        "dribbling": 81,
+        "passing": 85,
+        "shooting": 68,
+        "defending": 72,
+        "physical": 69,
+        "goalkeeping": 9
       }
     }
   },
@@ -3559,13 +3559,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 65,
-        "dribbling": 74,
-        "passing": 82,
-        "shooting": 72,
-        "defending": 75,
+        "speed": 73,
+        "dribbling": 84,
+        "passing": 81,
+        "shooting": 63,
+        "defending": 72,
         "physical": 68,
-        "goalkeeping": 11
+        "goalkeeping": 10
       }
     }
   },
@@ -3576,13 +3576,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 81,
-        "dribbling": 77,
-        "passing": 60,
-        "shooting": 61,
-        "defending": 73,
-        "physical": 87,
-        "goalkeeping": 13
+        "speed": 79,
+        "dribbling": 86,
+        "passing": 87,
+        "shooting": 68,
+        "defending": 76,
+        "physical": 69,
+        "goalkeeping": 12
       }
     }
   },
@@ -3593,13 +3593,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 89,
-        "dribbling": 67,
-        "passing": 82,
-        "shooting": 72,
-        "defending": 68,
-        "physical": 66,
-        "goalkeeping": 10
+        "speed": 72,
+        "dribbling": 86,
+        "passing": 87,
+        "shooting": 69,
+        "defending": 72,
+        "physical": 74,
+        "goalkeeping": 11
       }
     }
   },
@@ -3610,13 +3610,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 66,
-        "dribbling": 89,
-        "passing": 82,
-        "shooting": 73,
-        "defending": 88,
-        "physical": 76,
-        "goalkeeping": 5
+        "speed": 72,
+        "dribbling": 79,
+        "passing": 77,
+        "shooting": 65,
+        "defending": 63,
+        "physical": 63,
+        "goalkeeping": 9
       }
     }
   },
@@ -3627,13 +3627,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 65,
-        "dribbling": 60,
-        "passing": 64,
-        "shooting": 75,
-        "defending": 65,
-        "physical": 62,
-        "goalkeeping": 11
+        "speed": 78,
+        "dribbling": 79,
+        "passing": 59,
+        "shooting": 82,
+        "defending": 38,
+        "physical": 64,
+        "goalkeeping": 7
       }
     }
   },
@@ -3644,13 +3644,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 90,
-        "dribbling": 87,
-        "passing": 87,
-        "shooting": 81,
-        "defending": 86,
-        "physical": 72,
-        "goalkeeping": 6
+        "speed": 81,
+        "dribbling": 73,
+        "passing": 63,
+        "shooting": 84,
+        "defending": 50,
+        "physical": 63,
+        "goalkeeping": 9
       }
     }
   },
@@ -3661,13 +3661,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 83,
-        "dribbling": 73,
-        "passing": 64,
-        "shooting": 88,
-        "defending": 89,
+        "speed": 87,
+        "dribbling": 87,
+        "passing": 70,
+        "shooting": 89,
+        "defending": 52,
         "physical": 69,
-        "goalkeeping": 14
+        "goalkeeping": 11
       }
     }
   },
@@ -3678,13 +3678,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 73,
-        "dribbling": 89,
-        "passing": 62,
-        "shooting": 72,
-        "defending": 71,
-        "physical": 79,
-        "goalkeeping": 12
+        "speed": 88,
+        "dribbling": 86,
+        "passing": 66,
+        "shooting": 92,
+        "defending": 56,
+        "physical": 70,
+        "goalkeeping": 11
       }
     }
   },
@@ -3695,12 +3695,12 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 80,
-        "dribbling": 62,
-        "passing": 83,
-        "shooting": 87,
-        "defending": 83,
-        "physical": 85,
+        "speed": 89,
+        "dribbling": 86,
+        "passing": 73,
+        "shooting": 92,
+        "defending": 58,
+        "physical": 73,
         "goalkeeping": 15
       }
     }
@@ -3712,13 +3712,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 78,
-        "dribbling": 90,
-        "passing": 63,
-        "shooting": 81,
-        "defending": 80,
-        "physical": 87,
-        "goalkeeping": 14
+        "speed": 89,
+        "dribbling": 79,
+        "passing": 64,
+        "shooting": 86,
+        "defending": 48,
+        "physical": 63,
+        "goalkeeping": 7
       }
     }
   },
@@ -3729,13 +3729,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 73,
-        "dribbling": 79,
-        "passing": 83,
-        "shooting": 61,
-        "defending": 76,
-        "physical": 69,
-        "goalkeeping": 15
+        "speed": 75,
+        "dribbling": 62,
+        "passing": 72,
+        "shooting": 49,
+        "defending": 83,
+        "physical": 82,
+        "goalkeeping": 11
       }
     }
   },
@@ -3746,13 +3746,13 @@
     "preferred_pos": "POR",
     "positions": {
       "POR": {
-        "speed": 81,
-        "dribbling": 62,
-        "passing": 62,
-        "shooting": 84,
-        "defending": 75,
-        "physical": 86,
-        "goalkeeping": 82
+        "speed": 67,
+        "dribbling": 50,
+        "passing": 64,
+        "shooting": 38,
+        "defending": 69,
+        "physical": 75,
+        "goalkeeping": 85
       }
     },
     "full_name": "Ernesto Sevilla",
@@ -3765,13 +3765,13 @@
     "preferred_pos": "POR",
     "positions": {
       "POR": {
-        "speed": 80,
-        "dribbling": 84,
-        "passing": 64,
-        "shooting": 65,
-        "defending": 81,
-        "physical": 75,
-        "goalkeeping": 85
+        "speed": 63,
+        "dribbling": 50,
+        "passing": 58,
+        "shooting": 42,
+        "defending": 73,
+        "physical": 80,
+        "goalkeeping": 91
       }
     },
     "full_name": "Baltasar Garzón",
@@ -3784,13 +3784,13 @@
     "preferred_pos": "POR",
     "positions": {
       "POR": {
-        "speed": 79,
-        "dribbling": 87,
-        "passing": 79,
-        "shooting": 74,
-        "defending": 66,
-        "physical": 89,
-        "goalkeeping": 86
+        "speed": 60,
+        "dribbling": 51,
+        "passing": 60,
+        "shooting": 42,
+        "defending": 68,
+        "physical": 77,
+        "goalkeeping": 91
       }
     },
     "full_name": "Severo Ochoa",
@@ -3803,13 +3803,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 69,
-        "dribbling": 72,
-        "passing": 81,
-        "shooting": 80,
-        "defending": 71,
-        "physical": 75,
-        "goalkeeping": 13
+        "speed": 73,
+        "dribbling": 60,
+        "passing": 68,
+        "shooting": 52,
+        "defending": 86,
+        "physical": 79,
+        "goalkeeping": 10
       }
     },
     "full_name": "Vicente Fernández",
@@ -3822,13 +3822,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 63,
-        "dribbling": 67,
-        "passing": 67,
-        "shooting": 62,
-        "defending": 70,
-        "physical": 61,
-        "goalkeeping": 14
+        "speed": 72,
+        "dribbling": 58,
+        "passing": 68,
+        "shooting": 50,
+        "defending": 83,
+        "physical": 75,
+        "goalkeeping": 8
       }
     },
     "full_name": "Pablo Iglesias Posse",
@@ -3841,13 +3841,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 67,
-        "dribbling": 78,
-        "passing": 67,
-        "shooting": 60,
-        "defending": 62,
-        "physical": 83,
-        "goalkeeping": 15
+        "speed": 69,
+        "dribbling": 52,
+        "passing": 62,
+        "shooting": 49,
+        "defending": 83,
+        "physical": 80,
+        "goalkeeping": 9
       }
     },
     "full_name": "Javier Cámara",
@@ -3860,13 +3860,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 67,
-        "dribbling": 62,
-        "passing": 88,
-        "shooting": 61,
-        "defending": 87,
-        "physical": 71,
-        "goalkeeping": 6
+        "speed": 72,
+        "dribbling": 53,
+        "passing": 71,
+        "shooting": 46,
+        "defending": 84,
+        "physical": 81,
+        "goalkeeping": 10
       }
     },
     "full_name": "Juan Luis Guerra",
@@ -3879,13 +3879,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 67,
-        "dribbling": 68,
-        "passing": 81,
-        "shooting": 75,
-        "defending": 66,
-        "physical": 78,
-        "goalkeeping": 7
+        "speed": 66,
+        "dribbling": 56,
+        "passing": 64,
+        "shooting": 39,
+        "defending": 79,
+        "physical": 79,
+        "goalkeeping": 8
       }
     },
     "full_name": "Alfred Hitchcock",
@@ -3898,13 +3898,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 89,
-        "dribbling": 88,
-        "passing": 78,
-        "shooting": 78,
-        "defending": 75,
-        "physical": 68,
-        "goalkeeping": 12
+        "speed": 67,
+        "dribbling": 59,
+        "passing": 68,
+        "shooting": 47,
+        "defending": 82,
+        "physical": 79,
+        "goalkeeping": 9
       }
     },
     "full_name": "Miguel Ángel Revilla",
@@ -3917,13 +3917,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 73,
-        "dribbling": 66,
-        "passing": 63,
-        "shooting": 63,
-        "defending": 81,
-        "physical": 73,
-        "goalkeeping": 10
+        "speed": 62,
+        "dribbling": 77,
+        "passing": 81,
+        "shooting": 54,
+        "defending": 67,
+        "physical": 62,
+        "goalkeeping": 7
       }
     },
     "full_name": "Javier Marías",
@@ -3936,13 +3936,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 73,
-        "dribbling": 74,
-        "passing": 87,
-        "shooting": 83,
-        "defending": 61,
-        "physical": 81,
-        "goalkeeping": 15
+        "speed": 64,
+        "dribbling": 77,
+        "passing": 88,
+        "shooting": 59,
+        "defending": 66,
+        "physical": 66,
+        "goalkeeping": 10
       }
     },
     "full_name": "Andreu Buenafuente",
@@ -3955,13 +3955,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 63,
-        "dribbling": 61,
-        "passing": 72,
-        "shooting": 83,
-        "defending": 70,
-        "physical": 85,
-        "goalkeeping": 6
+        "speed": 74,
+        "dribbling": 82,
+        "passing": 87,
+        "shooting": 70,
+        "defending": 68,
+        "physical": 74,
+        "goalkeeping": 11
       }
     },
     "full_name": "Eduard Fernández",
@@ -3974,13 +3974,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 66,
-        "dribbling": 66,
-        "passing": 77,
-        "shooting": 74,
-        "defending": 64,
-        "physical": 73,
-        "goalkeeping": 7
+        "speed": 62,
+        "dribbling": 70,
+        "passing": 81,
+        "shooting": 52,
+        "defending": 59,
+        "physical": 64,
+        "goalkeeping": 6
       }
     },
     "full_name": "Ben Affleck",
@@ -3993,13 +3993,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 74,
-        "dribbling": 67,
-        "passing": 87,
-        "shooting": 89,
-        "defending": 62,
-        "physical": 74,
-        "goalkeeping": 13
+        "speed": 79,
+        "dribbling": 83,
+        "passing": 89,
+        "shooting": 68,
+        "defending": 73,
+        "physical": 70,
+        "goalkeeping": 12
       }
     },
     "full_name": "Joan Miró",
@@ -4012,13 +4012,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 61,
-        "dribbling": 80,
-        "passing": 77,
-        "shooting": 86,
-        "defending": 60,
-        "physical": 62,
-        "goalkeeping": 8
+        "speed": 78,
+        "dribbling": 78,
+        "passing": 84,
+        "shooting": 59,
+        "defending": 71,
+        "physical": 67,
+        "goalkeeping": 10
       }
     },
     "full_name": "Héroes del Silencio",
@@ -4031,13 +4031,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 73,
-        "dribbling": 75,
-        "passing": 75,
-        "shooting": 66,
-        "defending": 88,
-        "physical": 72,
-        "goalkeeping": 5
+        "speed": 86,
+        "dribbling": 81,
+        "passing": 62,
+        "shooting": 88,
+        "defending": 49,
+        "physical": 65,
+        "goalkeeping": 11
       }
     },
     "full_name": "Clint Eastwood",
@@ -4050,13 +4050,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 72,
-        "dribbling": 60,
-        "passing": 72,
-        "shooting": 68,
-        "defending": 90,
-        "physical": 85,
-        "goalkeeping": 12
+        "speed": 83,
+        "dribbling": 83,
+        "passing": 66,
+        "shooting": 87,
+        "defending": 51,
+        "physical": 71,
+        "goalkeeping": 10
       }
     },
     "full_name": "Loquillo",
@@ -4069,13 +4069,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 73,
-        "dribbling": 82,
-        "passing": 90,
-        "shooting": 83,
-        "defending": 86,
-        "physical": 77,
-        "goalkeeping": 15
+        "speed": 82,
+        "dribbling": 83,
+        "passing": 68,
+        "shooting": 82,
+        "defending": 48,
+        "physical": 67,
+        "goalkeeping": 10
       }
     },
     "full_name": "Pau Donés",
@@ -4088,13 +4088,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 75,
-        "dribbling": 64,
-        "passing": 66,
-        "shooting": 69,
-        "defending": 67,
-        "physical": 90,
-        "goalkeeping": 5
+        "speed": 78,
+        "dribbling": 74,
+        "passing": 52,
+        "shooting": 81,
+        "defending": 39,
+        "physical": 57,
+        "goalkeeping": 7
       }
     },
     "full_name": "David Muñoz",
@@ -4107,13 +4107,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 83,
-        "dribbling": 77,
-        "passing": 61,
-        "shooting": 83,
-        "defending": 71,
-        "physical": 61,
-        "goalkeeping": 5
+        "speed": 78,
+        "dribbling": 69,
+        "passing": 60,
+        "shooting": 78,
+        "defending": 43,
+        "physical": 59,
+        "goalkeeping": 8
       }
     },
     "full_name": "Santiago Abascal",
@@ -4126,13 +4126,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 75,
+        "speed": 78,
         "dribbling": 76,
-        "passing": 89,
-        "shooting": 87,
-        "defending": 77,
-        "physical": 65,
-        "goalkeeping": 5
+        "passing": 59,
+        "shooting": 80,
+        "defending": 41,
+        "physical": 64,
+        "goalkeeping": 7
       }
     },
     "full_name": "Lorenzo Milá",
@@ -4145,13 +4145,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 62,
-        "dribbling": 87,
-        "passing": 65,
-        "shooting": 62,
-        "defending": 80,
-        "physical": 62,
-        "goalkeeping": 15
+        "speed": 77,
+        "dribbling": 74,
+        "passing": 57,
+        "shooting": 82,
+        "defending": 48,
+        "physical": 64,
+        "goalkeeping": 9
       }
     },
     "full_name": "Cristina Castaño",
@@ -4164,13 +4164,13 @@
     "preferred_pos": "POR",
     "positions": {
       "POR": {
-        "speed": 81,
-        "dribbling": 67,
-        "passing": 78,
-        "shooting": 80,
-        "defending": 61,
-        "physical": 79,
-        "goalkeeping": 82
+        "speed": 66,
+        "dribbling": 51,
+        "passing": 66,
+        "shooting": 47,
+        "defending": 72,
+        "physical": 81,
+        "goalkeeping": 92
       }
     },
     "full_name": "Víctor Manuel",
@@ -4183,13 +4183,13 @@
     "preferred_pos": "POR",
     "positions": {
       "POR": {
-        "speed": 84,
-        "dribbling": 78,
-        "passing": 78,
-        "shooting": 77,
+        "speed": 68,
+        "dribbling": 52,
+        "passing": 62,
+        "shooting": 39,
         "defending": 70,
-        "physical": 89,
-        "goalkeeping": 88
+        "physical": 81,
+        "goalkeeping": 93
       }
     },
     "full_name": "Pedro J. Ramírez",
@@ -4202,12 +4202,12 @@
     "preferred_pos": "POR",
     "positions": {
       "POR": {
-        "speed": 84,
-        "dribbling": 82,
-        "passing": 70,
-        "shooting": 68,
-        "defending": 68,
-        "physical": 72,
+        "speed": 62,
+        "dribbling": 45,
+        "passing": 55,
+        "shooting": 38,
+        "defending": 66,
+        "physical": 76,
         "goalkeeping": 84
       }
     },
@@ -4221,13 +4221,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 80,
-        "dribbling": 69,
-        "passing": 74,
-        "shooting": 70,
-        "defending": 89,
-        "physical": 85,
-        "goalkeeping": 6
+        "speed": 66,
+        "dribbling": 53,
+        "passing": 68,
+        "shooting": 51,
+        "defending": 87,
+        "physical": 77,
+        "goalkeeping": 9
       }
     },
     "full_name": "Julia Roberts",
@@ -4241,12 +4241,12 @@
     "positions": {
       "DEF": {
         "speed": 74,
-        "dribbling": 79,
-        "passing": 78,
-        "shooting": 63,
-        "defending": 62,
-        "physical": 78,
-        "goalkeeping": 8
+        "dribbling": 57,
+        "passing": 69,
+        "shooting": 49,
+        "defending": 84,
+        "physical": 85,
+        "goalkeeping": 11
       }
     },
     "full_name": "Blanca Suárez",
@@ -4259,13 +4259,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 68,
-        "dribbling": 64,
-        "passing": 89,
-        "shooting": 71,
-        "defending": 88,
-        "physical": 63,
-        "goalkeeping": 8
+        "speed": 81,
+        "dribbling": 58,
+        "passing": 72,
+        "shooting": 54,
+        "defending": 87,
+        "physical": 83,
+        "goalkeeping": 12
       }
     },
     "full_name": "Isabel Díaz Ayuso",
@@ -4278,13 +4278,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 69,
-        "dribbling": 65,
+        "speed": 78,
+        "dribbling": 59,
         "passing": 74,
-        "shooting": 86,
-        "defending": 77,
-        "physical": 83,
-        "goalkeeping": 9
+        "shooting": 52,
+        "defending": 86,
+        "physical": 87,
+        "goalkeeping": 11
       }
     },
     "full_name": "Angelina Jolie",
@@ -4297,13 +4297,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 85,
-        "dribbling": 80,
-        "passing": 76,
-        "shooting": 60,
-        "defending": 81,
-        "physical": 87,
-        "goalkeeping": 13
+        "speed": 66,
+        "dribbling": 51,
+        "passing": 64,
+        "shooting": 44,
+        "defending": 79,
+        "physical": 81,
+        "goalkeeping": 8
       }
     },
     "full_name": "Nicole Kidman",
@@ -4316,13 +4316,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 89,
-        "dribbling": 81,
-        "passing": 63,
-        "shooting": 90,
+        "speed": 78,
+        "dribbling": 59,
+        "passing": 70,
+        "shooting": 54,
         "defending": 88,
-        "physical": 65,
-        "goalkeeping": 9
+        "physical": 88,
+        "goalkeeping": 10
       }
     },
     "full_name": "José Ortega y Gasset",
@@ -4335,13 +4335,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 88,
-        "dribbling": 63,
-        "passing": 83,
-        "shooting": 77,
-        "defending": 64,
-        "physical": 68,
-        "goalkeeping": 9
+        "speed": 69,
+        "dribbling": 82,
+        "passing": 80,
+        "shooting": 57,
+        "defending": 68,
+        "physical": 66,
+        "goalkeeping": 8
       }
     },
     "full_name": "Alberto Ruiz-Gallardón",
@@ -4354,13 +4354,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 66,
-        "dribbling": 82,
-        "passing": 70,
+        "speed": 76,
+        "dribbling": 85,
+        "passing": 87,
         "shooting": 66,
-        "defending": 81,
-        "physical": 80,
-        "goalkeeping": 9
+        "defending": 74,
+        "physical": 70,
+        "goalkeeping": 11
       }
     },
     "full_name": "David Bustamante",
@@ -4373,13 +4373,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 75,
-        "dribbling": 68,
-        "passing": 88,
-        "shooting": 89,
-        "defending": 87,
-        "physical": 61,
-        "goalkeeping": 6
+        "speed": 74,
+        "dribbling": 84,
+        "passing": 84,
+        "shooting": 59,
+        "defending": 63,
+        "physical": 65,
+        "goalkeeping": 9
       }
     },
     "full_name": "Fernando Trueba",
@@ -4393,12 +4393,12 @@
     "positions": {
       "MED": {
         "speed": 73,
-        "dribbling": 86,
-        "passing": 68,
+        "dribbling": 74,
+        "passing": 79,
         "shooting": 61,
-        "defending": 60,
-        "physical": 70,
-        "goalkeeping": 7
+        "defending": 69,
+        "physical": 67,
+        "goalkeeping": 10
       }
     },
     "full_name": "Selena Quintanilla",
@@ -4411,13 +4411,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 68,
-        "dribbling": 65,
-        "passing": 83,
-        "shooting": 74,
-        "defending": 77,
-        "physical": 82,
-        "goalkeeping": 11
+        "speed": 79,
+        "dribbling": 91,
+        "passing": 89,
+        "shooting": 72,
+        "defending": 72,
+        "physical": 78,
+        "goalkeeping": 13
       }
     },
     "full_name": "Silvia Abril",
@@ -4430,13 +4430,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 60,
-        "dribbling": 63,
-        "passing": 62,
-        "shooting": 90,
-        "defending": 88,
-        "physical": 82,
-        "goalkeeping": 7
+        "speed": 67,
+        "dribbling": 75,
+        "passing": 84,
+        "shooting": 60,
+        "defending": 64,
+        "physical": 64,
+        "goalkeeping": 8
       }
     },
     "full_name": "Yolanda Díaz",
@@ -4449,13 +4449,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 61,
-        "dribbling": 86,
-        "passing": 71,
-        "shooting": 78,
-        "defending": 78,
-        "physical": 64,
-        "goalkeeping": 11
+        "speed": 83,
+        "dribbling": 79,
+        "passing": 67,
+        "shooting": 85,
+        "defending": 54,
+        "physical": 66,
+        "goalkeeping": 12
       }
     },
     "full_name": "Karlos Simón",
@@ -4468,13 +4468,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 61,
-        "dribbling": 69,
-        "passing": 71,
-        "shooting": 88,
-        "defending": 90,
-        "physical": 85,
-        "goalkeeping": 5
+        "speed": 80,
+        "dribbling": 76,
+        "passing": 58,
+        "shooting": 83,
+        "defending": 42,
+        "physical": 62,
+        "goalkeeping": 8
       }
     },
     "full_name": "Jorge Lorenzo",
@@ -4487,12 +4487,12 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 71,
-        "dribbling": 66,
-        "passing": 81,
-        "shooting": 67,
-        "defending": 82,
-        "physical": 63,
+        "speed": 74,
+        "dribbling": 79,
+        "passing": 64,
+        "shooting": 84,
+        "defending": 48,
+        "physical": 64,
         "goalkeeping": 10
       }
     },
@@ -4507,12 +4507,12 @@
     "positions": {
       "DEL": {
         "speed": 77,
-        "dribbling": 88,
-        "passing": 87,
-        "shooting": 73,
-        "defending": 80,
-        "physical": 83,
-        "goalkeeping": 7
+        "dribbling": 76,
+        "passing": 59,
+        "shooting": 87,
+        "defending": 40,
+        "physical": 62,
+        "goalkeeping": 9
       }
     },
     "full_name": "Melody",
@@ -4526,12 +4526,12 @@
     "positions": {
       "DEL": {
         "speed": 89,
-        "dribbling": 67,
-        "passing": 87,
-        "shooting": 65,
-        "defending": 86,
-        "physical": 85,
-        "goalkeeping": 7
+        "dribbling": 84,
+        "passing": 70,
+        "shooting": 93,
+        "defending": 57,
+        "physical": 72,
+        "goalkeeping": 13
       }
     },
     "full_name": "Santiago Ramón y Cajal",
@@ -4544,13 +4544,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 73,
-        "dribbling": 60,
-        "passing": 65,
-        "shooting": 83,
-        "defending": 90,
-        "physical": 70,
-        "goalkeeping": 11
+        "speed": 74,
+        "dribbling": 69,
+        "passing": 59,
+        "shooting": 77,
+        "defending": 40,
+        "physical": 68,
+        "goalkeeping": 8
       }
     },
     "full_name": "Joaquin Phoenix",
@@ -4564,12 +4564,12 @@
     "positions": {
       "DEL": {
         "speed": 81,
-        "dribbling": 87,
-        "passing": 83,
-        "shooting": 85,
-        "defending": 68,
-        "physical": 68,
-        "goalkeeping": 7
+        "dribbling": 83,
+        "passing": 66,
+        "shooting": 84,
+        "defending": 52,
+        "physical": 69,
+        "goalkeeping": 12
       }
     },
     "full_name": "Martin Scorsese",
@@ -4582,13 +4582,13 @@
     "preferred_pos": "POR",
     "positions": {
       "POR": {
-        "speed": 64,
-        "dribbling": 87,
-        "passing": 75,
-        "shooting": 68,
-        "defending": 66,
-        "physical": 86,
-        "goalkeeping": 94
+        "speed": 66,
+        "dribbling": 52,
+        "passing": 59,
+        "shooting": 41,
+        "defending": 73,
+        "physical": 82,
+        "goalkeeping": 89
       }
     },
     "full_name": "Raúl Cimas",
@@ -4601,13 +4601,13 @@
     "preferred_pos": "POR",
     "positions": {
       "POR": {
-        "speed": 72,
-        "dribbling": 86,
-        "passing": 85,
-        "shooting": 88,
-        "defending": 67,
-        "physical": 67,
-        "goalkeeping": 80
+        "speed": 69,
+        "dribbling": 50,
+        "passing": 63,
+        "shooting": 43,
+        "defending": 74,
+        "physical": 81,
+        "goalkeeping": 89
       }
     },
     "full_name": "Eva Hache",
@@ -4620,13 +4620,13 @@
     "preferred_pos": "POR",
     "positions": {
       "POR": {
-        "speed": 69,
-        "dribbling": 72,
-        "passing": 70,
-        "shooting": 69,
-        "defending": 87,
-        "physical": 62,
-        "goalkeeping": 88
+        "speed": 71,
+        "dribbling": 48,
+        "passing": 61,
+        "shooting": 36,
+        "defending": 73,
+        "physical": 79,
+        "goalkeeping": 89
       }
     },
     "full_name": "Robert Downey Jr",
@@ -4639,13 +4639,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 80,
-        "dribbling": 76,
-        "passing": 72,
-        "shooting": 81,
-        "defending": 86,
-        "physical": 78,
-        "goalkeeping": 10
+        "speed": 74,
+        "dribbling": 56,
+        "passing": 71,
+        "shooting": 50,
+        "defending": 80,
+        "physical": 80,
+        "goalkeeping": 9
       }
     },
     "full_name": "Matías Prats Luque",
@@ -4658,13 +4658,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 63,
-        "dribbling": 88,
-        "passing": 68,
-        "shooting": 65,
-        "defending": 78,
-        "physical": 69,
-        "goalkeeping": 5
+        "speed": 73,
+        "dribbling": 57,
+        "passing": 71,
+        "shooting": 44,
+        "defending": 86,
+        "physical": 81,
+        "goalkeeping": 9
       }
     },
     "full_name": "Frida Kahlo",
@@ -4677,13 +4677,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 79,
-        "dribbling": 73,
-        "passing": 71,
-        "shooting": 83,
-        "defending": 85,
-        "physical": 71,
-        "goalkeeping": 11
+        "speed": 63,
+        "dribbling": 49,
+        "passing": 66,
+        "shooting": 43,
+        "defending": 77,
+        "physical": 78,
+        "goalkeeping": 9
       }
     },
     "full_name": "Denzel Washington",
@@ -4697,12 +4697,12 @@
     "positions": {
       "DEF": {
         "speed": 76,
-        "dribbling": 63,
-        "passing": 72,
-        "shooting": 88,
-        "defending": 78,
-        "physical": 67,
-        "goalkeeping": 9
+        "dribbling": 66,
+        "passing": 77,
+        "shooting": 52,
+        "defending": 89,
+        "physical": 86,
+        "goalkeeping": 10
       }
     },
     "full_name": "Juan Gabriel",
@@ -4715,13 +4715,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 82,
-        "dribbling": 73,
-        "passing": 60,
-        "shooting": 76,
-        "defending": 89,
-        "physical": 86,
-        "goalkeeping": 13
+        "speed": 73,
+        "dribbling": 58,
+        "passing": 70,
+        "shooting": 50,
+        "defending": 84,
+        "physical": 78,
+        "goalkeeping": 10
       }
     },
     "full_name": "Ada Colau",
@@ -4734,13 +4734,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 83,
-        "dribbling": 90,
-        "passing": 83,
-        "shooting": 83,
-        "defending": 81,
-        "physical": 67,
-        "goalkeeping": 10
+        "speed": 73,
+        "dribbling": 56,
+        "passing": 70,
+        "shooting": 51,
+        "defending": 89,
+        "physical": 77,
+        "goalkeeping": 9
       }
     },
     "full_name": "José Luis López Vázquez",
@@ -4753,13 +4753,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 62,
-        "dribbling": 90,
-        "passing": 81,
-        "shooting": 89,
-        "defending": 70,
-        "physical": 79,
-        "goalkeeping": 10
+        "speed": 72,
+        "dribbling": 78,
+        "passing": 85,
+        "shooting": 63,
+        "defending": 69,
+        "physical": 61,
+        "goalkeeping": 9
       }
     },
     "full_name": "Albert Rivera",
@@ -4772,13 +4772,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 87,
-        "dribbling": 63,
-        "passing": 83,
-        "shooting": 88,
-        "defending": 69,
-        "physical": 76,
-        "goalkeeping": 9
+        "speed": 65,
+        "dribbling": 72,
+        "passing": 79,
+        "shooting": 60,
+        "defending": 67,
+        "physical": 66,
+        "goalkeeping": 10
       }
     },
     "full_name": "José Luis Cuerda",
@@ -4791,13 +4791,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 73,
-        "dribbling": 70,
-        "passing": 72,
-        "shooting": 82,
-        "defending": 69,
-        "physical": 77,
-        "goalkeeping": 7
+        "speed": 79,
+        "dribbling": 83,
+        "passing": 86,
+        "shooting": 68,
+        "defending": 65,
+        "physical": 70,
+        "goalkeeping": 10
       }
     },
     "full_name": "Dani Pedrosa",
@@ -4810,13 +4810,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 73,
-        "dribbling": 81,
-        "passing": 90,
-        "shooting": 72,
-        "defending": 81,
-        "physical": 83,
-        "goalkeeping": 7
+        "speed": 76,
+        "dribbling": 79,
+        "passing": 89,
+        "shooting": 64,
+        "defending": 73,
+        "physical": 76,
+        "goalkeeping": 11
       }
     },
     "full_name": "Sandra Bullock",
@@ -4829,13 +4829,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 78,
-        "dribbling": 69,
-        "passing": 72,
-        "shooting": 77,
-        "defending": 86,
-        "physical": 60,
-        "goalkeeping": 9
+        "speed": 77,
+        "dribbling": 87,
+        "passing": 84,
+        "shooting": 67,
+        "defending": 76,
+        "physical": 68,
+        "goalkeeping": 10
       }
     },
     "full_name": "Luis Buñuel",
@@ -4848,13 +4848,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 66,
-        "dribbling": 73,
+        "speed": 80,
+        "dribbling": 82,
         "passing": 85,
-        "shooting": 78,
-        "defending": 79,
-        "physical": 80,
-        "goalkeeping": 10
+        "shooting": 65,
+        "defending": 70,
+        "physical": 71,
+        "goalkeeping": 11
       }
     },
     "full_name": "Scarlett Johansson",
@@ -4867,13 +4867,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 74,
-        "dribbling": 74,
-        "passing": 81,
-        "shooting": 66,
-        "defending": 77,
-        "physical": 75,
-        "goalkeeping": 7
+        "speed": 75,
+        "dribbling": 73,
+        "passing": 59,
+        "shooting": 74,
+        "defending": 36,
+        "physical": 58,
+        "goalkeeping": 6
       }
     },
     "full_name": "Plácido Domingo",
@@ -4886,13 +4886,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 62,
-        "dribbling": 69,
-        "passing": 76,
-        "shooting": 81,
-        "defending": 81,
-        "physical": 79,
-        "goalkeeping": 10
+        "speed": 82,
+        "dribbling": 77,
+        "passing": 63,
+        "shooting": 90,
+        "defending": 47,
+        "physical": 66,
+        "goalkeeping": 9
       }
     },
     "full_name": "Stanley Kubrick",
@@ -4905,13 +4905,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 86,
-        "dribbling": 90,
-        "passing": 84,
-        "shooting": 67,
-        "defending": 82,
-        "physical": 69,
-        "goalkeeping": 8
+        "speed": 89,
+        "dribbling": 91,
+        "passing": 72,
+        "shooting": 95,
+        "defending": 59,
+        "physical": 77,
+        "goalkeeping": 15
       }
     },
     "full_name": "Imanol Arias",
@@ -4924,13 +4924,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 66,
-        "dribbling": 64,
-        "passing": 60,
-        "shooting": 61,
-        "defending": 68,
-        "physical": 75,
-        "goalkeeping": 14
+        "speed": 80,
+        "dribbling": 77,
+        "passing": 62,
+        "shooting": 87,
+        "defending": 48,
+        "physical": 67,
+        "goalkeeping": 10
       }
     },
     "full_name": "Jesús Calleja",
@@ -4943,13 +4943,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 84,
-        "dribbling": 62,
-        "passing": 74,
-        "shooting": 73,
-        "defending": 89,
-        "physical": 80,
-        "goalkeeping": 14
+        "speed": 73,
+        "dribbling": 70,
+        "passing": 55,
+        "shooting": 79,
+        "defending": 43,
+        "physical": 60,
+        "goalkeeping": 7
       }
     },
     "full_name": "Pepa Bueno",
@@ -4962,13 +4962,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 82,
-        "dribbling": 82,
-        "passing": 72,
-        "shooting": 75,
-        "defending": 73,
-        "physical": 67,
-        "goalkeeping": 7
+        "speed": 87,
+        "dribbling": 87,
+        "passing": 67,
+        "shooting": 87,
+        "defending": 50,
+        "physical": 77,
+        "goalkeeping": 11
       }
     },
     "full_name": "Vanesa Martín",
@@ -4981,13 +4981,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 82,
-        "dribbling": 60,
-        "passing": 88,
-        "shooting": 84,
-        "defending": 88,
-        "physical": 84,
-        "goalkeeping": 6
+        "speed": 83,
+        "dribbling": 85,
+        "passing": 61,
+        "shooting": 86,
+        "defending": 52,
+        "physical": 68,
+        "goalkeeping": 11
       }
     },
     "full_name": "Marc Gasol",
@@ -5000,13 +5000,13 @@
     "preferred_pos": "POR",
     "positions": {
       "POR": {
-        "speed": 85,
-        "dribbling": 76,
-        "passing": 74,
-        "shooting": 62,
-        "defending": 77,
-        "physical": 67,
-        "goalkeeping": 83
+        "speed": 70,
+        "dribbling": 57,
+        "passing": 61,
+        "shooting": 45,
+        "defending": 74,
+        "physical": 80,
+        "goalkeeping": 89
       }
     },
     "full_name": "Emilio Aragón",
@@ -5019,11 +5019,11 @@
     "preferred_pos": "POR",
     "positions": {
       "POR": {
-        "speed": 67,
-        "dribbling": 85,
-        "passing": 74,
-        "shooting": 82,
-        "defending": 76,
+        "speed": 71,
+        "dribbling": 58,
+        "passing": 66,
+        "shooting": 41,
+        "defending": 74,
         "physical": 77,
         "goalkeeping": 90
       }
@@ -5038,13 +5038,13 @@
     "preferred_pos": "POR",
     "positions": {
       "POR": {
-        "speed": 77,
-        "dribbling": 79,
-        "passing": 86,
-        "shooting": 84,
+        "speed": 70,
+        "dribbling": 56,
+        "passing": 67,
+        "shooting": 44,
         "defending": 76,
-        "physical": 73,
-        "goalkeeping": 94
+        "physical": 79,
+        "goalkeeping": 93
       }
     },
     "full_name": "Johnny Depp",
@@ -5057,13 +5057,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 65,
-        "dribbling": 83,
-        "passing": 87,
-        "shooting": 75,
-        "defending": 74,
-        "physical": 69,
-        "goalkeeping": 8
+        "speed": 81,
+        "dribbling": 60,
+        "passing": 74,
+        "shooting": 62,
+        "defending": 92,
+        "physical": 89,
+        "goalkeeping": 13
       }
     },
     "full_name": "Al Pacino",
@@ -5076,13 +5076,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 80,
-        "dribbling": 68,
-        "passing": 84,
-        "shooting": 84,
-        "defending": 76,
-        "physical": 76,
-        "goalkeeping": 15
+        "speed": 73,
+        "dribbling": 63,
+        "passing": 68,
+        "shooting": 48,
+        "defending": 86,
+        "physical": 84,
+        "goalkeeping": 10
       }
     },
     "full_name": "Victoria Abril",
@@ -5095,13 +5095,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 68,
-        "dribbling": 74,
-        "passing": 62,
-        "shooting": 82,
-        "defending": 69,
-        "physical": 68,
-        "goalkeeping": 9
+        "speed": 62,
+        "dribbling": 52,
+        "passing": 64,
+        "shooting": 43,
+        "defending": 78,
+        "physical": 78,
+        "goalkeeping": 7
       }
     },
     "full_name": "Gloria Fuertes",
@@ -5114,13 +5114,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 70,
-        "dribbling": 88,
-        "passing": 77,
-        "shooting": 62,
-        "defending": 64,
-        "physical": 65,
-        "goalkeeping": 8
+        "speed": 77,
+        "dribbling": 59,
+        "passing": 67,
+        "shooting": 46,
+        "defending": 82,
+        "physical": 78,
+        "goalkeeping": 9
       }
     },
     "full_name": "Estopa",
@@ -5133,13 +5133,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 82,
-        "dribbling": 64,
-        "passing": 82,
-        "shooting": 66,
-        "defending": 62,
-        "physical": 74,
-        "goalkeeping": 11
+        "speed": 74,
+        "dribbling": 63,
+        "passing": 67,
+        "shooting": 51,
+        "defending": 87,
+        "physical": 87,
+        "goalkeeping": 10
       }
     },
     "full_name": "Rudy Fernández",
@@ -5152,13 +5152,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 77,
-        "dribbling": 74,
-        "passing": 73,
+        "speed": 86,
+        "dribbling": 72,
+        "passing": 74,
         "shooting": 61,
-        "defending": 66,
-        "physical": 87,
-        "goalkeeping": 11
+        "defending": 90,
+        "physical": 90,
+        "goalkeeping": 14
       }
     },
     "full_name": "Arturo Valls",
@@ -5171,13 +5171,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 88,
+        "speed": 85,
         "dribbling": 84,
-        "passing": 78,
-        "shooting": 90,
-        "defending": 82,
-        "physical": 60,
-        "goalkeeping": 14
+        "passing": 93,
+        "shooting": 69,
+        "defending": 72,
+        "physical": 71,
+        "goalkeeping": 11
       }
     },
     "full_name": "Sara Carbonero",
@@ -5190,13 +5190,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 75,
-        "dribbling": 60,
-        "passing": 90,
-        "shooting": 71,
-        "defending": 69,
-        "physical": 84,
-        "goalkeeping": 11
+        "speed": 73,
+        "dribbling": 83,
+        "passing": 84,
+        "shooting": 63,
+        "defending": 74,
+        "physical": 64,
+        "goalkeeping": 9
       }
     },
     "full_name": "Álex de la Iglesia",
@@ -5209,13 +5209,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 88,
-        "dribbling": 90,
-        "passing": 86,
-        "shooting": 73,
-        "defending": 77,
-        "physical": 83,
-        "goalkeeping": 13
+        "speed": 78,
+        "dribbling": 86,
+        "passing": 90,
+        "shooting": 68,
+        "defending": 78,
+        "physical": 77,
+        "goalkeeping": 10
       }
     },
     "full_name": "Cristina Cifuentes",
@@ -5229,12 +5229,12 @@
     "positions": {
       "MED": {
         "speed": 79,
-        "dribbling": 88,
-        "passing": 67,
-        "shooting": 75,
-        "defending": 67,
-        "physical": 68,
-        "goalkeeping": 11
+        "dribbling": 91,
+        "passing": 90,
+        "shooting": 69,
+        "defending": 78,
+        "physical": 75,
+        "goalkeeping": 10
       }
     },
     "full_name": "José Luis Perales",
@@ -5247,13 +5247,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 60,
-        "dribbling": 72,
-        "passing": 70,
-        "shooting": 81,
-        "defending": 81,
-        "physical": 85,
-        "goalkeeping": 11
+        "speed": 67,
+        "dribbling": 77,
+        "passing": 82,
+        "shooting": 62,
+        "defending": 67,
+        "physical": 62,
+        "goalkeeping": 8
       }
     },
     "full_name": "José Mercé",
@@ -5266,12 +5266,12 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 65,
+        "speed": 81,
         "dribbling": 86,
-        "passing": 74,
-        "shooting": 89,
-        "defending": 64,
-        "physical": 79,
+        "passing": 91,
+        "shooting": 67,
+        "defending": 79,
+        "physical": 77,
         "goalkeeping": 13
       }
     },
@@ -5285,13 +5285,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 89,
-        "dribbling": 72,
-        "passing": 78,
-        "shooting": 78,
-        "defending": 82,
-        "physical": 60,
-        "goalkeeping": 6
+        "speed": 90,
+        "dribbling": 82,
+        "passing": 67,
+        "shooting": 87,
+        "defending": 51,
+        "physical": 72,
+        "goalkeeping": 13
       }
     },
     "full_name": "José Bono",
@@ -5304,13 +5304,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 73,
-        "dribbling": 64,
-        "passing": 87,
-        "shooting": 74,
-        "defending": 66,
-        "physical": 61,
-        "goalkeeping": 9
+        "speed": 85,
+        "dribbling": 87,
+        "passing": 65,
+        "shooting": 89,
+        "defending": 53,
+        "physical": 77,
+        "goalkeeping": 12
       }
     },
     "full_name": "Michael Schumacher",
@@ -5323,13 +5323,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 70,
-        "dribbling": 66,
-        "passing": 74,
-        "shooting": 70,
-        "defending": 71,
-        "physical": 84,
-        "goalkeeping": 11
+        "speed": 76,
+        "dribbling": 73,
+        "passing": 60,
+        "shooting": 81,
+        "defending": 42,
+        "physical": 57,
+        "goalkeeping": 7
       }
     },
     "full_name": "Montserrat Caballé",
@@ -5342,13 +5342,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 84,
-        "dribbling": 90,
-        "passing": 86,
-        "shooting": 73,
-        "defending": 69,
-        "physical": 86,
-        "goalkeeping": 6
+        "speed": 89,
+        "dribbling": 85,
+        "passing": 65,
+        "shooting": 88,
+        "defending": 51,
+        "physical": 72,
+        "goalkeeping": 12
       }
     },
     "full_name": "Santiago Auserón",
@@ -5361,13 +5361,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 60,
-        "dribbling": 83,
-        "passing": 77,
-        "shooting": 61,
-        "defending": 72,
-        "physical": 67,
-        "goalkeeping": 15
+        "speed": 83,
+        "dribbling": 77,
+        "passing": 60,
+        "shooting": 81,
+        "defending": 43,
+        "physical": 68,
+        "goalkeeping": 9
       }
     },
     "full_name": "Niña Pastori",
@@ -5380,13 +5380,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 84,
-        "dribbling": 90,
-        "passing": 80,
-        "shooting": 61,
-        "defending": 85,
-        "physical": 60,
-        "goalkeeping": 8
+        "speed": 81,
+        "dribbling": 77,
+        "passing": 65,
+        "shooting": 82,
+        "defending": 47,
+        "physical": 65,
+        "goalkeeping": 10
       }
     },
     "full_name": "Pedro Infante",
@@ -5399,13 +5399,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 86,
-        "dribbling": 60,
-        "passing": 79,
-        "shooting": 64,
-        "defending": 68,
-        "physical": 64,
-        "goalkeeping": 12
+        "speed": 79,
+        "dribbling": 81,
+        "passing": 60,
+        "shooting": 89,
+        "defending": 48,
+        "physical": 68,
+        "goalkeeping": 9
       }
     },
     "full_name": "Amenábar",
@@ -5418,13 +5418,13 @@
     "preferred_pos": "POR",
     "positions": {
       "POR": {
-        "speed": 77,
-        "dribbling": 82,
-        "passing": 68,
-        "shooting": 85,
-        "defending": 71,
-        "physical": 65,
-        "goalkeeping": 83
+        "speed": 58,
+        "dribbling": 47,
+        "passing": 60,
+        "shooting": 38,
+        "defending": 68,
+        "physical": 74,
+        "goalkeeping": 88
       }
     },
     "full_name": "Najwa Nimri",
@@ -5437,13 +5437,13 @@
     "preferred_pos": "POR",
     "positions": {
       "POR": {
-        "speed": 68,
-        "dribbling": 69,
-        "passing": 63,
-        "shooting": 79,
-        "defending": 60,
-        "physical": 89,
-        "goalkeeping": 89
+        "speed": 59,
+        "dribbling": 44,
+        "passing": 58,
+        "shooting": 36,
+        "defending": 68,
+        "physical": 72,
+        "goalkeeping": 83
       }
     },
     "full_name": "Tom Hanks",
@@ -5456,13 +5456,13 @@
     "preferred_pos": "POR",
     "positions": {
       "POR": {
-        "speed": 84,
-        "dribbling": 89,
-        "passing": 72,
-        "shooting": 73,
-        "defending": 82,
-        "physical": 66,
-        "goalkeeping": 82
+        "speed": 73,
+        "dribbling": 54,
+        "passing": 61,
+        "shooting": 44,
+        "defending": 76,
+        "physical": 82,
+        "goalkeeping": 90
       }
     },
     "full_name": "Russell Crowe",
@@ -5475,12 +5475,12 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 82,
-        "dribbling": 86,
-        "passing": 80,
-        "shooting": 67,
-        "defending": 63,
-        "physical": 83,
+        "speed": 72,
+        "dribbling": 56,
+        "passing": 70,
+        "shooting": 45,
+        "defending": 86,
+        "physical": 77,
         "goalkeeping": 9
       }
     },
@@ -5494,13 +5494,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 81,
-        "dribbling": 79,
-        "passing": 85,
-        "shooting": 63,
-        "defending": 85,
-        "physical": 79,
-        "goalkeeping": 5
+        "speed": 69,
+        "dribbling": 58,
+        "passing": 64,
+        "shooting": 45,
+        "defending": 83,
+        "physical": 80,
+        "goalkeeping": 10
       }
     },
     "full_name": "Pablo Alborán",
@@ -5513,13 +5513,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 77,
-        "dribbling": 73,
-        "passing": 81,
-        "shooting": 71,
-        "defending": 62,
-        "physical": 77,
-        "goalkeeping": 15
+        "speed": 69,
+        "dribbling": 53,
+        "passing": 64,
+        "shooting": 49,
+        "defending": 81,
+        "physical": 74,
+        "goalkeeping": 10
       }
     },
     "full_name": "Robin Williams",
@@ -5532,13 +5532,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 60,
-        "dribbling": 87,
-        "passing": 73,
-        "shooting": 86,
-        "defending": 75,
-        "physical": 64,
-        "goalkeeping": 11
+        "speed": 70,
+        "dribbling": 60,
+        "passing": 70,
+        "shooting": 51,
+        "defending": 88,
+        "physical": 82,
+        "goalkeeping": 8
       }
     },
     "full_name": "Itziar Ituño",
@@ -5551,13 +5551,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 80,
-        "dribbling": 88,
-        "passing": 86,
-        "shooting": 74,
-        "defending": 82,
-        "physical": 65,
-        "goalkeeping": 11
+        "speed": 81,
+        "dribbling": 67,
+        "passing": 76,
+        "shooting": 57,
+        "defending": 90,
+        "physical": 87,
+        "goalkeeping": 12
       }
     },
     "full_name": "Rozalén",
@@ -5570,13 +5570,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 83,
-        "dribbling": 76,
-        "passing": 80,
-        "shooting": 68,
-        "defending": 79,
-        "physical": 86,
-        "goalkeeping": 13
+        "speed": 73,
+        "dribbling": 59,
+        "passing": 71,
+        "shooting": 48,
+        "defending": 88,
+        "physical": 82,
+        "goalkeeping": 10
       }
     },
     "full_name": "Jim Carrey",
@@ -5589,13 +5589,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 75,
-        "dribbling": 74,
-        "passing": 73,
-        "shooting": 86,
-        "defending": 83,
-        "physical": 78,
-        "goalkeeping": 9
+        "speed": 82,
+        "dribbling": 86,
+        "passing": 93,
+        "shooting": 74,
+        "defending": 77,
+        "physical": 77,
+        "goalkeeping": 11
       }
     },
     "full_name": "Nieves Herrero",
@@ -5608,12 +5608,12 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 87,
-        "dribbling": 67,
-        "passing": 86,
-        "shooting": 89,
-        "defending": 62,
-        "physical": 68,
+        "speed": 79,
+        "dribbling": 86,
+        "passing": 85,
+        "shooting": 68,
+        "defending": 69,
+        "physical": 76,
         "goalkeeping": 12
       }
     },
@@ -5627,13 +5627,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 84,
-        "dribbling": 74,
-        "passing": 78,
-        "shooting": 79,
-        "defending": 81,
-        "physical": 72,
-        "goalkeeping": 10
+        "speed": 76,
+        "dribbling": 86,
+        "passing": 88,
+        "shooting": 67,
+        "defending": 72,
+        "physical": 67,
+        "goalkeeping": 12
       }
     },
     "full_name": "Luis Eduardo Aute",
@@ -5646,13 +5646,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 75,
-        "dribbling": 87,
-        "passing": 70,
-        "shooting": 65,
-        "defending": 75,
-        "physical": 66,
-        "goalkeeping": 10
+        "speed": 81,
+        "dribbling": 89,
+        "passing": 93,
+        "shooting": 72,
+        "defending": 74,
+        "physical": 73,
+        "goalkeeping": 13
       }
     },
     "full_name": "Álex Ubago",
@@ -5665,12 +5665,12 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 68,
-        "dribbling": 70,
-        "passing": 68,
-        "shooting": 88,
-        "defending": 79,
-        "physical": 82,
+        "speed": 71,
+        "dribbling": 83,
+        "passing": 82,
+        "shooting": 59,
+        "defending": 73,
+        "physical": 67,
         "goalkeeping": 9
       }
     },
@@ -5684,13 +5684,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 60,
-        "dribbling": 76,
-        "passing": 90,
-        "shooting": 66,
-        "defending": 62,
-        "physical": 67,
-        "goalkeeping": 11
+        "speed": 82,
+        "dribbling": 89,
+        "passing": 92,
+        "shooting": 73,
+        "defending": 80,
+        "physical": 78,
+        "goalkeeping": 14
       }
     },
     "full_name": "Miguel de Cervantes",
@@ -5703,13 +5703,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 77,
-        "dribbling": 84,
-        "passing": 67,
-        "shooting": 82,
-        "defending": 76,
-        "physical": 80,
-        "goalkeeping": 12
+        "speed": 87,
+        "dribbling": 83,
+        "passing": 66,
+        "shooting": 88,
+        "defending": 55,
+        "physical": 67,
+        "goalkeeping": 10
       }
     },
     "full_name": "Jordi Évole",
@@ -5722,13 +5722,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 85,
-        "dribbling": 60,
-        "passing": 62,
-        "shooting": 69,
-        "defending": 68,
-        "physical": 72,
-        "goalkeeping": 8
+        "speed": 78,
+        "dribbling": 78,
+        "passing": 60,
+        "shooting": 84,
+        "defending": 45,
+        "physical": 61,
+        "goalkeeping": 9
       }
     },
     "full_name": "Matt Damon",
@@ -5741,13 +5741,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 81,
-        "dribbling": 78,
-        "passing": 71,
-        "shooting": 75,
-        "defending": 78,
-        "physical": 76,
-        "goalkeeping": 10
+        "speed": 86,
+        "dribbling": 88,
+        "passing": 69,
+        "shooting": 92,
+        "defending": 56,
+        "physical": 71,
+        "goalkeeping": 14
       }
     },
     "full_name": "Susanna Griso",
@@ -5760,13 +5760,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 83,
-        "dribbling": 77,
-        "passing": 70,
-        "shooting": 71,
-        "defending": 83,
-        "physical": 74,
-        "goalkeeping": 9
+        "speed": 80,
+        "dribbling": 75,
+        "passing": 61,
+        "shooting": 84,
+        "defending": 47,
+        "physical": 69,
+        "goalkeeping": 10
       }
     },
     "full_name": "Maribel Verdú",
@@ -5779,13 +5779,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 68,
-        "dribbling": 67,
-        "passing": 63,
+        "speed": 73,
+        "dribbling": 75,
+        "passing": 56,
         "shooting": 83,
-        "defending": 67,
-        "physical": 70,
-        "goalkeeping": 6
+        "defending": 42,
+        "physical": 59,
+        "goalkeeping": 8
       }
     },
     "full_name": "Terelu Campos",
@@ -5798,13 +5798,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 77,
-        "dribbling": 90,
-        "passing": 84,
-        "shooting": 82,
-        "defending": 66,
-        "physical": 66,
-        "goalkeeping": 8
+        "speed": 90,
+        "dribbling": 86,
+        "passing": 70,
+        "shooting": 87,
+        "defending": 56,
+        "physical": 70,
+        "goalkeeping": 12
       }
     },
     "full_name": "Ricky Rubio",
@@ -5817,13 +5817,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 75,
-        "dribbling": 68,
-        "passing": 83,
-        "shooting": 78,
-        "defending": 85,
-        "physical": 76,
-        "goalkeeping": 14
+        "speed": 85,
+        "dribbling": 81,
+        "passing": 63,
+        "shooting": 85,
+        "defending": 46,
+        "physical": 72,
+        "goalkeeping": 11
       }
     },
     "full_name": "Celia Cruz",
@@ -5836,12 +5836,12 @@
     "preferred_pos": "POR",
     "positions": {
       "POR": {
-        "speed": 70,
-        "dribbling": 71,
-        "passing": 65,
-        "shooting": 70,
-        "defending": 60,
-        "physical": 82,
+        "speed": 63,
+        "dribbling": 42,
+        "passing": 51,
+        "shooting": 31,
+        "defending": 67,
+        "physical": 70,
         "goalkeeping": 84
       }
     },
@@ -5855,13 +5855,13 @@
     "preferred_pos": "POR",
     "positions": {
       "POR": {
-        "speed": 64,
-        "dribbling": 61,
-        "passing": 77,
-        "shooting": 70,
-        "defending": 82,
-        "physical": 64,
-        "goalkeeping": 95
+        "speed": 61,
+        "dribbling": 51,
+        "passing": 58,
+        "shooting": 42,
+        "defending": 72,
+        "physical": 70,
+        "goalkeeping": 87
       }
     },
     "full_name": "Samuel L Jackson",
@@ -5874,13 +5874,13 @@
     "preferred_pos": "POR",
     "positions": {
       "POR": {
-        "speed": 63,
-        "dribbling": 78,
-        "passing": 69,
-        "shooting": 76,
-        "defending": 75,
-        "physical": 74,
-        "goalkeeping": 90
+        "speed": 65,
+        "dribbling": 51,
+        "passing": 62,
+        "shooting": 46,
+        "defending": 65,
+        "physical": 80,
+        "goalkeeping": 89
       }
     },
     "full_name": "Gloria Estefan",
@@ -5893,13 +5893,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 90,
-        "dribbling": 61,
-        "passing": 68,
-        "shooting": 90,
-        "defending": 87,
-        "physical": 76,
-        "goalkeeping": 6
+        "speed": 76,
+        "dribbling": 59,
+        "passing": 70,
+        "shooting": 50,
+        "defending": 86,
+        "physical": 81,
+        "goalkeeping": 11
       }
     },
     "full_name": "José Luis Garci",
@@ -5912,13 +5912,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 62,
-        "dribbling": 72,
-        "passing": 75,
-        "shooting": 62,
-        "defending": 78,
+        "speed": 74,
+        "dribbling": 62,
+        "passing": 67,
+        "shooting": 49,
+        "defending": 83,
         "physical": 81,
-        "goalkeeping": 15
+        "goalkeeping": 9
       }
     },
     "full_name": "Fernando Simón",
@@ -5931,13 +5931,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 64,
-        "dribbling": 64,
-        "passing": 85,
-        "shooting": 78,
-        "defending": 90,
-        "physical": 70,
-        "goalkeeping": 6
+        "speed": 77,
+        "dribbling": 54,
+        "passing": 66,
+        "shooting": 52,
+        "defending": 85,
+        "physical": 80,
+        "goalkeeping": 10
       }
     },
     "full_name": "Marisol",
@@ -5950,13 +5950,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 63,
-        "dribbling": 77,
-        "passing": 84,
-        "shooting": 73,
-        "defending": 79,
-        "physical": 80,
-        "goalkeeping": 14
+        "speed": 83,
+        "dribbling": 66,
+        "passing": 79,
+        "shooting": 54,
+        "defending": 89,
+        "physical": 87,
+        "goalkeeping": 13
       }
     },
     "full_name": "Martín Berasategui",
@@ -5969,13 +5969,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 84,
-        "dribbling": 76,
-        "passing": 72,
-        "shooting": 74,
-        "defending": 89,
-        "physical": 75,
-        "goalkeeping": 9
+        "speed": 82,
+        "dribbling": 63,
+        "passing": 73,
+        "shooting": 58,
+        "defending": 96,
+        "physical": 88,
+        "goalkeeping": 13
       }
     },
     "full_name": "Antonio Gaudí",
@@ -5988,13 +5988,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 78,
-        "dribbling": 73,
-        "passing": 69,
-        "shooting": 78,
-        "defending": 79,
-        "physical": 62,
-        "goalkeeping": 14
+        "speed": 74,
+        "dribbling": 53,
+        "passing": 66,
+        "shooting": 48,
+        "defending": 82,
+        "physical": 81,
+        "goalkeeping": 8
       }
     },
     "full_name": "Santiago Carrillo",
@@ -6007,12 +6007,12 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 63,
-        "dribbling": 90,
-        "passing": 84,
-        "shooting": 66,
-        "defending": 80,
-        "physical": 66,
+        "speed": 68,
+        "dribbling": 82,
+        "passing": 85,
+        "shooting": 62,
+        "defending": 67,
+        "physical": 65,
         "goalkeeping": 9
       }
     },
@@ -6026,13 +6026,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 62,
-        "dribbling": 65,
-        "passing": 67,
+        "speed": 76,
+        "dribbling": 79,
+        "passing": 83,
         "shooting": 65,
-        "defending": 77,
-        "physical": 62,
-        "goalkeeping": 7
+        "defending": 67,
+        "physical": 68,
+        "goalkeeping": 9
       }
     },
     "full_name": "Quentin Tarantino",
@@ -6045,13 +6045,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 73,
-        "dribbling": 74,
-        "passing": 82,
-        "shooting": 79,
-        "defending": 75,
-        "physical": 69,
-        "goalkeeping": 5
+        "speed": 82,
+        "dribbling": 88,
+        "passing": 92,
+        "shooting": 69,
+        "defending": 77,
+        "physical": 73,
+        "goalkeeping": 11
       }
     },
     "full_name": "Luz Casal",
@@ -6065,12 +6065,12 @@
     "positions": {
       "MED": {
         "speed": 69,
-        "dribbling": 82,
-        "passing": 69,
-        "shooting": 82,
-        "defending": 87,
-        "physical": 74,
-        "goalkeeping": 6
+        "dribbling": 81,
+        "passing": 79,
+        "shooting": 66,
+        "defending": 67,
+        "physical": 63,
+        "goalkeeping": 10
       }
     },
     "full_name": "Francisco Franco",
@@ -6083,13 +6083,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 67,
-        "dribbling": 89,
-        "passing": 68,
-        "shooting": 85,
-        "defending": 85,
-        "physical": 80,
-        "goalkeeping": 14
+        "speed": 80,
+        "dribbling": 84,
+        "passing": 89,
+        "shooting": 70,
+        "defending": 74,
+        "physical": 76,
+        "goalkeeping": 12
       }
     },
     "full_name": "Ernest Hemingway",
@@ -6102,13 +6102,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 85,
-        "dribbling": 89,
-        "passing": 66,
-        "shooting": 73,
-        "defending": 63,
-        "physical": 77,
-        "goalkeeping": 8
+        "speed": 67,
+        "dribbling": 79,
+        "passing": 79,
+        "shooting": 59,
+        "defending": 64,
+        "physical": 66,
+        "goalkeeping": 10
       }
     },
     "full_name": "Mamen Mendizábal",
@@ -6121,13 +6121,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 64,
-        "dribbling": 89,
+        "speed": 85,
+        "dribbling": 80,
         "passing": 68,
-        "shooting": 86,
-        "defending": 65,
-        "physical": 62,
-        "goalkeeping": 5
+        "shooting": 87,
+        "defending": 56,
+        "physical": 70,
+        "goalkeeping": 12
       }
     },
     "full_name": "Belén Rueda",
@@ -6140,13 +6140,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 85,
-        "dribbling": 69,
-        "passing": 79,
-        "shooting": 83,
-        "defending": 87,
-        "physical": 78,
-        "goalkeeping": 9
+        "speed": 82,
+        "dribbling": 76,
+        "passing": 59,
+        "shooting": 84,
+        "defending": 48,
+        "physical": 67,
+        "goalkeeping": 10
       }
     },
     "full_name": "María Teresa Campos",
@@ -6159,13 +6159,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 63,
-        "dribbling": 74,
-        "passing": 82,
-        "shooting": 69,
-        "defending": 83,
-        "physical": 72,
-        "goalkeeping": 9
+        "speed": 86,
+        "dribbling": 89,
+        "passing": 70,
+        "shooting": 93,
+        "defending": 54,
+        "physical": 75,
+        "goalkeeping": 13
       }
     },
     "full_name": "Heath Ledger",
@@ -6178,13 +6178,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 77,
-        "dribbling": 75,
-        "passing": 74,
-        "shooting": 62,
-        "defending": 80,
-        "physical": 61,
-        "goalkeeping": 11
+        "speed": 89,
+        "dribbling": 83,
+        "passing": 68,
+        "shooting": 90,
+        "defending": 55,
+        "physical": 74,
+        "goalkeeping": 14
       }
     },
     "full_name": "Miguel de Unamuno",
@@ -6197,13 +6197,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 70,
-        "dribbling": 79,
-        "passing": 68,
-        "shooting": 60,
-        "defending": 63,
-        "physical": 67,
-        "goalkeeping": 15
+        "speed": 72,
+        "dribbling": 69,
+        "passing": 56,
+        "shooting": 77,
+        "defending": 38,
+        "physical": 56,
+        "goalkeeping": 7
       }
     },
     "full_name": "Jordi Pujol",
@@ -6216,12 +6216,12 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 87,
-        "dribbling": 78,
-        "passing": 78,
-        "shooting": 90,
-        "defending": 61,
-        "physical": 84,
+        "speed": 94,
+        "dribbling": 86,
+        "passing": 74,
+        "shooting": 94,
+        "defending": 62,
+        "physical": 75,
         "goalkeeping": 15
       }
     },
@@ -6235,13 +6235,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 68,
-        "dribbling": 78,
-        "passing": 61,
-        "shooting": 84,
-        "defending": 85,
-        "physical": 65,
-        "goalkeeping": 12
+        "speed": 82,
+        "dribbling": 81,
+        "passing": 58,
+        "shooting": 83,
+        "defending": 47,
+        "physical": 62,
+        "goalkeeping": 11
       }
     },
     "full_name": "Inés Arrimadas",
@@ -6254,13 +6254,13 @@
     "preferred_pos": "POR",
     "positions": {
       "POR": {
-        "speed": 71,
-        "dribbling": 65,
-        "passing": 78,
-        "shooting": 74,
-        "defending": 80,
-        "physical": 86,
-        "goalkeeping": 95
+        "speed": 66,
+        "dribbling": 48,
+        "passing": 55,
+        "shooting": 37,
+        "defending": 66,
+        "physical": 80,
+        "goalkeeping": 87
       }
     },
     "full_name": "Antonio Gala",
@@ -6273,13 +6273,13 @@
     "preferred_pos": "POR",
     "positions": {
       "POR": {
-        "speed": 78,
-        "dribbling": 71,
-        "passing": 73,
-        "shooting": 71,
-        "defending": 70,
-        "physical": 81,
-        "goalkeeping": 83
+        "speed": 53,
+        "dribbling": 42,
+        "passing": 55,
+        "shooting": 36,
+        "defending": 62,
+        "physical": 71,
+        "goalkeeping": 84
       }
     },
     "full_name": "Ana Pastor",
@@ -6292,13 +6292,13 @@
     "preferred_pos": "POR",
     "positions": {
       "POR": {
-        "speed": 68,
-        "dribbling": 70,
-        "passing": 73,
-        "shooting": 83,
-        "defending": 75,
-        "physical": 69,
-        "goalkeeping": 92
+        "speed": 66,
+        "dribbling": 51,
+        "passing": 58,
+        "shooting": 37,
+        "defending": 69,
+        "physical": 84,
+        "goalkeeping": 89
       }
     },
     "full_name": "Luis Tosar",
@@ -6311,13 +6311,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 84,
-        "dribbling": 77,
-        "passing": 61,
-        "shooting": 74,
-        "defending": 62,
-        "physical": 71,
-        "goalkeeping": 9
+        "speed": 80,
+        "dribbling": 65,
+        "passing": 78,
+        "shooting": 59,
+        "defending": 96,
+        "physical": 85,
+        "goalkeeping": 13
       }
     },
     "full_name": "Mägo de Oz",
@@ -6330,13 +6330,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 63,
-        "dribbling": 84,
-        "passing": 72,
-        "shooting": 87,
-        "defending": 76,
-        "physical": 87,
-        "goalkeeping": 5
+        "speed": 70,
+        "dribbling": 59,
+        "passing": 62,
+        "shooting": 51,
+        "defending": 85,
+        "physical": 79,
+        "goalkeeping": 10
       }
     },
     "full_name": "Adolfo Suárez",
@@ -6349,13 +6349,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 87,
-        "dribbling": 77,
-        "passing": 74,
-        "shooting": 73,
-        "defending": 61,
-        "physical": 67,
-        "goalkeeping": 13
+        "speed": 79,
+        "dribbling": 64,
+        "passing": 70,
+        "shooting": 51,
+        "defending": 86,
+        "physical": 86,
+        "goalkeeping": 11
       }
     },
     "full_name": "Pablo Casado",
@@ -6368,13 +6368,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 79,
-        "dribbling": 84,
-        "passing": 75,
-        "shooting": 80,
-        "defending": 74,
-        "physical": 85,
-        "goalkeeping": 5
+        "speed": 70,
+        "dribbling": 52,
+        "passing": 68,
+        "shooting": 43,
+        "defending": 83,
+        "physical": 75,
+        "goalkeeping": 9
       }
     },
     "full_name": "Ana Rosa Quintana",
@@ -6387,13 +6387,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 68,
-        "dribbling": 77,
-        "passing": 64,
-        "shooting": 89,
-        "defending": 69,
-        "physical": 75,
-        "goalkeeping": 12
+        "speed": 75,
+        "dribbling": 63,
+        "passing": 71,
+        "shooting": 61,
+        "defending": 90,
+        "physical": 86,
+        "goalkeeping": 11
       }
     },
     "full_name": "Carlos Herrera",
@@ -6406,13 +6406,13 @@
     "preferred_pos": "DEF",
     "positions": {
       "DEF": {
-        "speed": 60,
-        "dribbling": 80,
-        "passing": 79,
-        "shooting": 85,
-        "defending": 67,
-        "physical": 83,
-        "goalkeeping": 7
+        "speed": 75,
+        "dribbling": 63,
+        "passing": 69,
+        "shooting": 51,
+        "defending": 90,
+        "physical": 86,
+        "goalkeeping": 13
       }
     },
     "full_name": "Joan Manuel Serrat",
@@ -6425,13 +6425,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 77,
-        "dribbling": 60,
-        "passing": 77,
-        "shooting": 73,
-        "defending": 62,
-        "physical": 67,
-        "goalkeeping": 6
+        "speed": 82,
+        "dribbling": 87,
+        "passing": 86,
+        "shooting": 70,
+        "defending": 69,
+        "physical": 72,
+        "goalkeeping": 14
       }
     },
     "full_name": "Vicente Vallés",
@@ -6444,13 +6444,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 90,
-        "dribbling": 63,
-        "passing": 80,
-        "shooting": 86,
-        "defending": 64,
-        "physical": 75,
-        "goalkeeping": 9
+        "speed": 77,
+        "dribbling": 86,
+        "passing": 89,
+        "shooting": 65,
+        "defending": 71,
+        "physical": 71,
+        "goalkeeping": 11
       }
     },
     "full_name": "Pastora Soler",
@@ -6463,13 +6463,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 82,
-        "dribbling": 68,
-        "passing": 73,
-        "shooting": 86,
-        "defending": 75,
-        "physical": 75,
-        "goalkeeping": 8
+        "speed": 78,
+        "dribbling": 84,
+        "passing": 88,
+        "shooting": 65,
+        "defending": 69,
+        "physical": 74,
+        "goalkeeping": 12
       }
     },
     "full_name": "Juan Mari Arzak",
@@ -6482,13 +6482,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 77,
-        "dribbling": 64,
-        "passing": 72,
-        "shooting": 66,
-        "defending": 89,
-        "physical": 79,
-        "goalkeeping": 13
+        "speed": 75,
+        "dribbling": 86,
+        "passing": 84,
+        "shooting": 67,
+        "defending": 68,
+        "physical": 68,
+        "goalkeeping": 10
       }
     },
     "full_name": "Jorge Javier Vázquez",
@@ -6501,13 +6501,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 88,
-        "dribbling": 64,
-        "passing": 87,
+        "speed": 70,
+        "dribbling": 79,
+        "passing": 85,
         "shooting": 62,
-        "defending": 68,
-        "physical": 84,
-        "goalkeeping": 11
+        "defending": 72,
+        "physical": 68,
+        "goalkeeping": 10
       }
     },
     "full_name": "India Martínez",
@@ -6520,13 +6520,13 @@
     "preferred_pos": "MED",
     "positions": {
       "MED": {
-        "speed": 89,
-        "dribbling": 85,
-        "passing": 76,
-        "shooting": 68,
-        "defending": 86,
-        "physical": 60,
-        "goalkeeping": 9
+        "speed": 69,
+        "dribbling": 78,
+        "passing": 82,
+        "shooting": 57,
+        "defending": 69,
+        "physical": 64,
+        "goalkeeping": 10
       }
     },
     "full_name": "Diego Rivera",
@@ -6539,13 +6539,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 69,
-        "dribbling": 86,
-        "passing": 78,
-        "shooting": 78,
-        "defending": 82,
-        "physical": 75,
-        "goalkeeping": 7
+        "speed": 82,
+        "dribbling": 82,
+        "passing": 63,
+        "shooting": 82,
+        "defending": 52,
+        "physical": 71,
+        "goalkeeping": 10
       }
     },
     "full_name": "Conor McGregor",
@@ -6558,13 +6558,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 77,
-        "dribbling": 75,
-        "passing": 71,
-        "shooting": 70,
-        "defending": 78,
-        "physical": 84,
-        "goalkeeping": 13
+        "speed": 79,
+        "dribbling": 74,
+        "passing": 59,
+        "shooting": 79,
+        "defending": 45,
+        "physical": 63,
+        "goalkeeping": 9
       }
     },
     "full_name": "Paz Padilla",
@@ -6577,13 +6577,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 74,
-        "dribbling": 89,
-        "passing": 70,
-        "shooting": 87,
-        "defending": 67,
-        "physical": 82,
-        "goalkeeping": 8
+        "speed": 82,
+        "dribbling": 79,
+        "passing": 67,
+        "shooting": 85,
+        "defending": 52,
+        "physical": 63,
+        "goalkeeping": 11
       }
     },
     "full_name": "Joaquín Reyes",
@@ -6596,13 +6596,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 72,
-        "dribbling": 67,
-        "passing": 87,
-        "shooting": 84,
-        "defending": 74,
-        "physical": 61,
-        "goalkeeping": 10
+        "speed": 76,
+        "dribbling": 78,
+        "passing": 63,
+        "shooting": 81,
+        "defending": 43,
+        "physical": 64,
+        "goalkeeping": 9
       }
     },
     "full_name": "Cantinflas",
@@ -6615,13 +6615,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 75,
-        "dribbling": 82,
-        "passing": 89,
+        "speed": 80,
+        "dribbling": 78,
+        "passing": 66,
         "shooting": 85,
-        "defending": 73,
-        "physical": 72,
-        "goalkeeping": 15
+        "defending": 49,
+        "physical": 68,
+        "goalkeeping": 9
       }
     },
     "full_name": "Salvador Dalí",
@@ -6634,13 +6634,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 86,
-        "dribbling": 80,
-        "passing": 64,
-        "shooting": 75,
-        "defending": 62,
-        "physical": 64,
-        "goalkeeping": 13
+        "speed": 83,
+        "dribbling": 82,
+        "passing": 69,
+        "shooting": 87,
+        "defending": 58,
+        "physical": 71,
+        "goalkeeping": 12
       }
     },
     "full_name": "Macarena Olona",
@@ -6653,13 +6653,13 @@
     "preferred_pos": "DEL",
     "positions": {
       "DEL": {
-        "speed": 70,
-        "dribbling": 87,
-        "passing": 63,
-        "shooting": 87,
-        "defending": 88,
-        "physical": 74,
-        "goalkeeping": 6
+        "speed": 85,
+        "dribbling": 81,
+        "passing": 65,
+        "shooting": 91,
+        "defending": 49,
+        "physical": 72,
+        "goalkeeping": 11
       }
     },
     "full_name": "Eddie Murphy",
