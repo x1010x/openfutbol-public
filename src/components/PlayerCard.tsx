@@ -4,6 +4,7 @@ import { playerAge } from '../data/economy';
 import { StatBar } from './StatBar';
 import { MOOD } from '../engine/playerMood';
 import { PlayerPhoto } from './PlayerPhoto';
+import { PlayerName } from './PlayerName';
 
 interface Props {
   player: Player;
@@ -50,10 +51,10 @@ export const PlayerCard = ({ player, seasonYear, highlight, onNameClick, footer,
               onClick={onNameClick}
               className="text-[12px] truncate text-left hover:text-vga-yellow underline decoration-dotted underline-offset-2"
             >
-              {player.name}
+              <PlayerName player={player} useShirt />
             </button>
           ) : (
-            <span className="text-[12px] truncate">{player.name}</span>
+            <PlayerName player={player} useShirt className="text-[12px] truncate" />
           )}
         </div>
         <span className="text-[8px] text-vga-cyan shrink-0">#{player.number}</span>

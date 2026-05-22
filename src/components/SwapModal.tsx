@@ -1,5 +1,6 @@
 import type { Player, Position } from '../types/game.d.ts';
 import { effectiveMedia, isOOP, liveMed } from '../engine/formations';
+import { PlayerName } from './PlayerName';
 
 const POS_COLOR: Record<string, string> = {
   POR: 'text-vga-yellow', DEF: 'text-vga-light-cyan',
@@ -87,7 +88,7 @@ export const SwapModal = ({ slotPos, currentPlayer, candidates, inLineup, onSele
                   >
                     <td className={`p-1 font-bold ${POS_COLOR[p.position] ?? 'text-vga-bright-white'}`}>{p.position}</td>
                     <td className="p-1 text-vga-bright-white">
-                      {p.name}
+                      <PlayerName player={p} />
                       {isCurrent && <span className="ml-1 text-[6px] text-vga-yellow">(actual)</span>}
                       {isTitular && <span className="ml-1 text-[6px] text-vga-cyan">(titular)</span>}
                     </td>

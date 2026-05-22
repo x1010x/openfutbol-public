@@ -3,6 +3,7 @@ import type { TeamStats } from '../store/leagueStore';
 import { MAX_SEASON_YEAR } from '../store/leagueStore';
 import { playerAge } from '../data/economy';
 import { extractDbId, getRetireAge } from '../data/mockTeams';
+import { PlayerName } from './PlayerName';
 
 interface Props {
   teams: Team[];
@@ -213,7 +214,7 @@ export const EndOfSeasonView = ({ teams, stats, userTeamId, onContinueSameTeam, 
               <div key={p.id} className="bg-vga-blue border border-vga-yellow px-2 py-1 text-[8px] flex justify-between items-center">
                 <div className="min-w-0 flex-1 truncate">
                   <span className="text-vga-yellow font-bold mr-1">{p.position}</span>
-                  <span className="text-vga-bright-white">{p.name}</span>
+                  <PlayerName player={p} className="text-vga-bright-white" />
                 </div>
                 <span className="text-vga-light-cyan shrink-0 ml-2">{playerAge(p, year)} años</span>
               </div>

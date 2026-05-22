@@ -5,6 +5,7 @@ import { ALL_FORMATIONS, FORMATIONS, effectiveMedia, isOOP, liveMed, pickBestXI,
 import { PitchDiagram } from './PitchDiagram';
 import { SwapModal } from './SwapModal';
 import { moodStateOf, MOOD } from '../engine/playerMood';
+import { PlayerName } from './PlayerName';
 
 interface Props {
   team: Team;
@@ -255,7 +256,7 @@ export const AlignmentView = ({ team, onUpdate, onBack, onToggleDiscipline }: Pr
                     </div>
                   </td>
                   <td className={`p-1 border border-vga-gray ${isTitular ? 'text-vga-bright-white font-bold' : 'text-vga-black'}`}>
-                    {player.name}
+                    <PlayerName player={player} />
                     {isSuspended && <span className="ml-1 text-[6px] text-vga-red font-bold">[SAN]</span>}
                     {isInjured && <span className="ml-1 text-[6px] text-vga-light-red font-bold">[LES {player.injuryWeeksRemaining}s]</span>}
                   </td>

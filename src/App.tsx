@@ -37,6 +37,7 @@ import type { StatKey } from './components/StatDrillDown';
 import { extractDbId } from './data/mockTeams';
 import { computePrice, evaluateOffer, formatEuros } from './data/economy';
 import { PlayerTooltipProvider } from './contexts/PlayerTooltipContext';
+import { PlayerName } from './components/PlayerName';
 import { formatJornadaDate } from './engine/calendar';
 import type { OfferResult } from './data/economy';
 
@@ -1755,7 +1756,7 @@ function App() {
                     const asst = findP(g.assistantId);
                     return (
                       <div key={`g${i}`} className="text-vga-bright-white">
-                        {g.minute}' {scorer?.fullName ?? '—'}{asst ? ` (asist. ${asst.fullName})` : ''}
+                        {g.minute}' {scorer ? <PlayerName player={scorer} /> : '—'}{asst ? <> (asist. <PlayerName player={asst} />)</> : ''}
                       </div>
                     );
                   })}
@@ -1767,13 +1768,13 @@ function App() {
                   {yellows.map((c, i) => (
                     <div key={`y${i}`} className="flex items-center gap-1 text-vga-bright-white">
                       <div className="w-1.5 h-2.5 bg-vga-yellow border border-black flex-shrink-0"></div>
-                      <span>{c.minute}' {findP(c.playerId)?.fullName ?? '—'}</span>
+                      <span>{c.minute}' {(() => { const pl = findP(c.playerId); return pl ? <PlayerName player={pl} /> : '—'; })()}</span>
                     </div>
                   ))}
                   {reds.map((c, i) => (
                     <div key={`r${i}`} className="flex items-center gap-1 text-vga-bright-white">
                       <div className="w-1.5 h-2.5 bg-vga-red border border-black flex-shrink-0"></div>
-                      <span>{c.minute}' {findP(c.playerId)?.fullName ?? '—'}</span>
+                      <span>{c.minute}' {(() => { const pl = findP(c.playerId); return pl ? <PlayerName player={pl} /> : '—'; })()}</span>
                     </div>
                   ))}
                 </div>
@@ -2063,7 +2064,7 @@ function App() {
                                     className={`border-b border-vga-gray/30 ${canSub ? 'cursor-pointer hover:bg-vga-green/30' : 'opacity-40 cursor-default'}`}
                                   >
                                     <td className={`p-1 font-bold ${fitsSlot ? 'text-vga-light-green' : 'text-vga-gray'}`}>{p.position}</td>
-                                    <td className="p-1 text-vga-bright-white">{p.name}</td>
+                                    <td className="p-1 text-vga-bright-white"><PlayerName player={p} /></td>
                                     <td className="p-1 text-center font-mono text-vga-yellow">{p.media}</td>
                                     <td className={`p-1 text-center font-mono ${pLiveMed < p.media ? 'text-vga-light-red' : 'text-vga-light-green'}`}>{pLiveMed}</td>
                                     <td className="p-1"><StaminaBar value={stam} /></td>
