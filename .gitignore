@@ -47,7 +47,6 @@ Thumbs.db
 
 # Vite / Vitest
 /public/mockServiceWorker.js
-\n# Internal/Temporary scripts\ntemp/
 
-# Others
+# Temporary files
 temp/
