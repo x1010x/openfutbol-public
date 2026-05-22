@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import type { Player, Position, Team } from '../types/game.d.ts';
+import { PlayerName } from './PlayerName';
 import type { TransferRecord } from '../store/leagueStore';
 import { signingBlockKey } from '../store/leagueStore';
 import { computePrice, formatEuros, offerStep, playerAge } from '../data/economy';
@@ -124,7 +125,7 @@ const OfferModal = ({
         <div className="bg-vga-black px-3 py-2 text-center border-b-2 border-vga-bright-white">
           <div className="text-vga-yellow text-[10px] uppercase font-bold">OFERTA POR</div>
           <div className="text-vga-bright-white text-[12px] mt-1">
-            <span className="text-vga-yellow mr-2">{entry.player.position}</span>{entry.player.name}
+            <span className="text-vga-yellow mr-2">{entry.player.position}</span><PlayerName player={entry.player} />
           </div>
           <div className="text-[8px] text-vga-cyan mt-1">{entry.isFreeAgent ? 'LIBRE' : entry.teamName} · valor {formatEuros(price)}</div>
         </div>
@@ -168,7 +169,7 @@ const OfferModal = ({
                         <div className="flex justify-between items-center gap-2">
                           <span className="min-w-0 truncate">
                             <span className="text-vga-yellow font-bold mr-1">{p.position}</span>
-                            {p.name}
+                            <PlayerName player={p} />
                             <span className="text-vga-cyan ml-2 text-[7px]">M{p.media} · {playerAge(p, seasonYear)}a</span>
                           </span>
                           <span className="text-vga-light-green text-[8px] shrink-0">{formatEuros(pPrice)}</span>
@@ -299,7 +300,7 @@ const ClausulaModal = ({
         <div className="bg-vga-red px-3 py-2 text-center border-b-2 border-vga-bright-white">
           <div className="text-vga-bright-white text-[10px] uppercase font-bold">CLAUSULAZO TEBAS</div>
           <div className="text-vga-bright-white text-[12px] mt-1">
-            <span className="text-vga-yellow mr-2">{entry.player.position}</span>{entry.player.name}
+            <span className="text-vga-yellow mr-2">{entry.player.position}</span><PlayerName player={entry.player} />
           </div>
           <div className="text-[8px] text-vga-bright-white mt-1 opacity-80">{entry.teamName}</div>
         </div>

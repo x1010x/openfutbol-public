@@ -4,6 +4,7 @@ import { formatEuros, computePrice, playerAge } from '../data/economy';
 import { StatBar } from './StatBar';
 import { StatRadar } from './StatRadar';
 import { PlayerPhoto } from './PlayerPhoto';
+import { PlayerName } from './PlayerName';
 
 interface Props {
   player: Player;
@@ -65,7 +66,7 @@ export const PlayerDetailView = ({ player, teamName, history, seasonYear, onBack
       <div className="bg-vga-blue border-4 border-vga-bright-white p-3 text-vga-bright-white vga-panel">
         <div className="flex items-baseline gap-3 border-b border-vga-cyan pb-2 mb-3">
           <span className={`text-[16px] font-bold ${POS_COLOR[player.position] ?? 'text-vga-yellow'}`}>{player.position}</span>
-          <span className="text-[18px] font-bold truncate">{player.name}</span>
+          <PlayerName player={player} useShirt className="text-[18px] font-bold truncate" />
           <span className="text-[10px] text-vga-cyan">#{player.number}</span>
         </div>
         <div className="text-[8px] text-vga-cyan mb-3 truncate">{player.fullName}</div>

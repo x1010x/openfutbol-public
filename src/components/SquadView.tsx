@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type { Player, Position, Team } from '../types/game.d.ts';
+import { PlayerName } from './PlayerName';
 
 const StaminaBar = ({ value }: { value: number }) => {
   const pct = Math.round(Math.max(0, Math.min(100, value)));
@@ -145,7 +146,7 @@ export const SquadView = ({
                   >
                     <div className="flex items-center gap-2 min-w-0">
                       <span className="text-vga-yellow text-[7px] font-bold shrink-0">{player.position}</span>
-                      <span className="text-vga-bright-white text-[8px] font-bold truncate">{player.name}</span>
+                      <PlayerName player={player} className="text-vga-bright-white text-[8px] font-bold truncate" />
                       <span className="text-vga-gray text-[7px] shrink-0">{playerOffers.length} {playerOffers.length === 1 ? 'oferta' : 'ofertas'}</span>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
@@ -184,8 +185,8 @@ export const SquadView = ({
                       <div className="text-vga-bright-white truncate">
                         <span className="text-vga-yellow font-bold mr-1">{player.position}</span>
                         {onPlayerClick ? (
-                          <button onClick={() => onPlayerClick(player.id)} className="hover:text-vga-yellow underline decoration-dotted underline-offset-2">{player.name}</button>
-                        ) : player.name}
+                          <button onClick={() => onPlayerClick(player.id)} className="hover:text-vga-yellow underline decoration-dotted underline-offset-2"><PlayerName player={player} /></button>
+                        ) : <PlayerName player={player} />}
                       </div>
                       <div className="text-[7px] text-vga-cyan mt-0.5">
                         DE <span className="text-vga-bright-white">{bidder.name}</span>
@@ -207,10 +208,10 @@ export const SquadView = ({
                               {i > 0 && ', '}
                               {onPlayerClick ? (
                                 <button onClick={() => onPlayerClick(p.id)} className="hover:text-vga-yellow underline decoration-dotted underline-offset-2 text-vga-light-cyan">
-                                  {p.position} {p.name}
+                                  {p.position} <PlayerName player={p} />
                                 </button>
                               ) : (
-                                <span className="text-vga-light-cyan">{p.position} {p.name}</span>
+                                <span className="text-vga-light-cyan">{p.position} <PlayerName player={p} /></span>
                               )}
                             </span>
                           ))}
@@ -270,7 +271,7 @@ export const SquadView = ({
                                   })}
                                   className={`flex items-center justify-between px-2 py-0.5 text-[7px] border ${sel ? 'bg-vga-yellow text-vga-black border-vga-black' : canAdd ? 'bg-vga-black text-vga-bright-white border-vga-gray hover:border-vga-yellow' : 'bg-vga-black text-vga-gray border-vga-gray opacity-40 cursor-default'}`}
                                 >
-                                  <span><span className="font-bold mr-1">{p.position}</span>{p.name}</span>
+                                  <span><span className="font-bold mr-1">{p.position}</span><PlayerName player={p} /></span>
                                   <span className="text-vga-cyan ml-2">{p.media} · {formatEuros(pPrice)}</span>
                                 </button>
                               );

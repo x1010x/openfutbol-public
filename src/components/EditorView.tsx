@@ -8,6 +8,7 @@ import { PlayerPickerPanel } from './PlayerPickerPanel';
 import { getTeamDefaults, extractDbId, buildPlayerForYear, getAllDBPlayerEntries, buildTeamFromSeason } from '../data/mockTeams';
 import { exportTeamPack, exportPlayerPack, loadPackFromFile } from '../data/packLoader';
 import { pickBestFormation, computePositionWeightedMedia } from '../engine/formations';
+import { PlayerName } from './PlayerName';
 
 interface Props {
   league: LeagueState;
@@ -488,7 +489,7 @@ export const EditorView = ({ league, onUpdateLeague, onBack }: Props) => {
                 <input type="checkbox" checked={sel} onChange={() => setExportSelected(prev => { const n = new Set(prev); sel ? n.delete(dbId) : n.add(dbId); return n; })}
                   className="w-3 h-3 shrink-0" />
                 <span className="text-vga-blue text-[8px] w-8">{p.preferredPos}</span>
-                <span className="text-vga-black text-[8px] flex-1 font-bold">{p.name}</span>
+                <PlayerName player={p} useShirt className="text-vga-black text-[8px] flex-1 font-bold" />
                 <StatBar label="" value={p.media} size="sm" segments={8} />
                 <span className="text-vga-black text-[8px] w-5 text-right">{p.media}</span>
                 <button onClick={() => setSub({ kind: 'PLAYER_EDIT', playerId: p.id, source: 'team', teamId: sub.teamId })}
@@ -754,7 +755,7 @@ export const EditorView = ({ league, onUpdateLeague, onBack }: Props) => {
                   <input type="checkbox" checked={sel} onChange={() => setExportSelected(prev => { const n = new Set(prev); sel ? n.delete(dbId) : n.add(dbId); return n; })}
                     className="w-3 h-3 shrink-0" />
                   <span className="text-vga-blue text-[8px] w-8">{p.preferredPos}</span>
-                  <span className="text-vga-black text-[8px] flex-1 font-bold">{p.name}</span>
+                  <PlayerName player={p} useShirt className="text-vga-black text-[8px] flex-1 font-bold" />
                   <span className="text-vga-black text-[8px] w-5 text-right">{p.media}</span>
                   <button onClick={() => setSub({ kind: 'PLAYER_EDIT', playerId: p.id, source: 'fa' })}
                     className="text-[7px] bg-vga-blue text-vga-bright-white px-1 py-0.5 border border-vga-black">EDITAR</button>
