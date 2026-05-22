@@ -1510,15 +1510,15 @@ function App() {
             <>
               {!showPreview ? (
                 <>
-                  <div className="flex justify-between items-center mb-4 bg-vga-black p-2 border border-vga-white">
-                    <div className="flex items-center gap-2 justify-center min-w-0 flex-1">
-                      <TeamCrest colors={homeTeam?.colors} size="sm" title={homeTeam?.name} teamId={homeTeam?.id} />
-                      <span className="text-[10px] text-vga-light-red text-center">{homeTeam?.name}</span>
+                  <div className="flex justify-between items-center mb-4 bg-vga-black p-3 border border-vga-white">
+                    <div className="flex flex-col items-center gap-1 flex-1 min-w-0">
+                      <TeamCrest colors={homeTeam?.colors} size="lg" title={homeTeam?.name} teamId={homeTeam?.id} />
+                      <span className="text-[10px] text-vga-light-red text-center leading-tight truncate w-full">{homeTeam?.name}</span>
                     </div>
-                    <span className="text-[10px] text-vga-white mx-2 font-pixel shrink-0">VS</span>
-                    <div className="flex items-center gap-2 justify-center min-w-0 flex-1">
-                      <span className="text-[10px] text-vga-light-cyan text-center">{awayTeam?.name}</span>
-                      <TeamCrest colors={awayTeam?.colors} size="sm" title={awayTeam?.name} teamId={awayTeam?.id} />
+                    <span className="text-[12px] text-vga-white mx-3 font-pixel shrink-0">VS</span>
+                    <div className="flex flex-col items-center gap-1 flex-1 min-w-0">
+                      <TeamCrest colors={awayTeam?.colors} size="lg" title={awayTeam?.name} teamId={awayTeam?.id} />
+                      <span className="text-[10px] text-vga-light-cyan text-center leading-tight truncate w-full">{awayTeam?.name}</span>
                     </div>
                   </div>
                   <button
@@ -1537,7 +1537,7 @@ function App() {
                       return (
                         <div key={team.id} className="flex-1 min-w-0">
                           <div className="text-center mb-1">
-                            <TeamCrest colors={team.colors} size="sm" title={team.name} teamId={team.id} />
+                            <TeamCrest colors={team.colors} size="md" title={team.name} teamId={team.id} />
                             <div className={`text-[8px] font-bold text-center leading-tight ${i === 0 ? 'text-vga-light-red' : 'text-vga-light-cyan'}`}>{team.name}</div>
                             <div className="text-[7px] text-vga-cyan">{team.formation} · {calculateTeamStrength(team).toFixed(0)}</div>
                           </div>
@@ -1793,7 +1793,7 @@ function App() {
                     <p className="text-vga-light-red text-[8px] mb-1 truncate uppercase">{match.homeTeam.name}</p>
                     <p className="text-vga-cyan text-[7px]">MED {homeMED}</p>
                   </div>
-                  <TeamCrest colors={match.homeTeam.colors} size="lg" title={match.homeTeam.name} teamId={match.homeTeam.id} />
+                  <TeamCrest colors={match.homeTeam.colors} size="xl" title={match.homeTeam.name} teamId={match.homeTeam.id} />
                 </div>
                 <div className="text-center px-2">
                   <p className="text-3xl text-vga-bright-white tracking-wider">
@@ -1804,7 +1804,7 @@ function App() {
                   <p className="text-vga-yellow text-[8px] mt-1">{match.minute}'</p>
                 </div>
                 <div className="flex items-center gap-3 justify-start min-w-0">
-                  <TeamCrest colors={match.awayTeam.colors} size="lg" title={match.awayTeam.name} teamId={match.awayTeam.id} />
+                  <TeamCrest colors={match.awayTeam.colors} size="xl" title={match.awayTeam.name} teamId={match.awayTeam.id} />
                   <div className="text-left min-w-0">
                     <p className="text-vga-light-cyan text-[8px] mb-1 truncate uppercase">{match.awayTeam.name}</p>
                     <p className="text-vga-cyan text-[7px]">MED {awayMED}</p>
