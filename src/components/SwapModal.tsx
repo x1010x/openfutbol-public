@@ -2,6 +2,8 @@ import type { Player, Position } from '../types/game.d.ts';
 import { effectiveMedia, isOOP, liveMed } from '../engine/formations';
 import { PlayerName } from './PlayerName';
 
+const POS_ORDER: Record<string, number> = { POR: 0, DEF: 1, MED: 2, DEL: 3, AML: 4, AMR: 5 };
+
 const POS_COLOR: Record<string, string> = {
   POR: 'text-vga-yellow', DEF: 'text-vga-light-cyan',
   MED: 'text-vga-light-green', DEL: 'text-vga-light-red',
@@ -73,7 +75,17 @@ export const SwapModal = ({ slotPos, currentPlayer, candidates, inLineup, onSele
               {candidates.length === 0 && (
                 <tr><td colSpan={5} className="p-2 text-vga-gray italic text-center">Sin jugadores disponibles</td></tr>
               )}
-              {candidates.map(p => {
+              {[...candidates]
+                .sort((a, b) => {
+                  const aTitular = inLineup.has(a.id) ? 1 : 0;
+                  const bTitular = inLineup.has(b.id) ? 1 : 0;
+                  if (aTitular !== bTitular) return aTitular - bTitular;
+                  const aLive = liveMed(a, a.stamina ?? 99, slotPos);
+                  const bLive = liveMed(b, b.stamina ?? 99, slotPos);
+                  if (bLive !== aLive) return bLive - aLive;
+                  return (POS_ORDER[a.position] ?? 9) - (POS_ORDER[b.position] ?? 9);
+                })
+                .map(p => {
                 const oop = isOOP(p, slotPos);
                 const effMed = Math.round(effectiveMedia(p, slotPos));
                 const stam = p.stamina ?? 99;
