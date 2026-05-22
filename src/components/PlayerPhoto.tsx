@@ -23,10 +23,11 @@ export const PlayerPhoto = ({ playerId, size = 'sm', className = '' }: Props) =>
 
   useEffect(() => { setAttempt('png'); }, [dbId]);
 
+  const base = import.meta.env.BASE_URL;
   const src =
     attempt === 'unknown'
-      ? '/assets/players/unknown.jpeg'
-      : `/assets/players/${dbId}.${attempt}`;
+      ? `${base}assets/players/unknown.jpeg`
+      : `${base}assets/players/${dbId}.${attempt}`;
 
   const handleError = () => {
     const idx = EXTS.indexOf(attempt);
