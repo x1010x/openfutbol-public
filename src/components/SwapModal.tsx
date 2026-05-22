@@ -75,50 +75,65 @@ export const SwapModal = ({ slotPos, currentPlayer, candidates, inLineup, onSele
               {candidates.length === 0 && (
                 <tr><td colSpan={5} className="p-2 text-vga-gray italic text-center">Sin jugadores disponibles</td></tr>
               )}
-              {[...candidates]
-                .sort((a, b) => {
+              {(() => {
+                const sorted = [...candidates].sort((a, b) => {
                   const aTitular = inLineup.has(a.id) ? 1 : 0;
                   const bTitular = inLineup.has(b.id) ? 1 : 0;
                   if (aTitular !== bTitular) return aTitular - bTitular;
-                  // Matching slot position comes first
                   const aMatch = a.position === slotPos ? 0 : 1;
                   const bMatch = b.position === slotPos ? 0 : 1;
                   if (aMatch !== bMatch) return aMatch - bMatch;
-                  // Among same-match group, sort by LIVE desc
                   const aLive = liveMed(a, a.stamina ?? 99, slotPos);
                   const bLive = liveMed(b, b.stamina ?? 99, slotPos);
                   if (bLive !== aLive) return bLive - aLive;
                   return (POS_ORDER[a.position] ?? 9) - (POS_ORDER[b.position] ?? 9);
-                })
-                .map(p => {
-                const oop = isOOP(p, slotPos);
-                const effMed = Math.round(effectiveMedia(p, slotPos));
-                const stam = p.stamina ?? 99;
-                const pLiveMed = liveMed(p, stam, slotPos);
-                const isCurrent = p.id === currentPlayer?.id;
-                const isTitular = !isCurrent && inLineup.has(p.id);
-                return (
-                  <tr
-                    key={p.id}
-                    onClick={() => onSelect(p.id)}
-                    className={`cursor-pointer border-b border-vga-gray/30 hover:bg-vga-green/30 ${isCurrent ? 'bg-vga-yellow/20' : ''}`}
-                  >
-                    <td className={`p-1 font-bold ${POS_COLOR[p.position] ?? 'text-vga-bright-white'}`}>{p.position}</td>
-                    <td className="p-1 text-vga-bright-white">
-                      <PlayerName player={p} />
-                      {isCurrent && <span className="ml-1 text-[6px] text-vga-yellow">(actual)</span>}
-                      {isTitular && <span className="ml-1 text-[6px] text-vga-cyan">(titular)</span>}
-                    </td>
-                    <td className={`p-1 text-center font-mono ${oop ? 'text-vga-light-red' : 'text-vga-light-green'}`}>
-                      {effMed}{oop && <span className="text-[6px]"> !</span>}
-                    </td>
-                    <td className={`p-1 text-center font-mono ${pLiveMed < p.media ? 'text-vga-light-red' : 'text-vga-light-green'}`}>
-                      {pLiveMed}
-                    </td>
-                    <td className="p-1"><StaminaBar value={stam} /></td>
-                  </tr>
-                );
-              })}
+                });
+                const rows: React.ReactNode[] = [];
+                let prevTitular: boolean | null = null;
+                let prevMatch: boolean | null = null;
+                for (const p of sorted) {
+                  const isTitular = inLineup.has(p.id);
+                  const isMatch = p.position === slotPos;
+                  if (prevTitular !== null && isTitular && !prevTitular) {
+                    rows.push(
+                      <tr key="divider-titular"><td colSpan={5} className="px-1 py-0.5 bg-vga-blue/40 text-vga-cyan text-[6px] uppercase tracking-widest text-center border-y border-vga-cyan/40">— titulares —</td></tr>
+                    );
+                  } else if (!isTitular && prevMatch !== null && !isMatch && prevMatch) {
+                    rows.push(
+                      <tr key="divider-oop"><td colSpan={5} className="px-1 py-0.5 bg-vga-black text-vga-light-red text-[6px] uppercase tracking-widest text-center border-y border-vga-light-red/40">— fuera de posición —</td></tr>
+                    );
+                  }
+                  prevTitular = isTitular;
+                  prevMatch = isMatch;
+                  const isCurrent = p.id === currentPlayer?.id;
+                  const oop = isOOP(p, slotPos);
+                  const effMed = Math.round(effectiveMedia(p, slotPos));
+                  const stam = p.stamina ?? 99;
+                  const pLiveMed = liveMed(p, stam, slotPos);
+                  rows.push(
+                    <tr
+                      key={p.id}
+                      onClick={() => onSelect(p.id)}
+                      className={`cursor-pointer border-b border-vga-gray/30 hover:bg-vga-green/30 ${isCurrent ? 'bg-vga-yellow/20' : ''}`}
+                    >
+                      <td className={`p-1 font-bold ${POS_COLOR[p.position] ?? 'text-vga-bright-white'}`}>{p.position}</td>
+                      <td className="p-1 text-vga-bright-white">
+                        <PlayerName player={p} />
+                        {isCurrent && <span className="ml-1 text-[6px] text-vga-yellow">(actual)</span>}
+                        {isTitular && !isCurrent && <span className="ml-1 text-[6px] text-vga-cyan">(titular)</span>}
+                      </td>
+                      <td className={`p-1 text-center font-mono ${oop ? 'text-vga-light-red' : 'text-vga-light-green'}`}>
+                        {effMed}{oop && <span className="text-[6px]"> !</span>}
+                      </td>
+                      <td className={`p-1 text-center font-mono ${pLiveMed < p.media ? 'text-vga-light-red' : 'text-vga-light-green'}`}>
+                        {pLiveMed}
+                      </td>
+                      <td className="p-1"><StaminaBar value={stam} /></td>
+                    </tr>
+                  );
+                }
+                return rows;
+              })()}
             </tbody>
           </table>
         </div>
