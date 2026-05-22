@@ -3,6 +3,7 @@ import type { Player, Team } from '../types/game.d.ts';
 import { TeamCrest } from './TeamCrest';
 import { PlayerPhoto } from './PlayerPhoto';
 import { groupFor } from '../store/leagueStore';
+import { usePlayerTooltip } from '../contexts/PlayerTooltipContext';
 
 type DraftPos = 'POR' | 'DEF' | 'MED' | 'DEL';
 
@@ -70,71 +71,16 @@ const sortByPosition = (picks: Player[]): Player[] => {
   });
 };
 
-// ── Hover tooltip ──────────────────────────────────────────────
-const PlayerTooltip = ({ player, year, x, y }: { player: Player; year: number; x: number; y: number }) => {
-  const pos = groupFor(player.position) as DraftPos;
-  const age = year - player.birthYear;
-  const allStats: (keyof Player['stats'])[] = ['speed', 'dribbling', 'passing', 'shooting', 'defending', 'physical', 'goalkeeping'];
-  const style: React.CSSProperties = {
-    position: 'fixed',
-    left: x + 16,
-    top: y - 8,
-    zIndex: 9999,
-    pointerEvents: 'none',
-  };
-  // Clamp to viewport
-  if (x + 220 > window.innerWidth) style.left = x - 224;
-  if (typeof style.top === 'number' && style.top + 280 > window.innerHeight) style.top = window.innerHeight - 288;
 
-  return (
-    <div style={style} className="w-52 bg-vga-black border-2 border-vga-white shadow-[4px_4px_0_rgba(0,0,0,1)]">
-      <div className={`px-2 py-1 flex items-center gap-2 border-b border-vga-gray ${POS_BADGE[pos]}`}>
-        <span className="text-[8px] font-bold">{pos}</span>
-        <span className="text-[8px] font-bold truncate">{player.fullName}</span>
-      </div>
-      <div className="flex gap-2 p-2">
-        <PlayerPhoto playerId={player.id} size="md" className="shrink-0 border border-vga-gray" />
-        <div className="flex flex-col gap-0.5 min-w-0">
-          <div className="text-vga-bright-white text-[9px] font-bold leading-tight">{player.fullName}</div>
-          <div className="text-vga-gray text-[7px]">{age} años · pico {player.peakAge}a</div>
-          <div className="text-vga-yellow text-[11px] font-bold">{player.media}</div>
-        </div>
-      </div>
-      <div className="px-2 pb-2 flex flex-col gap-0.5">
-        {allStats.map(stat => {
-          const val = player.stats[stat];
-          const isKey = KEY_STATS[pos]?.includes(stat);
-          return (
-            <div key={stat} className="flex items-center gap-1">
-              <span className={`text-[6px] w-6 shrink-0 ${isKey ? 'text-vga-yellow font-bold' : 'text-vga-gray'}`}>
-                {STAT_LABELS[stat]}
-              </span>
-              <div className="flex-1 bg-vga-gray h-1.5 relative">
-                <div
-                  className={`h-full ${isKey ? 'bg-vga-yellow' : 'bg-vga-blue'}`}
-                  style={{ width: `${val}%` }}
-                />
-              </div>
-              <span className={`text-[7px] w-4 text-right shrink-0 ${isKey ? 'text-vga-yellow font-bold' : 'text-vga-gray'}`}>
-                {val}
-              </span>
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-};
 
 // ── Pool player row ─────────────────────────────────────────────
 const PoolRow = ({
-  player, year, canPick, isUserTurn, overBudget, onPick, onHover, onLeave,
+  player, year, canPick, overBudget, onPick,
 }: {
-  player: Player; year: number; canPick: boolean; isUserTurn: boolean;
+  player: Player; year: number; canPick: boolean;
   overBudget: boolean; onPick: () => void;
-  onHover: (p: Player, x: number, y: number) => void;
-  onLeave: () => void;
 }) => {
+  const { show, hide } = usePlayerTooltip();
   const pos = groupFor(player.position) as DraftPos;
   const age = year - player.birthYear;
   const keyStats = KEY_STATS[pos] ?? [];
@@ -143,12 +89,10 @@ const PoolRow = ({
     <button
       disabled={!canPick}
       onClick={() => canPick && onPick()}
-      onMouseMove={e => onHover(player, e.clientX, e.clientY)}
-      onMouseLeave={onLeave}
+      onMouseMove={e => show(player, e.clientX, e.clientY)}
+      onMouseLeave={hide}
       className={`flex items-center gap-2 px-2 py-1.5 border-b border-vga-gray text-left w-full transition-colors ${
-        canPick
-          ? 'hover:bg-vga-blue cursor-pointer'
-          : 'cursor-default opacity-40'
+        canPick ? 'hover:bg-vga-blue cursor-pointer' : 'cursor-default opacity-40'
       }`}
     >
       <PlayerPhoto playerId={player.id} size="xs" className="shrink-0 border border-vga-gray" />
@@ -171,14 +115,10 @@ const PoolRow = ({
 };
 
 // ── Squad panel (sorted by position) ───────────────────────────
-const SquadPanel = ({
-  picks, label, isUser, cap, spent, year, onHover, onLeave,
-}: {
-  picks: Player[]; label: string; isUser: boolean; cap: number | null;
-  spent: number; year: number;
-  onHover: (p: Player, x: number, y: number) => void;
-  onLeave: () => void;
+const SquadPanel = ({ picks, label, isUser, cap, spent }: {
+  picks: Player[]; label: string; isUser: boolean; cap: number | null; spent: number;
 }) => {
+  const { show, hide } = usePlayerTooltip();
   const sorted = sortByPosition(picks);
   const remaining = cap !== null ? cap - spent : null;
 
@@ -202,16 +142,10 @@ const SquadPanel = ({
             if (group.length === 0) return null;
             return (
               <div key={pos}>
-                <div className={`px-2 py-0.5 text-[6px] font-bold uppercase border-b border-vga-gray ${POS_SECTION_COLOR[pos]}`}>
-                  {pos}
-                </div>
+                <div className={`px-2 py-0.5 text-[6px] font-bold uppercase border-b border-vga-gray ${POS_SECTION_COLOR[pos]}`}>{pos}</div>
                 {group.map(p => (
-                  <div
-                    key={p.id}
-                    className="flex items-center gap-1.5 px-2 py-1 border-b border-vga-gray last:border-0"
-                    onMouseMove={e => onHover(p, e.clientX, e.clientY)}
-                    onMouseLeave={onLeave}
-                  >
+                  <div key={p.id} className="flex items-center gap-1.5 px-2 py-1 border-b border-vga-gray last:border-0"
+                    onMouseMove={e => show(p, e.clientX, e.clientY)} onMouseLeave={hide}>
                     <PlayerPhoto playerId={p.id} size="xs" className="shrink-0" />
                     <span className="text-vga-bright-white text-[7px] flex-1 min-w-0 truncate">{p.fullName}</span>
                     <span className="text-vga-yellow text-[7px] shrink-0">{p.media}</span>
@@ -227,22 +161,16 @@ const SquadPanel = ({
 };
 
 // ── Rival panel ─────────────────────────────────────────────────
-const RivalPanel = ({
-  team, picks, isCurrent, year, onHover, onLeave,
-}: {
-  team: Team | undefined; picks: Player[]; isCurrent: boolean; year: number;
-  onHover: (p: Player, x: number, y: number) => void;
-  onLeave: () => void;
+const RivalPanel = ({ team, picks, isCurrent }: {
+  team: Team | undefined; picks: Player[]; isCurrent: boolean;
 }) => {
+  const { show, hide } = usePlayerTooltip();
   const [open, setOpen] = useState(false);
   const sorted = sortByPosition(picks);
 
   return (
     <div className={`border ${isCurrent ? 'border-vga-yellow' : 'border-vga-gray'} bg-vga-black`}>
-      <button
-        className="w-full flex items-center gap-2 px-2 py-1.5 hover:bg-vga-blue transition-colors"
-        onClick={() => setOpen(o => !o)}
-      >
+      <button className="w-full flex items-center gap-2 px-2 py-1.5 hover:bg-vga-blue transition-colors" onClick={() => setOpen(o => !o)}>
         <TeamCrest colors={team?.colors} size="xs" title={team?.name} teamId={team?.id} />
         <span className={`text-[8px] flex-1 min-w-0 truncate text-left ${isCurrent ? 'text-vga-yellow font-bold' : 'text-vga-bright-white'}`}>
           {team?.name ?? '—'}
@@ -259,12 +187,8 @@ const RivalPanel = ({
               <div key={pos}>
                 <div className={`px-2 py-0.5 text-[6px] font-bold ${POS_SECTION_COLOR[pos]} border-b border-vga-gray`}>{pos}</div>
                 {group.map(p => (
-                  <div
-                    key={p.id}
-                    className="flex items-center gap-1.5 px-2 py-0.5 border-b border-vga-gray last:border-0"
-                    onMouseMove={e => onHover(p, e.clientX, e.clientY)}
-                    onMouseLeave={onLeave}
-                  >
+                  <div key={p.id} className="flex items-center gap-1.5 px-2 py-0.5 border-b border-vga-gray last:border-0"
+                    onMouseMove={e => show(p, e.clientX, e.clientY)} onMouseLeave={hide}>
                     <PlayerPhoto playerId={p.id} size="xs" className="shrink-0" />
                     <span className="text-[7px] text-vga-bright-white flex-1 min-w-0 truncate">{p.fullName}</span>
                     <span className="text-[7px] text-vga-yellow shrink-0">{p.media}</span>
@@ -293,7 +217,6 @@ export const FantasyDraftView = ({
   const [pickIdx, setPickIdx] = useState(0);
   const [posFilter, setPosFilter] = useState<DraftPos | 'ALL'>('ALL');
   const [done, setDone] = useState(false);
-  const [tooltip, setTooltip] = useState<{ player: Player; x: number; y: number } | null>(null);
   const aiTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const currentTeamId = roundOrder[pickIdx];
@@ -339,9 +262,6 @@ export const FantasyDraftView = ({
     return () => { if (aiTimerRef.current) clearTimeout(aiTimerRef.current); };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [round, pickIdx, done]);
-
-  const showTooltip = (player: Player, x: number, y: number) => setTooltip({ player, x, y });
-  const hideTooltip = () => setTooltip(null);
 
   const displayPool = posFilter === 'ALL' ? pool : pool.filter(p => groupFor(p.position) === posFilter);
   const userPicks = teamPicks[userTeamId] ?? [];
@@ -389,8 +309,6 @@ export const FantasyDraftView = ({
 
   return (
     <div className="w-full max-w-5xl flex flex-col gap-3 animate-in fade-in duration-500">
-      {tooltip && <PlayerTooltip player={tooltip.player} year={year} x={tooltip.x} y={tooltip.y} />}
-
       {/* Header */}
       <div className="bg-vga-blue p-2 border-4 border-vga-white shadow-[4px_4px_0_rgba(0,0,0,1)] flex items-center justify-between">
         <div className="flex items-center gap-3">
@@ -444,11 +362,8 @@ export const FantasyDraftView = ({
                     player={p}
                     year={year}
                     canPick={canPick}
-                    isUserTurn={isUserTurn}
                     overBudget={overBudget}
                     onPick={() => doPick(userTeamId, p)}
-                    onHover={showTooltip}
-                    onLeave={hideTooltip}
                   />
                 );
               })
@@ -464,9 +379,6 @@ export const FantasyDraftView = ({
             isUser
             cap={cap}
             spent={teamSpent(userTeamId)}
-            year={year}
-            onHover={showTooltip}
-            onLeave={hideTooltip}
           />
 
           <div className="bg-vga-blue px-2 py-1.5 border-2 border-vga-white">
@@ -478,9 +390,6 @@ export const FantasyDraftView = ({
                   team={getTeam(id)}
                   picks={teamPicks[id] ?? []}
                   isCurrent={id === currentTeamId}
-                  year={year}
-                  onHover={showTooltip}
-                  onLeave={hideTooltip}
                 />
               ))}
             </div>

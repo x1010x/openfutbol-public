@@ -36,6 +36,7 @@ import { FantasyDraftView } from './components/FantasyDraftView';
 import type { StatKey } from './components/StatDrillDown';
 import { extractDbId } from './data/mockTeams';
 import { computePrice, evaluateOffer, formatEuros } from './data/economy';
+import { PlayerTooltipProvider } from './contexts/PlayerTooltipContext';
 import { formatJornadaDate } from './engine/calendar';
 import type { OfferResult } from './data/economy';
 
@@ -1654,6 +1655,7 @@ function App() {
   };
 
   return (
+    <PlayerTooltipProvider year={league?.year ?? selectedYear ?? new Date().getFullYear()}>
     <div className="min-h-screen bg-vga-black cool:bg-rc-bg">
       {showDisclaimer && <DisclaimerView onDismiss={dismissDisclaimer} />}
 
@@ -2150,6 +2152,7 @@ function App() {
         </MessageModal>
       )}
     </div>
+    </PlayerTooltipProvider>
   );
 }
 

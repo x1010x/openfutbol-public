@@ -1,4 +1,5 @@
 import type { Team } from '../types/game.d.ts';
+import { PlayerName } from './PlayerName';
 
 interface Props {
   teams: Team[];
@@ -50,8 +51,8 @@ export const StatsView = ({ teams, onPlayerClick, onBack }: Props) => {
                 <tr key={i} className="border-b border-vga-white/20">
                   <td className="text-vga-black">
                     {onPlayerClick ? (
-                      <button onClick={() => onPlayerClick(p.id)} className="hover:text-vga-blue underline decoration-dotted underline-offset-2">{p.name}</button>
-                    ) : p.name}
+                      <button onClick={() => onPlayerClick(p.id)} className="hover:text-vga-blue underline decoration-dotted underline-offset-2"><PlayerName player={p} /></button>
+                    ) : <PlayerName player={p} />}
                   </td>
                   <td className="text-vga-blue truncate max-w-[100px]">{p.teamName}</td>
                   <td className="text-right text-vga-light-green font-bold">{p.seasonStats.goals}</td>
@@ -77,8 +78,8 @@ export const StatsView = ({ teams, onPlayerClick, onBack }: Props) => {
                 <tr key={i} className="border-b border-vga-white/20">
                   <td className="text-vga-black">
                     {onPlayerClick ? (
-                      <button onClick={() => onPlayerClick(p.id)} className="hover:text-vga-blue underline decoration-dotted underline-offset-2">{p.name}</button>
-                    ) : p.name}
+                      <button onClick={() => onPlayerClick(p.id)} className="hover:text-vga-blue underline decoration-dotted underline-offset-2"><PlayerName player={p} /></button>
+                    ) : <PlayerName player={p} />}
                   </td>
                   <td className="text-vga-blue truncate max-w-[100px]">{p.teamName}</td>
                   <td className="text-right text-vga-light-cyan font-bold">{p.seasonStats.assists}</td>
@@ -95,9 +96,9 @@ export const StatsView = ({ teams, onPlayerClick, onBack }: Props) => {
             {badBoys.map((p, i) => (
               <div key={i} className="bg-vga-black p-1 border border-vga-white flex flex-col items-center">
                 {onPlayerClick ? (
-                  <button onClick={() => onPlayerClick(p.id)} className="text-vga-white text-[6px] text-center truncate w-full hover:text-vga-yellow underline decoration-dotted">{p.name}</button>
+                  <button onClick={() => onPlayerClick(p.id)} className="text-vga-white text-[6px] text-center truncate w-full hover:text-vga-yellow underline decoration-dotted"><PlayerName player={p} /></button>
                 ) : (
-                  <span className="text-vga-white text-[6px] text-center truncate w-full">{p.name}</span>
+                  <PlayerName player={p} className="text-vga-white text-[6px] text-center truncate w-full" />
                 )}
                 <div className="flex gap-1 mt-1">
                   <div className="flex items-center">
