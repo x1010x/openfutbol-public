@@ -39,63 +39,38 @@ export const MatchDetails = ({ match, teams }: { match: MatchInfo; teams: Team[]
   const awayReds = eventsForTeam(match.awayId, 'red');
 
   const hasAny =
-    homeGoals.length +
-      awayGoals.length +
-      homeYellows.length +
-      awayYellows.length +
-      homeReds.length +
-      awayReds.length >
-    0;
+    homeGoals.length + awayGoals.length +
+    homeYellows.length + awayYellows.length +
+    homeReds.length + awayReds.length > 0;
   if (!hasAny) return null;
 
-  const renderList = (items: MatchEvent[], color: string) =>
-    items.map((e, i) => (
-      <div key={`${e.type}${i}`} className={`${color} truncate`}>
-        {e.minute}' {findPlayerName(teams, e.playerId)}
+  const EventRow = ({ e, color }: { e: MatchEvent; color: string }) => (
+    <div className={`${color} text-[9px]`}>
+      {e.minute}' {findPlayerName(teams, e.playerId)}
+    </div>
+  );
+
+  const Section = ({ label, items, color }: { label: string; items: MatchEvent[]; color: string }) =>
+    items.length > 0 ? (
+      <div className="space-y-0.5">
+        <div className="text-[7px] text-vga-yellow uppercase font-bold">{label}</div>
+        {items.map((e, i) => <EventRow key={i} e={e} color={color} />)}
       </div>
-    ));
+    ) : null;
 
   return (
-    <div className="grid grid-cols-2 gap-2 px-2 pb-2 pt-1 border-t border-vga-gray text-[8px]">
-      <div className="text-right space-y-0.5">
-        {homeGoals.length > 0 && (
-          <>
-            <div className="text-[7px] text-vga-yellow uppercase">Goles</div>
-            {renderList(homeGoals, 'text-vga-light-green')}
-          </>
-        )}
-        {homeYellows.length > 0 && (
-          <>
-            <div className="text-[7px] text-vga-yellow uppercase mt-1">Amarillas</div>
-            {renderList(homeYellows, 'text-vga-yellow')}
-          </>
-        )}
-        {homeReds.length > 0 && (
-          <>
-            <div className="text-[7px] text-vga-yellow uppercase mt-1">Rojas</div>
-            {renderList(homeReds, 'text-vga-light-red')}
-          </>
-        )}
-      </div>
-      <div className="text-left space-y-0.5">
-        {awayGoals.length > 0 && (
-          <>
-            <div className="text-[7px] text-vga-yellow uppercase">Goles</div>
-            {renderList(awayGoals, 'text-vga-light-green')}
-          </>
-        )}
-        {awayYellows.length > 0 && (
-          <>
-            <div className="text-[7px] text-vga-yellow uppercase mt-1">Amarillas</div>
-            {renderList(awayYellows, 'text-vga-yellow')}
-          </>
-        )}
-        {awayReds.length > 0 && (
-          <>
-            <div className="text-[7px] text-vga-yellow uppercase mt-1">Rojas</div>
-            {renderList(awayReds, 'text-vga-light-red')}
-          </>
-        )}
+    <div className="border-t-2 border-vga-gray mt-1 pt-2 px-3 pb-2">
+      <div className="grid grid-cols-2 gap-4">
+        <div className="text-right space-y-2">
+          <Section label="Goles" items={homeGoals} color="text-vga-light-green" />
+          <Section label="Amarillas" items={homeYellows} color="text-vga-yellow" />
+          <Section label="Rojas" items={homeReds} color="text-vga-light-red" />
+        </div>
+        <div className="text-left space-y-2">
+          <Section label="Goles" items={awayGoals} color="text-vga-light-green" />
+          <Section label="Amarillas" items={awayYellows} color="text-vga-yellow" />
+          <Section label="Rojas" items={awayReds} color="text-vga-light-red" />
+        </div>
       </div>
     </div>
   );
@@ -123,16 +98,16 @@ export const JornadaResultsView = ({ jornada, teams, userTeamId, onContinue }: P
     });
 
   return (
-    <div className="w-full max-w-md flex flex-col gap-4 animate-in fade-in duration-300">
+    <div className="w-full max-w-2xl flex flex-col gap-4 animate-in fade-in duration-300">
       <div className="bg-vga-blue p-2 border-2 border-vga-white flex justify-between items-center vga-panel">
         <h2 className="text-vga-yellow text-xs uppercase font-bold">
           {jornada ? `Resultados Jornada ${jornada.number}` : 'Resultados'}
         </h2>
       </div>
 
-      <div className="bg-vga-gray border-4 border-vga-blue p-3">
+      <div className="bg-vga-gray border-4 border-vga-blue p-3 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
         {!jornada || jornada.matches.length === 0 ? (
-          <div className="bg-vga-black border border-vga-gray p-3 text-center text-[8px] text-vga-gray">
+          <div className="bg-vga-black border border-vga-gray p-4 text-center text-[9px] text-vga-gray">
             Sin partidos en esta jornada.
           </div>
         ) : (
@@ -140,39 +115,35 @@ export const JornadaResultsView = ({ jornada, teams, userTeamId, onContinue }: P
             {jornada.matches.map((m, i) => {
               const isUser = m.homeId === userTeamId || m.awayId === userTeamId;
               const userWon =
-                isUser &&
-                m.played &&
+                isUser && m.played &&
                 ((m.homeId === userTeamId && (m.homeScore ?? 0) > (m.awayScore ?? 0)) ||
-                  (m.awayId === userTeamId && (m.awayScore ?? 0) > (m.homeScore ?? 0)));
+                 (m.awayId === userTeamId && (m.awayScore ?? 0) > (m.homeScore ?? 0)));
               const userLost =
-                isUser &&
-                m.played &&
+                isUser && m.played &&
                 ((m.homeId === userTeamId && (m.homeScore ?? 0) < (m.awayScore ?? 0)) ||
-                  (m.awayId === userTeamId && (m.awayScore ?? 0) < (m.homeScore ?? 0)));
+                 (m.awayId === userTeamId && (m.awayScore ?? 0) < (m.homeScore ?? 0)));
               const borderClass = isUser
-                ? userWon
-                  ? 'border-vga-light-green'
-                  : userLost
-                  ? 'border-vga-light-red'
-                  : 'border-vga-yellow'
+                ? userWon ? 'border-vga-light-green'
+                : userLost ? 'border-vga-light-red'
+                : 'border-vga-yellow'
                 : 'border-vga-gray';
               const expanded = expandedMatches.has(i);
               return (
-                <div key={i} className={`bg-vga-black border-2 ${borderClass} cursor-pointer`}
+                <div key={i} className={`bg-vga-black border-2 ${borderClass} cursor-pointer hover:border-opacity-80`}
                   onClick={() => toggleMatch(i)}>
-                  <div className="grid grid-cols-[1fr_auto_1fr_auto] items-center gap-2 p-2 text-[9px]">
-                    <div className="flex items-center gap-1.5 justify-end min-w-0">
-                      <span className="text-vga-bright-white truncate">{teamName(m.homeId)}</span>
-                      <TeamCrest colors={teamColors(m.homeId)} size="xs" title={teamName(m.homeId)} teamId={m.homeId} />
+                  <div className="grid grid-cols-[1fr_auto_1fr_auto] items-center gap-3 px-3 py-2">
+                    <div className="flex items-center gap-2 justify-end min-w-0">
+                      <span className="text-vga-bright-white text-[10px] font-bold text-right">{teamName(m.homeId)}</span>
+                      <TeamCrest colors={teamColors(m.homeId)} size="sm" title={teamName(m.homeId)} teamId={m.homeId} />
                     </div>
-                    <div className="text-center font-mono text-vga-yellow text-[11px] px-1">
-                      {m.played ? `${m.homeScore} - ${m.awayScore}` : '—'}
+                    <div className="text-center font-mono text-vga-yellow text-sm font-bold px-2 shrink-0">
+                      {m.played ? `${m.homeScore} – ${m.awayScore}` : '—'}
                     </div>
-                    <div className="flex items-center gap-1.5 min-w-0">
-                      <TeamCrest colors={teamColors(m.awayId)} size="xs" title={teamName(m.awayId)} teamId={m.awayId} />
-                      <span className="text-vga-bright-white truncate">{teamName(m.awayId)}</span>
+                    <div className="flex items-center gap-2 min-w-0">
+                      <TeamCrest colors={teamColors(m.awayId)} size="sm" title={teamName(m.awayId)} teamId={m.awayId} />
+                      <span className="text-vga-bright-white text-[10px] font-bold">{teamName(m.awayId)}</span>
                     </div>
-                    <span className="text-[7px] text-vga-gray pl-1">{expanded ? '▼' : '▶'}</span>
+                    <span className="text-[8px] text-vga-gray shrink-0">{expanded ? '▼' : '▶'}</span>
                   </div>
                   {expanded && <MatchDetails match={m} teams={teams} />}
                 </div>
@@ -184,7 +155,7 @@ export const JornadaResultsView = ({ jornada, teams, userTeamId, onContinue }: P
 
       <button
         onClick={onContinue}
-        className="w-full bg-vga-green hover:bg-vga-light-green text-vga-bright-white py-2 px-4 border-b-4 border-r-4 border-vga-black active:border-0 text-xs font-bold"
+        className="w-full bg-vga-green hover:bg-vga-light-green text-vga-bright-white py-3 border-b-4 border-r-4 border-vga-black active:border-0 text-xs font-bold uppercase tracking-wider"
       >
         CONTINUAR
       </button>
