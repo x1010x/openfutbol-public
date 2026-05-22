@@ -14,7 +14,8 @@ const SIZE: Record<NonNullable<Props['size']>, string> = {
   lg: 'w-16 h-16',
 };
 
-type Attempt = 'png' | 'jpeg' | 'unknown';
+type Attempt = 'png' | 'jpeg' | 'jpg' | 'ico' | 'unknown';
+const EXTS: Attempt[] = ['png', 'jpeg', 'jpg', 'ico'];
 
 export const PlayerPhoto = ({ playerId, size = 'sm', className = '' }: Props) => {
   const dbId = extractDbId(playerId);
@@ -23,12 +24,13 @@ export const PlayerPhoto = ({ playerId, size = 'sm', className = '' }: Props) =>
   useEffect(() => { setAttempt('png'); }, [dbId]);
 
   const src =
-    attempt === 'png' ? `/assets/players/${dbId}.png`
-    : attempt === 'jpeg' ? `/assets/players/${dbId}.jpeg`
-    : '/assets/players/unknown.jpeg';
+    attempt === 'unknown'
+      ? '/assets/players/unknown.jpeg'
+      : `/assets/players/${dbId}.${attempt}`;
 
   const handleError = () => {
-    if (attempt === 'png') setAttempt('jpeg');
+    const idx = EXTS.indexOf(attempt);
+    if (idx !== -1 && idx < EXTS.length - 1) setAttempt(EXTS[idx + 1]);
     else setAttempt('unknown');
   };
 

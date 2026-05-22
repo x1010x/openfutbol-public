@@ -19,7 +19,8 @@ const SIZE: Record<NonNullable<Props['size']>, string> = {
 const JERSEY_PATH =
   'M4 4 L20 4 L20 5 L23 5 L23 11 L20 11 L20 14 L18 14 L18 21 L6 21 L6 14 L4 14 L4 11 L1 11 L1 5 L4 5 Z';
 
-type ImgAttempt = 'png' | 'jpeg' | 'svg';
+type ImgAttempt = 'png' | 'jpeg' | 'jpg' | 'ico' | 'svg';
+const TEAM_EXTS: ImgAttempt[] = ['png', 'jpeg', 'jpg', 'ico'];
 
 export const TeamCrest = ({ colors, size = 'sm', title, teamId }: Props) => {
   const id = useId().replace(/:/g, '');
@@ -28,14 +29,15 @@ export const TeamCrest = ({ colors, size = 'sm', title, teamId }: Props) => {
   useEffect(() => { if (teamId) setImgAttempt('png'); }, [teamId]);
 
   if (teamId && imgAttempt !== 'svg') {
-    const ext = imgAttempt === 'png' ? 'png' : 'jpeg';
+    const handleError = () => {
+      const idx = TEAM_EXTS.indexOf(imgAttempt);
+      if (idx !== -1 && idx < TEAM_EXTS.length - 1) setImgAttempt(TEAM_EXTS[idx + 1]);
+      else setImgAttempt('svg');
+    };
     return (
       <img
-        src={`/assets/teams/${teamId}.${ext}`}
-        onError={() => {
-          if (imgAttempt === 'png') setImgAttempt('jpeg');
-          else setImgAttempt('svg');
-        }}
+        src={`/assets/teams/${teamId}.${imgAttempt}`}
+        onError={handleError}
         alt={title ?? ''}
         title={title}
         className={`${SIZE[size]} shrink-0 object-contain`}
