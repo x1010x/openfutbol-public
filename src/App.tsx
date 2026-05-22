@@ -1512,12 +1512,12 @@ function App() {
                 <>
                   <div className="flex justify-between items-center mb-4 bg-vga-black p-3 border border-vga-white">
                     <div className="flex flex-col items-center gap-1 flex-1 min-w-0">
-                      <TeamCrest colors={homeTeam?.colors} size="lg" title={homeTeam?.name} teamId={homeTeam?.id} />
+                      <TeamCrest colors={homeTeam?.colors} size="xl" title={homeTeam?.name} teamId={homeTeam?.id} />
                       <span className="text-[10px] text-vga-light-red text-center leading-tight truncate w-full">{homeTeam?.name}</span>
                     </div>
                     <span className="text-[12px] text-vga-white mx-3 font-pixel shrink-0">VS</span>
                     <div className="flex flex-col items-center gap-1 flex-1 min-w-0">
-                      <TeamCrest colors={awayTeam?.colors} size="lg" title={awayTeam?.name} teamId={awayTeam?.id} />
+                      <TeamCrest colors={awayTeam?.colors} size="xl" title={awayTeam?.name} teamId={awayTeam?.id} />
                       <span className="text-[10px] text-vga-light-cyan text-center leading-tight truncate w-full">{awayTeam?.name}</span>
                     </div>
                   </div>
@@ -1537,7 +1537,7 @@ function App() {
                       return (
                         <div key={team.id} className="flex-1 min-w-0">
                           <div className="text-center mb-1">
-                            <TeamCrest colors={team.colors} size="md" title={team.name} teamId={team.id} />
+                            <TeamCrest colors={team.colors} size="lg" title={team.name} teamId={team.id} />
                             <div className={`text-[8px] font-bold text-center leading-tight ${i === 0 ? 'text-vga-light-red' : 'text-vga-light-cyan'}`}>{team.name}</div>
                             <div className="text-[7px] text-vga-cyan">{team.formation} · {calculateTeamStrength(team).toFixed(0)}</div>
                           </div>
