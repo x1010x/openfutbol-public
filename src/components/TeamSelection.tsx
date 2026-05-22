@@ -130,15 +130,15 @@ export const TeamSelection = ({ teams, selectedYear, yearStats, onSelectYear, on
                           className="bg-vga-black border-2 border-vga-gray p-3 hover:border-vga-light-green cursor-pointer group transition-colors"
                           onClick={() => onSelect(team.id)}
                         >
-                          <div className="flex justify-between items-center mb-2">
-                            <span className="text-vga-bright-white text-xs group-hover:text-vga-light-green">{team.name}</span>
-                            <span className="text-[8px] bg-vga-blue px-2 text-vga-yellow">STR: {strength}</span>
-                          </div>
-                          <div className="flex gap-3 items-center">
-                            <TeamCrest colors={team.colors} size="lg" title={team.name} teamId={team.id} />
-                            <div className="flex flex-col">
-                              <span className="text-[7px] text-vga-cyan">ESTRELLA:</span>
-                              <span className="text-[8px] text-vga-white">{star?.name ?? '—'} ({star?.media ?? 0})</span>
+                          <div className="flex flex-col items-center gap-2">
+                            <TeamCrest colors={team.colors} size="xl" title={team.name} teamId={team.id} />
+                            <div className="flex justify-between items-center w-full">
+                              <span className="text-vga-bright-white text-xs group-hover:text-vga-light-green truncate">{team.name}</span>
+                              <span className="text-[8px] bg-vga-blue px-2 text-vga-yellow shrink-0">STR: {strength}</span>
+                            </div>
+                            <div className="flex items-center gap-1 text-[7px] self-start">
+                              <span className="text-vga-cyan">ESTRELLA:</span>
+                              <span className="text-vga-white">{star?.name ?? '—'} ({star?.media ?? 0})</span>
                             </div>
                           </div>
                           <button className="w-full mt-3 bg-vga-gray group-hover:bg-vga-green text-[8px] py-1 text-vga-bright-white border border-vga-white">

@@ -135,7 +135,7 @@ export const LeagueSetupView = ({ year, existingTeams, onConfirm, onBack }: Prop
           active ? `${borderActive} bg-vga-bright-white` : 'border-vga-black bg-vga-gray opacity-50'
         }`}
       >
-        <TeamCrest colors={t.colors ?? ['#888', '#888', '#888']} size="sm" title={t.name} teamId={t.id} />
+        <TeamCrest colors={t.colors ?? ['#888', '#888', '#888']} size="md" title={t.name} teamId={t.id} />
         <div className="flex flex-col min-w-0">
           <span className="text-vga-black text-[8px] font-bold uppercase truncate">{t.name}</span>
           <span className={`text-[7px] ${accent}`}>{t.playerCount} jug.</span>
