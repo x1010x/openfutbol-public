@@ -80,10 +80,11 @@ export const SwapModal = ({ slotPos, currentPlayer, candidates, inLineup, onSele
                   const aTitular = inLineup.has(a.id) ? 1 : 0;
                   const bTitular = inLineup.has(b.id) ? 1 : 0;
                   if (aTitular !== bTitular) return aTitular - bTitular;
+                  const posDiff = (POS_ORDER[a.position] ?? 9) - (POS_ORDER[b.position] ?? 9);
+                  if (posDiff !== 0) return posDiff;
                   const aLive = liveMed(a, a.stamina ?? 99, slotPos);
                   const bLive = liveMed(b, b.stamina ?? 99, slotPos);
-                  if (bLive !== aLive) return bLive - aLive;
-                  return (POS_ORDER[a.position] ?? 9) - (POS_ORDER[b.position] ?? 9);
+                  return bLive - aLive;
                 })
                 .map(p => {
                 const oop = isOOP(p, slotPos);
