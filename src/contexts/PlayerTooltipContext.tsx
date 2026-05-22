@@ -69,7 +69,7 @@ const Tooltip = ({ player, x, y, year }: TooltipState & { year: number }) => {
       </div>
       <div className="px-2 pb-2 flex flex-col gap-0.5">
         {ALL_STATS.map(stat => {
-          const val = (player.stats as Record<string, number>)[stat] ?? 0;
+          const val = (player.stats as unknown as Record<string, number>)[stat] ?? 0;
           const isKey = keyStats.includes(stat);
           return (
             <div key={stat} className="flex items-center gap-1">
