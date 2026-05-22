@@ -37,7 +37,7 @@ export const TeamCrest = ({ colors, size = 'sm', title, teamId }: Props) => {
     };
     return (
       <img
-        src={`/assets/teams/${teamId}.${imgAttempt}`}
+        src={`${import.meta.env.BASE_URL}assets/teams/${teamId}.${imgAttempt}`}
         onError={handleError}
         alt={title ?? ''}
         title={title}
