@@ -3,6 +3,7 @@ import type { PlayerSeasonRecord } from '../store/leagueStore';
 import { formatEuros, computePrice, playerAge } from '../data/economy';
 import { StatBar } from './StatBar';
 import { StatRadar } from './StatRadar';
+import { PlayerPhoto } from './PlayerPhoto';
 
 interface Props {
   player: Player;
@@ -90,6 +91,7 @@ export const PlayerDetailView = ({ player, teamName, history, seasonYear, onBack
 
         <div className="flex gap-3 items-stretch flex-wrap">
           <div className="flex flex-col items-center justify-center bg-vga-black vga-panel-inset px-3 py-2 min-w-[80px]">
+            <PlayerPhoto playerId={player.id} size="lg" className="mb-1" />
             <span className="text-[8px] text-vga-cyan">MEDIA</span>
             <span className="text-3xl text-vga-light-green leading-none">{player.media}</span>
           </div>

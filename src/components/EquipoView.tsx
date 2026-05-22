@@ -205,7 +205,7 @@ export const EquipoView = ({ team, league, onPlayerClick, onBack }: Props) => {
 
       {/* Identidad */}
       <div className="bg-vga-gray border-2 border-vga-blue p-3 flex items-center gap-4">
-        <TeamCrest colors={team.colors} size="lg" title={team.name} />
+        <TeamCrest colors={team.colors} size="lg" title={team.name} teamId={team.id} />
         <div className="flex-1 grid grid-cols-2 gap-2 text-[8px]">
           <div><span className="text-vga-blue uppercase">Entrenador:</span> <span className="text-vga-black font-bold">{team.manager}</span></div>
           <div><span className="text-vga-blue uppercase">Estadio:</span> <span className="text-vga-black font-bold">{team.stadiumName}</span></div>
