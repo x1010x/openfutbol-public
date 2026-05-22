@@ -18,6 +18,7 @@ import { StatsView } from './components/StatsView';
 import { FinancesView } from './components/FinancesView';
 import { EndOfSeasonView } from './components/EndOfSeasonView';
 import { InstructionsView } from './components/InstructionsView';
+import { ColaborarView } from './components/ColaborarView';
 import { TransfersView } from './components/TransfersView';
 import { JornadaResultsView } from './components/JornadaResultsView';
 import { PlayerDetailView } from './components/PlayerDetailView';
@@ -113,6 +114,7 @@ function App() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [showPlayFlow, setShowPlayFlow] = useState(false);
   const [showInstructions, setShowInstructions] = useState(false);
+  const [showColaborar, setShowColaborar] = useState(false);
   const [instructionsScroll, setInstructionsScroll] = useState<'changelog' | 'engine' | undefined>(undefined);
   const [drillDown, setDrillDown] = useState<{ teamId: string; stat: StatKey } | null>(null);
   const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null);
@@ -1117,6 +1119,10 @@ function App() {
       return <InstructionsView onBack={() => { setShowInstructions(false); setInstructionsScroll(undefined); }} scrollTo={instructionsScroll} />;
     }
 
+    if (showColaborar) {
+      return <ColaborarView onBack={() => setShowColaborar(false)} />;
+    }
+
     if (view === 'EDITOR') {
       return (
         <EditorView
@@ -1220,6 +1226,12 @@ function App() {
               className="w-full bg-vga-gray text-vga-black py-3 text-[10px] border-2 border-vga-black font-bold uppercase tracking-widest hover:bg-vga-bright-white"
             >
               AJUSTES
+            </button>
+            <button
+              onClick={() => setShowColaborar(true)}
+              className="w-full bg-vga-black text-vga-cyan py-3 text-[10px] border-2 border-vga-cyan font-bold uppercase tracking-widest hover:bg-vga-cyan hover:text-vga-black"
+            >
+              COLABORAR
             </button>
           </div>
         );
