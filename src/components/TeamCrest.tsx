@@ -14,7 +14,7 @@ const SIZE: Record<NonNullable<Props['size']>, string> = {
   sm: 'w-6 h-6',
   md: 'w-9 h-9',
   lg: 'w-16 h-16',
-  xl: 'w-24 h-24',
+  xl: 'w-36 h-36',
 };
 
 const JERSEY_PATH =
