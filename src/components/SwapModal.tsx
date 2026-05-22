@@ -80,11 +80,15 @@ export const SwapModal = ({ slotPos, currentPlayer, candidates, inLineup, onSele
                   const aTitular = inLineup.has(a.id) ? 1 : 0;
                   const bTitular = inLineup.has(b.id) ? 1 : 0;
                   if (aTitular !== bTitular) return aTitular - bTitular;
-                  const posDiff = (POS_ORDER[a.position] ?? 9) - (POS_ORDER[b.position] ?? 9);
-                  if (posDiff !== 0) return posDiff;
+                  // Matching slot position comes first
+                  const aMatch = a.position === slotPos ? 0 : 1;
+                  const bMatch = b.position === slotPos ? 0 : 1;
+                  if (aMatch !== bMatch) return aMatch - bMatch;
+                  // Among same-match group, sort by LIVE desc
                   const aLive = liveMed(a, a.stamina ?? 99, slotPos);
                   const bLive = liveMed(b, b.stamina ?? 99, slotPos);
-                  return bLive - aLive;
+                  if (bLive !== aLive) return bLive - aLive;
+                  return (POS_ORDER[a.position] ?? 9) - (POS_ORDER[b.position] ?? 9);
                 })
                 .map(p => {
                 const oop = isOOP(p, slotPos);
