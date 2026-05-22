@@ -14,7 +14,7 @@ const findPlayerName = (teams: Team[], playerId?: string): string => {
   if (!playerId) return '—';
   for (const t of teams) {
     const p = t.players.find(pl => pl.id === playerId);
-    if (p) return p.name;
+    if (p) return p.fullName;
   }
   return '—';
 };

@@ -157,17 +157,17 @@ export const simulateMinute = (state: MatchState): MatchState => {
         newEvents.push({
           minute: nextMinute,
           type: 'goal',
-          description: `¡GOOOOOL de ${attackingTeam.name}! Marca ${scorer.name}${assistant ? ` tras pase de ${assistant.name}` : ''}`,
+          description: `¡GOOOOOL de ${attackingTeam.name}! Marca ${scorer.fullName}${assistant ? ` tras pase de ${assistant.fullName}` : ''}`,
           teamId: attackingTeam.id,
           playerId: scorer.id,
           assistantId: assistant?.id
         });
       } else {
-        const shooterLabel = shooter ? shooter.name : attackingTeam.name;
+        const shooterLabel = shooter ? shooter.fullName : attackingTeam.name;
         const onTarget = Math.random() < 0.4;
         if (onTarget) {
           if (isHomeEvent) homeShotsOnTarget++; else awayShotsOnTarget++;
-          const gkLabel = gk ? gk.name : 'el portero';
+          const gkLabel = gk ? gk.fullName : 'el portero';
           newEvents.push({
             minute: nextMinute,
             type: 'shot',
@@ -227,7 +227,7 @@ export const simulateMinute = (state: MatchState): MatchState => {
             newEvents.push({
               minute: nextMinute,
               type: 'red',
-              description: `¡Segunda amarilla! ${defender.name} (${defendingTeam.name}) se va expulsado tras una falta sobre ${attacker.name}.`,
+              description: `¡Segunda amarilla! ${defender.fullName} (${defendingTeam.name}) se va expulsado tras una falta sobre ${attacker.fullName}.`,
               teamId: defendingTeam.id,
               playerId: defender.id,
             });
@@ -236,7 +236,7 @@ export const simulateMinute = (state: MatchState): MatchState => {
             newEvents.push({
               minute: nextMinute,
               type: 'yellow',
-              description: `Falta de ${defender.name} sobre ${attacker.name}. Amarilla para ${defender.name} (${defendingTeam.name}).`,
+              description: `Falta de ${defender.fullName} sobre ${attacker.fullName}. Amarilla para ${defender.fullName} (${defendingTeam.name}).`,
               teamId: defendingTeam.id,
               playerId: defender.id,
             });
@@ -246,7 +246,7 @@ export const simulateMinute = (state: MatchState): MatchState => {
           newEvents.push({
             minute: nextMinute,
             type: 'red',
-            description: `¡ROJA DIRECTA para ${defender.name} (${defendingTeam.name})! Entrada terrible sobre ${attacker.name}.`,
+            description: `¡ROJA DIRECTA para ${defender.fullName} (${defendingTeam.name})! Entrada terrible sobre ${attacker.fullName}.`,
             teamId: defendingTeam.id,
             playerId: defender.id,
           });
@@ -288,7 +288,7 @@ export const simulateMinute = (state: MatchState): MatchState => {
       newEvents.push({
         minute: nextMinute,
         type: 'injury',
-        description: `¡Lesión de ${player.name} (${team.name})!`,
+        description: `¡Lesión de ${player.fullName} (${team.name})!`,
         teamId: team.id,
         playerId: pid,
       });
@@ -311,7 +311,7 @@ export const simulateMinute = (state: MatchState): MatchState => {
         newEvents.push({
           minute: nextMinute,
           type: 'sub',
-          description: `Cambio en ${team.name}: entra ${sub.name}, sale ${player.name}.`,
+          description: `Cambio en ${team.name}: entra ${sub.fullName}, sale ${player.fullName}.`,
           teamId: team.id,
           playerId: sub.id,
           playerOffId: pid,

@@ -1076,7 +1076,7 @@ function App() {
     const subEvent: MatchEvent = {
       minute: match.minute,
       type: 'sub',
-      description: `Cambio: entra ${playerIn.name}, sale ${playerOut.name}.`,
+      description: `Cambio: entra ${playerIn.fullName}, sale ${playerOut.fullName}.`,
       teamId: team.id,
       playerId: playerInId,
       playerOffId: playerOutId,
@@ -1753,7 +1753,7 @@ function App() {
                     const asst = findP(g.assistantId);
                     return (
                       <div key={`g${i}`} className="text-vga-bright-white">
-                        {g.minute}' {scorer?.name ?? '—'}{asst ? ` (asist. ${asst.name})` : ''}
+                        {g.minute}' {scorer?.fullName ?? '—'}{asst ? ` (asist. ${asst.fullName})` : ''}
                       </div>
                     );
                   })}
@@ -1765,13 +1765,13 @@ function App() {
                   {yellows.map((c, i) => (
                     <div key={`y${i}`} className="flex items-center gap-1 text-vga-bright-white">
                       <div className="w-1.5 h-2.5 bg-vga-yellow border border-black flex-shrink-0"></div>
-                      <span>{c.minute}' {findP(c.playerId)?.name ?? '—'}</span>
+                      <span>{c.minute}' {findP(c.playerId)?.fullName ?? '—'}</span>
                     </div>
                   ))}
                   {reds.map((c, i) => (
                     <div key={`r${i}`} className="flex items-center gap-1 text-vga-bright-white">
                       <div className="w-1.5 h-2.5 bg-vga-red border border-black flex-shrink-0"></div>
-                      <span>{c.minute}' {findP(c.playerId)?.name ?? '—'}</span>
+                      <span>{c.minute}' {findP(c.playerId)?.fullName ?? '—'}</span>
                     </div>
                   ))}
                 </div>
