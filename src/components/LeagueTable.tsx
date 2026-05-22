@@ -91,7 +91,7 @@ export const LeagueTable = ({ stats, schedule, userTeamId, teams, onCellClick, o
                 <td className={`p-1 border border-vga-white truncate max-w-[140px] ${isUser ? 'text-vga-yellow font-bold' : ''} ${onTeamClick ? 'cursor-pointer hover:bg-vga-magenta' : ''}`}
                     onClick={onTeamClick ? () => onTeamClick(team.teamId) : undefined}>
                   <div className="flex items-center gap-1.5">
-                    <TeamCrest colors={colorsById.get(team.teamId)} size="xs" />
+                    <TeamCrest colors={colorsById.get(team.teamId)} size="xs" teamId={team.teamId} />
                     <span className="truncate underline decoration-dotted underline-offset-2">{namesById.get(team.teamId) ?? team.name}</span>
                   </div>
                 </td>
