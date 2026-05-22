@@ -163,13 +163,13 @@ export const JornadaResultsView = ({ jornada, teams, userTeamId, onContinue }: P
                   <div className="grid grid-cols-[1fr_auto_1fr_auto] items-center gap-2 p-2 text-[9px]">
                     <div className="flex items-center gap-1.5 justify-end min-w-0">
                       <span className="text-vga-bright-white truncate">{teamName(m.homeId)}</span>
-                      <TeamCrest colors={teamColors(m.homeId)} size="xs" title={teamName(m.homeId)} />
+                      <TeamCrest colors={teamColors(m.homeId)} size="xs" title={teamName(m.homeId)} teamId={m.homeId} />
                     </div>
                     <div className="text-center font-mono text-vga-yellow text-[11px] px-1">
                       {m.played ? `${m.homeScore} - ${m.awayScore}` : '—'}
                     </div>
                     <div className="flex items-center gap-1.5 min-w-0">
-                      <TeamCrest colors={teamColors(m.awayId)} size="xs" title={teamName(m.awayId)} />
+                      <TeamCrest colors={teamColors(m.awayId)} size="xs" title={teamName(m.awayId)} teamId={m.awayId} />
                       <span className="text-vga-bright-white truncate">{teamName(m.awayId)}</span>
                     </div>
                     <span className="text-[7px] text-vga-gray pl-1">{expanded ? '▼' : '▶'}</span>

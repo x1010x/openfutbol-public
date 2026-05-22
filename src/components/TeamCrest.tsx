@@ -1,9 +1,10 @@
-import { useId } from 'react';
+import { useId, useState, useEffect } from 'react';
 
 interface Props {
   colors?: string[];
   size?: 'xs' | 'sm' | 'md' | 'lg';
   title?: string;
+  teamId?: string;
 }
 
 const DEFAULT_COLORS = ['#aaaaaa', '#555555'];
@@ -15,13 +16,33 @@ const SIZE: Record<NonNullable<Props['size']>, string> = {
   lg: 'w-16 h-16',
 };
 
-// Jersey silhouette: shirt with sleeves on top, shorts at the bottom.
-// Path coordinates in a 24x24 viewBox.
 const JERSEY_PATH =
   'M4 4 L20 4 L20 5 L23 5 L23 11 L20 11 L20 14 L18 14 L18 21 L6 21 L6 14 L4 14 L4 11 L1 11 L1 5 L4 5 Z';
 
-export const TeamCrest = ({ colors, size = 'sm', title }: Props) => {
+type ImgAttempt = 'png' | 'jpeg' | 'svg';
+
+export const TeamCrest = ({ colors, size = 'sm', title, teamId }: Props) => {
   const id = useId().replace(/:/g, '');
+  const [imgAttempt, setImgAttempt] = useState<ImgAttempt>('png');
+
+  useEffect(() => { if (teamId) setImgAttempt('png'); }, [teamId]);
+
+  if (teamId && imgAttempt !== 'svg') {
+    const ext = imgAttempt === 'png' ? 'png' : 'jpeg';
+    return (
+      <img
+        src={`/assets/teams/${teamId}.${ext}`}
+        onError={() => {
+          if (imgAttempt === 'png') setImgAttempt('jpeg');
+          else setImgAttempt('svg');
+        }}
+        alt={title ?? ''}
+        title={title}
+        className={`${SIZE[size]} shrink-0 object-contain`}
+      />
+    );
+  }
+
   const c = colors && colors.length > 0 ? colors : DEFAULT_COLORS;
   const shirtL = c[0] ?? '#888';
   const shirtR = c[1] ?? c[0] ?? '#888';
