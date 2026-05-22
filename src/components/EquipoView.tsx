@@ -4,6 +4,7 @@ import type { LeagueState, PlayerSeasonRecord, SeasonHistoryEntry, StreakSpan, T
 import { extractDbId, getPlayerNameByDbId } from '../data/mockTeams';
 import { formatJornadaDate } from '../engine/calendar';
 import { TeamCrest } from './TeamCrest';
+import { PlayerName } from './PlayerName';
 
 interface Props {
   team: Team;
@@ -249,7 +250,7 @@ export const EquipoView = ({ team, league, onPlayerClick, onBack }: Props) => {
                   <td className={`p-1 ${i === 0 ? 'text-vga-yellow font-bold' : 'text-vga-bright-white'}`}>{i + 1}</td>
                   <td className={`p-1 ${i === 0 ? 'text-vga-yellow font-bold' : 'text-vga-bright-white'} cursor-pointer hover:underline`}
                       onClick={() => onPlayerClick?.(p.id)}>
-                    {p.name}
+                    <PlayerName player={p} />
                   </td>
                   <td className="p-1 text-center text-vga-cyan">{p.seasonStats.appearances}</td>
                   <td className="p-1 text-center text-vga-light-green">{p.seasonStats.goals}</td>

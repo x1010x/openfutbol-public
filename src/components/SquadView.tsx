@@ -211,7 +211,7 @@ export const SquadView = ({
                                   {p.position} <PlayerName player={p} />
                                 </button>
                               ) : (
-                                <span className="text-vga-light-cyan">{p.position} {p.name}</span>
+                                <span className="text-vga-light-cyan">{p.position} <PlayerName player={p} /></span>
                               )}
                             </span>
                           ))}

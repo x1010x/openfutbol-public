@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { LeagueState } from '../store/leagueStore';
 import { getAllDBPlayerEntries, extractDbId } from '../data/mockTeams';
+import { PlayerName } from './PlayerName';
 
 interface Props {
   teamId: string;
@@ -70,8 +71,8 @@ export const PlayerPickerPanel = ({ teamId, year: _year, league, onPick, onBack 
             >
               <span className="text-vga-blue text-[8px] w-8 shrink-0">{p.preferredPos}</span>
               <div className="flex flex-col flex-1 min-w-0">
-                <span className="text-vga-black text-[8px] font-bold truncate">{p.name}</span>
-                <span className="text-vga-black text-[7px] opacity-60 truncate">{p.fullName}</span>
+                <PlayerName player={p} useShirt className="text-vga-black text-[8px] font-bold truncate" />
+                <PlayerName player={p} className="text-vga-black text-[7px] opacity-60 truncate" />
               </div>
               <span className="text-vga-black text-[7px] w-8 shrink-0">{p.birthYear}</span>
               {where && (
