@@ -93,14 +93,17 @@ const Tooltip = ({ player, x, y, year }: TooltipState & { year: number }) => {
 
 export const PlayerTooltipProvider = ({ children, year }: { children: React.ReactNode; year: number }) => {
   const [tip, setTip] = useState<TooltipState | null>(null);
+  const showTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const hideTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const show = useCallback((player: Player, x: number, y: number) => {
     if (hideTimer.current) clearTimeout(hideTimer.current);
-    setTip({ player, x, y });
+    if (showTimer.current) clearTimeout(showTimer.current);
+    showTimer.current = setTimeout(() => setTip({ player, x, y }), 500);
   }, []);
 
   const hide = useCallback(() => {
+    if (showTimer.current) clearTimeout(showTimer.current);
     hideTimer.current = setTimeout(() => setTip(null), 80);
   }, []);
 
