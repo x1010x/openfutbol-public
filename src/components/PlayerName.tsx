@@ -14,6 +14,7 @@ export const PlayerName = ({ player, className = '', useShirt = false }: Props) 
       className={className}
       onMouseMove={e => show(player, e.clientX, e.clientY)}
       onMouseLeave={hide}
+      onClick={hide}
     >
       {useShirt ? player.name : player.fullName}
     </span>
