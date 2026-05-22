@@ -125,22 +125,20 @@ export const LeagueSetupView = ({ year, existingTeams, onConfirm, onBack }: Prop
     const active = selected.has(t.id);
     const isImported = importedTemplates.some(it => it.id === t.id);
     const isEditor = editorTemplates.some(et => et.id === t.id);
-    const accent = isImported ? 'text-vga-cyan' : isEditor ? 'text-vga-magenta' : 'text-vga-blue';
-    const borderActive = isImported ? 'border-vga-cyan' : isEditor ? 'border-vga-magenta' : 'border-vga-blue';
+    const accent = isImported ? 'text-vga-cyan' : isEditor ? 'text-vga-magenta' : 'text-vga-gray';
+    const borderActive = isImported ? 'border-vga-cyan' : isEditor ? 'border-vga-magenta' : 'border-vga-light-green';
     return (
       <button
         key={t.id}
         onClick={() => toggle(t.id)}
-        className={`flex items-center gap-2 p-2 border-2 text-left transition-colors ${
-          active ? `${borderActive} bg-vga-bright-white` : 'border-vga-black bg-vga-gray opacity-50'
+        className={`flex flex-col items-center gap-2 p-3 border-2 text-center transition-colors group ${
+          active ? `${borderActive} bg-vga-black` : 'border-vga-gray bg-vga-black opacity-40 hover:opacity-70'
         }`}
       >
-        <TeamCrest colors={t.colors ?? ['#888', '#888', '#888']} size="md" title={t.name} teamId={t.id} />
-        <div className="flex flex-col min-w-0">
-          <span className="text-vga-black text-[8px] font-bold uppercase truncate">{t.name}</span>
-          <span className={`text-[7px] ${accent}`}>{t.playerCount} jug.</span>
-        </div>
-        <span className={`ml-auto text-[10px] font-bold ${active ? 'text-vga-green' : 'text-vga-black'}`}>
+        <TeamCrest colors={t.colors ?? ['#888', '#888', '#888']} size="lg" title={t.name} teamId={t.id} />
+        <span className="text-vga-bright-white text-[9px] font-bold uppercase leading-tight">{t.name}</span>
+        <span className={`text-[7px] ${accent}`}>{t.playerCount} jug.</span>
+        <span className={`text-[10px] font-bold ${active ? 'text-vga-light-green' : 'text-vga-gray'}`}>
           {active ? '✓' : '○'}
         </span>
       </button>
@@ -169,9 +167,9 @@ export const LeagueSetupView = ({ year, existingTeams, onConfirm, onBack }: Prop
           <span className="text-vga-blue text-[8px] font-bold shrink-0">{n}/{MAX_TEAMS}</span>
         </div>
 
-        <div className="overflow-y-auto" style={{ maxHeight: '360px' }}>
+        <div className="overflow-y-auto" style={{ maxHeight: '480px' }}>
           {isSearching ? (
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-3 gap-2">
               {filteredFlat!.map(renderTeamButton)}
               {filteredFlat!.length === 0 && (
                 <span className="col-span-2 text-vga-black text-[8px] opacity-60 p-2">Sin resultados.</span>
@@ -192,7 +190,7 @@ export const LeagueSetupView = ({ year, existingTeams, onConfirm, onBack }: Prop
                       <span className="text-vga-gray text-[7px]">{countryTeams.length} equipos  {open ? '▲' : '▼'}</span>
                     </button>
                     {open && (
-                      <div className="grid grid-cols-2 gap-2 mt-1 pl-2">
+                      <div className="grid grid-cols-3 gap-2 mt-1 pl-2">
                         {countryTeams.map(renderTeamButton)}
                       </div>
                     )}
