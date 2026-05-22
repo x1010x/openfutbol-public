@@ -116,7 +116,7 @@ export const StatDrillDown = ({ teamId, stat, teams, schedule, onClose }: Props)
         onClick={e => e.stopPropagation()}
       >
         <div className="bg-vga-blue p-2 border-b-2 border-vga-white flex items-center gap-2">
-          <TeamCrest colors={team.colors} size="sm" title={team.name} />
+          <TeamCrest colors={team.colors} size="sm" title={team.name} teamId={team.id} />
           <div className="flex-1 min-w-0">
             <div className="text-vga-yellow text-[10px] uppercase truncate">{team.name}</div>
             <div className="text-vga-cyan text-[7px] uppercase">{STAT_LABEL[stat]} · {total}</div>
@@ -152,7 +152,7 @@ export const StatDrillDown = ({ teamId, stat, teams, schedule, onClose }: Props)
                       <span className="text-vga-bright-white text-[8px] uppercase w-6">
                         {r.isHome ? 'CASA' : 'FUERA'}
                       </span>
-                      <TeamCrest colors={opponent?.colors} size="xs" title={opponent?.name} />
+                      <TeamCrest colors={opponent?.colors} size="xs" title={opponent?.name} teamId={opponent?.id} />
                       <span className="text-vga-bright-white truncate flex-1 text-left">
                         {opponent?.name ?? '—'}
                       </span>

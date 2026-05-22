@@ -712,7 +712,7 @@ export const EditorView = ({ league, onUpdateLeague, onBack }: Props) => {
             {filteredTeams.map(team => (
               <button key={team.id} onClick={() => setSub({ kind: 'TEAM_DETAIL', teamId: team.id })}
                 className="flex items-center gap-3 bg-vga-gray border-2 border-vga-blue px-3 py-2 hover:bg-vga-bright-white text-left shrink-0">
-                <TeamCrest colors={team.colors ?? ['#888', '#888', '#888']} size="sm" title={team.name} />
+                <TeamCrest colors={team.colors ?? ['#888', '#888', '#888']} size="sm" title={team.name} teamId={team.id} />
                 <div className="flex flex-col flex-1 min-w-0">
                   <span className="text-vga-black text-[9px] font-bold uppercase truncate">{team.name}</span>
                   <span className="text-vga-blue text-[7px]">{team.players.length} jugadores · {team.manager}</span>

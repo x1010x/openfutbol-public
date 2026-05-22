@@ -35,7 +35,7 @@ export const StatusBar = ({ league }: Props) => {
   return (
     <div className="bg-vga-blue border-2 border-vga-white vga-panel px-3 py-1 flex flex-wrap gap-x-4 gap-y-1 items-center text-[8px] mb-3 cool:bg-rc-panel cool:border-rc-primary">
       <div className="flex items-center gap-2">
-        <TeamCrest colors={userTeam.colors} size="sm" title={userTeam.name} />
+        <TeamCrest colors={userTeam.colors} size="sm" title={userTeam.name} teamId={userTeam.id} />
         <span className="text-vga-bright-white truncate max-w-[180px] cool:text-rc-accent">{userTeam.name}</span>
       </div>
       <div className="flex items-center gap-1">

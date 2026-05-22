@@ -136,7 +136,7 @@ export const FantasyDraftView = ({
               return (
                 <div key={id} className="bg-vga-black border border-vga-gray p-3">
                   <div className="flex items-center gap-2 mb-2">
-                    <TeamCrest colors={t?.colors} size="sm" title={t?.name} />
+                    <TeamCrest colors={t?.colors} size="sm" title={t?.name} teamId={id} />
                     <span className={`text-[9px] font-bold ${id === userTeamId ? 'text-vga-yellow' : 'text-vga-bright-white'}`}>
                       {t?.name ?? id}{id === userTeamId ? ' (TÚ)' : ''}
                     </span>
@@ -173,7 +173,7 @@ export const FantasyDraftView = ({
           <span className={`text-[8px] font-bold px-2 py-0.5 ${POS_BADGE_COLORS[roundPos]}`}>{roundPos}</span>
         </div>
         <div className="flex items-center gap-2">
-          {pickingTeam && <TeamCrest colors={pickingTeam.colors} size="sm" title={pickingTeam.name} />}
+          {pickingTeam && <TeamCrest colors={pickingTeam.colors} size="sm" title={pickingTeam.name} teamId={pickingTeam.id} />}
           <span className={`text-[8px] ${isUserTurn ? 'text-vga-yellow font-bold' : 'text-vga-bright-white'}`}>
             {isUserTurn ? 'TU TURNO' : (pickingTeam?.name ?? currentTeamId)}
           </span>
@@ -270,7 +270,7 @@ export const FantasyDraftView = ({
                     key={id}
                     className={`bg-vga-black border px-2 py-1 flex items-center gap-1 ${isCurrent ? 'border-vga-yellow' : 'border-vga-gray'}`}
                   >
-                    <TeamCrest colors={t?.colors} size="sm" title={t?.name} />
+                    <TeamCrest colors={t?.colors} size="sm" title={t?.name} teamId={id} />
                     <span className="text-vga-bright-white text-[7px] flex-1 min-w-0 truncate">{t?.name ?? id}</span>
                     <span className="text-vga-gray text-[7px] shrink-0">{picks.length}/{TOTAL_ROUNDS}</span>
                   </div>

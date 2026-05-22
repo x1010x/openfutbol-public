@@ -169,7 +169,7 @@ export const FantasySetupView = ({ availableYears, existingTeams, onConfirm, onB
                 const isUser = userTeamId === t.id;
                 return (
                   <div key={t.id} className="bg-vga-black border-2 border-vga-yellow p-2 flex items-center gap-2">
-                    <TeamCrest colors={t.colors} size="sm" title={t.name} />
+                    <TeamCrest colors={t.colors} size="sm" title={t.name} teamId={t.id} />
                     <span className="text-vga-bright-white text-[9px] flex-1 min-w-0 truncate">{t.name}</span>
                     <button
                       onClick={() => setUserTeamId(isUser ? '' : t.id)}

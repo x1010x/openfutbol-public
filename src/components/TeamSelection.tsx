@@ -135,7 +135,7 @@ export const TeamSelection = ({ teams, selectedYear, yearStats, onSelectYear, on
                             <span className="text-[8px] bg-vga-blue px-2 text-vga-yellow">STR: {strength}</span>
                           </div>
                           <div className="flex gap-3 items-center">
-                            <TeamCrest colors={team.colors} size="lg" title={team.name} />
+                            <TeamCrest colors={team.colors} size="lg" title={team.name} teamId={team.id} />
                             <div className="flex flex-col">
                               <span className="text-[7px] text-vga-cyan">ESTRELLA:</span>
                               <span className="text-[8px] text-vga-white">{star?.name ?? '—'} ({star?.media ?? 0})</span>
