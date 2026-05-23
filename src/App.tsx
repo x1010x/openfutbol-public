@@ -1979,12 +1979,22 @@ function App() {
 
       <footer className="mt-auto pt-8 text-vga-gray text-[8px] flex flex-col items-center gap-1 uppercase">
         <p>2026 OPENFUTBOL</p>
-        <button
-          onClick={() => setShowDisclaimer(true)}
-          className="text-vga-gray hover:text-vga-bright-white underline decoration-dotted underline-offset-2 mt-1"
-        >
-          DISCLAIMER
-        </button>
+        <div className="flex gap-4">
+          <button
+            onClick={() => setShowDisclaimer(true)}
+            className="text-vga-gray hover:text-vga-bright-white underline decoration-dotted underline-offset-2 mt-1"
+          >
+            DISCLAIMER
+          </button>
+          <a
+            href="https://github.com/x1010x/openfutbol-public"
+            className="text-vga-cyan hover:text-vga-bright-white underline decoration-dotted underline-offset-2 mt-1"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            GITHUB
+          </a>
+        </div>
         <p className="text-[6px] text-vga-gray/60 text-center max-w-md mt-1 normal-case leading-relaxed">
           Proyecto de fans. Sin afiliación, patrocinio ni aval de ningún club, liga o asociación.
           Todos los derechos de nombres de equipos, jugadores y competiciones pertenecen a sus respectivos dueños.
