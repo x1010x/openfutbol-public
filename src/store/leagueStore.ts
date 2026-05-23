@@ -919,7 +919,7 @@ export const computeTvBonus = (
   if (posHome === 0 || posAway === 0) return 0;
   const scoreHome = N + 1 - posHome;
   const scoreAway = N + 1 - posAway;
-  return Math.round(10_000_000 * (scoreHome + scoreAway) / (2 * N - 1));
+  return Math.round(5_000_000 * (scoreHome + scoreAway) / (2 * N - 1));
 };
 
 export const applyTvBonus = (
@@ -975,7 +975,7 @@ export const generateIncomingOffers = (state: LeagueState): LeagueState => {
 
       const attraction = playerAttraction(player, state.year);
       const bidMul = computeBidMultiplier(attraction, listed);
-      const amount = Math.max(100_000, Math.round((price * bidMul) / 100_000) * 100_000);
+      const amount = Math.max(50_000, Math.round((price * bidMul) / 200_000) * 100_000);
       if (amount > rival.budget) continue;
 
       const expiresAt = state.currentJornada + 1 + Math.floor(Math.random() * 3);
@@ -994,7 +994,8 @@ export const generateIncomingOffers = (state: LeagueState): LeagueState => {
         if (bench.length > 0) {
           const pick = bench[Math.floor(Math.random() * bench.length)];
           const pickPrice = computePrice(pick, state.year);
-          const adjustedCash = Math.max(100_000, Math.round((amount - pickPrice) / 100_000) * 100_000);
+          const adjustedCash = Math.max(50_000, Math.round((amount - pickPrice) / 200_000) * 100_000);
+
           if (adjustedCash <= rival.budget && adjustedCash > 0) {
             offeredPlayerIds = [pick.id];
             offers.push({
