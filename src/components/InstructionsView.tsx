@@ -261,11 +261,9 @@ export const InstructionsView = ({ onBack, scrollTo }: Props) => {
           <ul className="list-disc pl-5 space-y-1">
             <li>
               <span className="text-vga-cyan">v1.1.0</span> — Comunidad y países.
-              Pantalla COLABORAR con instrucciones para proponer equipos y jugadores vía Telegram.
-              Banderas SVG por país en todas las pantallas de selección.
-              4 equipos nuevos: Ajax y Agua (NL), Anderlechazo F.C. (BE), CSKA Se Pueda (RU), Malmoro (SE).
-              Badge NUEVO en el número de versión al detectar una actualización — ya no abre el changelog solo.
-              Renombrado CÓMO JUGAR → AYUDA. Corregida agrupación por países en el modo Fantasy.
+              Pantalla COLABORAR con canal de Telegram para proponer equipos y jugadores.
+              Banderas por país en las pantallas de selección.
+              Base de datos actualizada con equipos nuevos.
             </li>
             <li>
               <span className="text-vga-cyan">v1.0.0</span> — Primera versión pública.
