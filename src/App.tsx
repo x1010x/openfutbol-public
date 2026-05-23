@@ -18,6 +18,7 @@ import { StatsView } from './components/StatsView';
 import { FinancesView } from './components/FinancesView';
 import { EndOfSeasonView } from './components/EndOfSeasonView';
 import { InstructionsView } from './components/InstructionsView';
+import { ColaborarView } from './components/ColaborarView';
 import { TransfersView } from './components/TransfersView';
 import { JornadaResultsView } from './components/JornadaResultsView';
 import { PlayerDetailView } from './components/PlayerDetailView';
@@ -113,7 +114,9 @@ function App() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [showPlayFlow, setShowPlayFlow] = useState(false);
   const [showInstructions, setShowInstructions] = useState(false);
+  const [showColaborar, setShowColaborar] = useState(false);
   const [instructionsScroll, setInstructionsScroll] = useState<'changelog' | 'engine' | undefined>(undefined);
+  const [hasNewVersion, setHasNewVersion] = useState(false);
   const [drillDown, setDrillDown] = useState<{ teamId: string; stat: StatKey } | null>(null);
   const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null);
   const [previousView, setPreviousView] = useState<View>('LEAGUE');
@@ -191,11 +194,8 @@ function App() {
     }
     const seen = localStorage.getItem('openfutbol_seen_version');
     if (seen !== __BUILD_TIMESTAMP__) {
+      if (seen) setHasNewVersion(true);
       localStorage.setItem('openfutbol_seen_version', __BUILD_TIMESTAMP__);
-      if (seen) {
-        setInstructionsScroll('changelog');
-        setShowInstructions(true);
-      }
     }
   }, []);
 
@@ -1117,6 +1117,10 @@ function App() {
       return <InstructionsView onBack={() => { setShowInstructions(false); setInstructionsScroll(undefined); }} scrollTo={instructionsScroll} />;
     }
 
+    if (showColaborar) {
+      return <ColaborarView onBack={() => setShowColaborar(false)} />;
+    }
+
     if (view === 'EDITOR') {
       return (
         <EditorView
@@ -1220,6 +1224,12 @@ function App() {
               className="w-full bg-vga-gray text-vga-black py-3 text-[10px] border-2 border-vga-black font-bold uppercase tracking-widest hover:bg-vga-bright-white"
             >
               AJUSTES
+            </button>
+            <button
+              onClick={() => setShowColaborar(true)}
+              className="w-full bg-vga-black text-vga-cyan py-3 text-[10px] border-2 border-vga-cyan font-bold uppercase tracking-widest hover:bg-vga-cyan hover:text-vga-black"
+            >
+              COLABORAR
             </button>
           </div>
         );
@@ -1700,11 +1710,16 @@ function App() {
           <div className="flex justify-between items-center mt-1 px-2">
             <button
               type="button"
-              onClick={() => { setInstructionsScroll('changelog'); setShowInstructions(true); }}
-              className="text-vga-cyan text-[8px] hover:text-vga-yellow underline decoration-dotted underline-offset-2 cool:text-rc-accent cool:hover:text-rc-primary"
+              onClick={() => { setInstructionsScroll('changelog'); setShowInstructions(true); setHasNewVersion(false); }}
+              className="text-vga-cyan text-[8px] hover:text-vga-yellow underline decoration-dotted underline-offset-2 cool:text-rc-accent cool:hover:text-rc-primary flex items-center gap-1"
               title="Ver cambios recientes"
             >
               OPENFUTBOL v1.0.0-{__BUILD_TIMESTAMP__}
+              {hasNewVersion && (
+                <span className="bg-vga-red text-vga-bright-white text-[7px] px-1 font-bold animate-pulse">
+                  NUEVO
+                </span>
+              )}
             </button>
             <button
               type="button"
