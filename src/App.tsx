@@ -1010,7 +1010,6 @@ function App() {
       setHtPaused(true);
       setShowSubPanel(true);
       setSubOut(null);
-      setSubTab('campo');
       setMatch(prev => prev ? applyAiHtSubs(prev, league.userTeamId) : null);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -1107,7 +1106,6 @@ function App() {
       setIsPlaying(true);
     } else {
       setSubOut(null);
-      setSubTab('campo');
     }
   };
 
@@ -1864,7 +1862,7 @@ function App() {
                 <div className="mt-3 flex gap-2">
                   {canSub && (
                     <button
-                      onClick={() => { setIsPlaying(false); setShowSubPanel(true); setSubOut(null); setSubTab('campo'); }}
+                      onClick={() => { setIsPlaying(false); setShowSubPanel(true); setSubOut(null); }}
                       className="flex-1 bg-vga-yellow text-vga-black py-1 px-2 text-[8px] border border-vga-black hover:bg-vga-bright-white font-bold uppercase"
                     >
                       CAMBIOS ({userSubsUsed}/3)
