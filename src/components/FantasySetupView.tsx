@@ -13,16 +13,7 @@ interface Props {
 
 const MAX_TEAMS = 20;
 
-const COUNTRY_LABELS: Record<string, string> = {
-  spain: 'ESPAÑA',
-  england: 'INGLATERRA',
-  germany: 'ALEMANIA',
-  italy: 'ITALIA',
-  france: 'FRANCIA',
-  other: 'OTROS',
-};
-
-const COUNTRY_ORDER = ['spain', 'england', 'germany', 'italy', 'france', 'other'];
+import { CountryBadge } from './CountryBadge';
 
 const CAP_LIMIT = 1350;
 
@@ -96,10 +87,11 @@ export const FantasySetupView = ({ availableYears, existingTeams, onConfirm, onB
   const unselectedDb = dbTemplates.filter(t => !selected.includes(t.id));
   const byCountry = new Map<string, TeamTemplate[]>();
   for (const t of unselectedDb) {
-    const c = COUNTRY_ORDER.includes(t.country) ? t.country : 'other';
+    const c = t.country || 'unknown';
     if (!byCountry.has(c)) byCountry.set(c, []);
     byCountry.get(c)!.push(t);
   }
+  const sortedCountries = [...byCountry.keys()].sort();
   const unselectedEditor = editorTeams.filter(t => !selected.includes(t.id));
 
   const canStart = selected.length >= 2 && userTeamId !== '';
@@ -192,7 +184,7 @@ export const FantasySetupView = ({ availableYears, existingTeams, onConfirm, onB
 
         {/* Country-grouped pool — all collapsed by default */}
         <div className="flex flex-col gap-1 mb-4">
-          {COUNTRY_ORDER.filter(c => byCountry.has(c)).map(c => {
+          {sortedCountries.map(c => {
             const teams = byCountry.get(c)!;
             const open = openGroups.has(c);
             return (
@@ -201,7 +193,7 @@ export const FantasySetupView = ({ availableYears, existingTeams, onConfirm, onB
                   onClick={() => toggleGroup(c)}
                   className="w-full flex justify-between items-center px-2 py-1 bg-vga-black text-[8px] text-vga-gray hover:text-vga-bright-white hover:bg-vga-blue"
                 >
-                  <span className="font-bold">{COUNTRY_LABELS[c] ?? c.toUpperCase()}</span>
+                  <span className="font-bold"><CountryBadge code={c} size="lg" /></span>
                   <span className="flex items-center gap-2">
                     <span className="text-[7px] opacity-60">{teams.length} equipo{teams.length !== 1 ? 's' : ''}</span>
                     <span>{open ? '−' : '+'}</span>
