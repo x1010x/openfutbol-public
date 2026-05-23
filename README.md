@@ -1,87 +1,108 @@
 # OpenFutbol
 
-Open-source retro football management game inspired by PC Fútbol (1990s).
+Juego de gestión de fútbol retro de código abierto inspirado en el PC Fútbol de los 90.
+Los equipos son inventados, los nombres son chistes malos, los jugadores no existen
+y aun así es probable que te enganches más que a cualquier otra cosa que tengas pendiente.
 
-Game is live at: https://x1010x.github.io/openfutbol-public/
+Juega aquí: https://x1010x.github.io/openfutbol-public/
 
-## Features
+Mándanos tus ideas aquí: https://t.me/openfutbol
 
-- Pick a club from the available leagues and manage your squad.
-- Set your lineup, choose formation, and tweak tactics.
-- Simulate matches minute-by-minute with individual player stats driving outcomes.
-- Manage stamina, substitutions (3/match), injuries, and suspensions.
-- Negotiate transfers, set ticket prices, and track finances.
-- Fantasy mode: custom league + snake draft from a player pool.
-- League table, top scorers (Pichichi / Zamora), and full season stats.
-- End-of-season awards and season progression.
+## Qué tiene
 
-## Quick Start
+- Gestiona un equipo de fútbol imaginario con nombre de broma. Nadie te juzga.
+- Configura la alineación, la formación y la táctica como si de verdad importara.
+- Partidos simulados minuto a minuto donde las estadísticas de cada jugador
+  deciden si ganas o si culpas al árbitro.
+- Cansancio, sustituciones, lesiones y sanciones para que no te relajes ni un momento.
+- Fichajes, cláusulas de rescisión y finanzas que siempre van peor de lo que parecen.
+- Modo Fantasy: snake draft con tus amigos para ver quién entiende menos de fútbol.
+- Tabla, Pichichi, Zamora y estadísticas de temporada para regodearte o llorar.
+- Premios de fin de temporada y progresión entre temporadas para que el sufrimiento
+  tenga continuidad.
+
+## Sobre los nombres
+
+Sí, algunos nombres de jugadores pueden coincidir con personas reales.
+Es un juego gratuito, de navegador, en pixel art de 8 bits, sin ánimo de lucro,
+donde tu alter ego pixelado tiene una estadística de tiro de 64 sobre 99.
+
+Si alguien tiene tiempo libre para enfadarse por eso,
+le enviamos un abrazo y le recomendamos salir más.
+
+## Arrancar
 
 ```bash
-git clone https://github.com/your-username/openfutbol.git
-cd openfutbol
+git clone https://github.com/x1010x/openfutbol-public.git
+cd openfutbol-public
 npm install
 npm run dev
 ```
 
-`npm run dev` starts the Vite dev server.
-`npm run build` type-checks then produces the production bundle.
+`npm run dev` arranca el servidor de desarrollo Vite.
+`npm run build` comprueba los tipos y genera el bundle de producción.
+Si algo falla la culpa es tuya.
 
-## Tech Stack
+## Tecnología
 
-| Layer | Choice |
+| Capa | Elección |
 |---|---|
 | UI | React 19, TypeScript, Tailwind CSS v4 |
-| Build | Vite 8 (Rolldown), `tsc -b` for type checking |
-| State | `useState` + `localStorage` — no external store |
+| Build | Vite 8 (Rolldown), `tsc -b` para tipos |
+| Estado | `useState` + `localStorage` — sin store externo, sin excusas |
 
-## Project Structure
+## Estructura del proyecto
 
 ```
 src/
-  App.tsx                   Main app: view router, match loop, all top-level state
-  types/game.d.ts           All shared TypeScript types
-  index.css                 Tailwind config + theme styling
+  App.tsx                   App principal: rutas, bucle de partido, todo el estado
+  types/game.d.ts           Tipos TypeScript compartidos
+  index.css                 Config de Tailwind y estilos del tema
 
   engine/
-    simEngine.ts            Minute-by-minute match simulation
-    formations.ts           Formation definitions, OOP penalty, effective media
-    calendar.ts             Round-robin schedule generator
-    playerMood.ts           Mood system (affects effective stats)
+    simEngine.ts            Simulación minuto a minuto (el responsable de tus derrotas)
+    formations.ts           Formaciones, penalización fuera de posición, media efectiva
+    calendar.ts             Generador de calendario de liga
+    playerMood.ts           Sistema de estado de ánimo (tus jugadores también tienen días malos)
 
   store/
-    leagueStore.ts          League state helpers, stats, transfers, salary logic
+    leagueStore.ts          Estado de liga, estadísticas, fichajes, salarios
 
   data/
-    mockTeams.ts            Loads DB, builds Team objects, age curves, helpers
-    economy.ts              Player pricing, salary calculation, TV bonuses
+    mockTeams.ts            Carga la BD, construye objetos Team, curvas de edad
+    economy.ts              Precios, salarios y el bonus de TV que nunca es suficiente
     db/
-      players/              Placeholder players with randomized stats
-      teams/                Team rosters and season data
-      free_agents.json      Player IDs available as free agents
+      players/              374 jugadores inventados con estadísticas generadas
+      teams/                Plantillas y datos de temporada de 21 equipos de broma
+      free_agents.json      Jugadores sin equipo, por algo será
       names/
-        player_names.json   Player names keyed by UUID
-        team_names.json     Team names keyed by UUID
-        manager_names.json  Manager names keyed by teamUUID_year
-        stadium_names.json  Stadium names keyed by teamUUID_year
+        player_names.json   Nombres de jugadores por UUID
+        team_names.json     Nombres de equipos por UUID
+        manager_names.json  Entrenadores por UUID_año
+        stadium_names.json  Estadios por UUID_año
 
-  components/               UI components
+  components/               Componentes de UI
 ```
 
-## Data Layer
+## Los datos
 
-OpenFutbol uses a decoupled data architecture where both identity and attributes are easily editable by the community:
+Los jugadores, equipos y nombres están desacoplados para que cualquiera pueda tocarlos
+sin romper nada (o rompiendo lo mínimo):
 
-- `players/` — Player stats and attributes mapped by UUID. **Editable: adjust skills, peak age, or birth years here.**
-- `teams/` — Team rosters and season configurations.
-- `names/` — Editable name maps; change a name here (players, teams, managers, stadiums) and it propagates everywhere at runtime.
+- `players/` — Estadísticas por UUID. Cambia habilidades, edad pico o año de nacimiento.
+- `teams/` — Plantillas y configuración de temporada.
+- `names/` — Cambia un nombre aquí y se propaga a todo el juego en tiempo de ejecución.
+  Si quieres que el Torpedo de Cuenca se llame de otra manera, este es el sitio.
 
-The default dataset included is a placeholder set of 10 teams and 220 players designed for development and testing. Players now include a specific **Goalkeeping (POR)** stat that distinguishes keepers from field players.
+## Colaborar
 
-## Contributing
+No hace falta saber programar. No hace falta saber inglés. Hace falta tener un chiste bueno
+o ganas de que tu vecino salga en el juego.
 
-The easiest way to contribute is editing the JSON files in `src/data/db/names/` — fix a stadium name, correct a manager, or update player names. No build step required; changes are loaded at runtime.
+Lo más fácil: **[t.me/openfutbol](https://t.me/openfutbol)**
 
-## License
+Para los más atrevidos: [CONTRIBUIR.md](CONTRIBUIR.md)
+
+## Licencia
 
 PolyForm Noncommercial License 1.0.0
