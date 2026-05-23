@@ -799,7 +799,7 @@ function App() {
 
     if (matchDuration === 0) {
       let m = initialMatch;
-      while (!m.isFinished) m = simulateMinute(m);
+      while (!m.isFinished) m = simulateMinute(m, league.userTeamId);
       finalizeMatch(m);
       return;
     }
@@ -989,7 +989,7 @@ function App() {
     let interval: number;
     if (isPlaying && match && !match.isFinished) {
       interval = window.setInterval(() => {
-        setMatch(prev => prev ? simulateMinute(prev) : null);
+        setMatch(prev => prev ? simulateMinute(prev, league.userTeamId) : null);
       }, match.matchSpeed);
     }
     return () => clearInterval(interval);
@@ -1025,12 +1025,18 @@ function App() {
       const inLineup = new Set(team.lineup);
       const starters = team.lineup
         .filter(pid => !sentOff.includes(pid) && !injured.includes(pid))
-        .map(pid => ({ pid, stam: stamMap[pid] ?? 99 }))
+        .map(pid => {
+          const p = team.players.find(x => x.id === pid);
+          return { pid, stam: stamMap[pid] ?? 99, media: p?.media ?? 0 };
+        })
+        .filter(s => s.stam < 70) // Only consider subbing if below 70 stamina at halftime
         .sort((a, b) => a.stam - b.stam);
+
       const bench = team.players
         .filter(p => !inLineup.has(p.id) && !injured.includes(p.id) && !sentOff.includes(p.id) && (p.injuryWeeksRemaining ?? 0) === 0 && p.suspensionMatches === 0)
         .map(p => ({ p, stam: stamMap[p.id] ?? (p.stamina ?? 99) }))
-        .sort((a, b) => b.stam - a.stam);
+        .filter(b => b.stam > 90) // Only sub in fresh players
+        .sort((a, b) => b.p.media - a.p.media);
 
       const toMake = Math.min(3 - subsUsed, starters.length, bench.length);
       let newLineup = [...team.lineup];
@@ -1038,7 +1044,9 @@ function App() {
       const newStamMap = { ...stamMap };
 
       for (let i = 0; i < toMake; i++) {
-        if (bench[i].stam <= starters[i].stam + 10) continue;
+        // Only sub if bench player is not significantly worse than the tired starter (max 5 points difference)
+        if (bench[i].p.media < starters[i].media - 5) continue;
+        
         newLineup = newLineup.map(id => id === starters[i].pid ? bench[i].p.id : id);
         newStamMap[bench[i].p.id] = bench[i].stam;
         newSubsUsed++;

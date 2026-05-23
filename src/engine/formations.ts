@@ -21,7 +21,7 @@ export const isOOP = (player: Player, slotPos: Position): boolean => {
   return !player.allowedPositions.includes(slotPos);
 };
 
-const slotPenalty = (player: Player, slotPos: Position): number => {
+export const slotPenalty = (player: Player, slotPos: Position): number => {
   if (!isOOP(player, slotPos)) return 1;
   return slotPos === 'POR' ? GK_OOP_PENALTY : OOP_PENALTY;
 };
@@ -49,14 +49,14 @@ export const rawMedia = (player: Player): number =>
 // Formation picking uses stamina so AI naturally rotates tired players out.
 export const effectiveMedia = (player: Player, slotPos: Position): number => {
   const stam = player.stamina ?? 99;
-  return rawMedia(player) * slotPenalty(player, slotPos) * (0.8 + 0.2 * (stam / 99));
+  return rawMedia(player) * slotPenalty(player, slotPos) * (0.7 + 0.3 * (stam / 99));
 };
 
 // Effective MED as used by the simulation: OOP penalty + stamina factor.
 export const liveMed = (player: Player, stam: number, slotPos?: Position): number => {
   const raw = rawMedia(player);
   const pen = slotPos ? slotPenalty(player, slotPos) : 1;
-  return Math.floor(raw * pen * (0.8 + 0.2 * (stam / 99)));
+  return Math.floor(raw * pen * (0.7 + 0.3 * (stam / 99)));
 };
 
 export const effectiveStat = (player: Player, stat: keyof Player['stats'], slotPos: Position): number =>
@@ -91,7 +91,11 @@ export const pickBestXI = (
   disciplined: boolean = false,
 ): { lineup: string[]; strength: number } => {
   const slots = FORMATIONS[formationId];
-  const eligible = players.filter(p => !excludeIds.has(p.id) && (p.suspensionMatches ?? 0) === 0);
+  const eligible = players.filter(p => 
+    !excludeIds.has(p.id) && 
+    (p.suspensionMatches ?? 0) === 0 &&
+    (p.injuryWeeksRemaining ?? 0) === 0
+  );
   const used = new Set<string>();
   const lineup: string[] = [];
   let strength = 0;
