@@ -1114,7 +1114,7 @@ function App() {
 
   const renderMainContent = () => {
     if (showInstructions) {
-      return <InstructionsView onBack={() => { setShowInstructions(false); setInstructionsScroll(undefined); }} scrollTo={instructionsScroll} />;
+      return <InstructionsView onBack={() => { setShowInstructions(false); setInstructionsScroll(undefined); }} onColaborar={() => { setShowInstructions(false); setShowColaborar(true); }} scrollTo={instructionsScroll} />;
     }
 
     if (showColaborar) {
