@@ -34,9 +34,9 @@ export const MessageModal = ({
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className={`max-w-md w-full border-4 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] ${frame}`}
+        className={`max-w-md w-full border-4 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] max-h-[90vh] flex flex-col ${frame}`}
       >
-        <div className="bg-vga-black px-3 py-2 text-center border-b-2 border-vga-bright-white">
+        <div className="bg-vga-black px-3 py-2 text-center border-b-2 border-vga-bright-white shrink-0">
           <span className={`text-[10px] uppercase font-bold ${titleColor}`}>{title}</span>
           {subtitle && (
             <div className="text-vga-bright-white text-[12px] mt-1 uppercase tracking-wider">
@@ -44,10 +44,10 @@ export const MessageModal = ({
             </div>
           )}
         </div>
-        <div className={`p-4 text-[10px] leading-relaxed ${bodyColor}`}>
+        <div className={`p-4 text-[10px] leading-relaxed flex-1 overflow-y-auto ${bodyColor}`}>
           {children}
         </div>
-        <div className="bg-vga-black p-2 border-t-2 border-vga-bright-white">
+        <div className="bg-vga-black p-2 border-t-2 border-vga-bright-white shrink-0">
           <button
             onClick={onClose}
             className="w-full bg-vga-blue hover:bg-vga-light-blue text-vga-bright-white py-2 text-[10px] border-2 border-vga-bright-white"
