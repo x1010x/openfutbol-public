@@ -1963,8 +1963,8 @@ function App() {
 
               return (
                 <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-2">
-                  <div className="bg-vga-gray border-4 border-vga-yellow p-2 max-w-sm w-full max-h-[95vh] flex flex-col gap-2">
-                    <div className="bg-vga-yellow text-vga-black text-[10px] p-2 flex justify-between items-center uppercase font-bold">
+                  <div className="bg-vga-gray border-4 border-vga-yellow p-2 max-w-sm w-full max-h-[95vh] flex flex-col gap-2 min-h-0">
+                    <div className="bg-vga-yellow text-vga-black text-[10px] p-2 flex justify-between items-center uppercase font-bold shrink-0">
                       <span>CAMBIOS — {subsUsed}/3</span>
                       <span className="flex items-center gap-2">
                         {htPaused && <span className="text-[8px] font-normal">DESCANSO</span>}
@@ -1972,7 +1972,7 @@ function App() {
                       </span>
                     </div>
 
-                    <div className="flex border-2 border-vga-yellow">
+                    <div className="flex border-2 border-vga-yellow shrink-0">
                       {(['campo', 'suplentes'] as const).map(tab => (
                         <button
                           key={tab}
@@ -1984,6 +1984,7 @@ function App() {
                       ))}
                     </div>
 
+                    <div className="flex-1 overflow-y-auto min-h-0 flex flex-col gap-2">
                     {subTab === 'campo' && (
                       <>
                         {/* Formation / AutoFix / Discipline controls */}
@@ -2091,10 +2092,11 @@ function App() {
                         </div>
                       </>
                     )}
+                    </div>
 
                     <button
                       onClick={() => { setShowSubPanel(false); setSubOut(null); setIsPlaying(true); }}
-                      className="bg-vga-blue text-vga-bright-white py-1 px-2 text-[8px] border border-vga-black hover:bg-vga-light-blue font-bold uppercase"
+                      className="bg-vga-blue text-vga-bright-white py-1 px-2 text-[8px] border border-vga-black hover:bg-vga-light-blue font-bold uppercase shrink-0"
                     >
                       CONTINUAR
                     </button>
