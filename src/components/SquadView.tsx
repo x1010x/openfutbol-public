@@ -79,7 +79,6 @@ export const SquadView = ({
       .filter(p => positions.includes(p.position))
       .sort((a, b) => b.media - a.media);
 
-  const userPlayerById = (id: string) => team.players.find(p => p.id === id);
   const teamById = (id: string) => teams?.find(t => t.id === id);
 
   // Hide offers whose bidder can no longer cover the cash amount — they'd
@@ -88,11 +87,6 @@ export const SquadView = ({
     const bidder = teamById(o.fromTeamId);
     return bidder && bidder.budget >= o.amount;
   });
-
-  const showOffers =
-    !readOnly &&
-    affordableOffers.length > 0 &&
-    teams && onAcceptIncomingOffer && onRejectIncomingOffer;
 
   return (
     <div className="w-full max-w-5xl flex flex-col gap-4">
