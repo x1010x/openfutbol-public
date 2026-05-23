@@ -125,7 +125,6 @@ function App() {
   const [htPaused, setHtPaused] = useState(false);
   const [showSubPanel, setShowSubPanel] = useState(false);
   const [subOut, setSubOut] = useState<string | null>(null);
-  const [subTab, setSubTab] = useState<'campo' | 'suplentes'>('campo');
   const [previewSwapSlot, setPreviewSwapSlot] = useState<number | null>(null);
   const [showFantasyFlow, setShowFantasyFlow] = useState(false);
   const [fantasyYear, setFantasyYear] = useState(0);
@@ -1939,11 +1938,7 @@ function App() {
               const handlePitchClick = (idx: number) => {
                 const pid = liveTeam.lineup[idx];
                 if (!pid || sentOff.includes(pid) || injuredIds.includes(pid) || subsUsed >= 3) return;
-                setSubOut(prev => {
-                  const next = prev === pid ? null : pid;
-                  if (next) setSubTab('suplentes');
-                  return next;
-                });
+                setSubOut(prev => prev === pid ? null : pid);
               };
 
               const StaminaBar = ({ value }: { value: number }) => {
@@ -1972,127 +1967,68 @@ function App() {
                       </span>
                     </div>
 
-                    <div className="flex border-2 border-vga-yellow shrink-0">
-                      {(['campo', 'suplentes'] as const).map(tab => (
-                        <button
-                          key={tab}
-                          onClick={() => setSubTab(tab)}
-                          className={`flex-1 py-1 text-[7px] font-bold uppercase ${subTab === tab ? 'bg-vga-yellow text-vga-black' : 'bg-vga-black text-vga-yellow'}`}
-                        >
-                          {tab === 'campo' ? 'CAMPO' : `SUPLENTES${subOut ? ' ›' : ''}`}
-                        </button>
-                      ))}
-                    </div>
-
                     <div className="flex-1 overflow-y-auto min-h-0 flex flex-col gap-2">
-                    {subTab === 'campo' && (
-                      <>
-                        {/* Formation / AutoFix / Discipline controls */}
-                        <div className="flex flex-wrap gap-1 items-center">
-                          {ALL_FORMATIONS.map(f => (
-                            <button key={f}
-                              onClick={() => {
-                                const newLineup = reslotLineup(userTeamInMatch, userTeamInMatch.lineup.filter(Boolean), f);
-                                setMatch(prev => {
-                                  if (!prev) return null;
-                                  const isHome = prev.homeTeam.id === league.userTeamId;
-                                  const updated = { ...userTeamInMatch, formation: f, lineup: newLineup };
-                                  return isHome ? { ...prev, homeTeam: updated } : { ...prev, awayTeam: updated };
-                                });
-                              }}
-                              className={`px-1.5 py-0.5 text-[6px] border font-bold ${f === userTeamInMatch.formation ? 'bg-vga-yellow text-vga-black border-vga-black' : 'bg-vga-black text-vga-yellow border-vga-yellow hover:bg-vga-yellow/20'}`}
-                            >{f}</button>
-                          ))}
-                          <button
+                      {/* Formation / AutoFix / Discipline controls */}
+                      <div className="flex flex-wrap gap-1 items-center">
+                        {ALL_FORMATIONS.map(f => (
+                          <button key={f}
                             onClick={() => {
-                              const excl = new Set([...sentOff, ...injuredIds]);
-                              const { lineup } = pickBestXI(userTeamInMatch.players, userTeamInMatch.formation, excl, userTeamInMatch.tacticalDiscipline ?? true);
+                              const newLineup = reslotLineup(userTeamInMatch, userTeamInMatch.lineup.filter(Boolean), f);
                               setMatch(prev => {
                                 if (!prev) return null;
                                 const isHome = prev.homeTeam.id === league.userTeamId;
-                                const updated = { ...userTeamInMatch, lineup };
+                                const updated = { ...userTeamInMatch, formation: f, lineup: newLineup };
                                 return isHome ? { ...prev, homeTeam: updated } : { ...prev, awayTeam: updated };
                               });
                             }}
-                            className="px-1.5 py-0.5 text-[6px] border border-vga-green bg-vga-black text-vga-light-green hover:bg-vga-green/20 font-bold ml-auto"
-                          >AUTO-11</button>
-                          <button
-                            onClick={() => {
-                              setMatch(prev => {
-                                if (!prev) return null;
-                                const isHome = prev.homeTeam.id === league.userTeamId;
-                                const updated = { ...userTeamInMatch, tacticalDiscipline: !(userTeamInMatch.tacticalDiscipline ?? true) };
-                                return isHome ? { ...prev, homeTeam: updated } : { ...prev, awayTeam: updated };
-                              });
-                            }}
-                            className={`px-1.5 py-0.5 text-[6px] border font-bold ${(userTeamInMatch.tacticalDiscipline ?? true) ? 'bg-vga-cyan text-vga-black border-vga-black' : 'bg-vga-magenta text-vga-bright-white border-vga-black'}`}
-                          >{(userTeamInMatch.tacticalDiscipline ?? true) ? 'TAC:POS' : 'TAC:LIB'}</button>
-                        </div>
-                        <PitchDiagram
-                          team={liveTeam}
-                          selectedSlot={subOutSlotIdx ?? null}
-                          onSlotClick={handlePitchClick}
-                        />
-                        <div className="text-[7px] text-center font-bold uppercase py-0.5 border border-vga-yellow text-vga-yellow">
-                          {subOut
-                            ? `SALE: ${liveTeam.players.find(p => p.id === subOut)?.name} — elige suplente`
-                            : 'CLIC EN UN TITULAR PARA SUSTITUIR'}
-                        </div>
-                      </>
-                    )}
-
-                    {subTab === 'suplentes' && (
-                      <>
-                        {subOut && (
-                          <div className="text-[7px] text-center font-bold uppercase py-0.5 border border-vga-yellow text-vga-yellow">
-                            SALE: {liveTeam.players.find(p => p.id === subOut)?.name} — elige suplente
-                          </div>
-                        )}
-                        {!subOut && (
-                          <div className="text-[7px] text-center py-0.5 border border-vga-gray text-vga-gray uppercase">
-                            Ve a CAMPO, elige quien sale
-                          </div>
-                        )}
-                        <div className="flex-1 overflow-y-auto bg-vga-black border border-vga-gray">
-                          <table className="w-full text-[8px]">
-                            <thead className="sticky top-0 bg-vga-blue text-vga-bright-white uppercase">
-                              <tr>
-                                <th className="p-1 text-left">POS</th>
-                                <th className="p-1 text-left">NOMBRE</th>
-                                <th className="p-1 text-center">MED</th>
-                                <th className="p-1 text-center">LIVE</th>
-                                <th className="p-1">CAN</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {benchPlayers.length === 0 && (
-                                <tr><td colSpan={5} className="p-2 text-vga-gray italic text-center">Sin suplentes disponibles</td></tr>
-                              )}
-                              {benchPlayers.map(p => {
-                                const stam = stamMap[p.id] ?? (p.stamina ?? 99);
-                                const pLiveMed = liveMed(p, stam);
-                                const canSub = !!subOut && subsUsed < 3;
-                                const fitsSlot = subOutSlotPos ? p.allowedPositions.includes(subOutSlotPos) : false;
-                                return (
-                                  <tr
-                                    key={p.id}
-                                    onClick={() => canSub ? performUserSub(subOut!, p.id) : undefined}
-                                    className={`border-b border-vga-gray/30 ${canSub ? 'cursor-pointer hover:bg-vga-green/30' : 'opacity-40 cursor-default'}`}
-                                  >
-                                    <td className={`p-1 font-bold ${fitsSlot ? 'text-vga-light-green' : 'text-vga-gray'}`}>{p.position}</td>
-                                    <td className="p-1 text-vga-bright-white"><PlayerName player={p} /></td>
-                                    <td className="p-1 text-center font-mono text-vga-yellow">{p.media}</td>
-                                    <td className={`p-1 text-center font-mono ${pLiveMed < p.media ? 'text-vga-light-red' : 'text-vga-light-green'}`}>{pLiveMed}</td>
-                                    <td className="p-1"><StaminaBar value={stam} /></td>
-                                  </tr>
-                                );
-                              })}
-                            </tbody>
-                          </table>
-                        </div>
-                      </>
-                    )}
+                            className={`px-1.5 py-0.5 text-[6px] border font-bold ${f === userTeamInMatch.formation ? 'bg-vga-yellow text-vga-black border-vga-black' : 'bg-vga-black text-vga-yellow border-vga-yellow hover:bg-vga-yellow/20'}`}
+                          >{f}</button>
+                        ))}
+                        <button
+                          onClick={() => {
+                            const excl = new Set([...sentOff, ...injuredIds]);
+                            const { lineup } = pickBestXI(userTeamInMatch.players, userTeamInMatch.formation, excl, userTeamInMatch.tacticalDiscipline ?? true);
+                            setMatch(prev => {
+                              if (!prev) return null;
+                              const isHome = prev.homeTeam.id === league.userTeamId;
+                              const updated = { ...userTeamInMatch, lineup };
+                              return isHome ? { ...prev, homeTeam: updated } : { ...prev, awayTeam: updated };
+                            });
+                          }}
+                          className="px-1.5 py-0.5 text-[6px] border border-vga-green bg-vga-black text-vga-light-green hover:bg-vga-green/20 font-bold ml-auto"
+                        >AUTO-11</button>
+                        <button
+                          onClick={() => {
+                            setMatch(prev => {
+                              if (!prev) return null;
+                              const isHome = prev.homeTeam.id === league.userTeamId;
+                              const updated = { ...userTeamInMatch, tacticalDiscipline: !(userTeamInMatch.tacticalDiscipline ?? true) };
+                              return isHome ? { ...prev, homeTeam: updated } : { ...prev, awayTeam: updated };
+                            });
+                          }}
+                          className={`px-1.5 py-0.5 text-[6px] border font-bold ${(userTeamInMatch.tacticalDiscipline ?? true) ? 'bg-vga-cyan text-vga-black border-vga-black' : 'bg-vga-magenta text-vga-bright-white border-vga-black'}`}
+                        >{(userTeamInMatch.tacticalDiscipline ?? true) ? 'TAC:POS' : 'TAC:LIB'}</button>
+                      </div>
+                      <PitchDiagram
+                        team={liveTeam}
+                        selectedSlot={subOutSlotIdx ?? null}
+                        onSlotClick={handlePitchClick}
+                      />
+                      <div className="text-[7px] text-center font-bold uppercase py-0.5 border border-vga-yellow text-vga-yellow">
+                        CLIC EN UN TITULAR PARA SUSTITUIR
+                      </div>
                     </div>
+
+                    {subOut && (
+                      <SwapModal
+                        slotPos={subOutSlotPos ?? 'MED'}
+                        currentPlayer={liveTeam.players.find(p => p.id === subOut) ?? null}
+                        candidates={liveTeam.players.filter(p => !inLineup.has(p.id) && !injuredIds.includes(p.id) && !sentOff.includes(p.id) && (p.injuryWeeksRemaining ?? 0) === 0 && p.suspensionMatches === 0)}
+                        inLineup={inLineup}
+                        onSelect={(pid) => { performUserSub(subOut!, pid); setSubOut(null); }}
+                        onClose={() => setSubOut(null)}
+                      />
+                    )}
 
                     <button
                       onClick={() => { setShowSubPanel(false); setSubOut(null); setIsPlaying(true); }}

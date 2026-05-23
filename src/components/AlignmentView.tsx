@@ -203,7 +203,7 @@ export const AlignmentView = ({ team, onUpdate, onBack, onToggleDiscipline }: Pr
       />
 
       <div className="bg-vga-blue p-2 border-2 border-vga-white text-[7px] text-vga-bright-white text-center">
-        CLICA UNA POSICIÓN DEL CAMPO PARA ASIGNAR JUGADOR. EN LA TABLA, CLIC PARA AUTO-COLOCAR EN EL MEJOR HUECO.
+        CLICA UNA POSICIÓN DEL CAMPO PARA CAMBIAR EL JUGADOR.
       </div>
 
       <div className="bg-vga-gray border-4 border-vga-blue p-2">
@@ -233,8 +233,7 @@ export const AlignmentView = ({ team, onUpdate, onBack, onToggleDiscipline }: Pr
               return (
                 <tr
                   key={player.id}
-                  className={`cursor-pointer hover:bg-vga-blue group ${isTitular ? 'bg-vga-blue/30' : 'bg-vga-black/10'} ${(isSuspended || isInjured) ? 'opacity-50 grayscale' : ''}`}
-                  onClick={() => togglePlayer(player.id)}
+                  className={`${isTitular ? 'bg-vga-blue/30' : 'bg-vga-black/10'} ${(isSuspended || isInjured) ? 'opacity-50 grayscale' : ''}`}
                 >
                   <td className="p-1 border border-vga-gray text-center">
                     {isTitular && slotPos ? (
