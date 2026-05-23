@@ -40,7 +40,7 @@ export const InstructionsView = ({ onBack, scrollTo }: Props) => {
       <div className="bg-vga-blue p-4 border-4 border-vga-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-vga-yellow text-sm underline decoration-double">
-            CÓMO JUGAR
+            AYUDA
           </h2>
           <button
             onClick={onBack}

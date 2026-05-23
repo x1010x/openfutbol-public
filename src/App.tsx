@@ -1211,7 +1211,7 @@ function App() {
               onClick={() => setShowInstructions(true)}
               className="w-full bg-vga-blue text-vga-bright-white py-3 text-[10px] border-b-4 border-r-4 border-vga-black font-bold uppercase tracking-widest hover:opacity-90"
             >
-              CÓMO JUGAR / NOVEDADES
+              AYUDA / NOVEDADES
             </button>
             <button
               onClick={() => setView('EDITOR')}
@@ -1496,7 +1496,7 @@ function App() {
           {navBtn('EQUIPO',     'EQUIPO',    { isActive: currentView === 'EQUIPO' })}
           {navBtn('EDITAR',     'EDITOR',    { isActive: currentView === 'EDITOR' })}
           {navBtn('SISTEMA',    'BACKUP',    { isActive: currentView === 'BACKUP' })}
-          {navBtn('CÓMO JUGAR', 'INSTRUCTIONS')}
+          {navBtn('AYUDA', 'INSTRUCTIONS')}
         </nav>
         <div className="flex flex-col gap-6 min-w-0">
 
