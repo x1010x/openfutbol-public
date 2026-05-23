@@ -120,7 +120,7 @@ export const LeagueSetupView = ({ year, existingTeams, onConfirm, onBack }: Prop
         key={t.id}
         onClick={() => toggle(t.id)}
         className={`flex flex-col items-center gap-2 p-3 border-2 text-center transition-colors group ${
-          active ? `${borderActive} bg-vga-black` : 'border-vga-gray bg-vga-black opacity-40 hover:opacity-70'
+          active ? `${borderActive} border-4 bg-vga-blue shadow-[0_0_0_2px_rgba(255,255,255,0.3)]` : 'border-vga-gray bg-vga-black hover:border-vga-white hover:bg-vga-blue'
         }`}
       >
         <TeamCrest colors={t.colors ?? ['#888', '#888', '#888']} size="lg" title={t.name} teamId={t.id} />
