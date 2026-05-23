@@ -109,7 +109,7 @@
   },
   {
     "id": "29g078h1-1c2d-4e3f-4a5b-6789abcdef01",
-    "country": "ES",
+    "country": "PL",
     "seasons": [
       {
         "year": 2024,
@@ -325,7 +325,7 @@
   },
   {
     "id": "d65a9181-1939-4d93-a570-cf5c9c671251",
-    "country": "ES",
+    "country": "RU",
     "seasons": [
       {
         "year": 2024,
@@ -433,7 +433,7 @@
   },
   {
     "id": "a12bc3de-f456-4b78-cc8e-ff11d21ae72b",
-    "country": "ES",
+    "country": "GB",
     "seasons": [
       {
         "year": 2024,
@@ -541,7 +541,7 @@
   },
   {
     "id": "18h189i2-2d3e-4f4a-5b6c-789abcdef012",
-    "country": "ES",
+    "country": "BE",
     "seasons": [
       {
         "year": 2024,
@@ -649,7 +649,7 @@
   },
   {
     "id": "a12ab3cd-2345-4b94-cc4e-ff77j87gk38h",
-    "country": "ES",
+    "country": "DE",
     "seasons": [
       {
         "year": 2024,
@@ -757,7 +757,7 @@
   },
   {
     "id": "c3c4d1ef-44c3-40f9-83be-e5cc0a7c1210",
-    "country": "ES",
+    "country": "IT",
     "seasons": [
       {
         "year": 2024,
@@ -973,7 +973,7 @@
   },
   {
     "id": "74l523m6-6b6c-7d8e-9f0a-bcdef0123456",
-    "country": "ES",
+    "country": "IL",
     "seasons": [
       {
         "year": 2024,
@@ -1189,7 +1189,7 @@
   },
   {
     "id": "b45bb7df-f125-4b35-bb7e-ff92c21ad61d",
-    "country": "ES",
+    "country": "GB",
     "seasons": [
       {
         "year": 2024,
@@ -1405,7 +1405,7 @@
   },
   {
     "id": "f78gh9ij-2345-4c89-dd9f-aa22e32bf83c",
-    "country": "ES",
+    "country": "DE",
     "seasons": [
       {
         "year": 2024,
@@ -1621,7 +1621,7 @@
   },
   {
     "id": "63m634n7-7c7d-8e9f-0a1b-cdef01234567",
-    "country": "ES",
+    "country": "CZ",
     "seasons": [
       {
         "year": 2024,
@@ -1836,7 +1836,7 @@
     ]
   },
   {
-    "id": "ajaxyagua",
+    "id": "39bccee0-d0de-4aba-b12a-1c705c6b47e7",
     "country": "NL",
     "seasons": [
       {
@@ -1845,32 +1845,90 @@
         "stadiumCapacity": 54000,
         "ticketPrice": 22,
         "budget": 130000000,
-        "colors": ["#CC0000", "#FFFFFF", "#CC0000"],
+        "colors": [
+          "#CC0000",
+          "#FFFFFF",
+          "#CC0000"
+        ],
         "players": [
-          { "player_id": "2f1d16cf-64ce-4e2d-ad1e-2362c6bd64b8", "number": 1 },
-          { "player_id": "6358d615-0366-4a45-9e42-952f15b51da3", "number": 13 },
-          { "player_id": "ae542ba1-2110-42f1-98a4-5e8ed2118fe6", "number": 2 },
-          { "player_id": "78c99b28-0696-42ba-8760-e92c68e7106b", "number": 3 },
-          { "player_id": "bab8020b-880b-473a-9a52-ccb0ff843fe7", "number": 4 },
-          { "player_id": "6fd9018f-e07b-489a-bf6f-88bb6e0e66a6", "number": 5 },
-          { "player_id": "7492e397-1423-4267-821e-c51dd0bb8803", "number": 6 },
-          { "player_id": "d6a5d524-d3a7-44cf-a39d-a2c4357bf47f", "number": 7 },
-          { "player_id": "1f332c4b-e719-4980-8748-1f921403fdfa", "number": 8 },
-          { "player_id": "e4be2c21-cb54-4790-b743-40dddeecbd41", "number": 9 },
-          { "player_id": "78b1050f-f6b1-4af8-9a46-84cb6bc1feeb", "number": 10 },
-          { "player_id": "8da0861c-7fac-4c20-9e6f-39bd2647136b", "number": 11 },
-          { "player_id": "fadd7a03-1a74-4b0e-b7d6-b4dd4488aac3", "number": 14 },
-          { "player_id": "20f3d33e-3ca4-4c2a-a3e8-e0704078d142", "number": 15 },
-          { "player_id": "479776a3-9a2a-4f23-9ae0-722e220c0ec4", "number": 16 },
-          { "player_id": "807abe57-a1fb-4c82-a6f5-1364c49da484", "number": 17 },
-          { "player_id": "41e8a809-6505-4e07-9431-92c7a59d006e", "number": 18 },
-          { "player_id": "8889cb5d-91c5-488a-b58c-07a78fd3eb92", "number": 19 }
+          {
+            "player_id": "2f1d16cf-64ce-4e2d-ad1e-2362c6bd64b8",
+            "number": 1
+          },
+          {
+            "player_id": "6358d615-0366-4a45-9e42-952f15b51da3",
+            "number": 13
+          },
+          {
+            "player_id": "ae542ba1-2110-42f1-98a4-5e8ed2118fe6",
+            "number": 2
+          },
+          {
+            "player_id": "78c99b28-0696-42ba-8760-e92c68e7106b",
+            "number": 3
+          },
+          {
+            "player_id": "bab8020b-880b-473a-9a52-ccb0ff843fe7",
+            "number": 4
+          },
+          {
+            "player_id": "6fd9018f-e07b-489a-bf6f-88bb6e0e66a6",
+            "number": 5
+          },
+          {
+            "player_id": "7492e397-1423-4267-821e-c51dd0bb8803",
+            "number": 6
+          },
+          {
+            "player_id": "d6a5d524-d3a7-44cf-a39d-a2c4357bf47f",
+            "number": 7
+          },
+          {
+            "player_id": "1f332c4b-e719-4980-8748-1f921403fdfa",
+            "number": 8
+          },
+          {
+            "player_id": "e4be2c21-cb54-4790-b743-40dddeecbd41",
+            "number": 9
+          },
+          {
+            "player_id": "78b1050f-f6b1-4af8-9a46-84cb6bc1feeb",
+            "number": 10
+          },
+          {
+            "player_id": "8da0861c-7fac-4c20-9e6f-39bd2647136b",
+            "number": 11
+          },
+          {
+            "player_id": "fadd7a03-1a74-4b0e-b7d6-b4dd4488aac3",
+            "number": 14
+          },
+          {
+            "player_id": "20f3d33e-3ca4-4c2a-a3e8-e0704078d142",
+            "number": 15
+          },
+          {
+            "player_id": "479776a3-9a2a-4f23-9ae0-722e220c0ec4",
+            "number": 16
+          },
+          {
+            "player_id": "807abe57-a1fb-4c82-a6f5-1364c49da484",
+            "number": 17
+          },
+          {
+            "player_id": "41e8a809-6505-4e07-9431-92c7a59d006e",
+            "number": 18
+          },
+          {
+            "player_id": "8889cb5d-91c5-488a-b58c-07a78fd3eb92",
+            "number": 19
+          }
         ]
       }
     ]
   },
   {
-    "id": "anderlechazo",
+    "id": "30339f34-3056-4154-b7e7-20c7e5ab4404",
     "country": "BE",
     "seasons": [
       {
@@ -1879,32 +1937,90 @@
         "stadiumCapacity": 21500,
         "ticketPrice": 18,
         "budget": 85000000,
-        "colors": ["#6B2D8B", "#FFFFFF", "#6B2D8B"],
+        "colors": [
+          "#6B2D8B",
+          "#FFFFFF",
+          "#6B2D8B"
+        ],
         "players": [
-          { "player_id": "be2c90af-77a6-481a-b35b-4e3eb71e1a84", "number": 1 },
-          { "player_id": "076dc79d-7f06-4349-8390-1fc2c5bccb8a", "number": 13 },
-          { "player_id": "e3d2e672-90bf-4782-a9c8-ee821ed3469f", "number": 2 },
-          { "player_id": "f20afd73-1e0f-44ab-940a-93b039dae114", "number": 3 },
-          { "player_id": "40b280d0-659c-48b4-a44e-8d686206fe97", "number": 4 },
-          { "player_id": "a61a4d8b-a387-4029-8e52-9ddf45b717ff", "number": 5 },
-          { "player_id": "c04b001f-7c01-47b7-a840-ab9d00cfeb8e", "number": 6 },
-          { "player_id": "a1a9621e-6fe8-4838-83c7-0d4336859860", "number": 7 },
-          { "player_id": "bf2b42b5-c607-4aec-8b8c-86652cf2392c", "number": 8 },
-          { "player_id": "a9b2cfb5-1076-4f15-a0fb-00e8178bf58e", "number": 9 },
-          { "player_id": "dfbf7f29-e880-49fa-8f37-e95e326a82c4", "number": 10 },
-          { "player_id": "fe6fabbb-61f2-45a7-a893-431bc649301f", "number": 11 },
-          { "player_id": "8d418172-cd24-4653-97ad-931f21888bb8", "number": 14 },
-          { "player_id": "c9f846a9-cfc5-4a60-8c80-53f8bf79ffcb", "number": 15 },
-          { "player_id": "a1d1d88f-f979-461d-b824-d14f8d52cddf", "number": 16 },
-          { "player_id": "e1d989b3-ac98-4ebe-869b-c9b27274ed79", "number": 17 },
-          { "player_id": "d292978a-462a-4e73-8654-90a9e6558995", "number": 18 },
-          { "player_id": "a4ed15ca-7e51-4973-b7b7-b66a193907f7", "number": 19 }
+          {
+            "player_id": "be2c90af-77a6-481a-b35b-4e3eb71e1a84",
+            "number": 1
+          },
+          {
+            "player_id": "076dc79d-7f06-4349-8390-1fc2c5bccb8a",
+            "number": 13
+          },
+          {
+            "player_id": "e3d2e672-90bf-4782-a9c8-ee821ed3469f",
+            "number": 2
+          },
+          {
+            "player_id": "f20afd73-1e0f-44ab-940a-93b039dae114",
+            "number": 3
+          },
+          {
+            "player_id": "40b280d0-659c-48b4-a44e-8d686206fe97",
+            "number": 4
+          },
+          {
+            "player_id": "a61a4d8b-a387-4029-8e52-9ddf45b717ff",
+            "number": 5
+          },
+          {
+            "player_id": "c04b001f-7c01-47b7-a840-ab9d00cfeb8e",
+            "number": 6
+          },
+          {
+            "player_id": "a1a9621e-6fe8-4838-83c7-0d4336859860",
+            "number": 7
+          },
+          {
+            "player_id": "bf2b42b5-c607-4aec-8b8c-86652cf2392c",
+            "number": 8
+          },
+          {
+            "player_id": "a9b2cfb5-1076-4f15-a0fb-00e8178bf58e",
+            "number": 9
+          },
+          {
+            "player_id": "dfbf7f29-e880-49fa-8f37-e95e326a82c4",
+            "number": 10
+          },
+          {
+            "player_id": "fe6fabbb-61f2-45a7-a893-431bc649301f",
+            "number": 11
+          },
+          {
+            "player_id": "8d418172-cd24-4653-97ad-931f21888bb8",
+            "number": 14
+          },
+          {
+            "player_id": "c9f846a9-cfc5-4a60-8c80-53f8bf79ffcb",
+            "number": 15
+          },
+          {
+            "player_id": "a1d1d88f-f979-461d-b824-d14f8d52cddf",
+            "number": 16
+          },
+          {
+            "player_id": "e1d989b3-ac98-4ebe-869b-c9b27274ed79",
+            "number": 17
+          },
+          {
+            "player_id": "d292978a-462a-4e73-8654-90a9e6558995",
+            "number": 18
+          },
+          {
+            "player_id": "a4ed15ca-7e51-4973-b7b7-b66a193907f7",
+            "number": 19
+          }
         ]
       }
     ]
   },
   {
-    "id": "cska",
+    "id": "39c7ab5f-5912-44cf-93b7-d6d292e82ec6",
     "country": "RU",
     "seasons": [
       {
@@ -1913,32 +2029,90 @@
         "stadiumCapacity": 30000,
         "ticketPrice": 14,
         "budget": 75000000,
-        "colors": ["#CC0000", "#003087", "#003087"],
+        "colors": [
+          "#CC0000",
+          "#003087",
+          "#003087"
+        ],
         "players": [
-          { "player_id": "c1ca02f8-a6f4-414d-a4ae-6c45da30f5c7", "number": 1 },
-          { "player_id": "f7664c50-6291-467d-910b-dbbe39f42d30", "number": 13 },
-          { "player_id": "3a03f5e4-6896-4cb7-b58c-3cc679aa7d7a", "number": 2 },
-          { "player_id": "65a5d4e9-eb84-43ce-81a9-4aef85b36df6", "number": 3 },
-          { "player_id": "3b4d13c6-e60a-4435-aae0-9f979455ed51", "number": 4 },
-          { "player_id": "0cf017d2-8bab-4c89-a6e3-fdba1ef7d27e", "number": 5 },
-          { "player_id": "05e5f356-635b-4139-bfd4-dda93d0b3844", "number": 6 },
-          { "player_id": "a9bae36c-f501-4dfa-9490-13a9969e5361", "number": 7 },
-          { "player_id": "6e594789-9a9a-4af1-b50b-9eae11b6800e", "number": 8 },
-          { "player_id": "76cfafaa-d686-46b4-993b-b806e5f8e8c7", "number": 9 },
-          { "player_id": "1f0cd8a5-f9a1-40c0-9f5e-ce923c2bb09f", "number": 10 },
-          { "player_id": "4db9c3f0-8353-4fcd-8e42-8c79065a4f34", "number": 11 },
-          { "player_id": "13cfcb65-a17b-4234-b9d4-3bc9226ba152", "number": 14 },
-          { "player_id": "ae1bcf31-34a8-4ac5-b899-c2c944c29877", "number": 15 },
-          { "player_id": "7faeebba-76b6-4a28-bd31-686e82b575e9", "number": 16 },
-          { "player_id": "4a535409-f062-4bbe-88fa-112d5b2ccb95", "number": 17 },
-          { "player_id": "cbe06166-23cd-4b0e-920e-6b1a8aa7ed73", "number": 18 },
-          { "player_id": "2dfeea1d-4de1-45a1-b26c-1a03f0c96493", "number": 19 }
+          {
+            "player_id": "c1ca02f8-a6f4-414d-a4ae-6c45da30f5c7",
+            "number": 1
+          },
+          {
+            "player_id": "f7664c50-6291-467d-910b-dbbe39f42d30",
+            "number": 13
+          },
+          {
+            "player_id": "3a03f5e4-6896-4cb7-b58c-3cc679aa7d7a",
+            "number": 2
+          },
+          {
+            "player_id": "65a5d4e9-eb84-43ce-81a9-4aef85b36df6",
+            "number": 3
+          },
+          {
+            "player_id": "3b4d13c6-e60a-4435-aae0-9f979455ed51",
+            "number": 4
+          },
+          {
+            "player_id": "0cf017d2-8bab-4c89-a6e3-fdba1ef7d27e",
+            "number": 5
+          },
+          {
+            "player_id": "05e5f356-635b-4139-bfd4-dda93d0b3844",
+            "number": 6
+          },
+          {
+            "player_id": "a9bae36c-f501-4dfa-9490-13a9969e5361",
+            "number": 7
+          },
+          {
+            "player_id": "6e594789-9a9a-4af1-b50b-9eae11b6800e",
+            "number": 8
+          },
+          {
+            "player_id": "76cfafaa-d686-46b4-993b-b806e5f8e8c7",
+            "number": 9
+          },
+          {
+            "player_id": "1f0cd8a5-f9a1-40c0-9f5e-ce923c2bb09f",
+            "number": 10
+          },
+          {
+            "player_id": "4db9c3f0-8353-4fcd-8e42-8c79065a4f34",
+            "number": 11
+          },
+          {
+            "player_id": "13cfcb65-a17b-4234-b9d4-3bc9226ba152",
+            "number": 14
+          },
+          {
+            "player_id": "ae1bcf31-34a8-4ac5-b899-c2c944c29877",
+            "number": 15
+          },
+          {
+            "player_id": "7faeebba-76b6-4a28-bd31-686e82b575e9",
+            "number": 16
+          },
+          {
+            "player_id": "4a535409-f062-4bbe-88fa-112d5b2ccb95",
+            "number": 17
+          },
+          {
+            "player_id": "cbe06166-23cd-4b0e-920e-6b1a8aa7ed73",
+            "number": 18
+          },
+          {
+            "player_id": "2dfeea1d-4de1-45a1-b26c-1a03f0c96493",
+            "number": 19
+          }
         ]
       }
     ]
   },
   {
-    "id": "malmoro",
+    "id": "51962f58-53b6-4498-ba08-779944f26e19",
     "country": "SE",
     "seasons": [
       {
@@ -1947,26 +2121,84 @@
         "stadiumCapacity": 24000,
         "ticketPrice": 16,
         "budget": 60000000,
-        "colors": ["#009EE2", "#FFFFFF", "#009EE2"],
+        "colors": [
+          "#009EE2",
+          "#FFFFFF",
+          "#009EE2"
+        ],
         "players": [
-          { "player_id": "8bfda6c2-72a8-41c3-80de-89a5f0b30581", "number": 1 },
-          { "player_id": "28d254c4-ed34-435f-bc1a-75a9e1fc0c03", "number": 13 },
-          { "player_id": "178cb2c5-74a7-417e-84ab-f31c85a11a81", "number": 2 },
-          { "player_id": "9801ac44-d7db-4982-8351-ffecc7313d2e", "number": 3 },
-          { "player_id": "f0e5e0cd-4184-4faf-aac1-aaedaaa267da", "number": 4 },
-          { "player_id": "83a06f69-215d-4b1c-b5fc-29d447c79f59", "number": 5 },
-          { "player_id": "97850d6d-7156-4595-aa08-c05eceb6b6c0", "number": 6 },
-          { "player_id": "2a650264-d8a5-4f10-a68f-faf1bab0230e", "number": 7 },
-          { "player_id": "fb4da9df-2326-48e5-b391-81f58ce55c06", "number": 8 },
-          { "player_id": "fe13a7c3-df5e-4e1d-850e-94e3d5b267d0", "number": 9 },
-          { "player_id": "9faebb4e-9325-4818-a0fb-20b4de218dbe", "number": 10 },
-          { "player_id": "e51c3a63-6a94-45b3-a61e-01b2319b6d26", "number": 11 },
-          { "player_id": "1d5b55e9-1380-4e77-b3a6-1852eb88266f", "number": 14 },
-          { "player_id": "c448bc69-544b-49dc-aca3-bfe7c01d0e81", "number": 15 },
-          { "player_id": "6e5dbd84-c25c-4a49-8abc-ae7ddbc7eb9e", "number": 16 },
-          { "player_id": "74cbb9b4-532f-4cf9-8dbb-1b492aa891b1", "number": 17 },
-          { "player_id": "11d0c54d-7096-4257-9c8a-86da68a9921d", "number": 18 },
-          { "player_id": "d179ec9c-6f85-4bbe-ac24-4fdfa0961240", "number": 19 }
+          {
+            "player_id": "8bfda6c2-72a8-41c3-80de-89a5f0b30581",
+            "number": 1
+          },
+          {
+            "player_id": "28d254c4-ed34-435f-bc1a-75a9e1fc0c03",
+            "number": 13
+          },
+          {
+            "player_id": "178cb2c5-74a7-417e-84ab-f31c85a11a81",
+            "number": 2
+          },
+          {
+            "player_id": "9801ac44-d7db-4982-8351-ffecc7313d2e",
+            "number": 3
+          },
+          {
+            "player_id": "f0e5e0cd-4184-4faf-aac1-aaedaaa267da",
+            "number": 4
+          },
+          {
+            "player_id": "83a06f69-215d-4b1c-b5fc-29d447c79f59",
+            "number": 5
+          },
+          {
+            "player_id": "97850d6d-7156-4595-aa08-c05eceb6b6c0",
+            "number": 6
+          },
+          {
+            "player_id": "2a650264-d8a5-4f10-a68f-faf1bab0230e",
+            "number": 7
+          },
+          {
+            "player_id": "fb4da9df-2326-48e5-b391-81f58ce55c06",
+            "number": 8
+          },
+          {
+            "player_id": "fe13a7c3-df5e-4e1d-850e-94e3d5b267d0",
+            "number": 9
+          },
+          {
+            "player_id": "9faebb4e-9325-4818-a0fb-20b4de218dbe",
+            "number": 10
+          },
+          {
+            "player_id": "e51c3a63-6a94-45b3-a61e-01b2319b6d26",
+            "number": 11
+          },
+          {
+            "player_id": "1d5b55e9-1380-4e77-b3a6-1852eb88266f",
+            "number": 14
+          },
+          {
+            "player_id": "c448bc69-544b-49dc-aca3-bfe7c01d0e81",
+            "number": 15
+          },
+          {
+            "player_id": "6e5dbd84-c25c-4a49-8abc-ae7ddbc7eb9e",
+            "number": 16
+          },
+          {
+            "player_id": "74cbb9b4-532f-4cf9-8dbb-1b492aa891b1",
+            "number": 17
+          },
+          {
+            "player_id": "11d0c54d-7096-4257-9c8a-86da68a9921d",
+            "number": 18
+          },
+          {
+            "player_id": "d179ec9c-6f85-4bbe-ac24-4fdfa0961240",
+            "number": 19
+          }
         ]
       }
     ]
