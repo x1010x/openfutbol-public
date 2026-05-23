@@ -35,6 +35,14 @@ export const ColaborarView = ({ onBack }: Props) => (
         </button>
       </div>
 
+      <div className="bg-vga-black border border-vga-yellow p-3 text-[9px] text-vga-bright-white leading-relaxed mb-4">
+        <span className="text-vga-yellow font-bold">Aviso:</span> esto está en desarrollo.
+        Hay bugs, hay cosas feas y hay decisiones de diseño cuestionables.
+        Todos los comentarios constructivos son bienvenidos.
+        Para decir que el juego es una mierda ya lo sabemos — pero si además
+        quieres ayudar a que lo sea menos, este es el sitio.
+      </div>
+
       <p className="text-vga-bright-white text-[9px] leading-relaxed mb-4">
         Queremos que colaboréis todos — aunque no sepáis nada de informática.
         Si tenéis un chiste bueno, una idea para un equipo o queréis que vuestro
