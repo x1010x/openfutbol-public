@@ -1,52 +1,246 @@
 import { useState } from 'react';
-import type { FormationId, Position, Team } from '../types/game.d.ts';
+import type { CSSProperties, ReactNode } from 'react';
+import type { FormationId, Player, Position, Team } from '../types/game.d.ts';
 import { calculateTeamStrength } from '../engine/simEngine';
 import { ALL_FORMATIONS, FORMATIONS, effectiveMedia, isOOP, liveMed, pickBestXI, reslotLineup } from '../engine/formations';
 import { PitchDiagram } from './PitchDiagram';
-import { SwapModal } from './SwapModal';
 import { moodStateOf, MOOD } from '../engine/playerMood';
 import { PlayerName } from './PlayerName';
+
+interface IngameProps {
+  subsUsed: number;
+  maxSubs: number;
+  injuredIds: string[];
+  sentOff: string[];
+  htPaused: boolean;
+  onSubstitute: (outId: string, inId: string) => void;
+  onContinue: () => void;
+}
 
 interface Props {
   team: Team;
   onUpdate: (patch: { lineup: string[]; formation: FormationId }) => void;
   onBack: () => void;
   onToggleDiscipline: () => void;
+  ingame?: IngameProps;
 }
+
+const POS_COLOR: Record<string, string> = {
+  POR: 'text-vga-yellow', DEF: 'text-vga-light-cyan',
+  MED: 'text-vga-light-green', DEL: 'text-vga-light-red',
+  AML: 'text-vga-light-magenta', AMR: 'text-vga-light-magenta',
+};
+const getPositionColor = (pos: string) => POS_COLOR[pos] ?? 'text-vga-white';
 
 const StaminaBar = ({ value }: { value: number }) => {
   const pct = Math.round(Math.max(0, Math.min(100, value)));
-  const col = pct >= 60 ? 'bg-vga-light-green' : pct >= 30 ? 'bg-vga-yellow' : 'bg-vga-light-red';
+  const col = pct >= 60 ? '#55ff55' : pct >= 30 ? '#ffff55' : '#ff5555';
   return (
-    <div className="flex items-center gap-1">
-      <div className="w-10 h-1.5 bg-vga-black border border-vga-gray">
-        <div className={`h-full ${col}`} style={{ width: `${pct}%` }} />
-      </div>
-      <span className="text-[6px] text-vga-gray font-mono">{pct}</span>
+    <div style={{ width: 36, height: 5, background: '#000000', border: '1px solid #333355', flexShrink: 0 }}>
+      <div style={{ width: `${pct}%`, height: '100%', background: col }} />
     </div>
   );
 };
 
-const getPositionColor = (pos: string) => {
-  switch (pos) {
-    case 'POR': return 'text-vga-yellow';
-    case 'DEF': return 'text-vga-light-cyan';
-    case 'MED': return 'text-vga-light-green';
-    case 'DEL': return 'text-vga-light-red';
-    case 'AML':
-    case 'AMR': return 'text-vga-light-magenta';
-    default: return 'text-vga-white';
-  }
+const POS_ORDER: Record<string, number> = { POR: 0, DEF: 1, MED: 2, DEL: 3, AML: 4, AMR: 5 };
+
+const byPosThenLive = (slotPos: Position) => (a: Player, b: Player) => {
+  const posA = POS_ORDER[a.position] ?? 9;
+  const posB = POS_ORDER[b.position] ?? 9;
+  if (posA !== posB) return posA - posB;
+  return liveMed(b, b.stamina ?? 99, slotPos) - liveMed(a, a.stamina ?? 99, slotPos);
 };
 
-export const AlignmentView = ({ team, onUpdate, onBack, onToggleDiscipline }: Props) => {
+const Divider = ({ label, color, bg, border }: { label: string; color: string; bg: string; border: string }) => (
+  <tr>
+    <td colSpan={6} style={{ background: bg, borderTop: `1px solid ${border}`, borderBottom: `1px solid ${border}`, padding: '1px 4px', fontSize: 5, color, textAlign: 'center', textTransform: 'uppercase', letterSpacing: 2 }}>
+      ─── {label} ───
+    </td>
+  </tr>
+);
+
+// ─── Picker rows (slot selected) ────────────────────────────────────
+const PickerRows = ({
+  candidates, slotPos, currentSlotPlayerId, selectedSlot, assignToSlot, slotOfPlayer
+}: {
+  candidates: Player[]; slotPos: Position; currentSlotPlayerId: string | null;
+  selectedSlot: number; assignToSlot: (idx: number, pid: string | null) => void;
+  slotOfPlayer: Map<string, number>;
+}) => {
+  // Group: available in-position, available OOP, titulars (in field)
+  const available = candidates.filter(p => !slotOfPlayer.has(p.id));
+  const inField   = candidates.filter(p =>  slotOfPlayer.has(p.id));
+
+  const inPos = available.filter(p => !isOOP(p, slotPos)).sort(byPosThenLive(slotPos));
+  const oop   = available.filter(p =>  isOOP(p, slotPos)).sort(byPosThenLive(slotPos));
+  const field = [...inField].sort((a, b) =>
+    liveMed(b, b.stamina ?? 99, slotPos) - liveMed(a, a.stamina ?? 99, slotPos)
+  );
+
+  const makeRow = (p: Player, isTitular: boolean) => {
+    const isCurrent = p.id === currentSlotPlayerId;
+    const oopFlag = isOOP(p, slotPos);
+    const stam = p.stamina ?? 99;
+    const pLive = liveMed(p, stam, slotPos);
+    const effMed = Math.round(effectiveMedia(p, slotPos));
+    const baseBg = isCurrent ? 'rgba(255,255,85,0.12)' : isTitular ? 'rgba(0,0,170,0.35)' : 'transparent';
+    return (
+      <tr
+        key={p.id}
+        onClick={() => assignToSlot(selectedSlot, p.id)}
+        style={{ cursor: 'pointer', background: baseBg, borderBottom: '1px solid #111133' }}
+        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(85,85,255,0.22)'; }}
+        onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = baseBg; }}
+      >
+        <td style={{ width: 14, textAlign: 'center', paddingLeft: 2, paddingRight: 2, fontSize: 7, color: '#ffff55', borderRight: '1px solid #222244' }}>
+          {isCurrent ? '▶' : ''}
+        </td>
+        <td className={`font-bold ${getPositionColor(p.position)}`} style={{ width: 24, textAlign: 'center', fontSize: 7, borderRight: '1px solid #222244', padding: '2px 2px' }}>
+          {p.position}
+        </td>
+        <td style={{ fontSize: 7, color: '#ffffff', padding: '2px 3px', borderRight: '1px solid #222244', maxWidth: 80, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
+          <PlayerName player={p} />
+          {isTitular && <span style={{ fontSize: 5, color: '#55ffff', marginLeft: 3 }}>(campo)</span>}
+        </td>
+        <td style={{ width: 26, textAlign: 'center', fontSize: 7, fontFamily: 'monospace', color: oopFlag ? '#ff5555' : '#55ff55', borderRight: '1px solid #222244', padding: '2px 2px' }}>
+          {effMed}
+        </td>
+        <td style={{ width: 26, textAlign: 'center', fontSize: 7, fontFamily: 'monospace', color: pLive < p.media ? '#ff5555' : '#55ffff', borderRight: '1px solid #222244', padding: '2px 2px' }}>
+          {pLive}
+        </td>
+        <td style={{ padding: '2px 3px' }}>
+          <StaminaBar value={stam} />
+        </td>
+      </tr>
+    );
+  };
+
+  if (inPos.length === 0 && oop.length === 0 && field.length === 0) {
+    return <tr><td colSpan={6} style={{ padding: 8, textAlign: 'center', fontSize: 6, color: '#555577', fontStyle: 'italic' }}>Sin jugadores disponibles</td></tr>;
+  }
+
+  return (
+    <>
+      {inPos.map(p => makeRow(p, false))}
+      {oop.length > 0 && <Divider label="fuera de posición" color="#ff5555" bg="#1a0000" border="#442222" />}
+      {oop.map(p => makeRow(p, false))}
+      {field.length > 0 && <Divider label="en campo" color="#55ffff" bg="#000033" border="#224444" />}
+      {field.map(p => makeRow(p, true))}
+    </>
+  );
+};
+
+// ─── Roster rows (no slot selected) ─────────────────────────────────
+const RosterRows = ({
+  sortedPlayers, slots, slotOfPlayer, selectedSlot, setSelectedSlot, togglePlayer
+}: {
+  sortedPlayers: Player[]; slots: Position[];
+  slotOfPlayer: Map<string, number>; selectedSlot: number | null;
+  setSelectedSlot: (s: number | null) => void; togglePlayer: (pid: string) => void;
+}) => {
+  const rows: ReactNode[] = [];
+  let suplenteDivider = false;
+
+  for (const player of sortedPlayers) {
+    const slotIdx = slotOfPlayer.get(player.id);
+    const isTitular = slotIdx !== undefined;
+    const slotPos: Position | null = isTitular ? slots[slotIdx!] : null;
+    const oop = isTitular && slotPos ? isOOP(player, slotPos) : false;
+    const isSuspended = player.suspensionMatches > 0;
+    const isInjured = (player.injuryWeeksRemaining ?? 0) > 0;
+    const unavailable = isSuspended || isInjured;
+    const effMed = isTitular && slotPos ? Math.round(effectiveMedia(player, slotPos)) : player.media;
+    const stamina = player.stamina ?? 99;
+    const mood = moodStateOf(player, isTitular);
+    const moodInfo = MOOD[mood];
+    const isSelected = isTitular && slotIdx === selectedSlot;
+
+    if (!suplenteDivider && !isTitular) {
+      suplenteDivider = true;
+      rows.push(
+        <tr key="div-suplentes">
+          <td colSpan={6} style={{ background: '#001800', borderTop: '1px solid #114411', borderBottom: '1px solid #114411', padding: '1px 4px', fontSize: 5, color: '#55aa55', textAlign: 'center', textTransform: 'uppercase', letterSpacing: 2 }}>
+            ─── suplentes ───
+          </td>
+        </tr>
+      );
+    }
+
+    rows.push(
+      <tr
+        key={player.id}
+        onClick={() => {
+          if (unavailable) return;
+          if (isTitular && slotIdx !== undefined) {
+            setSelectedSlot(selectedSlot === slotIdx ? null : slotIdx);
+          } else {
+            togglePlayer(player.id);
+          }
+        }}
+        style={{
+          cursor: unavailable ? 'default' : 'pointer',
+          opacity: unavailable ? 0.45 : 1,
+          background: isSelected
+            ? 'rgba(255,255,85,0.14)'
+            : isTitular
+              ? 'rgba(0,0,100,0.45)'
+              : 'transparent',
+          borderBottom: '1px solid #111133',
+        }}
+        onMouseEnter={e => { if (!unavailable) (e.currentTarget as HTMLElement).style.background = isSelected ? 'rgba(255,255,85,0.22)' : 'rgba(85,85,255,0.14)'; }}
+        onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = isSelected ? 'rgba(255,255,85,0.14)' : isTitular ? 'rgba(0,0,100,0.45)' : 'transparent'; }}
+      >
+        {/* slot # */}
+        <td style={{ width: 14, textAlign: 'center', fontSize: 7, color: isSelected ? '#ffff55' : '#555577', borderRight: '1px solid #222244', padding: '2px 2px' }}>
+          {isTitular ? (isSelected ? '▶' : String(slotIdx! + 1)) : '—'}
+        </td>
+        {/* position */}
+        <td style={{ width: 24, textAlign: 'center', fontSize: 7, borderRight: '1px solid #222244', padding: '2px 2px' }}>
+          <span className={`font-bold ${isTitular ? getPositionColor(slotPos ?? player.position) : 'text-vga-gray'}`}>
+            {isTitular ? slotPos : player.position}
+          </span>
+          {oop && <span style={{ fontSize: 5, color: '#ff5555', marginLeft: 1 }}>!</span>}
+        </td>
+        {/* name */}
+        <td style={{ fontSize: 7, padding: '2px 3px', borderRight: '1px solid #222244', color: isTitular ? '#ffffff' : '#888899', maxWidth: 90, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
+          <span style={{ fontWeight: isTitular ? 'bold' : 'normal' }}>
+            <PlayerName player={player} />
+          </span>
+          {player.seasonStats?.yellowCards > 0 && <span style={{ display: 'inline-block', width: 4, height: 6, background: '#ffff55', border: '0.5px solid black', marginLeft: 2, verticalAlign: 'middle' }} />}
+          {player.seasonStats?.redCards > 0 && <span style={{ display: 'inline-block', width: 4, height: 6, background: '#aa0000', border: '0.5px solid black', marginLeft: 2, verticalAlign: 'middle' }} />}
+          {isSuspended && <span style={{ fontSize: 5, color: '#ff5555', marginLeft: 3, fontWeight: 'bold' }}>[SAN]</span>}
+          {isInjured && <span style={{ fontSize: 5, color: '#ff8855', marginLeft: 3, fontWeight: 'bold' }}>[LES {player.injuryWeeksRemaining}s]</span>}
+        </td>
+        {/* MED */}
+        <td style={{ width: 26, textAlign: 'center', fontSize: 7, fontFamily: 'monospace', color: oop ? '#ff5555' : isTitular ? '#55ff55' : '#888899', borderRight: '1px solid #222244', padding: '2px 2px' }}>
+          {effMed}
+        </td>
+        {/* LIVE */}
+        <td style={{ width: 26, textAlign: 'center', fontSize: 7, fontFamily: 'monospace', color: '#55ffff', borderRight: '1px solid #222244', padding: '2px 2px' }}>
+          {liveMed(player, stamina, isTitular && slotPos ? slotPos : undefined)}
+        </td>
+        {/* stamina + mood */}
+        <td style={{ padding: '2px 3px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+            <StaminaBar value={stamina} />
+            <span className={moodInfo.colorClass} style={{ fontSize: 7, fontWeight: 'bold' }}>{moodInfo.symbol}</span>
+          </div>
+        </td>
+      </tr>
+    );
+  }
+
+  return <>{rows}</>;
+};
+
+// ═══ MAIN COMPONENT ═══════════════════════════════════════════════════
+export const AlignmentView = ({ team, onUpdate, onBack, onToggleDiscipline, ingame }: Props) => {
   const teamMED = Math.floor(calculateTeamStrength(team));
   const slots = FORMATIONS[team.formation];
   const [selectedSlot, setSelectedSlot] = useState<number | null>(null);
 
   const slotOfPlayer = new Map<string, number>();
   team.lineup.forEach((id, idx) => { if (id) slotOfPlayer.set(id, idx); });
-
   const currentTitulars = team.lineup.filter(Boolean);
   const titularCount = currentTitulars.length;
 
@@ -57,23 +251,29 @@ export const AlignmentView = ({ team, onUpdate, onBack, onToggleDiscipline }: Pr
   };
 
   const handleAutoFix = () => {
-    const { lineup } = pickBestXI(team.players, team.formation, new Set(), team.tacticalDiscipline ?? true);
+    const excl = ingame ? new Set([...ingame.sentOff, ...ingame.injuredIds]) : new Set<string>();
+    const { lineup } = pickBestXI(team.players, team.formation, excl, team.tacticalDiscipline ?? true);
     onUpdate({ lineup, formation: team.formation });
   };
 
-  // Asignación directa a un slot concreto (desde la modal del pitch).
   const assignToSlot = (slotIdx: number, playerId: string | null) => {
+    if (ingame) {
+      // In-game mode: real substitution (permanent)
+      if (playerId === null) { setSelectedSlot(null); return; }
+      const outId = team.lineup[slotIdx];
+      if (outId && ingame.subsUsed < ingame.maxSubs) {
+        ingame.onSubstitute(outId, playerId);
+      }
+      setSelectedSlot(null);
+      return;
+    }
     const newLineup: string[] = [];
     for (let i = 0; i < slots.length; i++) newLineup.push(team.lineup[i] ?? '');
-
     if (playerId === null) {
       newLineup[slotIdx] = '';
     } else {
       const existingSlot = newLineup.indexOf(playerId);
-      if (existingSlot !== -1) {
-        // Rotacional: el que estaba en slotIdx pasa al hueco que deja el otro
-        newLineup[existingSlot] = newLineup[slotIdx];
-      }
+      if (existingSlot !== -1) newLineup[existingSlot] = newLineup[slotIdx];
       newLineup[slotIdx] = playerId;
     }
     while (newLineup.length > 0 && newLineup[newLineup.length - 1] === '') newLineup.pop();
@@ -81,206 +281,275 @@ export const AlignmentView = ({ team, onUpdate, onBack, onToggleDiscipline }: Pr
     setSelectedSlot(null);
   };
 
-  // Toggle desde la tabla — usa el algoritmo greedy (re-asigna slots).
   const togglePlayer = (playerId: string) => {
+    if (ingame) return; // no free toggles in-game
     const player = team.players.find(p => p.id === playerId);
-    if (!player) return;
-    if (player.suspensionMatches > 0) {
-      alert(`${player.name} está sancionado y no puede jugar.`);
-      return;
-    }
-    if ((player.injuryWeeksRemaining ?? 0) > 0) {
-      alert(`${player.name} está lesionado (${player.injuryWeeksRemaining} semanas).`);
-      return;
-    }
-
-    const isCurrentlyTitular = slotOfPlayer.has(playerId);
+    if (!player || player.suspensionMatches > 0 || (player.injuryWeeksRemaining ?? 0) > 0) return;
+    const isTitular = slotOfPlayer.has(playerId);
     let newTitulars: string[];
-    if (isCurrentlyTitular) {
+    if (isTitular) {
       newTitulars = currentTitulars.filter(id => id !== playerId);
     } else {
-      if (titularCount >= 11) {
-        alert('Alineación completa. Quita un titular antes de añadir otro.');
-        return;
-      }
+      if (titularCount >= 11) return;
       newTitulars = [...currentTitulars, playerId];
     }
-    const newLineup = reslotLineup(team, newTitulars, team.formation);
-    onUpdate({ lineup: newLineup, formation: team.formation });
+    onUpdate({ lineup: reslotLineup(team, newTitulars, team.formation), formation: team.formation });
   };
+
+  const inPickMode = selectedSlot !== null;
+  const slotPos: Position | null = inPickMode ? slots[selectedSlot!] : null;
+  const currentSlotPlayerId = inPickMode ? (team.lineup[selectedSlot!] ?? null) : null;
+
+  const candidates = slotPos
+    ? team.players.filter(p => {
+        if (p.suspensionMatches > 0 || (p.injuryWeeksRemaining ?? 0) > 0) return false;
+        if (ingame) {
+          // In-game: only bench players can come in, exclude injured/sentOff in match
+          if (ingame.injuredIds.includes(p.id) || ingame.sentOff.includes(p.id)) return false;
+          if (slotOfPlayer.has(p.id)) return false;
+        }
+        return true;
+      })
+    : [];
 
   const sortedPlayers = [...team.players].sort((a, b) => {
     const ta = slotOfPlayer.has(a.id) ? 0 : 1;
     const tb = slotOfPlayer.has(b.id) ? 0 : 1;
     if (ta !== tb) return ta - tb;
-    if (ta === 0) {
-      return (slotOfPlayer.get(a.id)! - slotOfPlayer.get(b.id)!);
-    }
+    if (ta === 0) return (slotOfPlayer.get(a.id)! - slotOfPlayer.get(b.id)!);
     return b.media - a.media;
   });
 
-  const slotModal = selectedSlot !== null ? (() => {
-    const slotPos: Position = slots[selectedSlot];
-    const currentId = team.lineup[selectedSlot] ?? null;
-    const currentPlayer = currentId ? team.players.find(p => p.id === currentId) ?? null : null;
-    const candidates = team.players
-      .filter(p => p.suspensionMatches === 0 && (p.injuryWeeksRemaining ?? 0) === 0)
-      .sort((a, b) => effectiveMedia(b, slotPos) - effectiveMedia(a, slotPos));
-    const inLineup = new Set(team.lineup.filter(Boolean));
-    return (
-      <SwapModal
-        slotPos={slotPos}
-        currentPlayer={currentPlayer}
-        candidates={candidates}
-        inLineup={inLineup}
-        onSelect={(pid) => assignToSlot(selectedSlot, pid)}
-        onClear={currentId ? () => assignToSlot(selectedSlot, null) : undefined}
-        onClose={() => setSelectedSlot(null)}
-      />
-    );
-  })() : null;
+  // ─── Style constants ─────────────────────────────────────────────
+  const outerFrame: CSSProperties = {
+    border: '4px solid #aaaaaa',
+    boxShadow: 'inset 2px 2px 0 #ffffff, inset -2px -2px 0 #000000, 5px 5px 0 #000000',
+    background: '#000000',
+    maxWidth: 760,
+    width: '100%',
+  };
+  const headerStyle: CSSProperties = {
+    background: 'linear-gradient(180deg, #0004e0 0%, #0000aa 100%)',
+    borderBottom: '4px solid #aaaaaa',
+    boxShadow: 'inset 2px 2px 0 #5555ff, inset -2px -2px 0 #000055',
+    padding: '6px 8px',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  };
+  const sectionLabel: CSSProperties = {
+    background: 'linear-gradient(180deg, #0002aa 0%, #000088 100%)',
+    borderBottom: '2px solid #333366',
+    textAlign: 'center',
+    padding: '2px 4px',
+    fontSize: 6,
+    color: '#ffff55',
+    fontWeight: 'bold',
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+  };
+  const tableHead: CSSProperties = {
+    background: 'linear-gradient(180deg, #0004e0 0%, #0000cc 100%)',
+    color: '#55ffff',
+    fontSize: 6,
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+    position: 'sticky',
+    top: 0,
+    zIndex: 1,
+  };
 
   return (
-    <div className="w-full max-w-2xl flex flex-col gap-4 animate-in fade-in duration-300">
-      <div className="bg-vga-blue p-2 border-2 border-vga-white flex justify-between items-center vga-panel">
-        <div className="flex flex-col">
-          <h2 className="text-vga-yellow text-[10px] uppercase font-bold">ALINEACIÓN: {team.name}</h2>
-          <span className="text-[7px] text-vga-bright-white">ENTRENADOR: {team.manager}</span>
-        </div>
-        <div className="flex gap-2 items-center">
-          <span className="text-[10px] bg-vga-black text-vga-yellow px-2 border border-vga-white">
-            MED: {teamMED}
-          </span>
-          <span className="text-[10px] bg-vga-black text-vga-light-green px-2 border border-vga-white">
-            {titularCount}/11
-          </span>
-          <button
-            onClick={onBack}
-            className="bg-vga-red text-vga-bright-white px-3 py-1 text-[8px] border border-vga-black hover:bg-vga-light-red"
-          >
-            GUARDAR Y SALIR
-          </button>
-        </div>
-      </div>
+    <div style={{ width: '100%', display: 'flex', justifyContent: 'center', padding: '0 4px' }}>
+      <div style={outerFrame}>
 
-      <div className="bg-vga-gray border-2 border-vga-blue p-2">
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="text-vga-blue text-[8px] font-bold uppercase mr-1">FORMACIÓN:</span>
-          {ALL_FORMATIONS.map(f => (
+        {/* ═══ HEADER BAR ═══════════════════════════════════════════ */}
+        <div style={headerStyle}>
+          <div>
+            <div style={{ fontSize: 9, color: '#ffff55', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: 2 }}>
+              {ingame ? '▶ CAMBIOS' : '▶ ALINEACIÓN'} — {team.name}
+              {ingame?.htPaused && <span style={{ marginLeft: 8, fontSize: 6, color: '#55ffff' }}>DESCANSO</span>}
+            </div>
+            <div style={{ fontSize: 6, color: '#aaaaaa', textTransform: 'uppercase', marginTop: 2 }}>
+              ENT: {team.manager}
+            </div>
+          </div>
+          <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+            <div style={{ background: '#000000', border: '2px solid #ffff55', padding: '2px 6px', fontSize: 8, color: '#ffff55', fontFamily: 'monospace', fontWeight: 'bold', boxShadow: 'inset 1px 1px 0 #888800, inset -1px -1px 0 #333300' }}>
+              MED {teamMED}
+            </div>
+            {ingame ? (
+              <div style={{ background: '#000000', border: `2px solid ${ingame.subsUsed >= ingame.maxSubs ? '#ff5555' : '#55ff55'}`, padding: '2px 6px', fontSize: 8, color: ingame.subsUsed >= ingame.maxSubs ? '#ff5555' : '#55ff55', fontFamily: 'monospace', fontWeight: 'bold' }}>
+                CAMBIOS {ingame.subsUsed}/{ingame.maxSubs}
+              </div>
+            ) : (
+              <div style={{ background: '#000000', border: `2px solid ${titularCount === 11 ? '#55ff55' : '#ff5555'}`, padding: '2px 6px', fontSize: 8, color: titularCount === 11 ? '#55ff55' : '#ff5555', fontFamily: 'monospace', fontWeight: 'bold' }}>
+                {titularCount}/11
+              </div>
+            )}
             <button
-              key={f}
-              onClick={() => handleFormationChange(f)}
-              className={`px-2 py-1 text-[8px] border-2 font-bold ${
-                f === team.formation
-                  ? 'bg-vga-yellow text-vga-black border-vga-bright-white'
-                  : 'bg-vga-blue text-vga-bright-white border-vga-gray hover:bg-vga-light-blue'
-              }`}
+              onClick={ingame ? ingame.onContinue : onBack}
+              style={{ background: ingame ? '#0000aa' : '#aa0000', color: '#ffffff', border: '2px solid #aaaaaa', padding: '3px 10px', fontSize: 7, fontWeight: 'bold', textTransform: 'uppercase', cursor: 'pointer', boxShadow: ingame ? 'inset 1px 1px 0 #5555ff, inset -1px -1px 0 #000055' : 'inset 1px 1px 0 #ff5555, inset -1px -1px 0 #550000' }}
+              onMouseEnter={e => { (e.target as HTMLElement).style.background = ingame ? '#0004e0' : '#ff5555'; }}
+              onMouseLeave={e => { (e.target as HTMLElement).style.background = ingame ? '#0000aa' : '#aa0000'; }}
             >
-              {f}
+              {ingame ? '■ CONTINUAR' : '■ GUARDAR Y SALIR'}
             </button>
-          ))}
-          <button
-            onClick={onToggleDiscipline}
-            title={team.tacticalDiscipline ? 'Posicional: jugadores en su posición natural. Clic para cambiar.' : 'Libre: elige por MED máxima sin restricción de posición. Clic para cambiar.'}
-            className={`ml-auto px-2 py-1 text-[7px] border-2 font-bold ${team.tacticalDiscipline ? 'bg-vga-cyan text-vga-black border-vga-black' : 'bg-vga-magenta text-vga-bright-white border-vga-black'}`}
-          >
-            {team.tacticalDiscipline ? 'TAC:POS' : 'TAC:LIBRE'}
-          </button>
-          <button
-            onClick={handleAutoFix}
-            title="Rellena los 11 slots con el mejor encaje de toda la plantilla"
-            className="px-2 py-1 text-[8px] border-2 font-bold bg-vga-green text-vga-bright-white border-vga-black hover:bg-vga-light-green"
-          >
-            AUTO-FIX 11
-          </button>
+          </div>
         </div>
-      </div>
 
-      <PitchDiagram
-        team={team}
-        selectedSlot={selectedSlot}
-        onSlotClick={(idx) => setSelectedSlot(idx === selectedSlot ? null : idx)}
-      />
+        {/* ═══ TWO-COLUMN BODY ══════════════════════════════════════ */}
+        <div style={{ display: 'flex', background: '#00000f' }}>
 
-      <div className="bg-vga-blue p-2 border-2 border-vga-white text-[7px] text-vga-bright-white text-center">
-        CLICA UNA POSICIÓN DEL CAMPO PARA CAMBIAR EL JUGADOR.
-      </div>
+          {/* ─── LEFT: PITCH ─────────────────────────────────────── */}
+          <div style={{ width: '40%', flexShrink: 0, borderRight: '4px solid #aaaaaa' }}>
+            <div style={{ ...sectionLabel, color: inPickMode ? '#55ffff' : '#ffff55' }}>
+              {inPickMode ? `◉ SLOT ${slotPos} — ELIGE →` : `◈ CAMPO — ${team.formation}`}
+            </div>
+            <PitchDiagram
+              team={team}
+              selectedSlot={selectedSlot}
+              onSlotClick={(idx) => {
+                if (ingame && ingame.subsUsed >= ingame.maxSubs) return;
+                setSelectedSlot(idx === selectedSlot ? null : idx);
+              }}
+            />
+            {inPickMode && currentSlotPlayerId && !ingame && (
+              <button
+                onClick={() => assignToSlot(selectedSlot!, null)}
+                style={{ width: '100%', background: '#aa0000', color: '#ffffff', border: 'none', borderTop: '2px solid #555555', padding: '3px 0', fontSize: 6, fontWeight: 'bold', textTransform: 'uppercase', cursor: 'pointer', letterSpacing: 1 }}
+                onMouseEnter={e => { (e.target as HTMLElement).style.background = '#ff5555'; }}
+                onMouseLeave={e => { (e.target as HTMLElement).style.background = '#aa0000'; }}
+              >
+                ✕ VACIAR SLOT
+              </button>
+            )}
+            {inPickMode && !currentSlotPlayerId && (
+              <div style={{ textAlign: 'center', padding: '3px 0', fontSize: 6, color: '#555577', borderTop: '2px solid #333344' }}>
+                slot vacío
+              </div>
+            )}
+          </div>
 
-      <div className="bg-vga-gray border-4 border-vga-blue p-2">
-        <table className="w-full text-[8px] text-left border-collapse">
-          <thead>
-            <tr className="bg-vga-black text-vga-cyan uppercase">
-              <th className="p-1 border border-vga-gray">SLOT</th>
-              <th className="p-1 border border-vga-gray">POS</th>
-              <th className="p-1 border border-vga-gray">NOMBRE</th>
-              <th className="p-1 border border-vga-gray text-center">MED</th>
-              <th className="p-1 border border-vga-gray text-center">CAN</th>
-              <th className="p-1 border border-vga-gray text-center">ANI</th>
-            </tr>
-          </thead>
-          <tbody>
-            {sortedPlayers.map(player => {
-              const slotIdx = slotOfPlayer.get(player.id);
-              const isTitular = slotIdx !== undefined;
-              const slotPos: Position | null = isTitular ? slots[slotIdx!] : null;
-              const oop = isTitular && slotPos ? isOOP(player, slotPos) : false;
-              const isSuspended = player.suspensionMatches > 0;
-              const isInjured = (player.injuryWeeksRemaining ?? 0) > 0;
-              const effMed = isTitular && slotPos ? Math.round(effectiveMedia(player, slotPos)) : player.media;
-              const stamina = player.stamina ?? 99;
-              const mood = moodStateOf(player, isTitular);
-              const moodInfo = MOOD[mood];
-              return (
-                <tr
-                  key={player.id}
-                  className={`${isTitular ? 'bg-vga-blue/30' : 'bg-vga-black/10'} ${(isSuspended || isInjured) ? 'opacity-50 grayscale' : ''}`}
+          {/* ─── RIGHT: ROSTER / PICKER ──────────────────────────── */}
+          <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
+            <div style={{ ...sectionLabel, color: inPickMode ? '#55ffff' : '#ffff55' }}>
+              {inPickMode ? `▶ ELIGE PARA ${slotPos}` : '▶ PLANTILLA COMPLETA'}
+              {inPickMode && (
+                <button
+                  onClick={() => setSelectedSlot(null)}
+                  style={{ marginLeft: 8, background: 'transparent', border: '1px solid #ff5555', color: '#ff5555', fontSize: 5, padding: '1px 4px', cursor: 'pointer', fontWeight: 'bold' }}
                 >
-                  <td className="p-1 border border-vga-gray text-center">
-                    {isTitular && slotPos ? (
-                      <span className={`font-bold ${getPositionColor(slotPos)}`}>
-                        {slotPos}
-                        {oop && <span className="ml-0.5 text-vga-red" title="Fuera de posición">!</span>}
-                      </span>
-                    ) : (
-                      <span className={(isSuspended || isInjured) ? 'text-vga-red' : 'text-vga-black opacity-40'}>
-                        {(isSuspended || isInjured) ? 'X' : '—'}
-                      </span>
-                    )}
-                  </td>
-                  <td className={`p-1 border border-vga-gray font-bold ${getPositionColor(player.position)}`}>
-                    <div className="flex items-center gap-1">
-                      {player.position}
-                      {player.seasonStats.yellowCards > 0 && <div className="w-1 h-2 bg-vga-yellow border-[0.5px] border-black"></div>}
-                      {player.seasonStats.redCards > 0 && <div className="w-1 h-2 bg-vga-red border-[0.5px] border-black"></div>}
-                    </div>
-                  </td>
-                  <td className={`p-1 border border-vga-gray ${isTitular ? 'text-vga-bright-white font-bold' : 'text-vga-black'}`}>
-                    <PlayerName player={player} />
-                    {isSuspended && <span className="ml-1 text-[6px] text-vga-red font-bold">[SAN]</span>}
-                    {isInjured && <span className="ml-1 text-[6px] text-vga-light-red font-bold">[LES {player.injuryWeeksRemaining}s]</span>}
-                  </td>
-                  <td className="p-1 border border-vga-gray text-center font-mono">
-                    <div className={oop ? 'text-vga-light-red' : isTitular ? 'text-vga-light-green' : 'text-vga-bright-white'}>
-                      {isTitular && slotPos ? effMed : player.media}{oop && <span className="text-[6px] opacity-70"> *</span>}
-                    </div>
-                    <div className="text-[7px] text-vga-cyan">
-                      {liveMed(player, stamina, isTitular && slotPos ? slotPos : undefined)}
-                    </div>
-                  </td>
-                  <td className="p-1 border border-vga-gray">
-                    <StaminaBar value={stamina} />
-                  </td>
-                  <td className={`p-1 border border-vga-gray text-center text-[9px] font-bold ${moodInfo.colorClass}`}>
-                    {moodInfo.symbol}
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
+                  ESC
+                </button>
+              )}
+            </div>
+            <div style={{ overflowY: 'auto', maxHeight: 320 }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', tableLayout: 'fixed' }}>
+                <thead>
+                  <tr style={tableHead}>
+                    <th style={{ width: 16, textAlign: 'center', padding: '2px 2px', borderRight: '1px solid #222255', borderBottom: '2px solid #333366' }}>#</th>
+                    <th style={{ width: 26, textAlign: 'center', padding: '2px 2px', borderRight: '1px solid #222255', borderBottom: '2px solid #333366' }}>POS</th>
+                    <th style={{ textAlign: 'left', padding: '2px 4px', borderRight: '1px solid #222255', borderBottom: '2px solid #333366' }}>NOMBRE</th>
+                    <th style={{ width: 28, textAlign: 'center', padding: '2px 2px', borderRight: '1px solid #222255', borderBottom: '2px solid #333366' }}>MED</th>
+                    <th style={{ width: 28, textAlign: 'center', padding: '2px 2px', borderRight: '1px solid #222255', borderBottom: '2px solid #333366' }}>VIV</th>
+                    <th style={{ width: 50, textAlign: 'center', padding: '2px 4px', borderBottom: '2px solid #333366' }}>CAN</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {inPickMode ? (
+                    <PickerRows
+                      candidates={candidates}
+                      slotPos={slotPos!}
+                      currentSlotPlayerId={currentSlotPlayerId}
+                      selectedSlot={selectedSlot!}
+                      assignToSlot={assignToSlot}
+                      slotOfPlayer={slotOfPlayer}
+                    />
+                  ) : (
+                    <RosterRows
+                      sortedPlayers={sortedPlayers}
+                      slots={slots}
+                      slotOfPlayer={slotOfPlayer}
+                      selectedSlot={selectedSlot}
+                      setSelectedSlot={setSelectedSlot}
+                      togglePlayer={togglePlayer}
+                    />
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
 
-      {slotModal}
+        {/* ═══ FORMATION BAR ════════════════════════════════════════ */}
+        <div style={{ background: 'linear-gradient(180deg, #0002cc 0%, #000088 100%)', borderTop: '4px solid #aaaaaa', borderBottom: '2px solid #333366', padding: '4px 8px', display: 'flex', alignItems: 'center', gap: 4, flexWrap: 'wrap' }}>
+          <span style={{ fontSize: 6, color: '#ffff55', fontWeight: 'bold', textTransform: 'uppercase', marginRight: 4, letterSpacing: 1 }}>FORMACIÓN:</span>
+          {ALL_FORMATIONS.map(f => {
+            const active = f === team.formation;
+            return (
+              <button
+                key={f}
+                onClick={() => handleFormationChange(f)}
+                style={{
+                  padding: '2px 6px',
+                  fontSize: 7,
+                  fontWeight: 'bold',
+                  border: active ? '2px solid #ffffff' : '2px solid #555577',
+                  background: active ? '#ffff55' : '#000022',
+                  color: active ? '#000000' : '#aaaaaa',
+                  cursor: 'pointer',
+                  boxShadow: active
+                    ? 'inset 1px 1px 0 #ffff99, inset -1px -1px 0 #888800, 0 0 8px rgba(255,255,85,0.5)'
+                    : 'inset 1px 1px 0 #333355, inset -1px -1px 0 #000000',
+                }}
+                onMouseEnter={e => { if (!active) { (e.target as HTMLElement).style.color = '#ffff55'; (e.target as HTMLElement).style.borderColor = '#aaaaaa'; } }}
+                onMouseLeave={e => { if (!active) { (e.target as HTMLElement).style.color = '#aaaaaa'; (e.target as HTMLElement).style.borderColor = '#555577'; } }}
+              >
+                {f}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* ═══ COMMAND BAR ══════════════════════════════════════════ */}
+        <div style={{ background: '#000008', borderTop: '2px solid #333344', padding: '4px 8px', display: 'flex', alignItems: 'center', gap: 6 }}>
+          {!ingame && (
+            <CmdButton onClick={handleAutoFix} color="#55ff55" hoverBg="#00aa00">
+              ■ AUTO-11
+            </CmdButton>
+          )}
+          <CmdButton
+            onClick={onToggleDiscipline}
+            color={team.tacticalDiscipline ? '#55ffff' : '#ff55ff'}
+            hoverBg={team.tacticalDiscipline ? '#00aaaa' : '#aa00aa'}
+          >
+            ■ {team.tacticalDiscipline ? 'TAC:POS' : 'TAC:LIB'}
+          </CmdButton>
+          {inPickMode && (
+            <CmdButton onClick={() => setSelectedSlot(null)} color="#ffff55" hoverBg="#888800">
+              ■ CANCELAR
+            </CmdButton>
+          )}
+          <div style={{ marginLeft: 'auto', fontSize: 6, color: '#333355' }}>
+            {ingame
+              ? (ingame.subsUsed >= ingame.maxSubs ? '✕ CAMBIOS AGOTADOS' : inPickMode ? 'ELIGE QUIÉN ENTRA' : 'CLIC EN UN TITULAR PARA SUSTITUIRLO')
+              : (inPickMode ? 'CLIC EN UN JUGADOR PARA ASIGNARLO AL SLOT' : 'CLIC EN EL CAMPO PARA SELECCIONAR UN SLOT')}
+          </div>
+        </div>
+
+      </div>
     </div>
   );
 };
+
+const CmdButton = ({ onClick, color, hoverBg, children }: { onClick: () => void; color: string; hoverBg: string; children: ReactNode }) => (
+  <button
+    onClick={onClick}
+    style={{ fontSize: 6, border: `1px solid ${color}`, color, background: 'transparent', padding: '2px 8px', fontWeight: 'bold', textTransform: 'uppercase', cursor: 'pointer', letterSpacing: 1 }}
+    onMouseEnter={e => { (e.target as HTMLElement).style.background = hoverBg; (e.target as HTMLElement).style.color = '#000000'; }}
+    onMouseLeave={e => { (e.target as HTMLElement).style.background = 'transparent'; (e.target as HTMLElement).style.color = color; }}
+  >
+    {children}
+  </button>
+);

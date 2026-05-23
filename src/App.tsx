@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 
 import { getAvailableYears, getAvailableYearsWithStats, getTeamColorsForYear, migrateTeam, buildFreeAgentFromDB, buildTeamFromSeason, getTeamTemplatesForYear, getFantasyPool, buildFantasyTeam } from './data/mockTeams';
-import type { FormationId, MatchEvent, MatchState, Position, Team } from './types/game.d.ts';
+import type { FormationId, MatchEvent, MatchState, Team } from './types/game.d.ts';
 import { applyMoodToTeam } from './engine/playerMood';
 import { simulateMinute, calculateTeamStrength } from './engine/simEngine';
-import { FORMATIONS, ALL_FORMATIONS, liveMed, pickBestXI, reslotLineup } from './engine/formations';
+import { FORMATIONS } from './engine/formations';
 import { getInitialLeagueState, getFantasyLeagueState, updateLeagueStats, deductWeeklySalaries, generateIncomingOffers, autoListAiPlayers, simulateAiMarketSignings, advanceSeason, simulateAiTrades, simulateAiFreeAgentSignings, appendTransfer, decrementSuspensions, signingBlockKey, squadNeeds, groupFor, repickAiFormations, writebackMatchStamina, decayTeamStaminaAfterMatch, decrementInjuries, applyStaminaRecovery, computeTvBonus, applyTvBonus } from './store/leagueStore';
 import type { TransferRecord } from './store/leagueStore';
 import type { LeagueState } from './store/leagueStore';
@@ -124,7 +124,6 @@ function App() {
   const [message, setMessage] = useState<{ title: string; body: string; tone?: 'info' | 'danger' | 'warning' } | null>(null);
   const [htPaused, setHtPaused] = useState(false);
   const [showSubPanel, setShowSubPanel] = useState(false);
-  const [subOut, setSubOut] = useState<string | null>(null);
   const [previewSwapSlot, setPreviewSwapSlot] = useState<number | null>(null);
   const [showFantasyFlow, setShowFantasyFlow] = useState(false);
   const [fantasyYear, setFantasyYear] = useState(0);
@@ -797,7 +796,6 @@ function App() {
 
     setHtPaused(false);
     setShowSubPanel(false);
-    setSubOut(null);
 
     if (matchDuration === 0) {
       let m = initialMatch;
@@ -1009,7 +1007,6 @@ function App() {
       setIsPlaying(false);
       setHtPaused(true);
       setShowSubPanel(true);
-      setSubOut(null);
       setMatch(prev => prev ? applyAiHtSubs(prev, league.userTeamId) : null);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -1102,10 +1099,7 @@ function App() {
     const newSubsUsed = subsUsed + 1;
     if (newSubsUsed >= 3) {
       setShowSubPanel(false);
-      setSubOut(null);
       setIsPlaying(true);
-    } else {
-      setSubOut(null);
     }
   };
 
@@ -1862,7 +1856,7 @@ function App() {
                 <div className="mt-3 flex gap-2">
                   {canSub && (
                     <button
-                      onClick={() => { setIsPlaying(false); setShowSubPanel(true); setSubOut(null); }}
+                      onClick={() => { setIsPlaying(false); setShowSubPanel(true); }}
                       className="flex-1 bg-vga-yellow text-vga-black py-1 px-2 text-[8px] border border-vga-black hover:bg-vga-bright-white font-bold uppercase"
                     >
                       CAMBIOS ({userSubsUsed}/3)
@@ -1905,136 +1899,43 @@ function App() {
               const sentOff = isUserHome ? match.homeSentOff : match.awaySentOff;
               const injuredIds = isUserHome ? match.homeInjuredInMatch : match.awayInjuredInMatch;
 
-              const inLineup = new Set(userTeamInMatch.lineup);
-              const subOutIdx = subOut ? userTeamInMatch.lineup.indexOf(subOut) : -1;
-              const subOutSlotPos: Position | null = subOutIdx >= 0
-                ? (FORMATIONS[userTeamInMatch.formation]?.[subOutIdx] ?? null)
-                : null;
-              const POS_ORDER: Record<string, number> = { DEL: 0, AML: 1, AMR: 1, MED: 2, DEF: 3, POR: 4 };
-              const benchPlayers = userTeamInMatch.players
-                .filter(p => !inLineup.has(p.id) && !injuredIds.includes(p.id) && !sentOff.includes(p.id) && (p.injuryWeeksRemaining ?? 0) === 0 && p.suspensionMatches === 0)
-                .sort((a, b) => {
-                  if (subOutSlotPos) {
-                    const aFits = a.allowedPositions.includes(subOutSlotPos);
-                    const bFits = b.allowedPositions.includes(subOutSlotPos);
-                    if (aFits !== bFits) return aFits ? -1 : 1;
-                  }
-                  const aPosOrd = POS_ORDER[a.position] ?? 5;
-                  const bPosOrd = POS_ORDER[b.position] ?? 5;
-                  if (aPosOrd !== bPosOrd) return aPosOrd - bPosOrd;
-                  return b.media - a.media;
-                });
-
               // Patch team players with live stamina so PitchDiagram shows real values
               const liveTeam = {
                 ...userTeamInMatch,
                 players: userTeamInMatch.players.map(p => ({ ...p, stamina: stamMap[p.id] ?? p.stamina ?? 99 })),
               };
 
-              const subOutSlotIdx = subOut ? liveTeam.lineup.indexOf(subOut) : null;
-
-              const handlePitchClick = (idx: number) => {
-                const pid = liveTeam.lineup[idx];
-                if (!pid || sentOff.includes(pid) || injuredIds.includes(pid) || subsUsed >= 3) return;
-                setSubOut(prev => prev === pid ? null : pid);
-              };
-
-              const StaminaBar = ({ value }: { value: number }) => {
-                const pct = Math.round(Math.max(0, Math.min(100, value)));
-                const col = pct >= 60 ? 'bg-vga-light-green' : pct >= 30 ? 'bg-vga-yellow' : 'bg-vga-light-red';
-                return (
-                  <div className="flex items-center gap-1">
-                    <div className="w-10 h-1.5 bg-vga-black border border-vga-gray">
-                      <div className={`h-full ${col}`} style={{ width: `${pct}%` }} />
-                    </div>
-                    <span className="text-[6px] text-vga-gray font-mono">{pct}</span>
-                  </div>
-                );
-              };
-
-              const liveMED = Math.floor(calculateTeamStrength(liveTeam, sentOff, stamMap));
-
               return (
-                <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-2">
-                  <div className="bg-vga-gray border-4 border-vga-yellow p-2 max-w-sm w-full max-h-[95vh] flex flex-col gap-2 min-h-0">
-                    <div className="bg-vga-yellow text-vga-black text-[10px] p-2 flex justify-between items-center uppercase font-bold shrink-0">
-                      <span>CAMBIOS — {subsUsed}/3</span>
-                      <span className="flex items-center gap-2">
-                        {htPaused && <span className="text-[8px] font-normal">DESCANSO</span>}
-                        <span className="text-[8px] font-normal">MED <span className="font-bold">{liveMED}</span></span>
-                      </span>
-                    </div>
-
-                    <div className="flex-1 overflow-y-auto min-h-0 flex flex-col gap-2">
-                      {/* Formation / AutoFix / Discipline controls */}
-                      <div className="flex flex-wrap gap-1 items-center">
-                        {ALL_FORMATIONS.map(f => (
-                          <button key={f}
-                            onClick={() => {
-                              const newLineup = reslotLineup(userTeamInMatch, userTeamInMatch.lineup.filter(Boolean), f);
-                              setMatch(prev => {
-                                if (!prev) return null;
-                                const isHome = prev.homeTeam.id === league.userTeamId;
-                                const updated = { ...userTeamInMatch, formation: f, lineup: newLineup };
-                                return isHome ? { ...prev, homeTeam: updated } : { ...prev, awayTeam: updated };
-                              });
-                            }}
-                            className={`px-1.5 py-0.5 text-[6px] border font-bold ${f === userTeamInMatch.formation ? 'bg-vga-yellow text-vga-black border-vga-black' : 'bg-vga-black text-vga-yellow border-vga-yellow hover:bg-vga-yellow/20'}`}
-                          >{f}</button>
-                        ))}
-                        <button
-                          onClick={() => {
-                            const excl = new Set([...sentOff, ...injuredIds]);
-                            const { lineup } = pickBestXI(userTeamInMatch.players, userTeamInMatch.formation, excl, userTeamInMatch.tacticalDiscipline ?? true);
-                            setMatch(prev => {
-                              if (!prev) return null;
-                              const isHome = prev.homeTeam.id === league.userTeamId;
-                              const updated = { ...userTeamInMatch, lineup };
-                              return isHome ? { ...prev, homeTeam: updated } : { ...prev, awayTeam: updated };
-                            });
-                          }}
-                          className="px-1.5 py-0.5 text-[6px] border border-vga-green bg-vga-black text-vga-light-green hover:bg-vga-green/20 font-bold ml-auto"
-                        >AUTO-11</button>
-                        <button
-                          onClick={() => {
-                            setMatch(prev => {
-                              if (!prev) return null;
-                              const isHome = prev.homeTeam.id === league.userTeamId;
-                              const updated = { ...userTeamInMatch, tacticalDiscipline: !(userTeamInMatch.tacticalDiscipline ?? true) };
-                              return isHome ? { ...prev, homeTeam: updated } : { ...prev, awayTeam: updated };
-                            });
-                          }}
-                          className={`px-1.5 py-0.5 text-[6px] border font-bold ${(userTeamInMatch.tacticalDiscipline ?? true) ? 'bg-vga-cyan text-vga-black border-vga-black' : 'bg-vga-magenta text-vga-bright-white border-vga-black'}`}
-                        >{(userTeamInMatch.tacticalDiscipline ?? true) ? 'TAC:POS' : 'TAC:LIB'}</button>
-                      </div>
-                      <PitchDiagram
-                        team={liveTeam}
-                        selectedSlot={subOutSlotIdx ?? null}
-                        onSlotClick={handlePitchClick}
-                      />
-                      <div className="text-[7px] text-center font-bold uppercase py-0.5 border border-vga-yellow text-vga-yellow">
-                        CLIC EN UN TITULAR PARA SUSTITUIR
-                      </div>
-                    </div>
-
-                    {subOut && (
-                      <SwapModal
-                        slotPos={subOutSlotPos ?? 'MED'}
-                        currentPlayer={liveTeam.players.find(p => p.id === subOut) ?? null}
-                        candidates={liveTeam.players.filter(p => !inLineup.has(p.id) && !injuredIds.includes(p.id) && !sentOff.includes(p.id) && (p.injuryWeeksRemaining ?? 0) === 0 && p.suspensionMatches === 0)}
-                        inLineup={inLineup}
-                        onSelect={(pid) => { performUserSub(subOut!, pid); setSubOut(null); }}
-                        onClose={() => setSubOut(null)}
-                      />
-                    )}
-
-                    <button
-                      onClick={() => { setShowSubPanel(false); setSubOut(null); setIsPlaying(true); }}
-                      className="bg-vga-blue text-vga-bright-white py-1 px-2 text-[8px] border border-vga-black hover:bg-vga-light-blue font-bold uppercase shrink-0"
-                    >
-                      CONTINUAR
-                    </button>
-                  </div>
+                <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.88)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50, padding: 8 }}>
+                  <AlignmentView
+                    team={liveTeam}
+                    onUpdate={(patch) => {
+                      setMatch(prev => {
+                        if (!prev) return null;
+                        const isHome = prev.homeTeam.id === league.userTeamId;
+                        const updated = { ...userTeamInMatch, ...patch };
+                        return isHome ? { ...prev, homeTeam: updated } : { ...prev, awayTeam: updated };
+                      });
+                    }}
+                    onBack={() => { setShowSubPanel(false); setIsPlaying(true); }}
+                    onToggleDiscipline={() => {
+                      setMatch(prev => {
+                        if (!prev) return null;
+                        const isHome = prev.homeTeam.id === league.userTeamId;
+                        const updated = { ...userTeamInMatch, tacticalDiscipline: !(userTeamInMatch.tacticalDiscipline ?? true) };
+                        return isHome ? { ...prev, homeTeam: updated } : { ...prev, awayTeam: updated };
+                      });
+                    }}
+                    ingame={{
+                      subsUsed,
+                      maxSubs: 3,
+                      injuredIds,
+                      sentOff,
+                      htPaused,
+                      onSubstitute: (outId, inId) => performUserSub(outId, inId),
+                      onContinue: () => { setShowSubPanel(false); setIsPlaying(true); },
+                    }}
+                  />
                 </div>
               );
             })()}
