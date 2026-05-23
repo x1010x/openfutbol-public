@@ -4,6 +4,7 @@ import type { Team } from '../types/game.d.ts';
 import { getTeamTemplatesForYear, getTeamCountry, type TeamTemplate } from '../data/mockTeams';
 import { loadPackFromFile } from '../data/packLoader';
 import { TeamCrest } from './TeamCrest';
+import { CountryBadge } from './CountryBadge';
 
 interface Props {
   year: number;
@@ -14,19 +15,6 @@ interface Props {
 
 const MIN_TEAMS = 4;
 const MAX_TEAMS = 24;
-
-const COUNTRY_LABELS: Record<string, string> = {
-  spain: 'ESPAÑA',
-  england: 'INGLATERRA',
-  germany: 'ALEMANIA',
-  france: 'FRANCIA',
-  italy: 'ITALIA',
-  portugal: 'PORTUGAL',
-  netherlands: 'PAÍSES BAJOS',
-  scotland: 'ESCOCIA',
-  editor: 'MIS EQUIPOS',
-  unknown: '—',
-};
 
 export const LeagueSetupView = ({ year, existingTeams, onConfirm, onBack }: Props) => {
   const templates = getTeamTemplatesForYear(year);
@@ -178,7 +166,6 @@ export const LeagueSetupView = ({ year, existingTeams, onConfirm, onBack }: Prop
           ) : (
             <div className="flex flex-col gap-1">
               {sortedCountries.map(([country, countryTeams]) => {
-                const label = COUNTRY_LABELS[country] ?? country.toUpperCase();
                 const open = openCountries.has(country);
                 return (
                   <div key={country}>
@@ -186,7 +173,9 @@ export const LeagueSetupView = ({ year, existingTeams, onConfirm, onBack }: Prop
                       onClick={() => toggleCountry(country)}
                       className="w-full flex items-center justify-between bg-vga-blue border border-vga-white px-3 py-1.5 hover:bg-vga-cyan hover:text-vga-black text-left"
                     >
-                      <span className="text-vga-yellow text-[9px] font-bold">{label}</span>
+                      <span className="text-vga-yellow text-[9px] font-bold">
+                        <CountryBadge code={country} size="lg" />
+                      </span>
                       <span className="text-vga-gray text-[7px]">{countryTeams.length} equipos  {open ? '▲' : '▼'}</span>
                     </button>
                     {open && (
