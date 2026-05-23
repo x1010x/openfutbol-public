@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 
 interface Props {
   onBack: () => void;
+  onColaborar: () => void;
   scrollTo?: 'changelog' | 'engine';
 }
 
@@ -23,7 +24,7 @@ const Tip = ({ children }: { children: React.ReactNode }) => (
   </div>
 );
 
-export const InstructionsView = ({ onBack, scrollTo }: Props) => {
+export const InstructionsView = ({ onBack, onColaborar, scrollTo }: Props) => {
   const changelogRef = useRef<HTMLDivElement>(null);
   const engineRef = useRef<HTMLDivElement>(null);
 
@@ -291,7 +292,10 @@ export const InstructionsView = ({ onBack, scrollTo }: Props) => {
         </p>
         <p>
           Para más detalles sobre cómo proponer equipos, generar escudos con IA
-          y añadir jugadores, pulsa <span className="text-vga-yellow">COLABORAR</span> en el menú principal.
+          y añadir jugadores,{' '}
+          <button onClick={onColaborar} className="text-vga-cyan underline hover:text-vga-yellow">
+            visita COLABORAR
+          </button>.
         </p>
       </div>
 
