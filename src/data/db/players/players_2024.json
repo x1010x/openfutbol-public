@@ -3754,9 +3754,7 @@
         "physical": 75,
         "goalkeeping": 85
       }
-    },
-    "full_name": "Ernesto Sevilla",
-    "shirt_name": "Ernesto"
+    }
   },
   {
     "id": "166d65fe-f3f8-407b-8e08-11ee515c79eb",
@@ -3773,9 +3771,7 @@
         "physical": 80,
         "goalkeeping": 91
       }
-    },
-    "full_name": "Baltasar Garzón",
-    "shirt_name": "Garzón"
+    }
   },
   {
     "id": "c1ca02f8-a6f4-414d-a4ae-6c45da30f5c7",
@@ -3792,9 +3788,7 @@
         "physical": 77,
         "goalkeeping": 91
       }
-    },
-    "full_name": "Severo Ochoa",
-    "shirt_name": "Ochoa"
+    }
   },
   {
     "id": "f0e5e0cd-4184-4faf-aac1-aaedaaa267da",
@@ -3811,9 +3805,7 @@
         "physical": 79,
         "goalkeeping": 10
       }
-    },
-    "full_name": "Vicente Fernández",
-    "shirt_name": "Vicente"
+    }
   },
   {
     "id": "27ae62f0-5a00-4b8a-ad3e-ace5d97a2f7a",
@@ -3830,9 +3822,7 @@
         "physical": 75,
         "goalkeeping": 8
       }
-    },
-    "full_name": "Pablo Iglesias Posse",
-    "shirt_name": "Pablo Iglesias"
+    }
   },
   {
     "id": "6846c13d-8ae8-4db3-b670-7fc27f7a8831",
@@ -3849,9 +3839,7 @@
         "physical": 80,
         "goalkeeping": 9
       }
-    },
-    "full_name": "Javier Cámara",
-    "shirt_name": "Javier Cámara"
+    }
   },
   {
     "id": "ae542ba1-2110-42f1-98a4-5e8ed2118fe6",
@@ -3868,9 +3856,7 @@
         "physical": 81,
         "goalkeeping": 10
       }
-    },
-    "full_name": "Juan Luis Guerra",
-    "shirt_name": "Juan Luis"
+    }
   },
   {
     "id": "12226aa4-e056-4be0-a37d-4ae076c8168e",
@@ -3887,9 +3873,7 @@
         "physical": 79,
         "goalkeeping": 8
       }
-    },
-    "full_name": "Alfred Hitchcock",
-    "shirt_name": "Hitchcock"
+    }
   },
   {
     "id": "79a564ed-28d4-4075-9bed-918a1687ab00",
@@ -3906,9 +3890,7 @@
         "physical": 79,
         "goalkeeping": 9
       }
-    },
-    "full_name": "Miguel Ángel Revilla",
-    "shirt_name": "Revilla"
+    }
   },
   {
     "id": "a9bae36c-f501-4dfa-9490-13a9969e5361",
@@ -3925,9 +3907,7 @@
         "physical": 62,
         "goalkeeping": 7
       }
-    },
-    "full_name": "Javier Marías",
-    "shirt_name": "Marías"
+    }
   },
   {
     "id": "dcc2b60d-802b-4b44-8a5f-946e34384f91",
@@ -3944,9 +3924,7 @@
         "physical": 66,
         "goalkeeping": 10
       }
-    },
-    "full_name": "Andreu Buenafuente",
-    "shirt_name": "Andreu"
+    }
   },
   {
     "id": "44f72ea9-30ef-488a-8e2f-79d5b50a9adc",
@@ -3963,9 +3941,7 @@
         "physical": 74,
         "goalkeeping": 11
       }
-    },
-    "full_name": "Eduard Fernández",
-    "shirt_name": "Eduard"
+    }
   },
   {
     "id": "ae48a4b6-2c15-406f-aea6-e79a4463f611",
@@ -3982,9 +3958,7 @@
         "physical": 64,
         "goalkeeping": 6
       }
-    },
-    "full_name": "Ben Affleck",
-    "shirt_name": "Affleck"
+    }
   },
   {
     "id": "98921ee3-ec66-48f4-b5a6-0110566f9431",
@@ -4001,9 +3975,7 @@
         "physical": 70,
         "goalkeeping": 12
       }
-    },
-    "full_name": "Joan Miró",
-    "shirt_name": "Miró"
+    }
   },
   {
     "id": "52e8151b-e0ae-4ba0-8462-dac480a933b2",
@@ -4020,9 +3992,7 @@
         "physical": 67,
         "goalkeeping": 10
       }
-    },
-    "full_name": "Héroes del Silencio",
-    "shirt_name": "Héroes"
+    }
   },
   {
     "id": "c91b55b3-e150-4d73-84af-b5a7434e0492",
@@ -4039,9 +4009,7 @@
         "physical": 65,
         "goalkeeping": 11
       }
-    },
-    "full_name": "Clint Eastwood",
-    "shirt_name": "Eastwood"
+    }
   },
   {
     "id": "4d6118a8-2ccd-40f3-b0cb-36eedb1a3866",
@@ -4058,9 +4026,7 @@
         "physical": 71,
         "goalkeeping": 10
       }
-    },
-    "full_name": "Loquillo",
-    "shirt_name": "Loquillo"
+    }
   },
   {
     "id": "3feeff67-2995-4ed5-815c-800c52b424fa",
@@ -4077,9 +4043,7 @@
         "physical": 67,
         "goalkeeping": 10
       }
-    },
-    "full_name": "Pau Donés",
-    "shirt_name": "Jarabe"
+    }
   },
   {
     "id": "c9f846a9-cfc5-4a60-8c80-53f8bf79ffcb",
@@ -4096,9 +4060,7 @@
         "physical": 57,
         "goalkeeping": 7
       }
-    },
-    "full_name": "David Muñoz",
-    "shirt_name": "David Muñoz"
+    }
   },
   {
     "id": "3023176c-1e9f-4f04-9155-99fee1f48501",
@@ -4115,9 +4077,7 @@
         "physical": 59,
         "goalkeeping": 8
       }
-    },
-    "full_name": "Santiago Abascal",
-    "shirt_name": "Abascal"
+    }
   },
   {
     "id": "8b8cfa53-179e-46a9-b4df-818fffc20da5",
@@ -4134,9 +4094,7 @@
         "physical": 64,
         "goalkeeping": 7
       }
-    },
-    "full_name": "Lorenzo Milá",
-    "shirt_name": "Lorenzo"
+    }
   },
   {
     "id": "66a2a6c9-6ccc-4a12-87ec-3886c08c7ab0",
@@ -4153,9 +4111,7 @@
         "physical": 64,
         "goalkeeping": 9
       }
-    },
-    "full_name": "Cristina Castaño",
-    "shirt_name": "Cristina Castaño"
+    }
   },
   {
     "id": "1cb76a5f-05f4-4032-8775-69b7544a2162",
@@ -4172,9 +4128,7 @@
         "physical": 81,
         "goalkeeping": 92
       }
-    },
-    "full_name": "Víctor Manuel",
-    "shirt_name": "Víctor Manuel"
+    }
   },
   {
     "id": "630c6bde-acf2-4877-8fad-f9d0f75a79a6",
@@ -4191,9 +4145,7 @@
         "physical": 81,
         "goalkeeping": 93
       }
-    },
-    "full_name": "Pedro J. Ramírez",
-    "shirt_name": "Pedro J"
+    }
   },
   {
     "id": "2a496714-dfbf-4ce9-815d-2ccda45a8df6",
@@ -4210,9 +4162,7 @@
         "physical": 76,
         "goalkeeping": 84
       }
-    },
-    "full_name": "El Gran Wyoming",
-    "shirt_name": "Wyoming"
+    }
   },
   {
     "id": "d510bdea-45e2-43a8-bd9a-413d1778d8f6",
@@ -4229,9 +4179,7 @@
         "physical": 77,
         "goalkeeping": 9
       }
-    },
-    "full_name": "Julia Roberts",
-    "shirt_name": "Julia Roberts"
+    }
   },
   {
     "id": "84a49716-a95e-4493-b3bf-35c7f66025c7",
@@ -4248,9 +4196,7 @@
         "physical": 85,
         "goalkeeping": 11
       }
-    },
-    "full_name": "Blanca Suárez",
-    "shirt_name": "Blanca"
+    }
   },
   {
     "id": "60a663db-d032-4130-b2d8-35d611f72ea3",
@@ -4267,9 +4213,7 @@
         "physical": 83,
         "goalkeeping": 12
       }
-    },
-    "full_name": "Isabel Díaz Ayuso",
-    "shirt_name": "Ayuso"
+    }
   },
   {
     "id": "ee414370-307e-446d-8544-aece9cb25bd1",
@@ -4286,9 +4230,7 @@
         "physical": 87,
         "goalkeeping": 11
       }
-    },
-    "full_name": "Angelina Jolie",
-    "shirt_name": "Jolie"
+    }
   },
   {
     "id": "c6537441-8472-4d14-ac17-144c1e11cefb",
@@ -4305,9 +4247,7 @@
         "physical": 81,
         "goalkeeping": 8
       }
-    },
-    "full_name": "Nicole Kidman",
-    "shirt_name": "Kidman"
+    }
   },
   {
     "id": "7492e397-1423-4267-821e-c51dd0bb8803",
@@ -4324,9 +4264,7 @@
         "physical": 88,
         "goalkeeping": 10
       }
-    },
-    "full_name": "José Ortega y Gasset",
-    "shirt_name": "Ortega"
+    }
   },
   {
     "id": "e8d77eae-6f5a-4ce4-b35b-50a887b87bb1",
@@ -4343,9 +4281,7 @@
         "physical": 66,
         "goalkeeping": 8
       }
-    },
-    "full_name": "Alberto Ruiz-Gallardón",
-    "shirt_name": "Gallardón"
+    }
   },
   {
     "id": "562cf80a-8e82-4bed-8ad6-cbe40bfe5e7d",
@@ -4362,9 +4298,7 @@
         "physical": 70,
         "goalkeeping": 11
       }
-    },
-    "full_name": "David Bustamante",
-    "shirt_name": "Bustamante"
+    }
   },
   {
     "id": "b1355bc9-67a8-402c-a88d-faf51d28bec5",
@@ -4381,9 +4315,7 @@
         "physical": 65,
         "goalkeeping": 9
       }
-    },
-    "full_name": "Fernando Trueba",
-    "shirt_name": "Trueba"
+    }
   },
   {
     "id": "264a7169-55d1-41ed-883a-535271aca74e",
@@ -4400,9 +4332,7 @@
         "physical": 67,
         "goalkeeping": 10
       }
-    },
-    "full_name": "Selena Quintanilla",
-    "shirt_name": "Selena"
+    }
   },
   {
     "id": "8d22a38e-dc03-427d-8b2c-36e8582071d3",
@@ -4419,9 +4349,7 @@
         "physical": 78,
         "goalkeeping": 13
       }
-    },
-    "full_name": "Silvia Abril",
-    "shirt_name": "Silvia"
+    }
   },
   {
     "id": "1f0cd8a5-f9a1-40c0-9f5e-ce923c2bb09f",
@@ -4438,9 +4366,7 @@
         "physical": 64,
         "goalkeeping": 8
       }
-    },
-    "full_name": "Yolanda Díaz",
-    "shirt_name": "Yolanda"
+    }
   },
   {
     "id": "d7d1d73c-96fb-4e22-94c3-a2fd195b8fc3",
@@ -4457,9 +4383,7 @@
         "physical": 66,
         "goalkeeping": 12
       }
-    },
-    "full_name": "Karlos Simón",
-    "shirt_name": "Simón"
+    }
   },
   {
     "id": "5e488297-e902-4fe0-88e6-69288dc5d136",
@@ -4476,9 +4400,7 @@
         "physical": 62,
         "goalkeeping": 8
       }
-    },
-    "full_name": "Jorge Lorenzo",
-    "shirt_name": "Lorenzo"
+    }
   },
   {
     "id": "aff86f84-b045-47c4-ac73-583a3246235b",
@@ -4495,9 +4417,7 @@
         "physical": 64,
         "goalkeeping": 10
       }
-    },
-    "full_name": "Federico García Lorca",
-    "shirt_name": "Lorca"
+    }
   },
   {
     "id": "a6a5afea-7c07-41f7-913a-c63d2340fd09",
@@ -4514,9 +4434,7 @@
         "physical": 62,
         "goalkeeping": 9
       }
-    },
-    "full_name": "Melody",
-    "shirt_name": "Melody"
+    }
   },
   {
     "id": "d84d6f03-7913-40a9-9cc2-2c8b9f8ddce0",
@@ -4533,9 +4451,7 @@
         "physical": 72,
         "goalkeeping": 13
       }
-    },
-    "full_name": "Santiago Ramón y Cajal",
-    "shirt_name": "Ramón y Cajal"
+    }
   },
   {
     "id": "86872edf-6b49-4fec-b242-760566aa0271",
@@ -4552,9 +4468,7 @@
         "physical": 68,
         "goalkeeping": 8
       }
-    },
-    "full_name": "Joaquin Phoenix",
-    "shirt_name": "Phoenix"
+    }
   },
   {
     "id": "11d0c54d-7096-4257-9c8a-86da68a9921d",
@@ -4571,9 +4485,7 @@
         "physical": 69,
         "goalkeeping": 12
       }
-    },
-    "full_name": "Martin Scorsese",
-    "shirt_name": "Scorsese"
+    }
   },
   {
     "id": "358045e2-09e2-4171-8686-6458d0ddccac",
@@ -4590,9 +4502,7 @@
         "physical": 82,
         "goalkeeping": 89
       }
-    },
-    "full_name": "Raúl Cimas",
-    "shirt_name": "Raúl Cimas"
+    }
   },
   {
     "id": "246c7111-dfe7-4bbd-8835-4d539856018f",
@@ -4609,9 +4519,7 @@
         "physical": 81,
         "goalkeeping": 89
       }
-    },
-    "full_name": "Eva Hache",
-    "shirt_name": "Eva Hache"
+    }
   },
   {
     "id": "076dc79d-7f06-4349-8390-1fc2c5bccb8a",
@@ -4628,9 +4536,7 @@
         "physical": 79,
         "goalkeeping": 89
       }
-    },
-    "full_name": "Robert Downey Jr",
-    "shirt_name": "Downey"
+    }
   },
   {
     "id": "9d7abdf0-cd2e-489c-a273-880db1b987af",
@@ -4647,9 +4553,7 @@
         "physical": 80,
         "goalkeeping": 9
       }
-    },
-    "full_name": "Matías Prats Luque",
-    "shirt_name": "Prats"
+    }
   },
   {
     "id": "fa53b441-4717-4b64-be70-329f211f5af4",
@@ -4666,9 +4570,7 @@
         "physical": 81,
         "goalkeeping": 9
       }
-    },
-    "full_name": "Frida Kahlo",
-    "shirt_name": "Frida"
+    }
   },
   {
     "id": "06786c1c-1ad8-49ed-89f5-ad95b0b52d24",
@@ -4685,9 +4587,7 @@
         "physical": 78,
         "goalkeeping": 9
       }
-    },
-    "full_name": "Denzel Washington",
-    "shirt_name": "Denzel"
+    }
   },
   {
     "id": "f14847ea-18f3-489f-877e-810e4715b9a9",
@@ -4704,9 +4604,7 @@
         "physical": 86,
         "goalkeeping": 10
       }
-    },
-    "full_name": "Juan Gabriel",
-    "shirt_name": "Juan Gabriel"
+    }
   },
   {
     "id": "2f7c9151-bdde-49e5-a480-f5b6905d05b3",
@@ -4723,9 +4621,7 @@
         "physical": 78,
         "goalkeeping": 10
       }
-    },
-    "full_name": "Ada Colau",
-    "shirt_name": "Ada"
+    }
   },
   {
     "id": "ce6eb6f5-bbd7-43b7-a473-1ac3840989fd",
@@ -4742,9 +4638,7 @@
         "physical": 77,
         "goalkeeping": 9
       }
-    },
-    "full_name": "José Luis López Vázquez",
-    "shirt_name": "López Vázquez"
+    }
   },
   {
     "id": "1f332c4b-e719-4980-8748-1f921403fdfa",
@@ -4761,9 +4655,7 @@
         "physical": 61,
         "goalkeeping": 9
       }
-    },
-    "full_name": "Albert Rivera",
-    "shirt_name": "Rivera"
+    }
   },
   {
     "id": "965c1278-ab8f-4251-aab0-2c6fd3042de2",
@@ -4780,9 +4672,7 @@
         "physical": 66,
         "goalkeeping": 10
       }
-    },
-    "full_name": "José Luis Cuerda",
-    "shirt_name": "Cuerda"
+    }
   },
   {
     "id": "211e272b-d27c-48d6-8db6-30e56a24af3c",
@@ -4799,9 +4689,7 @@
         "physical": 70,
         "goalkeeping": 10
       }
-    },
-    "full_name": "Dani Pedrosa",
-    "shirt_name": "Pedrosa"
+    }
   },
   {
     "id": "2a650264-d8a5-4f10-a68f-faf1bab0230e",
@@ -4818,9 +4706,7 @@
         "physical": 76,
         "goalkeeping": 11
       }
-    },
-    "full_name": "Sandra Bullock",
-    "shirt_name": "Bullock"
+    }
   },
   {
     "id": "f84be898-6d64-4be2-a0b7-9e4ad2c063d3",
@@ -4837,9 +4723,7 @@
         "physical": 68,
         "goalkeeping": 10
       }
-    },
-    "full_name": "Luis Buñuel",
-    "shirt_name": "Buñuel"
+    }
   },
   {
     "id": "61c5ce8d-1648-4eec-bf78-3464c22db301",
@@ -4856,9 +4740,7 @@
         "physical": 71,
         "goalkeeping": 11
       }
-    },
-    "full_name": "Scarlett Johansson",
-    "shirt_name": "Scarlett"
+    }
   },
   {
     "id": "9862bba9-ebcc-4551-ad66-8d24e057672e",
@@ -4875,9 +4757,7 @@
         "physical": 58,
         "goalkeeping": 6
       }
-    },
-    "full_name": "Plácido Domingo",
-    "shirt_name": "Plácido"
+    }
   },
   {
     "id": "4a535409-f062-4bbe-88fa-112d5b2ccb95",
@@ -4894,9 +4774,7 @@
         "physical": 66,
         "goalkeeping": 9
       }
-    },
-    "full_name": "Stanley Kubrick",
-    "shirt_name": "Kubrick"
+    }
   },
   {
     "id": "7faeebba-76b6-4a28-bd31-686e82b575e9",
@@ -4913,9 +4791,7 @@
         "physical": 77,
         "goalkeeping": 15
       }
-    },
-    "full_name": "Imanol Arias",
-    "shirt_name": "Imanol"
+    }
   },
   {
     "id": "b3defc84-656f-4a2d-81d8-72758f0708ae",
@@ -4932,9 +4808,7 @@
         "physical": 67,
         "goalkeeping": 10
       }
-    },
-    "full_name": "Jesús Calleja",
-    "shirt_name": "Calleja"
+    }
   },
   {
     "id": "682fdf2a-6826-435a-8a66-40beb8c62de4",
@@ -4951,9 +4825,7 @@
         "physical": 60,
         "goalkeeping": 7
       }
-    },
-    "full_name": "Pepa Bueno",
-    "shirt_name": "Pepa"
+    }
   },
   {
     "id": "16762507-5662-4b7d-89bc-d1ae56f38ed0",
@@ -4970,9 +4842,7 @@
         "physical": 77,
         "goalkeeping": 11
       }
-    },
-    "full_name": "Vanesa Martín",
-    "shirt_name": "Vanesa"
+    }
   },
   {
     "id": "a128da55-fbf0-4495-9528-1c468a69913e",
@@ -4989,9 +4859,7 @@
         "physical": 68,
         "goalkeeping": 11
       }
-    },
-    "full_name": "Marc Gasol",
-    "shirt_name": "Marc Gasol"
+    }
   },
   {
     "id": "0cb9e996-322a-47eb-9191-89584c164993",
@@ -5008,9 +4876,7 @@
         "physical": 80,
         "goalkeeping": 89
       }
-    },
-    "full_name": "Emilio Aragón",
-    "shirt_name": "Miliki"
+    }
   },
   {
     "id": "265df45b-f133-4829-9e70-9266a3f52288",
@@ -5027,9 +4893,7 @@
         "physical": 77,
         "goalkeeping": 90
       }
-    },
-    "full_name": "Mario Casas",
-    "shirt_name": "Mario Casas"
+    }
   },
   {
     "id": "087ae768-16a9-431c-ba18-e13fbaec71fc",
@@ -5046,9 +4910,7 @@
         "physical": 79,
         "goalkeeping": 93
       }
-    },
-    "full_name": "Johnny Depp",
-    "shirt_name": "Depp"
+    }
   },
   {
     "id": "3978e984-9122-4052-bce3-f5d4654f452d",
@@ -5065,9 +4927,7 @@
         "physical": 89,
         "goalkeeping": 13
       }
-    },
-    "full_name": "Al Pacino",
-    "shirt_name": "Pacino"
+    }
   },
   {
     "id": "1117b87c-dedf-45b5-bd7c-cd81c83a1cdb",
@@ -5084,9 +4944,7 @@
         "physical": 84,
         "goalkeeping": 10
       }
-    },
-    "full_name": "Victoria Abril",
-    "shirt_name": "Victoria Abril"
+    }
   },
   {
     "id": "232c58ce-595d-46f5-a38f-2163e1ed7147",
@@ -5103,9 +4961,7 @@
         "physical": 78,
         "goalkeeping": 7
       }
-    },
-    "full_name": "Gloria Fuertes",
-    "shirt_name": "Gloria"
+    }
   },
   {
     "id": "472fb95d-8b16-4ac9-ac35-e2da7edfe44d",
@@ -5122,9 +4978,7 @@
         "physical": 78,
         "goalkeeping": 9
       }
-    },
-    "full_name": "Estopa",
-    "shirt_name": "Estopa"
+    }
   },
   {
     "id": "8c464b9a-2bb5-4f6e-899e-00d32de70584",
@@ -5141,9 +4995,7 @@
         "physical": 87,
         "goalkeeping": 10
       }
-    },
-    "full_name": "Rudy Fernández",
-    "shirt_name": "Rudy"
+    }
   },
   {
     "id": "e9e59798-da56-403f-8052-2c5f13b27473",
@@ -5160,9 +5012,7 @@
         "physical": 90,
         "goalkeeping": 14
       }
-    },
-    "full_name": "Arturo Valls",
-    "shirt_name": "Arturo"
+    }
   },
   {
     "id": "543805c9-7331-4362-98ca-5d00e244ccc8",
@@ -5179,9 +5029,7 @@
         "physical": 71,
         "goalkeeping": 11
       }
-    },
-    "full_name": "Sara Carbonero",
-    "shirt_name": "Sara"
+    }
   },
   {
     "id": "6b28428c-354b-4c12-81fc-ea2bf04de643",
@@ -5198,9 +5046,7 @@
         "physical": 64,
         "goalkeeping": 9
       }
-    },
-    "full_name": "Álex de la Iglesia",
-    "shirt_name": "Álex"
+    }
   },
   {
     "id": "0c65690e-64f2-4dab-ae87-a4b4144bfb5e",
@@ -5217,9 +5063,7 @@
         "physical": 77,
         "goalkeeping": 10
       }
-    },
-    "full_name": "Cristina Cifuentes",
-    "shirt_name": "Cifuentes"
+    }
   },
   {
     "id": "b5b034e8-e48e-4c33-9b70-f8d124a6c0f0",
@@ -5236,9 +5080,7 @@
         "physical": 75,
         "goalkeeping": 10
       }
-    },
-    "full_name": "José Luis Perales",
-    "shirt_name": "Perales"
+    }
   },
   {
     "id": "d02b336d-217c-4c4d-b82d-737ea0a3c961",
@@ -5255,9 +5097,7 @@
         "physical": 62,
         "goalkeeping": 8
       }
-    },
-    "full_name": "José Mercé",
-    "shirt_name": "Mercé"
+    }
   },
   {
     "id": "6e594789-9a9a-4af1-b50b-9eae11b6800e",
@@ -5274,9 +5114,7 @@
         "physical": 77,
         "goalkeeping": 13
       }
-    },
-    "full_name": "Morgan Freeman",
-    "shirt_name": "Freeman"
+    }
   },
   {
     "id": "5db82a88-cc28-466a-84c3-07ee50a90a69",
@@ -5293,9 +5131,7 @@
         "physical": 72,
         "goalkeeping": 13
       }
-    },
-    "full_name": "José Bono",
-    "shirt_name": "Bono"
+    }
   },
   {
     "id": "6e5dbd84-c25c-4a49-8abc-ae7ddbc7eb9e",
@@ -5312,9 +5148,7 @@
         "physical": 77,
         "goalkeeping": 12
       }
-    },
-    "full_name": "Michael Schumacher",
-    "shirt_name": "Schumacher"
+    }
   },
   {
     "id": "befdea7b-8252-4204-a2d1-18f2850b0f24",
@@ -5331,9 +5165,7 @@
         "physical": 57,
         "goalkeeping": 7
       }
-    },
-    "full_name": "Montserrat Caballé",
-    "shirt_name": "Caballé"
+    }
   },
   {
     "id": "f35f52db-df83-4535-9e61-d4272be3b229",
@@ -5350,9 +5182,7 @@
         "physical": 72,
         "goalkeeping": 12
       }
-    },
-    "full_name": "Santiago Auserón",
-    "shirt_name": "Auserón"
+    }
   },
   {
     "id": "6743c877-c976-4317-b4d4-4e6b401b6da2",
@@ -5369,9 +5199,7 @@
         "physical": 68,
         "goalkeeping": 9
       }
-    },
-    "full_name": "Niña Pastori",
-    "shirt_name": "Pastori"
+    }
   },
   {
     "id": "7cd6c6d2-d542-4fe8-aecb-208afef307e0",
@@ -5388,9 +5216,7 @@
         "physical": 65,
         "goalkeeping": 10
       }
-    },
-    "full_name": "Pedro Infante",
-    "shirt_name": "Pedro Infante"
+    }
   },
   {
     "id": "479776a3-9a2a-4f23-9ae0-722e220c0ec4",
@@ -5407,9 +5233,7 @@
         "physical": 68,
         "goalkeeping": 9
       }
-    },
-    "full_name": "Amenábar",
-    "shirt_name": "Amenábar"
+    }
   },
   {
     "id": "2bbe765d-ac4c-4740-9770-f291f3a33ab9",
@@ -5426,9 +5250,7 @@
         "physical": 74,
         "goalkeeping": 88
       }
-    },
-    "full_name": "Najwa Nimri",
-    "shirt_name": "Najwa"
+    }
   },
   {
     "id": "8635854d-6681-4fdd-8f12-98c3b81abc19",
@@ -5445,9 +5267,7 @@
         "physical": 72,
         "goalkeeping": 83
       }
-    },
-    "full_name": "Tom Hanks",
-    "shirt_name": "Tom Hanks"
+    }
   },
   {
     "id": "3d5fb1c1-9d4b-4d41-af96-66dec46e8081",
@@ -5464,9 +5284,7 @@
         "physical": 82,
         "goalkeeping": 90
       }
-    },
-    "full_name": "Russell Crowe",
-    "shirt_name": "Crowe"
+    }
   },
   {
     "id": "d5b0dc30-3274-4a7f-8c28-90a4db2e612c",
@@ -5483,9 +5301,7 @@
         "physical": 77,
         "goalkeeping": 9
       }
-    },
-    "full_name": "Berto Romero",
-    "shirt_name": "Berto"
+    }
   },
   {
     "id": "20708f6e-16fd-4ce0-90b4-77d55fda986e",
@@ -5502,9 +5318,7 @@
         "physical": 80,
         "goalkeeping": 10
       }
-    },
-    "full_name": "Pablo Alborán",
-    "shirt_name": "Alborán"
+    }
   },
   {
     "id": "53f8e7db-eb1e-4655-8dd1-fc024d6db34d",
@@ -5521,9 +5335,7 @@
         "physical": 74,
         "goalkeeping": 10
       }
-    },
-    "full_name": "Robin Williams",
-    "shirt_name": "Robin"
+    }
   },
   {
     "id": "a5bdb000-ead8-4adb-a644-b6d0c9f5d4a9",
@@ -5540,9 +5352,7 @@
         "physical": 82,
         "goalkeeping": 8
       }
-    },
-    "full_name": "Itziar Ituño",
-    "shirt_name": "Lisboa"
+    }
   },
   {
     "id": "82e312bd-9f37-4951-bd98-4c3fb8258d12",
@@ -5559,9 +5369,7 @@
         "physical": 87,
         "goalkeeping": 12
       }
-    },
-    "full_name": "Rozalén",
-    "shirt_name": "Rozalén"
+    }
   },
   {
     "id": "69ea59fe-e370-455b-a27a-24b21dee1365",
@@ -5578,9 +5386,7 @@
         "physical": 82,
         "goalkeeping": 10
       }
-    },
-    "full_name": "Jim Carrey",
-    "shirt_name": "Jim Carrey"
+    }
   },
   {
     "id": "45f9a8d7-bf1b-4996-8c6c-7bcf182ed84f",
@@ -5597,9 +5403,7 @@
         "physical": 77,
         "goalkeeping": 11
       }
-    },
-    "full_name": "Nieves Herrero",
-    "shirt_name": "Nieves"
+    }
   },
   {
     "id": "bf2b42b5-c607-4aec-8b8c-86652cf2392c",
@@ -5616,9 +5420,7 @@
         "physical": 76,
         "goalkeeping": 12
       }
-    },
-    "full_name": "Pedro Sánchez",
-    "shirt_name": "Pedro Sánchez"
+    }
   },
   {
     "id": "a1a9621e-6fe8-4838-83c7-0d4336859860",
@@ -5635,9 +5437,7 @@
         "physical": 67,
         "goalkeeping": 12
       }
-    },
-    "full_name": "Luis Eduardo Aute",
-    "shirt_name": "Aute"
+    }
   },
   {
     "id": "95545c58-003e-4bdf-92b7-45650dee66b1",
@@ -5654,9 +5454,7 @@
         "physical": 73,
         "goalkeeping": 13
       }
-    },
-    "full_name": "Álex Ubago",
-    "shirt_name": "Ubago"
+    }
   },
   {
     "id": "924ea691-2590-463a-9de2-1723935da77c",
@@ -5673,9 +5471,7 @@
         "physical": 67,
         "goalkeeping": 9
       }
-    },
-    "full_name": "Pilar Rubio",
-    "shirt_name": "Pilar"
+    }
   },
   {
     "id": "d366159d-e9b2-49b7-a593-f876084541fa",
@@ -5692,9 +5488,7 @@
         "physical": 78,
         "goalkeeping": 14
       }
-    },
-    "full_name": "Miguel de Cervantes",
-    "shirt_name": "Cervantes"
+    }
   },
   {
     "id": "12cd4c7e-0df4-46fd-82b5-5d925a13902a",
@@ -5711,9 +5505,7 @@
         "physical": 67,
         "goalkeeping": 10
       }
-    },
-    "full_name": "Jordi Évole",
-    "shirt_name": "Évole"
+    }
   },
   {
     "id": "e1d989b3-ac98-4ebe-869b-c9b27274ed79",
@@ -5730,9 +5522,7 @@
         "physical": 61,
         "goalkeeping": 9
       }
-    },
-    "full_name": "Matt Damon",
-    "shirt_name": "Damon"
+    }
   },
   {
     "id": "88cf7f87-8e23-40b1-b733-b7ff7dce63a1",
@@ -5749,9 +5539,7 @@
         "physical": 71,
         "goalkeeping": 14
       }
-    },
-    "full_name": "Susanna Griso",
-    "shirt_name": "Griso"
+    }
   },
   {
     "id": "77a84070-9653-4d7d-9f20-722568d37365",
@@ -5768,9 +5556,7 @@
         "physical": 69,
         "goalkeeping": 10
       }
-    },
-    "full_name": "Maribel Verdú",
-    "shirt_name": "Maribel"
+    }
   },
   {
     "id": "5461de99-1e04-46e1-ab84-bf9b4b4704bf",
@@ -5787,9 +5573,7 @@
         "physical": 59,
         "goalkeeping": 8
       }
-    },
-    "full_name": "Terelu Campos",
-    "shirt_name": "Terelu"
+    }
   },
   {
     "id": "13cfcb65-a17b-4234-b9d4-3bc9226ba152",
@@ -5806,9 +5590,7 @@
         "physical": 70,
         "goalkeeping": 12
       }
-    },
-    "full_name": "Ricky Rubio",
-    "shirt_name": "Rubio"
+    }
   },
   {
     "id": "ae1bcf31-34a8-4ac5-b899-c2c944c29877",
@@ -5825,9 +5607,7 @@
         "physical": 72,
         "goalkeeping": 11
       }
-    },
-    "full_name": "Celia Cruz",
-    "shirt_name": "Celia"
+    }
   },
   {
     "id": "85a22fd6-4618-4ee3-a019-0feece6a461f",
@@ -5844,9 +5624,7 @@
         "physical": 70,
         "goalkeeping": 84
       }
-    },
-    "full_name": "Jennifer Lopez",
-    "shirt_name": "JLo"
+    }
   },
   {
     "id": "699b5677-51b7-420a-a7f2-e1032962f61c",
@@ -5863,9 +5641,7 @@
         "physical": 70,
         "goalkeeping": 87
       }
-    },
-    "full_name": "Samuel L Jackson",
-    "shirt_name": "Samuel"
+    }
   },
   {
     "id": "f8a65068-af97-4a39-a91e-6d046894073d",
@@ -5882,9 +5658,7 @@
         "physical": 80,
         "goalkeeping": 89
       }
-    },
-    "full_name": "Gloria Estefan",
-    "shirt_name": "Gloria Estefan"
+    }
   },
   {
     "id": "284d78e5-2d23-4dab-ae23-93497d39f264",
@@ -5901,9 +5675,7 @@
         "physical": 81,
         "goalkeeping": 11
       }
-    },
-    "full_name": "José Luis Garci",
-    "shirt_name": "Garci"
+    }
   },
   {
     "id": "252f8811-0956-4915-9f51-828d3317be93",
@@ -5920,9 +5692,7 @@
         "physical": 81,
         "goalkeeping": 9
       }
-    },
-    "full_name": "Fernando Simón",
-    "shirt_name": "Fernando Simón"
+    }
   },
   {
     "id": "97850d6d-7156-4595-aa08-c05eceb6b6c0",
@@ -5939,9 +5709,7 @@
         "physical": 80,
         "goalkeeping": 10
       }
-    },
-    "full_name": "Marisol",
-    "shirt_name": "Marisol"
+    }
   },
   {
     "id": "f2045e98-bb5a-45b8-94b2-7fa580e8c0c5",
@@ -5958,9 +5726,7 @@
         "physical": 87,
         "goalkeeping": 13
       }
-    },
-    "full_name": "Martín Berasategui",
-    "shirt_name": "Martín"
+    }
   },
   {
     "id": "769b09a5-b547-4cf7-9371-7ff2290cd4e2",
@@ -5977,9 +5743,7 @@
         "physical": 88,
         "goalkeeping": 13
       }
-    },
-    "full_name": "Antonio Gaudí",
-    "shirt_name": "Gaudí"
+    }
   },
   {
     "id": "f2481db3-e4b0-43e1-82f8-b36c4c50311a",
@@ -5996,9 +5760,7 @@
         "physical": 81,
         "goalkeeping": 8
       }
-    },
-    "full_name": "Santiago Carrillo",
-    "shirt_name": "Carrillo"
+    }
   },
   {
     "id": "da0789dd-ad90-44e5-937e-15da1c6bc512",
@@ -6015,9 +5777,7 @@
         "physical": 65,
         "goalkeeping": 9
       }
-    },
-    "full_name": "Sole Giménez",
-    "shirt_name": "Sole"
+    }
   },
   {
     "id": "76cfafaa-d686-46b4-993b-b806e5f8e8c7",
@@ -6034,9 +5794,7 @@
         "physical": 68,
         "goalkeeping": 9
       }
-    },
-    "full_name": "Quentin Tarantino",
-    "shirt_name": "Tarantino"
+    }
   },
   {
     "id": "8da0861c-7fac-4c20-9e6f-39bd2647136b",
@@ -6053,9 +5811,7 @@
         "physical": 73,
         "goalkeeping": 11
       }
-    },
-    "full_name": "Luz Casal",
-    "shirt_name": "Luz"
+    }
   },
   {
     "id": "e6bd3356-61ee-4628-a9a6-6ad70b8f9d27",
@@ -6072,9 +5828,7 @@
         "physical": 63,
         "goalkeeping": 10
       }
-    },
-    "full_name": "Francisco Franco",
-    "shirt_name": "Franco"
+    }
   },
   {
     "id": "a6699af2-6ce5-4969-a379-0f457c2a9b2e",
@@ -6091,9 +5845,7 @@
         "physical": 76,
         "goalkeeping": 12
       }
-    },
-    "full_name": "Ernest Hemingway",
-    "shirt_name": "Hemingway"
+    }
   },
   {
     "id": "8348ab3a-123b-435d-80da-fc6e2f7cf50c",
@@ -6110,9 +5862,7 @@
         "physical": 66,
         "goalkeeping": 10
       }
-    },
-    "full_name": "Mamen Mendizábal",
-    "shirt_name": "Mamen"
+    }
   },
   {
     "id": "41e8a809-6505-4e07-9431-92c7a59d006e",
@@ -6129,9 +5879,7 @@
         "physical": 70,
         "goalkeeping": 12
       }
-    },
-    "full_name": "Belén Rueda",
-    "shirt_name": "Belén Rueda"
+    }
   },
   {
     "id": "8d418172-cd24-4653-97ad-931f21888bb8",
@@ -6148,9 +5896,7 @@
         "physical": 67,
         "goalkeeping": 10
       }
-    },
-    "full_name": "María Teresa Campos",
-    "shirt_name": "Campos"
+    }
   },
   {
     "id": "b3fda2a1-bf66-466a-a9cc-e2462ad606d7",
@@ -6167,9 +5913,7 @@
         "physical": 75,
         "goalkeeping": 13
       }
-    },
-    "full_name": "Heath Ledger",
-    "shirt_name": "Ledger"
+    }
   },
   {
     "id": "1f0cf196-f3d8-452c-8118-737d4ae5de27",
@@ -6186,9 +5930,7 @@
         "physical": 74,
         "goalkeeping": 14
       }
-    },
-    "full_name": "Miguel de Unamuno",
-    "shirt_name": "Unamuno"
+    }
   },
   {
     "id": "98279849-f810-44d4-bd4e-13a6fc65c359",
@@ -6205,9 +5947,7 @@
         "physical": 56,
         "goalkeeping": 7
       }
-    },
-    "full_name": "Jordi Pujol",
-    "shirt_name": "Pujol"
+    }
   },
   {
     "id": "a4ed15ca-7e51-4973-b7b7-b66a193907f7",
@@ -6224,9 +5964,7 @@
         "physical": 75,
         "goalkeeping": 15
       }
-    },
-    "full_name": "Julia Otero",
-    "shirt_name": "Julia"
+    }
   },
   {
     "id": "8889cb5d-91c5-488a-b58c-07a78fd3eb92",
@@ -6243,9 +5981,7 @@
         "physical": 62,
         "goalkeeping": 11
       }
-    },
-    "full_name": "Inés Arrimadas",
-    "shirt_name": "Arrimadas"
+    }
   },
   {
     "id": "3db7ed9e-c8c4-42bc-8755-70d1381aedcd",
@@ -6262,9 +5998,7 @@
         "physical": 80,
         "goalkeeping": 87
       }
-    },
-    "full_name": "Antonio Gala",
-    "shirt_name": "Gala"
+    }
   },
   {
     "id": "5175954f-19f6-414c-8f01-19b9ea79cc61",
@@ -6281,9 +6015,7 @@
         "physical": 71,
         "goalkeeping": 84
       }
-    },
-    "full_name": "Ana Pastor",
-    "shirt_name": "Ana Pastor"
+    }
   },
   {
     "id": "1d677f2e-cf05-49b3-bf12-1607e9afa6c3",
@@ -6300,9 +6032,7 @@
         "physical": 84,
         "goalkeeping": 89
       }
-    },
-    "full_name": "Luis Tosar",
-    "shirt_name": "Tosar"
+    }
   },
   {
     "id": "d04cc0a5-4be1-4532-81ae-cbfee248ce7b",
@@ -6319,9 +6049,7 @@
         "physical": 85,
         "goalkeeping": 13
       }
-    },
-    "full_name": "Mägo de Oz",
-    "shirt_name": "Mägo"
+    }
   },
   {
     "id": "bab8020b-880b-473a-9a52-ccb0ff843fe7",
@@ -6338,9 +6066,7 @@
         "physical": 79,
         "goalkeeping": 10
       }
-    },
-    "full_name": "Adolfo Suárez",
-    "shirt_name": "Suárez"
+    }
   },
   {
     "id": "7961403c-c994-4429-8f96-a00e0de804a6",
@@ -6357,9 +6083,7 @@
         "physical": 86,
         "goalkeeping": 11
       }
-    },
-    "full_name": "Pablo Casado",
-    "shirt_name": "Casado"
+    }
   },
   {
     "id": "58e93b94-e89b-4add-83eb-9266ca9cbf85",
@@ -6376,9 +6100,7 @@
         "physical": 75,
         "goalkeeping": 9
       }
-    },
-    "full_name": "Ana Rosa Quintana",
-    "shirt_name": "Ana Rosa"
+    }
   },
   {
     "id": "25721ef2-7719-4bb7-95d7-bdc8a86a2526",
@@ -6395,9 +6117,7 @@
         "physical": 86,
         "goalkeeping": 11
       }
-    },
-    "full_name": "Carlos Herrera",
-    "shirt_name": "Herrera"
+    }
   },
   {
     "id": "e02eced8-4041-4cd8-92f2-b90e2bd16169",
@@ -6414,9 +6134,7 @@
         "physical": 86,
         "goalkeeping": 13
       }
-    },
-    "full_name": "Joan Manuel Serrat",
-    "shirt_name": "Serrat"
+    }
   },
   {
     "id": "a0860499-d0e3-455f-929a-bdabe4871552",
@@ -6433,9 +6151,7 @@
         "physical": 72,
         "goalkeeping": 14
       }
-    },
-    "full_name": "Vicente Vallés",
-    "shirt_name": "Vicente Vallés"
+    }
   },
   {
     "id": "d5e72743-da4c-4cbe-8306-42c99ff52fd8",
@@ -6452,9 +6168,7 @@
         "physical": 71,
         "goalkeeping": 11
       }
-    },
-    "full_name": "Pastora Soler",
-    "shirt_name": "Pastora"
+    }
   },
   {
     "id": "2415cda5-03c6-4bfd-88c8-0d8758570630",
@@ -6471,9 +6185,7 @@
         "physical": 74,
         "goalkeeping": 12
       }
-    },
-    "full_name": "Juan Mari Arzak",
-    "shirt_name": "Arzak"
+    }
   },
   {
     "id": "751b3f30-fd71-4e82-8bae-c184319dd462",
@@ -6490,9 +6202,7 @@
         "physical": 68,
         "goalkeeping": 10
       }
-    },
-    "full_name": "Jorge Javier Vázquez",
-    "shirt_name": "Jorge Javier"
+    }
   },
   {
     "id": "4a938d85-eeb8-4211-9c46-d82af7b08235",
@@ -6509,9 +6219,7 @@
         "physical": 68,
         "goalkeeping": 10
       }
-    },
-    "full_name": "India Martínez",
-    "shirt_name": "India"
+    }
   },
   {
     "id": "d09648c9-8a86-4b62-95a8-6170891fb71f",
@@ -6528,9 +6236,7 @@
         "physical": 64,
         "goalkeeping": 10
       }
-    },
-    "full_name": "Diego Rivera",
-    "shirt_name": "Rivera"
+    }
   },
   {
     "id": "c552fcb1-99b5-4611-97e0-ff1b20008351",
@@ -6547,9 +6253,7 @@
         "physical": 71,
         "goalkeeping": 10
       }
-    },
-    "full_name": "Conor McGregor",
-    "shirt_name": "McGregor"
+    }
   },
   {
     "id": "ce7e42c4-2ab5-4edc-b1a0-33f92b34a372",
@@ -6566,9 +6270,7 @@
         "physical": 63,
         "goalkeeping": 9
       }
-    },
-    "full_name": "Paz Padilla",
-    "shirt_name": "Paz"
+    }
   },
   {
     "id": "65b02d9e-cd43-4b47-a895-536b3530253b",
@@ -6585,9 +6287,7 @@
         "physical": 63,
         "goalkeeping": 11
       }
-    },
-    "full_name": "Joaquín Reyes",
-    "shirt_name": "Joaquín Reyes"
+    }
   },
   {
     "id": "f95c4c9c-bd81-44ff-9b50-a945bf786191",
@@ -6604,9 +6304,7 @@
         "physical": 64,
         "goalkeeping": 9
       }
-    },
-    "full_name": "Cantinflas",
-    "shirt_name": "Cantinflas"
+    }
   },
   {
     "id": "94dcb749-831c-40a4-a799-ac2a2fed1eb3",
@@ -6623,9 +6321,7 @@
         "physical": 68,
         "goalkeeping": 9
       }
-    },
-    "full_name": "Salvador Dalí",
-    "shirt_name": "Dalí"
+    }
   },
   {
     "id": "b6214ceb-d3d7-4ae3-be2b-472f980a8430",
@@ -6642,9 +6338,7 @@
         "physical": 71,
         "goalkeeping": 12
       }
-    },
-    "full_name": "Macarena Olona",
-    "shirt_name": "Olona"
+    }
   },
   {
     "id": "cbe06166-23cd-4b0e-920e-6b1a8aa7ed73",
@@ -6661,8 +6355,1604 @@
         "physical": 72,
         "goalkeeping": 11
       }
-    },
-    "full_name": "Eddie Murphy",
-    "shirt_name": "Murphy"
+    }
+  },
+  {
+    "id": "938814e8-fbfe-4294-b848-c9647d5ad84e",
+    "birth_year": 1998,
+    "peak_age": 28,
+    "preferred_pos": "POR",
+    "positions": {
+      "POR": {
+        "speed": 71,
+        "dribbling": 76,
+        "passing": 74,
+        "shooting": 71,
+        "defending": 78,
+        "physical": 73,
+        "goalkeeping": 86
+      }
+    }
+  },
+  {
+    "id": "11719e94-c4a6-4b6e-846c-3dca4d19f05b",
+    "birth_year": 2001,
+    "peak_age": 28,
+    "preferred_pos": "POR",
+    "positions": {
+      "POR": {
+        "speed": 80,
+        "dribbling": 86,
+        "passing": 80,
+        "shooting": 83,
+        "defending": 82,
+        "physical": 84,
+        "goalkeeping": 89
+      }
+    }
+  },
+  {
+    "id": "8e1990b5-bde9-497a-9e2e-b5ba36167463",
+    "birth_year": 2002,
+    "peak_age": 28,
+    "preferred_pos": "DEF",
+    "positions": {
+      "DEF": {
+        "speed": 79,
+        "dribbling": 76,
+        "passing": 77,
+        "shooting": 76,
+        "defending": 77,
+        "physical": 80,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "d6b1d5a0-167b-4de4-84c8-41f6ac005536",
+    "birth_year": 2002,
+    "peak_age": 28,
+    "preferred_pos": "DEF",
+    "positions": {
+      "DEF": {
+        "speed": 77,
+        "dribbling": 77,
+        "passing": 73,
+        "shooting": 76,
+        "defending": 72,
+        "physical": 74,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "2f141965-0eda-49f3-b04f-f84280a9a97d",
+    "birth_year": 2003,
+    "peak_age": 28,
+    "preferred_pos": "DEF",
+    "positions": {
+      "DEF": {
+        "speed": 79,
+        "dribbling": 74,
+        "passing": 74,
+        "shooting": 78,
+        "defending": 73,
+        "physical": 72,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "02d92240-0e3a-4a7d-a3db-cbe6ca972693",
+    "birth_year": 2004,
+    "peak_age": 28,
+    "preferred_pos": "DEF",
+    "positions": {
+      "DEF": {
+        "speed": 73,
+        "dribbling": 70,
+        "passing": 74,
+        "shooting": 71,
+        "defending": 67,
+        "physical": 65,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "9ded0bf2-2e5f-47f6-aba7-863406b9ab72",
+    "birth_year": 2000,
+    "peak_age": 28,
+    "preferred_pos": "DEF",
+    "positions": {
+      "DEF": {
+        "speed": 75,
+        "dribbling": 80,
+        "passing": 76,
+        "shooting": 75,
+        "defending": 78,
+        "physical": 73,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "b87c2a4b-2b31-44cf-8c47-388d358f93f0",
+    "birth_year": 1996,
+    "peak_age": 28,
+    "preferred_pos": "MED",
+    "positions": {
+      "MED": {
+        "speed": 79,
+        "dribbling": 86,
+        "passing": 87,
+        "shooting": 82,
+        "defending": 85,
+        "physical": 81,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "b82a8079-0038-47bf-972a-5a2d832be6db",
+    "birth_year": 2004,
+    "peak_age": 28,
+    "preferred_pos": "MED",
+    "positions": {
+      "MED": {
+        "speed": 68,
+        "dribbling": 73,
+        "passing": 66,
+        "shooting": 72,
+        "defending": 72,
+        "physical": 73,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "a95af953-ad28-4bbd-be85-1b996d0c1298",
+    "birth_year": 1997,
+    "peak_age": 28,
+    "preferred_pos": "MED",
+    "positions": {
+      "MED": {
+        "speed": 85,
+        "dribbling": 81,
+        "passing": 76,
+        "shooting": 79,
+        "defending": 84,
+        "physical": 79,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "1374639f-9780-477a-83fc-2edf96649b9d",
+    "birth_year": 2002,
+    "peak_age": 28,
+    "preferred_pos": "MED",
+    "positions": {
+      "MED": {
+        "speed": 78,
+        "dribbling": 76,
+        "passing": 75,
+        "shooting": 73,
+        "defending": 80,
+        "physical": 80,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "0e3649fd-e376-4c98-8aaf-31d536305b9a",
+    "birth_year": 1997,
+    "peak_age": 28,
+    "preferred_pos": "MED",
+    "positions": {
+      "MED": {
+        "speed": 79,
+        "dribbling": 74,
+        "passing": 75,
+        "shooting": 72,
+        "defending": 77,
+        "physical": 74,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "ee2aa5cc-6eb0-440d-9ca2-7cc269c0dcd9",
+    "birth_year": 1999,
+    "peak_age": 28,
+    "preferred_pos": "DEL",
+    "positions": {
+      "DEL": {
+        "speed": 79,
+        "dribbling": 77,
+        "passing": 72,
+        "shooting": 73,
+        "defending": 74,
+        "physical": 74,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "7dcd472f-5393-4f96-8fea-0e5686016edb",
+    "birth_year": 2000,
+    "peak_age": 28,
+    "preferred_pos": "DEL",
+    "positions": {
+      "DEL": {
+        "speed": 67,
+        "dribbling": 66,
+        "passing": 70,
+        "shooting": 74,
+        "defending": 72,
+        "physical": 71,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "c38134a4-071e-4a83-bc61-964f6fd4c563",
+    "birth_year": 2002,
+    "peak_age": 28,
+    "preferred_pos": "DEL",
+    "positions": {
+      "DEL": {
+        "speed": 78,
+        "dribbling": 82,
+        "passing": 74,
+        "shooting": 77,
+        "defending": 81,
+        "physical": 82,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "0ed1cf15-6227-4b95-a236-35be0bacc022",
+    "birth_year": 2001,
+    "peak_age": 28,
+    "preferred_pos": "DEL",
+    "positions": {
+      "DEL": {
+        "speed": 65,
+        "dribbling": 71,
+        "passing": 65,
+        "shooting": 74,
+        "defending": 69,
+        "physical": 65,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "6efd2fa1-68e4-4096-ba3b-34357eb69296",
+    "birth_year": 1996,
+    "peak_age": 28,
+    "preferred_pos": "DEL",
+    "positions": {
+      "DEL": {
+        "speed": 82,
+        "dribbling": 73,
+        "passing": 77,
+        "shooting": 77,
+        "defending": 76,
+        "physical": 79,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "7cf90deb-abf9-4378-8018-0a6d62b27f2f",
+    "birth_year": 2004,
+    "peak_age": 28,
+    "preferred_pos": "DEL",
+    "positions": {
+      "DEL": {
+        "speed": 75,
+        "dribbling": 74,
+        "passing": 78,
+        "shooting": 76,
+        "defending": 72,
+        "physical": 77,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "89572816-e9aa-4613-96eb-265213482196",
+    "birth_year": 2003,
+    "peak_age": 28,
+    "preferred_pos": "POR",
+    "positions": {
+      "POR": {
+        "speed": 67,
+        "dribbling": 72,
+        "passing": 67,
+        "shooting": 69,
+        "defending": 72,
+        "physical": 65,
+        "goalkeeping": 91
+      }
+    }
+  },
+  {
+    "id": "2a124c41-719f-4490-aa31-9c8fd303fc62",
+    "birth_year": 1996,
+    "peak_age": 28,
+    "preferred_pos": "POR",
+    "positions": {
+      "POR": {
+        "speed": 79,
+        "dribbling": 81,
+        "passing": 78,
+        "shooting": 85,
+        "defending": 85,
+        "physical": 78,
+        "goalkeeping": 87
+      }
+    }
+  },
+  {
+    "id": "6eab43cc-d72f-4866-8d73-ed498b400d55",
+    "birth_year": 1995,
+    "peak_age": 28,
+    "preferred_pos": "DEF",
+    "positions": {
+      "DEF": {
+        "speed": 79,
+        "dribbling": 73,
+        "passing": 75,
+        "shooting": 79,
+        "defending": 77,
+        "physical": 77,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "42eba50f-a766-4b56-ae84-eb8e6916d1c4",
+    "birth_year": 1999,
+    "peak_age": 28,
+    "preferred_pos": "DEF",
+    "positions": {
+      "DEF": {
+        "speed": 79,
+        "dribbling": 76,
+        "passing": 77,
+        "shooting": 80,
+        "defending": 78,
+        "physical": 85,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "9591ddeb-7127-487d-8e98-9a623288889f",
+    "birth_year": 1995,
+    "peak_age": 28,
+    "preferred_pos": "DEF",
+    "positions": {
+      "DEF": {
+        "speed": 76,
+        "dribbling": 73,
+        "passing": 75,
+        "shooting": 77,
+        "defending": 74,
+        "physical": 74,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "6ebacd31-1d0a-4a18-bb62-2b267df8e4fd",
+    "birth_year": 2002,
+    "peak_age": 28,
+    "preferred_pos": "DEF",
+    "positions": {
+      "DEF": {
+        "speed": 78,
+        "dribbling": 87,
+        "passing": 84,
+        "shooting": 81,
+        "defending": 86,
+        "physical": 82,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "1fb2d5d8-613d-4dda-81b0-fceecf77e6a7",
+    "birth_year": 1995,
+    "peak_age": 28,
+    "preferred_pos": "DEF",
+    "positions": {
+      "DEF": {
+        "speed": 78,
+        "dribbling": 81,
+        "passing": 80,
+        "shooting": 81,
+        "defending": 87,
+        "physical": 80,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "5943f0b1-d451-4f01-a449-c7112e39a08c",
+    "birth_year": 1995,
+    "peak_age": 28,
+    "preferred_pos": "MED",
+    "positions": {
+      "MED": {
+        "speed": 79,
+        "dribbling": 81,
+        "passing": 74,
+        "shooting": 77,
+        "defending": 79,
+        "physical": 78,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "fa4285fe-71eb-4fd5-b10d-bb818ed78726",
+    "birth_year": 1997,
+    "peak_age": 28,
+    "preferred_pos": "MED",
+    "positions": {
+      "MED": {
+        "speed": 82,
+        "dribbling": 86,
+        "passing": 82,
+        "shooting": 83,
+        "defending": 86,
+        "physical": 80,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "24f2afc4-81c4-4e34-acae-28d62d19b9ea",
+    "birth_year": 2003,
+    "peak_age": 28,
+    "preferred_pos": "MED",
+    "positions": {
+      "MED": {
+        "speed": 86,
+        "dribbling": 79,
+        "passing": 82,
+        "shooting": 80,
+        "defending": 80,
+        "physical": 86,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "e4e2b117-ee27-4dc1-8df7-ccb1cb7709de",
+    "birth_year": 1999,
+    "peak_age": 28,
+    "preferred_pos": "MED",
+    "positions": {
+      "MED": {
+        "speed": 76,
+        "dribbling": 74,
+        "passing": 73,
+        "shooting": 80,
+        "defending": 81,
+        "physical": 74,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "281f8358-81f3-44fa-b1a0-14b3a39db4d1",
+    "birth_year": 2002,
+    "peak_age": 28,
+    "preferred_pos": "MED",
+    "positions": {
+      "MED": {
+        "speed": 81,
+        "dribbling": 82,
+        "passing": 80,
+        "shooting": 80,
+        "defending": 80,
+        "physical": 77,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "d25bbe49-0545-48bc-9b98-aa6b7fe7a1ac",
+    "birth_year": 1999,
+    "peak_age": 28,
+    "preferred_pos": "DEL",
+    "positions": {
+      "DEL": {
+        "speed": 82,
+        "dribbling": 80,
+        "passing": 79,
+        "shooting": 80,
+        "defending": 82,
+        "physical": 79,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "8f36fabd-e177-4e8e-a3f3-806e3a6ff1d5",
+    "birth_year": 2003,
+    "peak_age": 28,
+    "preferred_pos": "DEL",
+    "positions": {
+      "DEL": {
+        "speed": 72,
+        "dribbling": 73,
+        "passing": 75,
+        "shooting": 74,
+        "defending": 74,
+        "physical": 70,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "f01714ff-cf9d-4999-acae-f8727ee4e339",
+    "birth_year": 2004,
+    "peak_age": 28,
+    "preferred_pos": "DEL",
+    "positions": {
+      "DEL": {
+        "speed": 74,
+        "dribbling": 73,
+        "passing": 70,
+        "shooting": 77,
+        "defending": 78,
+        "physical": 75,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "1888ba2c-181c-4bca-bcbf-4d7cee53f29f",
+    "birth_year": 1999,
+    "peak_age": 28,
+    "preferred_pos": "DEL",
+    "positions": {
+      "DEL": {
+        "speed": 79,
+        "dribbling": 78,
+        "passing": 86,
+        "shooting": 84,
+        "defending": 79,
+        "physical": 84,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "4b361431-f454-4796-b00c-d95fda42743d",
+    "birth_year": 1999,
+    "peak_age": 28,
+    "preferred_pos": "DEL",
+    "positions": {
+      "DEL": {
+        "speed": 72,
+        "dribbling": 74,
+        "passing": 74,
+        "shooting": 72,
+        "defending": 72,
+        "physical": 76,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "f1c1e394-e467-4a1e-bc5f-1e7b05a433ce",
+    "birth_year": 1999,
+    "peak_age": 28,
+    "preferred_pos": "DEL",
+    "positions": {
+      "DEL": {
+        "speed": 82,
+        "dribbling": 82,
+        "passing": 73,
+        "shooting": 82,
+        "defending": 78,
+        "physical": 73,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "3d8ae029-3fb0-49a1-a3dd-a053684f1a26",
+    "birth_year": 1995,
+    "peak_age": 28,
+    "preferred_pos": "POR",
+    "positions": {
+      "POR": {
+        "speed": 79,
+        "dribbling": 82,
+        "passing": 81,
+        "shooting": 87,
+        "defending": 79,
+        "physical": 84,
+        "goalkeeping": 92
+      }
+    }
+  },
+  {
+    "id": "52a6e3ea-14ef-4150-b1eb-88b966a252f2",
+    "birth_year": 1997,
+    "peak_age": 28,
+    "preferred_pos": "POR",
+    "positions": {
+      "POR": {
+        "speed": 81,
+        "dribbling": 74,
+        "passing": 75,
+        "shooting": 72,
+        "defending": 76,
+        "physical": 74,
+        "goalkeeping": 88
+      }
+    }
+  },
+  {
+    "id": "97c3fabb-df3a-4f83-bfcc-66a4aec26e9c",
+    "birth_year": 1996,
+    "peak_age": 28,
+    "preferred_pos": "DEF",
+    "positions": {
+      "DEF": {
+        "speed": 81,
+        "dribbling": 80,
+        "passing": 81,
+        "shooting": 86,
+        "defending": 85,
+        "physical": 79,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "ff8e41c7-9504-41a5-9aff-5df127d1ea26",
+    "birth_year": 2000,
+    "peak_age": 28,
+    "preferred_pos": "DEF",
+    "positions": {
+      "DEF": {
+        "speed": 77,
+        "dribbling": 83,
+        "passing": 84,
+        "shooting": 84,
+        "defending": 75,
+        "physical": 78,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "5d744d1a-c16a-47e8-a48d-4935a9ae31cf",
+    "birth_year": 2003,
+    "peak_age": 28,
+    "preferred_pos": "DEF",
+    "positions": {
+      "DEF": {
+        "speed": 79,
+        "dribbling": 80,
+        "passing": 85,
+        "shooting": 80,
+        "defending": 82,
+        "physical": 78,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "028cca26-ae88-4587-9eb9-56c8d0521c5a",
+    "birth_year": 1996,
+    "peak_age": 28,
+    "preferred_pos": "DEF",
+    "positions": {
+      "DEF": {
+        "speed": 75,
+        "dribbling": 79,
+        "passing": 74,
+        "shooting": 75,
+        "defending": 79,
+        "physical": 80,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "7b193de3-6820-48d0-b836-b22d905b7bd1",
+    "birth_year": 1998,
+    "peak_age": 28,
+    "preferred_pos": "DEF",
+    "positions": {
+      "DEF": {
+        "speed": 76,
+        "dribbling": 71,
+        "passing": 70,
+        "shooting": 78,
+        "defending": 77,
+        "physical": 79,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "35f96d33-9168-4253-8b2c-25728b56348d",
+    "birth_year": 2004,
+    "peak_age": 28,
+    "preferred_pos": "MED",
+    "positions": {
+      "MED": {
+        "speed": 67,
+        "dribbling": 66,
+        "passing": 72,
+        "shooting": 69,
+        "defending": 73,
+        "physical": 75,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "89b52963-3b1d-403c-bb38-ed459e09db34",
+    "birth_year": 1997,
+    "peak_age": 28,
+    "preferred_pos": "MED",
+    "positions": {
+      "MED": {
+        "speed": 69,
+        "dribbling": 75,
+        "passing": 75,
+        "shooting": 69,
+        "defending": 76,
+        "physical": 73,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "b36dadb9-1513-4628-ac66-c02a7c52b0ea",
+    "birth_year": 2003,
+    "peak_age": 28,
+    "preferred_pos": "MED",
+    "positions": {
+      "MED": {
+        "speed": 72,
+        "dribbling": 68,
+        "passing": 66,
+        "shooting": 74,
+        "defending": 69,
+        "physical": 68,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "0d7ce564-1cf4-44e9-8a6e-bdf310c82cb8",
+    "birth_year": 1998,
+    "peak_age": 28,
+    "preferred_pos": "MED",
+    "positions": {
+      "MED": {
+        "speed": 70,
+        "dribbling": 68,
+        "passing": 70,
+        "shooting": 69,
+        "defending": 71,
+        "physical": 70,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "300ff3ff-29ea-4026-a0de-b8570200796c",
+    "birth_year": 2003,
+    "peak_age": 28,
+    "preferred_pos": "MED",
+    "positions": {
+      "MED": {
+        "speed": 73,
+        "dribbling": 71,
+        "passing": 66,
+        "shooting": 70,
+        "defending": 71,
+        "physical": 73,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "8c87f052-155d-4216-adba-a062908e8b68",
+    "birth_year": 2002,
+    "peak_age": 28,
+    "preferred_pos": "DEL",
+    "positions": {
+      "DEL": {
+        "speed": 81,
+        "dribbling": 74,
+        "passing": 79,
+        "shooting": 75,
+        "defending": 77,
+        "physical": 75,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "a1a7049f-f786-4a2c-8db8-0c3965cf1072",
+    "birth_year": 1998,
+    "peak_age": 28,
+    "preferred_pos": "DEL",
+    "positions": {
+      "DEL": {
+        "speed": 77,
+        "dribbling": 83,
+        "passing": 75,
+        "shooting": 83,
+        "defending": 83,
+        "physical": 78,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "49b5803c-4cbf-478b-9d9e-8e0b80a25511",
+    "birth_year": 2002,
+    "peak_age": 28,
+    "preferred_pos": "DEL",
+    "positions": {
+      "DEL": {
+        "speed": 86,
+        "dribbling": 83,
+        "passing": 84,
+        "shooting": 79,
+        "defending": 79,
+        "physical": 80,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "215a7460-3d66-45c8-abac-98c0a33b3ea8",
+    "birth_year": 1999,
+    "peak_age": 28,
+    "preferred_pos": "DEL",
+    "positions": {
+      "DEL": {
+        "speed": 80,
+        "dribbling": 85,
+        "passing": 82,
+        "shooting": 83,
+        "defending": 86,
+        "physical": 87,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "bccf2715-d736-4337-b13e-44a404079a77",
+    "birth_year": 2000,
+    "peak_age": 28,
+    "preferred_pos": "DEL",
+    "positions": {
+      "DEL": {
+        "speed": 76,
+        "dribbling": 83,
+        "passing": 80,
+        "shooting": 74,
+        "defending": 78,
+        "physical": 77,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "ecc7bcaf-1351-4539-af59-836c27afb7de",
+    "birth_year": 2000,
+    "peak_age": 28,
+    "preferred_pos": "DEL",
+    "positions": {
+      "DEL": {
+        "speed": 87,
+        "dribbling": 87,
+        "passing": 81,
+        "shooting": 86,
+        "defending": 80,
+        "physical": 79,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "d3f0e13d-14e3-424b-b794-0d21041f3073",
+    "birth_year": 2000,
+    "peak_age": 28,
+    "preferred_pos": "POR",
+    "positions": {
+      "POR": {
+        "speed": 72,
+        "dribbling": 75,
+        "passing": 76,
+        "shooting": 74,
+        "defending": 68,
+        "physical": 70,
+        "goalkeeping": 92
+      }
+    }
+  },
+  {
+    "id": "b574046a-5d7f-4888-9cd4-b329e55015be",
+    "birth_year": 1999,
+    "peak_age": 28,
+    "preferred_pos": "POR",
+    "positions": {
+      "POR": {
+        "speed": 72,
+        "dribbling": 75,
+        "passing": 79,
+        "shooting": 74,
+        "defending": 74,
+        "physical": 76,
+        "goalkeeping": 92
+      }
+    }
+  },
+  {
+    "id": "bd84d308-5895-4491-bbed-5db931f0f814",
+    "birth_year": 2000,
+    "peak_age": 28,
+    "preferred_pos": "DEF",
+    "positions": {
+      "DEF": {
+        "speed": 66,
+        "dribbling": 68,
+        "passing": 65,
+        "shooting": 65,
+        "defending": 67,
+        "physical": 66,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "b58fbc6b-7f96-4125-ab24-a7b350097be0",
+    "birth_year": 1999,
+    "peak_age": 28,
+    "preferred_pos": "DEF",
+    "positions": {
+      "DEF": {
+        "speed": 73,
+        "dribbling": 75,
+        "passing": 73,
+        "shooting": 74,
+        "defending": 70,
+        "physical": 78,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "34f413b8-313e-404e-9682-537bb1ad7571",
+    "birth_year": 1997,
+    "peak_age": 28,
+    "preferred_pos": "DEF",
+    "positions": {
+      "DEF": {
+        "speed": 71,
+        "dribbling": 70,
+        "passing": 72,
+        "shooting": 76,
+        "defending": 72,
+        "physical": 73,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "4e91a970-9b97-4500-bc8c-1f168aee2046",
+    "birth_year": 2003,
+    "peak_age": 28,
+    "preferred_pos": "DEF",
+    "positions": {
+      "DEF": {
+        "speed": 76,
+        "dribbling": 78,
+        "passing": 74,
+        "shooting": 74,
+        "defending": 74,
+        "physical": 74,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "bf36cb81-2b13-4c84-949d-9e183a592952",
+    "birth_year": 1997,
+    "peak_age": 28,
+    "preferred_pos": "DEF",
+    "positions": {
+      "DEF": {
+        "speed": 74,
+        "dribbling": 75,
+        "passing": 81,
+        "shooting": 75,
+        "defending": 79,
+        "physical": 82,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "b659e1e2-2b29-415c-9ee0-df3b753ad13f",
+    "birth_year": 1998,
+    "peak_age": 28,
+    "preferred_pos": "MED",
+    "positions": {
+      "MED": {
+        "speed": 80,
+        "dribbling": 85,
+        "passing": 79,
+        "shooting": 81,
+        "defending": 84,
+        "physical": 85,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "a99ea73d-877d-4a6e-8049-2fad2e6c917a",
+    "birth_year": 1996,
+    "peak_age": 28,
+    "preferred_pos": "MED",
+    "positions": {
+      "MED": {
+        "speed": 76,
+        "dribbling": 73,
+        "passing": 74,
+        "shooting": 76,
+        "defending": 72,
+        "physical": 77,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "30eee00d-0e78-45d9-9b15-302a72404c29",
+    "birth_year": 1999,
+    "peak_age": 28,
+    "preferred_pos": "MED",
+    "positions": {
+      "MED": {
+        "speed": 75,
+        "dribbling": 70,
+        "passing": 69,
+        "shooting": 74,
+        "defending": 76,
+        "physical": 75,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "6fef5682-d50e-4229-bb4b-b52d68ef4368",
+    "birth_year": 2003,
+    "peak_age": 28,
+    "preferred_pos": "MED",
+    "positions": {
+      "MED": {
+        "speed": 82,
+        "dribbling": 87,
+        "passing": 83,
+        "shooting": 87,
+        "defending": 81,
+        "physical": 83,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "0d7e2447-fc52-4b69-b6f7-a43a0eba568a",
+    "birth_year": 1995,
+    "peak_age": 28,
+    "preferred_pos": "MED",
+    "positions": {
+      "MED": {
+        "speed": 77,
+        "dribbling": 84,
+        "passing": 83,
+        "shooting": 75,
+        "defending": 80,
+        "physical": 79,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "f64d5534-0a00-40d5-aa70-03fc101f8257",
+    "birth_year": 1999,
+    "peak_age": 28,
+    "preferred_pos": "DEL",
+    "positions": {
+      "DEL": {
+        "speed": 79,
+        "dribbling": 81,
+        "passing": 86,
+        "shooting": 81,
+        "defending": 86,
+        "physical": 83,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "83dc1bce-2e4f-4f64-8d29-1464ce866be0",
+    "birth_year": 2003,
+    "peak_age": 28,
+    "preferred_pos": "DEL",
+    "positions": {
+      "DEL": {
+        "speed": 75,
+        "dribbling": 77,
+        "passing": 83,
+        "shooting": 82,
+        "defending": 82,
+        "physical": 81,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "6c8b0d62-8826-4a30-a36a-45b225aea500",
+    "birth_year": 1999,
+    "peak_age": 28,
+    "preferred_pos": "DEL",
+    "positions": {
+      "DEL": {
+        "speed": 69,
+        "dribbling": 71,
+        "passing": 75,
+        "shooting": 74,
+        "defending": 75,
+        "physical": 67,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "2a8b85c9-d513-46aa-bea3-25312d1832bb",
+    "birth_year": 1995,
+    "peak_age": 28,
+    "preferred_pos": "DEL",
+    "positions": {
+      "DEL": {
+        "speed": 68,
+        "dribbling": 68,
+        "passing": 75,
+        "shooting": 74,
+        "defending": 71,
+        "physical": 69,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "ab9ecfd3-68b4-42a9-8256-1ed6233feeeb",
+    "birth_year": 1995,
+    "peak_age": 28,
+    "preferred_pos": "DEL",
+    "positions": {
+      "DEL": {
+        "speed": 83,
+        "dribbling": 79,
+        "passing": 77,
+        "shooting": 82,
+        "defending": 77,
+        "physical": 77,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "821a4d04-187e-4abb-bf84-894c05b86f73",
+    "birth_year": 1997,
+    "peak_age": 28,
+    "preferred_pos": "DEL",
+    "positions": {
+      "DEL": {
+        "speed": 79,
+        "dribbling": 88,
+        "passing": 86,
+        "shooting": 82,
+        "defending": 88,
+        "physical": 85,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "6124ff20-bc42-4637-9807-d1c48f6bc73e",
+    "birth_year": 2001,
+    "peak_age": 28,
+    "preferred_pos": "POR",
+    "positions": {
+      "POR": {
+        "speed": 72,
+        "dribbling": 70,
+        "passing": 76,
+        "shooting": 79,
+        "defending": 70,
+        "physical": 75,
+        "goalkeeping": 90
+      }
+    }
+  },
+  {
+    "id": "4eebb8b0-958f-40b2-8e82-84ad35c4e769",
+    "birth_year": 2003,
+    "peak_age": 28,
+    "preferred_pos": "POR",
+    "positions": {
+      "POR": {
+        "speed": 84,
+        "dribbling": 76,
+        "passing": 79,
+        "shooting": 77,
+        "defending": 80,
+        "physical": 75,
+        "goalkeeping": 90
+      }
+    }
+  },
+  {
+    "id": "a7a082a4-d3ff-4538-bbe7-ba49485694c8",
+    "birth_year": 1997,
+    "peak_age": 28,
+    "preferred_pos": "POR",
+    "positions": {
+      "POR": {
+        "speed": 75,
+        "dribbling": 80,
+        "passing": 76,
+        "shooting": 82,
+        "defending": 78,
+        "physical": 79,
+        "goalkeeping": 92
+      }
+    }
+  },
+  {
+    "id": "aea8db7e-c68e-4317-8814-8eeeaf045ec4",
+    "birth_year": 1997,
+    "peak_age": 28,
+    "preferred_pos": "DEF",
+    "positions": {
+      "DEF": {
+        "speed": 79,
+        "dribbling": 83,
+        "passing": 87,
+        "shooting": 84,
+        "defending": 81,
+        "physical": 81,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "aa5b3579-e441-4956-b4b9-73dc45660438",
+    "birth_year": 1998,
+    "peak_age": 28,
+    "preferred_pos": "DEF",
+    "positions": {
+      "DEF": {
+        "speed": 71,
+        "dribbling": 71,
+        "passing": 72,
+        "shooting": 72,
+        "defending": 77,
+        "physical": 78,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "be5afecf-aba9-4e36-bc53-cf0138ad9d13",
+    "birth_year": 1997,
+    "peak_age": 28,
+    "preferred_pos": "DEF",
+    "positions": {
+      "DEF": {
+        "speed": 76,
+        "dribbling": 75,
+        "passing": 80,
+        "shooting": 81,
+        "defending": 80,
+        "physical": 78,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "1156a97e-8327-4ee9-869c-6906fe2e2f44",
+    "birth_year": 2004,
+    "peak_age": 28,
+    "preferred_pos": "DEF",
+    "positions": {
+      "DEF": {
+        "speed": 74,
+        "dribbling": 73,
+        "passing": 74,
+        "shooting": 74,
+        "defending": 78,
+        "physical": 72,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "b64c57bd-3c28-47b7-9441-aee564dea21f",
+    "birth_year": 1997,
+    "peak_age": 28,
+    "preferred_pos": "DEF",
+    "positions": {
+      "DEF": {
+        "speed": 71,
+        "dribbling": 76,
+        "passing": 73,
+        "shooting": 79,
+        "defending": 75,
+        "physical": 71,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "6659ef7d-103c-4723-b6f2-abe66c38721c",
+    "birth_year": 2003,
+    "peak_age": 28,
+    "preferred_pos": "DEF",
+    "positions": {
+      "DEF": {
+        "speed": 75,
+        "dribbling": 84,
+        "passing": 77,
+        "shooting": 81,
+        "defending": 75,
+        "physical": 84,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "20260f29-5b11-48f5-8778-dd8b03b67bcc",
+    "birth_year": 1999,
+    "peak_age": 28,
+    "preferred_pos": "DEF",
+    "positions": {
+      "DEF": {
+        "speed": 81,
+        "dribbling": 78,
+        "passing": 79,
+        "shooting": 83,
+        "defending": 86,
+        "physical": 80,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "9ce0d47b-4d61-4ea2-a9a3-1d4995a550a2",
+    "birth_year": 2000,
+    "peak_age": 28,
+    "preferred_pos": "MED",
+    "positions": {
+      "MED": {
+        "speed": 75,
+        "dribbling": 70,
+        "passing": 71,
+        "shooting": 72,
+        "defending": 72,
+        "physical": 75,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "bd6a1b0c-9395-4b68-a66c-3cea319b42c9",
+    "birth_year": 1996,
+    "peak_age": 28,
+    "preferred_pos": "MED",
+    "positions": {
+      "MED": {
+        "speed": 80,
+        "dribbling": 85,
+        "passing": 81,
+        "shooting": 83,
+        "defending": 84,
+        "physical": 81,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "af1aa8e4-4f55-4a13-872f-e9f4d7f95d83",
+    "birth_year": 2003,
+    "peak_age": 28,
+    "preferred_pos": "MED",
+    "positions": {
+      "MED": {
+        "speed": 81,
+        "dribbling": 74,
+        "passing": 77,
+        "shooting": 77,
+        "defending": 78,
+        "physical": 77,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "c55efbe8-7759-4d49-be76-051271131f71",
+    "birth_year": 2001,
+    "peak_age": 28,
+    "preferred_pos": "MED",
+    "positions": {
+      "MED": {
+        "speed": 80,
+        "dribbling": 79,
+        "passing": 87,
+        "shooting": 86,
+        "defending": 82,
+        "physical": 79,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "e2886b06-93ca-4297-8a98-3640c2cae9a6",
+    "birth_year": 2003,
+    "peak_age": 28,
+    "preferred_pos": "MED",
+    "positions": {
+      "MED": {
+        "speed": 76,
+        "dribbling": 79,
+        "passing": 80,
+        "shooting": 77,
+        "defending": 83,
+        "physical": 79,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "fcc5f703-f764-479d-834d-febcc58f2bda",
+    "birth_year": 1996,
+    "peak_age": 28,
+    "preferred_pos": "MED",
+    "positions": {
+      "MED": {
+        "speed": 79,
+        "dribbling": 77,
+        "passing": 77,
+        "shooting": 82,
+        "defending": 74,
+        "physical": 75,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "d9df1eaf-9307-4c6b-9814-91ff207291d7",
+    "birth_year": 1998,
+    "peak_age": 28,
+    "preferred_pos": "MED",
+    "positions": {
+      "MED": {
+        "speed": 77,
+        "dribbling": 82,
+        "passing": 79,
+        "shooting": 83,
+        "defending": 85,
+        "physical": 85,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "c2a1f0c3-7ea3-4c04-80ed-ccdf51ad2dcf",
+    "birth_year": 1999,
+    "peak_age": 28,
+    "preferred_pos": "DEL",
+    "positions": {
+      "DEL": {
+        "speed": 81,
+        "dribbling": 83,
+        "passing": 76,
+        "shooting": 81,
+        "defending": 80,
+        "physical": 83,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "50dffff3-c336-4505-80a0-65114cc776e3",
+    "birth_year": 2004,
+    "peak_age": 28,
+    "preferred_pos": "DEL",
+    "positions": {
+      "DEL": {
+        "speed": 75,
+        "dribbling": 81,
+        "passing": 76,
+        "shooting": 78,
+        "defending": 81,
+        "physical": 79,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "41102a9b-9799-466f-a760-74ba4a073652",
+    "birth_year": 2000,
+    "peak_age": 28,
+    "preferred_pos": "DEL",
+    "positions": {
+      "DEL": {
+        "speed": 76,
+        "dribbling": 75,
+        "passing": 81,
+        "shooting": 74,
+        "defending": 81,
+        "physical": 78,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "62eed4d2-fa2f-415c-a379-3955f4bb7d75",
+    "birth_year": 1998,
+    "peak_age": 28,
+    "preferred_pos": "DEL",
+    "positions": {
+      "DEL": {
+        "speed": 79,
+        "dribbling": 77,
+        "passing": 82,
+        "shooting": 81,
+        "defending": 82,
+        "physical": 77,
+        "goalkeeping": 10
+      }
+    }
+  },
+  {
+    "id": "6879bce6-1641-496e-a5c0-82faf33a3fa1",
+    "birth_year": 2003,
+    "peak_age": 28,
+    "preferred_pos": "DEL",
+    "positions": {
+      "DEL": {
+        "speed": 79,
+        "dribbling": 87,
+        "passing": 85,
+        "shooting": 84,
+        "defending": 86,
+        "physical": 85,
+        "goalkeeping": 10
+      }
+    }
   }
 ]

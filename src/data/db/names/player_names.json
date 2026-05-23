@@ -124,8 +124,8 @@
     "s": "Alaska"
   },
   "11f2c48e-f254-43d6-b295-9e05b461ff46": {
-    "f": "Mario Vaquerizo",
-    "s": "Vaquerizo"
+    "f": "Mario Conde",
+    "s": "Mario Conde"
   },
   "70e59ba1-c500-4ef7-a990-ec8f18e128dd": {
     "f": "Camilo José Cela",
@@ -1598,5 +1598,382 @@
   "a5bdb000-ead8-4adb-a644-b6d0c9f5d4a9": {
     "f": "Itziar Ituño",
     "s": "Lisboa"
+  },
+  
+  "938814e8-fbfe-4294-b848-c9647d5ad84e": {
+    "f": "Dwayne Johnson",
+    "s": "The Rock"
+  },
+  "11719e94-c4a6-4b6e-846c-3dca4d19f05b": {
+    "f": "Rihanna",
+    "s": "Rihanna"
+  },
+  "8e1990b5-bde9-497a-9e2e-b5ba36167463": {
+    "f": "Justin Bieber",
+    "s": "Bieber"
+  },
+  "d6b1d5a0-167b-4de4-84c8-41f6ac005536": {
+    "f": "Adele",
+    "s": "Adele"
+  },
+  "2f141965-0eda-49f3-b04f-f84280a9a97d": {
+    "f": "Ed Sheeran",
+    "s": "Sheeran"
+  },
+  "02d92240-0e3a-4a7d-a3db-cbe6ca972693": {
+    "f": "Donald Trump",
+    "s": "Trump"
+  },
+  "9ded0bf2-2e5f-47f6-aba7-863406b9ab72": {
+    "f": "Joe Biden",
+    "s": "Biden"
+  },
+  "b87c2a4b-2b31-44cf-8c47-388d358f93f0": {
+    "f": "Billie Eilish",
+    "s": "Eilish"
+  },
+  "b82a8079-0038-47bf-972a-5a2d832be6db": {
+    "f": "Katy Perry",
+    "s": "Perry"
+  },
+  "a95af953-ad28-4bbd-be85-1b996d0c1298": {
+    "f": "Snoop Dogg",
+    "s": "Snoop Dogg"
+  },
+  "1374639f-9780-477a-83fc-2edf96649b9d": {
+    "f": "Eminem",
+    "s": "Eminem"
+  },
+  "0e3649fd-e376-4c98-8aaf-31d536305b9a": {
+    "f": "Drake",
+    "s": "Drake"
+  },
+  "ee2aa5cc-6eb0-440d-9ca2-7cc269c0dcd9": {
+    "f": "Tom Holland",
+    "s": "Holland"
+  },
+  "7dcd472f-5393-4f96-8fea-0e5686016edb": {
+    "f": "Zendaya",
+    "s": "Zendaya"
+  },
+  "c38134a4-071e-4a83-bc61-964f6fd4c563": {
+    "f": "Chris Hemsworth",
+    "s": "Hemsworth"
+  },
+  "0ed1cf15-6227-4b95-a236-35be0bacc022": {
+    "f": "Pedro Pascal",
+    "s": "Pascal"
+  },
+  "6efd2fa1-68e4-4096-ba3b-34357eb69296": {
+    "f": "Cillian Murphy",
+    "s": "Murphy"
+  },
+  "7cf90deb-abf9-4378-8018-0a6d62b27f2f": {
+    "f": "Ryan Reynolds",
+    "s": "Reynolds"
+  },
+  "89572816-e9aa-4613-96eb-265213482196": {
+    "f": "Hugh Jackman",
+    "s": "Jackman"
+  },
+  "2a124c41-719f-4490-aa31-9c8fd303fc62": {
+    "f": "John Cena",
+    "s": "Cena"
+  },
+  "6eab43cc-d72f-4866-8d73-ed498b400d55": {
+    "f": "Elton John",
+    "s": "Elton John"
+  },
+  "42eba50f-a766-4b56-ae84-eb8e6916d1c4": {
+    "f": "Paul McCartney",
+    "s": "McCartney"
+  },
+  "9591ddeb-7127-487d-8e98-9a623288889f": {
+    "f": "John Lennon",
+    "s": "Lennon"
+  },
+  "6ebacd31-1d0a-4a18-bb62-2b267df8e4fd": {
+    "f": "Mick Jagger",
+    "s": "Jagger"
+  },
+  "1fb2d5d8-613d-4dda-81b0-fceecf77e6a7": {
+    "f": "David Bowie",
+    "s": "Bowie"
+  },
+  "5943f0b1-d451-4f01-a449-c7112e39a08c": {
+    "f": "Elvis Presley",
+    "s": "Elvis"
+  },
+  "fa4285fe-71eb-4fd5-b10d-bb818ed78726": {
+    "f": "Frank Sinatra",
+    "s": "Sinatra"
+  },
+  "24f2afc4-81c4-4e34-acae-28d62d19b9ea": {
+    "f": "Kurt Cobain",
+    "s": "Cobain"
+  },
+  "e4e2b117-ee27-4dc1-8df7-ccb1cb7709de": {
+    "f": "Amy Winehouse",
+    "s": "Winehouse"
+  },
+  "281f8358-81f3-44fa-b1a0-14b3a39db4d1": {
+    "f": "Mariah Carey",
+    "s": "Mariah"
+  },
+  "d25bbe49-0545-48bc-9b98-aa6b7fe7a1ac": {
+    "f": "Dua Lipa",
+    "s": "Dua Lipa"
+  },
+  "8f36fabd-e177-4e8e-a3f3-806e3a6ff1d5": {
+    "f": "Ariana Grande",
+    "s": "Ariana"
+  },
+  "f01714ff-cf9d-4999-acae-f8727ee4e339": {
+    "f": "Selena Gomez",
+    "s": "Selena Gomez"
+  },
+  "1888ba2c-181c-4bca-bcbf-4d7cee53f29f": {
+    "f": "Miley Cyrus",
+    "s": "Miley"
+  },
+  "4b361431-f454-4796-b00c-d95fda42743d": {
+    "f": "Bruno Mars",
+    "s": "Bruno Mars"
+  },
+  "f1c1e394-e467-4a1e-bc5f-1e7b05a433ce": {
+    "f": "The Weeknd",
+    "s": "The Weeknd"
+  },
+  "3d8ae029-3fb0-49a1-a3dd-a053684f1a26": {
+    "f": "Post Malone",
+    "s": "Post Malone"
+  },
+  "52a6e3ea-14ef-4150-b1eb-88b966a252f2": {
+    "f": "Maluma",
+    "s": "Maluma"
+  },
+  "97c3fabb-df3a-4f83-bfcc-66a4aec26e9c": {
+    "f": "Romeo Santos",
+    "s": "Romeo Santos"
+  },
+  "ff8e41c7-9504-41a5-9aff-5df127d1ea26": {
+    "f": "Marc Anthony",
+    "s": "Marc Anthony"
+  },
+  "5d744d1a-c16a-47e8-a48d-4935a9ae31cf": {
+    "f": "Pitbull",
+    "s": "Pitbull"
+  },
+  "028cca26-ae88-4587-9eb9-56c8d0521c5a": {
+    "f": "Carlos Vives",
+    "s": "Carlos Vives"
+  },
+  "7b193de3-6820-48d0-b836-b22d905b7bd1": {
+    "f": "Juanes",
+    "s": "Juanes"
+  },
+  "35f96d33-9168-4253-8b2c-25728b56348d": {
+    "f": "Fito Cabrales",
+    "s": "Fito"
+  },
+  "89b52963-3b1d-403c-bb38-ed459e09db34": {
+    "f": "Andres Calamaro",
+    "s": "Calamaro"
+  },
+  "b36dadb9-1513-4628-ac66-c02a7c52b0ea": {
+    "f": "Charly Garcia",
+    "s": "Charly"
+  },
+  "0d7ce564-1cf4-44e9-8a6e-bdf310c82cb8": {
+    "f": "Gustavo Cerati",
+    "s": "Cerati"
+  },
+  "300ff3ff-29ea-4026-a0de-b8570200796c": {
+    "f": "Carlos Santana",
+    "s": "Santana"
+  },
+  "8c87f052-155d-4216-adba-a062908e8b68": {
+    "f": "Mario Vargas Llosa",
+    "s": "Vargas Llosa"
+  },
+  "a1a7049f-f786-4a2c-8db8-0c3965cf1072": {
+    "f": "Gabriel Garcia Marquez",
+    "s": "G. Marquez"
+  },
+  "49b5803c-4cbf-478b-9d9e-8e0b80a25511": {
+    "f": "Isabel Allende",
+    "s": "Allende"
+  },
+  "215a7460-3d66-45c8-abac-98c0a33b3ea8": {
+    "f": "Jorge Luis Borges",
+    "s": "Borges"
+  },
+  "bccf2715-d736-4337-b13e-44a404079a77": {
+    "f": "Pablo Neruda",
+    "s": "Neruda"
+  },
+  "ecc7bcaf-1351-4539-af59-836c27afb7de": {
+    "f": "Julio Cortazar",
+    "s": "Cortazar"
+  },
+  "d3f0e13d-14e3-424b-b794-0d21041f3073": {
+    "f": "Antonio Machado",
+    "s": "Machado"
+  },
+  "b574046a-5d7f-4888-9cd4-b329e55015be": {
+    "f": "Gustavo Adolfo Becquer",
+    "s": "Becquer"
+  },
+  "bd84d308-5895-4491-bbed-5db931f0f814": {
+    "f": "Rosalia de Castro",
+    "s": "Rosalia Castro"
+  },
+  "b58fbc6b-7f96-4125-ab24-a7b350097be0": {
+    "f": "Francisco de Goya",
+    "s": "Goya"
+  },
+  "34f413b8-313e-404e-9682-537bb1ad7571": {
+    "f": "Diego Velazquez",
+    "s": "Velazquez"
+  },
+  "4e91a970-9b97-4500-bc8c-1f168aee2046": {
+    "f": "Karl Marx",
+    "s": "Marx"
+  },
+  "bf36cb81-2b13-4c84-949d-9e183a592952": {
+    "f": "Friedrich Nietzsche",
+    "s": "Nietzsche"
+  },
+  "b659e1e2-2b29-415c-9ee0-df3b753ad13f": {
+    "f": "Rene Descartes",
+    "s": "Descartes"
+  },
+  "a99ea73d-877d-4a6e-8049-2fad2e6c917a": {
+    "f": "Aristoteles",
+    "s": "Aristoteles"
+  },
+  "30eee00d-0e78-45d9-9b15-302a72404c29": {
+    "f": "Platon",
+    "s": "Platon"
+  },
+  "6fef5682-d50e-4229-bb4b-b52d68ef4368": {
+    "f": "Socrates",
+    "s": "Socrates"
+  },
+  "0d7e2447-fc52-4b69-b6f7-a43a0eba568a": {
+    "f": "Dalai Lama",
+    "s": "Dalai Lama"
+  },
+  "f64d5534-0a00-40d5-aa70-03fc101f8257": {
+    "f": "Papa Francisco",
+    "s": "Papa Francisco"
+  },
+  "83dc1bce-2e4f-4f64-8d29-1464ce866be0": {
+    "f": "Juan Pablo II",
+    "s": "Juan Pablo II"
+  },
+  "6c8b0d62-8826-4a30-a36a-45b225aea500": {
+    "f": "Teresa de Calcuta",
+    "s": "Madre Teresa"
+  },
+  "2a8b85c9-d513-46aa-bea3-25312d1832bb": {
+    "f": "Martin Luther King",
+    "s": "MLK"
+  },
+  "ab9ecfd3-68b4-42a9-8256-1ed6233feeeb": {
+    "f": "Che Guevara",
+    "s": "Che Guevara"
+  },
+  "821a4d04-187e-4abb-bf84-894c05b86f73": {
+    "f": "Fidel Castro",
+    "s": "Fidel"
+  },
+  "6124ff20-bc42-4637-9807-d1c48f6bc73e": {
+    "f": "Angela Merkel",
+    "s": "Merkel"
+  },
+  "4eebb8b0-958f-40b2-8e82-84ad35c4e769": {
+    "f": "Emmanuel Macron",
+    "s": "Macron"
+  },
+  "a7a082a4-d3ff-4538-bbe7-ba49485694c8": {
+    "f": "George Washington",
+    "s": "Washington"
+  },
+  "aea8db7e-c68e-4317-8814-8eeeaf045ec4": {
+    "f": "Nikola Tesla",
+    "s": "Tesla"
+  },
+  "aa5b3579-e441-4956-b4b9-73dc45660438": {
+    "f": "Thomas Edison",
+    "s": "Edison"
+  },
+  "be5afecf-aba9-4e36-bc53-cf0138ad9d13": {
+    "f": "Henry Ford",
+    "s": "Ford"
+  },
+  "1156a97e-8327-4ee9-869c-6906fe2e2f44": {
+    "f": "Walt Disney",
+    "s": "Disney"
+  },
+  "b64c57bd-3c28-47b7-9441-aee564dea21f": {
+    "f": "Charlie Chaplin",
+    "s": "Chaplin"
+  },
+  "6659ef7d-103c-4723-b6f2-abe66c38721c": {
+    "f": "Johnny Cash",
+    "s": "Cash"
+  },
+  "20260f29-5b11-48f5-8778-dd8b03b67bcc": {
+    "f": "Bob Dylan",
+    "s": "Dylan"
+  },
+  "9ce0d47b-4d61-4ea2-a9a3-1d4995a550a2": {
+    "f": "John Travolta",
+    "s": "Travolta"
+  },
+  "bd6a1b0c-9395-4b68-a66c-3cea319b42c9": {
+    "f": "Nicolas Cage",
+    "s": "Cage"
+  },
+  "af1aa8e4-4f55-4a13-872f-e9f4d7f95d83": {
+    "f": "Bruce Willis",
+    "s": "Willis"
+  },
+  "c55efbe8-7759-4d49-be76-051271131f71": {
+    "f": "Jason Statham",
+    "s": "Statham"
+  },
+  "e2886b06-93ca-4297-8a98-3640c2cae9a6": {
+    "f": "Vin Diesel",
+    "s": "Vin Diesel"
+  },
+  "fcc5f703-f764-479d-834d-febcc58f2bda": {
+    "f": "Salma Hayek",
+    "s": "Salma Hayek"
+  },
+  "d9df1eaf-9307-4c6b-9814-91ff207291d7": {
+    "f": "Sofia Vergara",
+    "s": "Sofia Vergara"
+  },
+  "c2a1f0c3-7ea3-4c04-80ed-ccdf51ad2dcf": {
+    "f": "Natalie Portman",
+    "s": "Portman"
+  },
+  "50dffff3-c336-4505-80a0-65114cc776e3": {
+    "f": "Alberto Chicote",
+    "s": "Chicote"
+  },
+  "41102a9b-9799-466f-a760-74ba4a073652": {
+    "f": "Jordi Cruz",
+    "s": "Jordi Cruz"
+  },
+  "62eed4d2-fa2f-415c-a379-3955f4bb7d75": {
+    "f": "TheGrefg",
+    "s": "TheGrefg"
+  },
+  "6879bce6-1641-496e-a5c0-82faf33a3fa1": {
+    "f": "IlloJuan",
+    "s": "IlloJuan"
   }
 }
