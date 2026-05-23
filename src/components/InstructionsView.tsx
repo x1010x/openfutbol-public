@@ -274,6 +274,25 @@ export const InstructionsView = ({ onBack, scrollTo }: Props) => {
         </div>
       </div>
 
+      <div className="bg-vga-black p-4 border-2 border-vga-cyan text-[9px] text-vga-bright-white space-y-2">
+        <p className="text-vga-cyan font-bold">COLABORA EN EL JUEGO</p>
+        <p>
+          ¿Tienes una idea para un equipo? ¿Un chiste malo que merece ser un escudo?
+          ¿Quieres que tu cara aparezca en un jugador pixelado? Mándanoslo al canal de Telegram:
+        </p>
+        <p>
+          <a href="https://t.me/openfutbol" target="_blank" rel="noreferrer"
+            className="text-vga-cyan underline hover:text-vga-yellow">
+            t.me/openfutbol
+          </a>
+          {' '}— sin cuentas raras, sin tecnicismos, sin complicaciones.
+        </p>
+        <p>
+          Para más detalles sobre cómo proponer equipos, generar escudos con IA
+          y añadir jugadores, pulsa <span className="text-vga-yellow">COLABORAR</span> en el menú principal.
+        </p>
+      </div>
+
       <div className="bg-vga-magenta p-2 text-[8px] text-vga-bright-white text-center border-2 border-vga-white">
         ESTA PÁGINA SE ACTUALIZA A MEDIDA QUE EL JUEGO EVOLUCIONA.
       </div>
