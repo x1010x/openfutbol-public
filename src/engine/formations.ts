@@ -107,6 +107,8 @@ export const pickBestXI = (
     const natives = eligible.filter(p => !used.has(p.id) && p.allowedPositions.includes(slotPos));
     const useNativesFirst = slotPos === 'POR' || (disciplined && natives.length > 0);
     const pool = useNativesFirst && natives.length > 0 ? natives : eligible;
+    
+    // Find best in current pool
     for (const p of pool) {
       if (used.has(p.id)) continue;
       const score = effectiveMedia(p, slotPos);
@@ -115,12 +117,25 @@ export const pickBestXI = (
         best = p;
       }
     }
+    
+    // If no best found in current pool and disciplined, fallback to global eligible pool
+    if (!best && disciplined) {
+      for (const p of eligible) {
+        if (used.has(p.id)) continue;
+        const score = effectiveMedia(p, slotPos);
+        if (score > bestScore) {
+          bestScore = score;
+          best = p;
+        }
+      }
+    }
+
     if (best) {
       lineup.push(best.id);
       used.add(best.id);
       strength += bestScore;
     } else {
-      break;
+      lineup.push(''); // Fill with empty if truly no one left
     }
   }
   return { lineup, strength };
