@@ -1714,7 +1714,7 @@ function App() {
               className="text-vga-cyan text-[8px] hover:text-vga-yellow underline decoration-dotted underline-offset-2 cool:text-rc-accent cool:hover:text-rc-primary flex items-center gap-1"
               title="Ver cambios recientes"
             >
-              OPENFUTBOL v1.0.0-{__BUILD_TIMESTAMP__}
+              OPENFUTBOL v1.1.0-{__BUILD_TIMESTAMP__}
               {hasNewVersion && (
                 <span className="bg-vga-red text-vga-bright-white text-[7px] px-1 font-bold animate-pulse">
                   NUEVO
