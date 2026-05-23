@@ -14,7 +14,10 @@ export const FORMATIONS: Record<FormationId, Position[]> = {
 
 export const ALL_FORMATIONS: FormationId[] = ['4-4-2', '5-3-2', '4-3-3', '4-2-4', '5-4-1', '3-4-3'];
 
+const FORWARD_FAMILY: Position[] = ['DEL', 'AML', 'AMR'];
+
 export const isOOP = (player: Player, slotPos: Position): boolean => {
+  if (FORWARD_FAMILY.includes(slotPos) && player.allowedPositions.some(p => FORWARD_FAMILY.includes(p))) return false;
   return !player.allowedPositions.includes(slotPos);
 };
 
