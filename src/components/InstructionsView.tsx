@@ -260,14 +260,16 @@ export const InstructionsView = ({ onBack, scrollTo }: Props) => {
         <Section title="CAMBIOS RECIENTES">
           <ul className="list-disc pl-5 space-y-1">
             <li>
-              <span className="text-vga-cyan">v1.0.0</span> — Preparado para repositorio público. 
-              Nueva arquitectura modular de datos basada en UUIDs y placeholders. 
-              Limpieza de metadatos internos y optimización del motor de carga JSON.
+              <span className="text-vga-cyan">v1.1.0</span> — Comunidad y países.
+              Pantalla COLABORAR con canal de Telegram para proponer equipos y jugadores.
+              Banderas por país en las pantallas de selección.
+              Base de datos actualizada con equipos nuevos.
             </li>
             <li>
-              <span className="text-vga-cyan">v0.1.0 - v0.14.2</span> — Desarrollo inicial: 
-              Simulación de partidos minuto a minuto, sistema de temas (Retrocutre/Retrocool), 
-              modo Fantasy Draft, gestión económica, editor de equipos y mercado de fichajes.
+              <span className="text-vga-cyan">v1.0.0</span> — Primera versión pública.
+              Arquitectura modular de datos basada en UUIDs. Simulación de partidos minuto a minuto,
+              sistema de temas (Retrocutre/Retrocool), modo Fantasy Draft, gestión económica,
+              editor de equipos y mercado de fichajes.
             </li>
           </ul>
         </Section>

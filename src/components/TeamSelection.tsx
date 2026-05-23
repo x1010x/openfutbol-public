@@ -4,18 +4,7 @@ import type { YearStats } from '../data/mockTeams';
 import { getTeamCountry } from '../data/mockTeams';
 import { calculateTeamStrength } from '../engine/simEngine';
 import { TeamCrest } from './TeamCrest';
-
-const COUNTRY_LABELS: Record<string, string> = {
-  spain: 'ESPAÑA',
-  england: 'INGLATERRA',
-  germany: 'ALEMANIA',
-  france: 'FRANCIA',
-  italy: 'ITALIA',
-  portugal: 'PORTUGAL',
-  netherlands: 'PAÍSES BAJOS',
-  scotland: 'ESCOCIA',
-  unknown: '—',
-};
+import { CountryBadge } from './CountryBadge';
 
 interface Props {
   teams: Team[];
@@ -108,7 +97,6 @@ export const TeamSelection = ({ teams, selectedYear, yearStats, onSelectYear, on
 
         <div className="flex flex-col gap-2 max-h-[520px] overflow-y-auto pr-1">
           {sortedCountries.map(([country, countryTeams]) => {
-            const label = COUNTRY_LABELS[country] ?? country.toUpperCase();
             const open = openCountries.has(country);
             return (
               <div key={country}>
@@ -116,7 +104,9 @@ export const TeamSelection = ({ teams, selectedYear, yearStats, onSelectYear, on
                   onClick={() => toggleCountry(country)}
                   className="w-full flex items-center justify-between bg-vga-blue border border-vga-white px-3 py-2 hover:bg-vga-cyan hover:text-vga-black text-left"
                 >
-                  <span className="text-vga-yellow text-[9px] font-bold">{label}</span>
+                  <span className="text-vga-yellow text-[9px] font-bold">
+                    <CountryBadge code={country} size="lg" />
+                  </span>
                   <span className="text-vga-gray text-[7px]">{countryTeams.length} equipos  {open ? '▲' : '▼'}</span>
                 </button>
                 {open && (
