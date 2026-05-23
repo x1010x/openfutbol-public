@@ -1,5 +1,5 @@
 import type { Team, MatchState, MatchEvent, Player, Position } from '../types/game.d.ts';
-import { FORMATIONS, buildSlotMap, effectiveStat, rawMedia, slotPenalty } from './formations';
+import { FORMATIONS, buildSlotMap, effectiveMedia, effectiveStat, rawMedia, slotPenalty } from './formations';
 
 export const calculateTeamStrength = (team: Team, sentOff: string[] = [], stamina?: Record<string, number>) => {
   if (!team.lineup || !team.formation) return 0;
