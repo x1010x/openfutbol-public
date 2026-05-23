@@ -29,6 +29,9 @@ export const DisclaimerView = ({ onDismiss }: Props) => {
           >
             {DISCLAIMER_ACCEPT_BUTTON}
           </button>
+          <div className="text-center text-[7px] text-vga-gray">
+            CÓDIGO FUENTE EN <a href="https://github.com/x1010x/openfutbol-public" className="text-vga-cyan underline" target="_blank" rel="noopener noreferrer">GITHUB</a>
+          </div>
         </div>
       </div>
     </div>
