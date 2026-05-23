@@ -52,20 +52,20 @@ export const InstructionsView = ({ onBack, scrollTo }: Props) => {
 
         <Section title="MODOS DE JUEGO">
           <p>
-            <span className="text-vga-yellow">JUGAR</span> — Elige una temporada, un país y un equipo real.
-            Compites en una liga con plantillas históricas de esa época.
+            <span className="text-vga-yellow">JUGAR</span> — Elige una temporada y un equipo. Ninguno es real.
+            Los nombres son chistes malos, los jugadores son inventados y el estadio probablemente no existe.
+            Compites en una liga con otros once equipos igual de dudosos. Gana el que menos vergüenza pase.
           </p>
           <p>
-            <span className="text-vga-yellow">FANTASY</span> — Crea tu propia liga. Tú y los equipos rivales
-            sois seleccionadores: en un sorteo de 18 rondas cada equipo elige a sus jugadores del pool
-            completo de esa temporada. Modo <span className="text-vga-cyan">LIBRE</span> sin restricciones,
-            o modo <span className="text-vga-cyan">CON CAP</span> con un límite de 1350 MED por equipo —
-            puedes fichar un par de cracks pero el resto tendrá que compensar.
+            <span className="text-vga-yellow">FANTASY</span> — Crea tu propia liga y haz un draft de jugadores
+            como si supieras lo que estás haciendo. Modo <span className="text-vga-cyan">LIBRE</span> para los
+            que se creen Florentino, o modo <span className="text-vga-cyan">CON CAP</span> con un límite de
+            1350 MED por equipo para los que prefieren sufrir con presupuesto. 18 rondas, muchos arrepentimientos.
           </p>
           <p>
-            <span className="text-vga-yellow">EDITOR</span> — Crea equipos y jugadores desde cero,
-            ajusta estadísticas y colores, y expórtalos como datapack para compartirlos.
-            Los equipos del editor se pueden añadir directamente a una liga FANTASY.
+            <span className="text-vga-yellow">EDITOR</span> — Crea equipos desde cero, ponle un nombre ridículo,
+            unos colores horribles y compártelo. Los equipos del editor se pueden meter directamente en una liga
+            FANTASY para hacerle la vida imposible a tus amigos.
           </p>
         </Section>
 
