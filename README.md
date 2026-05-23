@@ -99,7 +99,39 @@ sin romper nada (o rompiendo lo mínimo):
 No hace falta saber programar. No hace falta saber inglés. Hace falta tener un chiste bueno
 o ganas de que tu vecino salga en el juego.
 
-Lo más fácil: **[t.me/openfutbol](https://t.me/openfutbol)**
+**La forma más fácil: [t.me/openfutbol](https://t.me/openfutbol)**
+
+Entráis al canal, mandáis lo que tengáis y nosotros nos encargamos del resto.
+
+### Proponer un equipo
+
+Necesitáis un nombre con su chiste y un escudo. El escudo lo genera una IA gratis —
+copiad este prompt en ChatGPT o cualquier generador de imágenes y añadid al final
+el nombre y concepto de vuestro equipo:
+
+> Escudo de club de fútbol en pixel art retro, estilo de insignia de videojuego arcade
+> auténtico de los años 90 inspirado en los clásicos de SNES y Neo Geo, textura de parche
+> bordado muy detallada, contornos de píxeles gruesos, tipografía apilada en negrita con
+> el nombre del equipo, club de fútbol parodia con argot español humorístico, mascota o
+> icono central que ilustra el chiste, composición de escudo simétrica, paleta de colores
+> retro limitada, sombreado y tramado ricos en píxeles, estética de ultras vintage, fondo
+> azul marino oscuro, pixel art limpio y nítido, bordes de tela cosida falsos, iluminación
+> dramática, energía de caricatura exagerada, proporciones icónicas de escudo de fútbol.
+
+Mandad la imagen al canal con el nombre, el chiste y los colores (vale con decir "rojo y negro").
+
+### Añadir la cara de un jugador
+
+Adjuntad una foto a ChatGPT o cualquier IA multimodal y usad este prompt:
+
+> Icono de retrato en pixel art retro de 8 bits que recrea aproximadamente los rasgos
+> faciales, la expresión y el pelo de la foto de referencia proporcionada. Debe llevar
+> una camiseta de fútbol sin ningún escudo ni equipo visible. Sin texto de ningún tipo.
+> El fondo dentro del retrato es negro sólido y profundo. El icono está enmarcado por
+> un grueso borde cuadrado blanco. La imagen puede ser pequeña. Es para un simulador
+> de fútbol. Conservar el borde.
+
+Mandad la imagen al canal con el nombre de la persona y en qué equipo queréis que juegue.
 
 Para los más atrevidos: [CONTRIBUIR.md](CONTRIBUIR.md)
 
