@@ -1,5 +1,5 @@
 import type { Team, MatchState, MatchEvent, Player, Position } from '../types/game.d.ts';
-import { FORMATIONS, buildSlotMap, effectiveMedia, effectiveStat } from './formations';
+import { FORMATIONS, buildSlotMap, effectiveStat, rawMedia, slotPenalty } from './formations';
 
 export const calculateTeamStrength = (team: Team, sentOff: string[] = [], stamina?: Record<string, number>) => {
   if (!team.lineup || !team.formation) return 0;
@@ -12,8 +12,10 @@ export const calculateTeamStrength = (team: Team, sentOff: string[] = [], stamin
     const p = team.players.find(pp => pp.id === pid);
     if (!p) continue;
     const stam = stamina ? (stamina[pid] ?? 99) : (p.stamina ?? 99);
-    const stamFactor = 0.8 + 0.2 * (stam / 99);
-    total += effectiveMedia(p, slots[i]) * stamFactor;
+    const stamFactor = 0.7 + 0.3 * (stam / 99);
+    // Use rawMedia * slotPenalty instead of effectiveMedia to avoid double stamina penalty
+    // because effectiveMedia also applies its own stamina factor based on p.stamina.
+    total += rawMedia(p) * slotPenalty(p, slots[i]) * stamFactor;
   }
   return total / 11;
 };
@@ -34,13 +36,13 @@ const calcStoppage = (events: MatchEvent[], fromMin: number, toMin: number): num
   return Math.round(Math.min(isFirst ? 3 : 7, Math.max(isFirst ? 1 : 3, raw)));
 };
 
-export const simulateMinute = (state: MatchState): MatchState => {
+export const simulateMinute = (state: MatchState, userTeamId?: string): MatchState => {
   if (state.isFinished) return state;
 
   const nextMinute = state.minute + 1;
   let stoppageTime1 = state.stoppageTime1;
   let stoppageTime2 = state.stoppageTime2;
-  const newEvents: MatchEvent[] = [...state.events];
+  let newEvents: MatchEvent[] = [...state.events];
   let homeScore = state.homeScore;
   let awayScore = state.awayScore;
   const homeSentOff = [...state.homeSentOff];
@@ -61,6 +63,67 @@ export const simulateMinute = (state: MatchState): MatchState => {
   let awaySubsUsed = state.awaySubsUsed;
   let homeTeam = state.homeTeam;
   let awayTeam = state.awayTeam;
+
+  // AI Tactical Substitutions
+  if (nextMinute >= 60 && nextMinute <= 88 && nextMinute % 5 === 0) {
+    for (const isHome of [true, false] as const) {
+      const team = isHome ? homeTeam : awayTeam;
+      if (team.id === userTeamId) continue;
+      
+      const subsUsed = isHome ? homeSubsUsed : awaySubsUsed;
+      if (subsUsed >= 3) continue;
+
+      const stamMap = isHome ? newHomeStamina : newAwayStamina;
+      const injured = isHome ? homeInjuredInMatch : awayInjuredInMatch;
+      const sentOff = isHome ? homeSentOff : awaySentOff;
+
+      const tired = team.lineup
+        .filter(id => id && !injured.includes(id) && !sentOff.includes(id))
+        .map(id => ({ id, stam: stamMap[id] ?? 99 }))
+        .filter(x => x.stam < 55)
+        .sort((a, b) => a.stam - b.stam);
+
+      if (tired.length > 0) {
+        const inLineup = new Set(team.lineup);
+        const bench = team.players
+          .filter(p => 
+            !inLineup.has(p.id) && 
+            !injured.includes(p.id) && 
+            !sentOff.includes(p.id) && 
+            (p.injuryWeeksRemaining ?? 0) === 0 && 
+            p.suspensionMatches === 0 &&
+            (stamMap[p.id] ?? p.stamina ?? 99) > 80
+          )
+          .sort((a, b) => b.media - a.media);
+
+        if (bench.length > 0) {
+          const playerOutId = tired[0].id;
+          const playerIn = bench[0];
+          const playerOut = team.players.find(p => p.id === playerOutId)!;
+
+          const newLineup = team.lineup.map(id => id === playerOutId ? playerIn.id : id);
+          newEvents.push({
+            minute: nextMinute,
+            type: 'sub',
+            description: `Cambio en ${team.name}: entra ${playerIn.fullName}, sale ${playerOut.fullName}.`,
+            teamId: team.id,
+            playerId: playerIn.id,
+            playerOffId: playerOutId,
+          });
+
+          if (isHome) {
+            homeTeam = { ...homeTeam, lineup: newLineup };
+            homeSubsUsed++;
+            newHomeStamina[playerIn.id] = playerIn.stamina ?? 99;
+          } else {
+            awayTeam = { ...awayTeam, lineup: newLineup };
+            awaySubsUsed++;
+            newAwayStamina[playerIn.id] = playerIn.stamina ?? 99;
+          }
+        }
+      }
+    }
+  }
 
   const sf = (pid: string, stamMap: Record<string, number>): number =>
     (stamMap[pid] ?? 99) / 99;

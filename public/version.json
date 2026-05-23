@@ -1,1 +1,9 @@
-{"version":"1.1.0","ts":"20260523124715"}
+{
+  "ts": "20260523150000",
+  "version": "1.2.0",
+  "changelog": [
+    "Fixed AI teams not making substitutions correctly during matches and jornadas.",
+    "Increased stamina impact on AI rotation logic.",
+    "Added tactical substitutions for AI teams during match simulation."
+  ]
+}
