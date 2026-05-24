@@ -1,6 +1,8 @@
+import { useState } from 'react';
 import type { LeagueState } from '../store/leagueStore';
 import { encodeBackup, decodeBackup } from '../utils/backupUtils';
 import { useT } from '../i18n';
+import { EngineSettingsView } from './EngineSettingsView';
 
 interface Props {
   league: LeagueState;
@@ -11,6 +13,7 @@ interface Props {
 
 export const BackupView = ({ league, onRestore, onReset, onBack }: Props) => {
   const t = useT();
+  const [tab, setTab] = useState<'backup' | 'engine'>('backup');
 
   const handleReset = () => {
     if (confirm(t('misc.confirmReset'))) {
@@ -62,13 +65,35 @@ export const BackupView = ({ league, onRestore, onReset, onBack }: Props) => {
   return (
     <div className="w-full max-w-2xl flex flex-col gap-4 animate-in fade-in duration-300">
       <div className="bg-vga-blue p-2 border-2 border-vga-white flex justify-between items-center vga-panel">
-        <h2 className="text-vga-yellow text-xs uppercase font-bold">{t('section.backup')}</h2>
+        <div className="flex items-center gap-2">
+          <h2 className="text-vga-yellow text-xs uppercase font-bold">{t('section.backup')}</h2>
+          <div className="flex gap-1">
+            <button
+              onClick={() => setTab('backup')}
+              className={`text-[7px] px-2 py-0.5 border font-bold uppercase ${tab === 'backup' ? 'bg-vga-yellow text-vga-black border-vga-yellow' : 'text-vga-gray border-vga-gray hover:text-vga-bright-white hover:border-vga-bright-white'}`}
+            >
+              BACKUP
+            </button>
+            <button
+              onClick={() => setTab('engine')}
+              className={`text-[7px] px-2 py-0.5 border font-bold uppercase ${tab === 'engine' ? 'bg-vga-cyan text-vga-black border-vga-cyan' : 'text-vga-gray border-vga-gray hover:text-vga-bright-white hover:border-vga-bright-white'}`}
+            >
+              ENGINE
+            </button>
+          </div>
+        </div>
         <button onClick={onBack} className="bg-vga-red text-vga-bright-white px-3 py-1 text-[8px] border border-vga-black hover:bg-vga-light-red">
           {t('btn.back')}
         </button>
       </div>
 
-      <div className="bg-vga-gray border-4 border-vga-blue p-6 flex flex-col gap-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+      {tab === 'engine' && (
+        <div className="bg-vga-gray border-4 border-vga-blue p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+          <EngineSettingsView />
+        </div>
+      )}
+
+      {tab === 'backup' && <div className="bg-vga-gray border-4 border-vga-blue p-6 flex flex-col gap-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
         <div className="flex flex-col gap-2">
           <h3 className="text-vga-blue text-[10px] font-bold border-b border-vga-blue pb-1 uppercase">{t('section.exportGame')}</h3>
           <p className="text-vga-black text-[8px] leading-relaxed">{t('backup.exportDesc')}</p>
@@ -105,7 +130,7 @@ export const BackupView = ({ league, onRestore, onReset, onBack }: Props) => {
             {t('btn.resetLeague')}
           </button>
         </div>
-      </div>
+      </div>}
     </div>
   );
 };

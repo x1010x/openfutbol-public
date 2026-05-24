@@ -9,7 +9,9 @@ import { FORMATIONS } from './engine/formations';
 import { getInitialLeagueState, getFantasyLeagueState, updateLeagueStats, deductWeeklySalaries, generateIncomingOffers, autoListAiPlayers, simulateAiMarketSignings, advanceSeason, simulateAiTrades, simulateAiFreeAgentSignings, simulateAiClausulazos, appendTransfer, decrementSuspensions, signingBlockKey, transferredKey, squadNeeds, groupFor, repickAiFormations, writebackMatchStamina, decayTeamStaminaAfterMatch, decrementInjuries, applyStaminaRecovery, computeTvBonus, applyTvBonus, isTransferWindowOpen, windowJornadasLeft, jornadasUntilWindowOpen } from './store/leagueStore';
 import type { TransferRecord, ManagerSeasonRecord } from './store/leagueStore';
 import type { LeagueState } from './store/leagueStore';
-import { computeBoardObjective, computeTransferDelta, firingChance, applyMeterDelta, METER_DELTAS, isObjectiveMet, computeMatchMeterDelta, computeMatchReputationDelta, computeSeasonReputationDelta } from './engine/florentinometro';
+import { computeBoardObjective, computeTransferDelta, firingChance, applyMeterDelta, isObjectiveMet, computeMatchMeterDelta, computeMatchReputationDelta, computeSeasonReputationDelta } from './engine/florentinometro';
+import { engineSettings, loadEngineSettings } from './engine/engineSettings';
+loadEngineSettings();
 import { LeagueTable } from './components/LeagueTable';
 import { StatusBar } from './components/StatusBar';
 import { SquadView } from './components/SquadView';
@@ -1063,7 +1065,7 @@ function App() {
       const lastWeek = weeks?.[weeks.length - 1];
       if (lastWeek) {
         const net = (lastWeek.income ?? 0) - (lastWeek.salaries ?? 0);
-        const weekDelta = net >= 0 ? METER_DELTAS.weeklyPositive : METER_DELTAS.weeklyNegative;
+        const weekDelta = net >= 0 ? engineSettings.meterWeeklyPositive : engineSettings.meterWeeklyNegative;
         const newMeter = applyMeterDelta(newLeague.florentinometro ?? 5, weekDelta);
         newLeague = {
           ...newLeague,

@@ -1,4 +1,5 @@
 import type { Team, Player } from '../types/game.d.ts';
+import { engineSettings } from './engineSettings';
 
 export type BoardObjective = 'avoid_relegation' | 'top_half' | 'top_4' | 'win_league';
 
@@ -165,7 +166,7 @@ export const computeMatchMeterDelta = (params: {
   const goalDiff = userGoals - oppGoals;
   const cleanSheet = oppGoals === 0;
 
-  let delta = isWin ? 0.30 : isDraw ? 0.00 : -0.35;
+  let delta = isWin ? engineSettings.meterWinBase : isDraw ? engineSettings.meterDrawBase : engineSettings.meterLossBase;
 
   if (isWin) {
     if (strengthDiff < -5) delta += isHome ? 0.20 : 0.30; // upset win

@@ -1,5 +1,6 @@
 import type { Team, Player, MatchEvent, Position } from '../types/game.d.ts';
 import type { BoardObjective } from '../engine/florentinometro';
+import { engineSettings } from '../engine/engineSettings';
 import { getTeamsForYearWithOverflow, getFreeAgents, getEligibleFreeAgents, advancePlayerToYear, extractDbId } from '../data/mockTeams';
 import { generateSchedule } from '../engine/calendar';
 import { pickBestFormation, computePositionWeightedMedia } from '../engine/formations';
@@ -671,7 +672,7 @@ export const applyStaminaRecovery = (state: LeagueState): LeagueState => {
     ...team,
     players: team.players.map(p => ({
       ...p,
-      stamina: Math.min(99, (p.stamina ?? 99) + Math.round(12 + (p.stats.physical / 99) * 13)),
+      stamina: Math.min(99, (p.stamina ?? 99) + Math.round((12 + (p.stats.physical / 99) * 13) * engineSettings.staminaRecoveryMult)),
     })),
   }));
   return { ...state, teams: newTeams };
@@ -761,7 +762,7 @@ export const simulateAiMarketSignings = (state: LeagueState): LeagueState => {
 
   let working = state;
   for (const buyer of [...aiTeams].sort(() => Math.random() - 0.5)) {
-    if (Math.random() > 0.3) continue;
+    if (Math.random() > engineSettings.aiSigningProb) continue;
     const liveTeam = working.teams.find(t => t.id === buyer.id);
     if (!liveTeam || liveTeam.players.length >= 25) continue;
 
@@ -1227,7 +1228,7 @@ export const simulateAiFreeAgentSignings = (state: LeagueState): LeagueState => 
   const shuffled = [...aiTeams].sort(() => Math.random() - 0.5);
 
   for (const team of shuffled) {
-    if (Math.random() > 0.25) continue;
+    if (Math.random() > engineSettings.aiSigningProb) continue;
     const liveTeam = working.teams.find(t => t.id === team.id);
     if (!liveTeam || liveTeam.players.length >= 25) continue;
     if (working.freeAgents.length === 0) break;
@@ -1320,8 +1321,7 @@ export const simulateAiClausulazos = (state: LeagueState): LeagueState => {
         : 0;
       if (player.media <= weakestMedia + 5) continue; // must be a substantial upgrade
 
-      // ~5% chance per eligible rival → averages ~1 clausulazo per window
-      if (Math.random() > 0.05) continue;
+      if (Math.random() > engineSettings.aiClausulazoProb) continue;
 
       // Execute the clausulazo
       const newTeams = state.teams.map(t => {
@@ -1380,7 +1380,7 @@ export const simulateAiClausulazos = (state: LeagueState): LeagueState => {
 export const simulateAiTrades = (state: LeagueState): LeagueState => {
   const aiTeams = state.teams.filter(t => t.id !== state.userTeamId);
   if (aiTeams.length < 2) return state;
-  if (Math.random() > 0.45) return state;
+  if (Math.random() > engineSettings.aiTradeProb) return state;
 
   const shuffled = [...aiTeams].sort(() => Math.random() - 0.5);
   const teamA = shuffled[0];
