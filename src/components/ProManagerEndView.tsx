@@ -8,6 +8,14 @@ import { formatEuros } from '../data/economy';
 import { TeamCrest } from './TeamCrest';
 import { useT } from '../i18n';
 
+function keepProbability(meter: number): number {
+  if (meter >= 9) return 0.97;
+  if (meter >= 7) return 0.80;
+  if (meter >= 6) return 0.60;
+  // Exponential decay below 6
+  return Math.max(0, 0.60 * Math.pow(0.40, 6 - meter));
+}
+
 const OBJ_KEYS: Record<BoardObjective, string> = {
   win_league:       'florentino.obj.win_league',
   top_4:            'florentino.obj.top_4',
@@ -53,9 +61,9 @@ export const ProManagerEndView = ({
   const totalTeams = sortedStats.length;
   const myStats = stats[userTeamId];
   const objectiveMet = isObjectiveMet(boardObjective, userRank, totalTeams);
-  const boardHappy = florentinometro >= 5 && objectiveMet;
-
   const meter = clampMeter(florentinometro);
+  const [boardKeepsYou] = useState(() => Math.random() < keepProbability(meter));
+  const boardHappy = boardKeepsYou;
   const meterColor =
     meter >= 7 ? '#55ff55' :
     meter >= 5 ? '#ffff55' :
