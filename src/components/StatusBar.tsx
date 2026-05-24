@@ -6,11 +6,14 @@ import { objectiveLabel, clampMeter } from '../engine/florentinometro';
 
 interface Props {
   league: LeagueState;
+  windowOpen?: boolean;
+  windowJornadasLeft?: number;
+  jornadasUntilOpen?: number;
   onBoardAlert?: () => void;
   onCareer?: () => void;
 }
 
-export const StatusBar = ({ league, onBoardAlert, onCareer }: Props) => {
+export const StatusBar = ({ league, windowOpen, windowJornadasLeft, jornadasUntilOpen, onBoardAlert, onCareer }: Props) => {
   const t = useT();
   if (!league.isStarted) return null;
   const userTeam = league.teams.find(t => t.id === league.userTeamId);
@@ -75,6 +78,20 @@ export const StatusBar = ({ league, onBoardAlert, onCareer }: Props) => {
           <span className="text-vga-cyan cool:text-rc-accent">{t('status.diff')}</span>
           <span className={diff >= 0 ? 'text-vga-light-green' : 'text-vga-light-red'}>{diffStr}</span>
         </div>
+        {windowOpen !== undefined && (
+          <div className={`flex items-center gap-1 px-1 border ${windowOpen ? 'border-vga-light-green' : 'border-vga-light-red'}`}>
+            <span className={`font-bold ${windowOpen ? 'text-vga-light-green' : 'text-vga-light-red'}`}>
+              {windowOpen ? '▲' : '▼'}
+            </span>
+            <span className={`font-bold ${windowOpen ? 'text-vga-light-green' : 'text-vga-light-red'}`}>
+              {windowOpen
+                ? `MKT ${windowJornadasLeft}J`
+                : jornadasUntilOpen && jornadasUntilOpen < 900
+                  ? `MKT +${jornadasUntilOpen}J`
+                  : 'MKT ✗'}
+            </span>
+          </div>
+        )}
         <div className="flex items-center gap-1 ml-auto">
           <span className="text-vga-cyan cool:text-rc-accent">{t('status.cash')}</span>
           <span className={`font-bold ${cashColor}`}>{formatEuros(userTeam.budget)}</span>

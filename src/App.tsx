@@ -1346,6 +1346,19 @@ function App() {
     setView('MANAGER_CAREER');
   };
 
+  const handleRenameManager = (name: string) => {
+    setLeague(prev => ({ ...prev, managerName: name.trim() || prev.managerName }));
+  };
+
+  const handleImportCareer = (data: { managerName?: string; managerCareer?: ManagerSeasonRecord[]; managerReputation?: number }) => {
+    setLeague(prev => ({
+      ...prev,
+      ...(data.managerName ? { managerName: data.managerName } : {}),
+      ...(data.managerCareer ? { managerCareer: data.managerCareer } : {}),
+      ...(data.managerReputation !== undefined ? { managerReputation: data.managerReputation } : {}),
+    }));
+  };
+
   const handleResetGame = () => {
     localStorage.removeItem('openfutbol_league');
     localStorage.removeItem('openfutbol_welcomed');
@@ -1577,6 +1590,8 @@ function App() {
           career={league.managerCareer ?? []}
           currentMeter={league.florentinometro ?? 5}
           managerReputation={league.managerReputation}
+          onRename={handleRenameManager}
+          onImport={handleImportCareer}
           onBack={() => setView(league.isStarted ? 'LEAGUE' : 'LEAGUE')}
         />
       );
@@ -2210,6 +2225,9 @@ function App() {
       <div className="w-full max-w-4xl">
         <StatusBar
           league={league}
+          windowOpen={windowOpen}
+          windowJornadasLeft={winLeft}
+          jornadasUntilOpen={winUntil}
           onBoardAlert={lastBoardAlert ? () => setBoardAlert(lastBoardAlert) : undefined}
           onCareer={league.gameMode === 'promanager' && (league.managerCareer?.length ?? 0) > 0 ? () => setView('MANAGER_CAREER') : undefined}
         />

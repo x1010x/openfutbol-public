@@ -534,6 +534,11 @@
   "career.fired":           "DESPEDIDO",
   "career.metObj":          "OBJ CUMPLIDO",
   "career.missedObj":       "OBJ FALLADO",
+  "career.editName":        "editar",
+  "career.export":          "EXPORTAR",
+  "career.exportTitle":     "Descargar datos de carrera como JSON",
+  "career.import":          "IMPORTAR",
+  "career.importTitle":     "Cargar datos de carrera desde archivo JSON",
 
   "ai.clausulazoTitle":     "CLAUSULAZO",
   "ai.clausulazoBody":      "{team} ha ejecutado la cláusula de {player} y ha pagado {amount} directamente. El jugador ya se ha ido.",

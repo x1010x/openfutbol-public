@@ -534,6 +534,11 @@
   "career.fired":           "SACKED",
   "career.metObj":          "OBJ MET",
   "career.missedObj":       "OBJ MISSED",
+  "career.editName":        "edit",
+  "career.export":          "EXPORT",
+  "career.exportTitle":     "Download career data as JSON",
+  "career.import":          "IMPORT",
+  "career.importTitle":     "Load career data from JSON file",
 
   "ai.clausulazoTitle":     "BUYOUT TRIGGERED",
   "ai.clausulazoBody":      "{team} has activated {player}'s release clause and paid {amount} directly. The player has already left.",

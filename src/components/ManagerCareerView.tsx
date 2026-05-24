@@ -1,13 +1,22 @@
+import { useRef, useState } from 'react';
 import type { ManagerSeasonRecord } from '../store/leagueStore';
 import { useT } from '../i18n';
 import { formatEuros } from '../data/economy';
 import type { BoardObjective } from '../engine/florentinometro';
+
+interface CareerExport {
+  managerName: string;
+  managerCareer: ManagerSeasonRecord[];
+  managerReputation: number;
+}
 
 interface Props {
   managerName: string;
   career: ManagerSeasonRecord[];
   currentMeter: number;
   managerReputation?: number;
+  onRename?: (name: string) => void;
+  onImport?: (data: Partial<CareerExport>) => void;
   onBack: () => void;
 }
 
@@ -18,8 +27,12 @@ const OBJECTIVE_KEYS: Record<BoardObjective, string> = {
   avoid_relegation: 'florentino.obj.avoid_relegation',
 };
 
-export const ManagerCareerView = ({ managerName, career, currentMeter, managerReputation, onBack }: Props) => {
+export const ManagerCareerView = ({ managerName, career, currentMeter, managerReputation, onRename, onImport, onBack }: Props) => {
   const t = useT();
+  const [editingName, setEditingName] = useState(false);
+  const [nameInput, setNameInput] = useState(managerName);
+  const [importError, setImportError] = useState('');
+  const fileRef = useRef<HTMLInputElement>(null);
 
   const uniqueSeasons = new Set(career.map(r => r.year)).size;
   const totalGames = career.reduce((s, r) => s + r.gamesManaged, 0);
@@ -41,23 +54,109 @@ export const ManagerCareerView = ({ managerName, career, currentMeter, managerRe
     return `${n}th`;
   };
 
+  const handleExport = () => {
+    const data: CareerExport = {
+      managerName,
+      managerCareer: career,
+      managerReputation: managerReputation ?? 50,
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `openfutbol_career_${managerName.replace(/\s+/g, '_') || 'manager'}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleImportFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      try {
+        const data = JSON.parse(ev.target?.result as string) as Partial<CareerExport>;
+        if (!data || typeof data !== 'object') throw new Error('Invalid format');
+        onImport?.(data);
+        setImportError('');
+      } catch {
+        setImportError('Invalid file');
+      }
+      if (fileRef.current) fileRef.current.value = '';
+    };
+    reader.readAsText(file);
+  };
+
+  const commitRename = () => {
+    if (nameInput.trim()) onRename?.(nameInput.trim());
+    setEditingName(false);
+  };
+
   return (
     <div className="w-full max-w-lg flex flex-col gap-4 animate-in fade-in duration-300">
       <div className="bg-vga-black border-4 border-vga-magenta p-4 vga-panel">
-        <div className="flex justify-between items-center mb-4">
-          <div>
+        <div className="flex justify-between items-start mb-4">
+          <div className="flex-1 min-w-0 mr-3">
             <h2 className="text-vga-magenta text-sm font-bold uppercase">{t('career.title')}</h2>
-            {managerName && (
-              <p className="text-vga-bright-white text-xs mt-1">{managerName}</p>
+            {editingName ? (
+              <div className="flex items-center gap-2 mt-1">
+                <input
+                  autoFocus
+                  value={nameInput}
+                  onChange={e => setNameInput(e.target.value)}
+                  onKeyDown={e => { if (e.key === 'Enter') commitRename(); if (e.key === 'Escape') setEditingName(false); }}
+                  className="bg-vga-blue border border-vga-cyan text-vga-bright-white text-[9px] px-2 py-1 font-mono outline-none w-40"
+                  maxLength={30}
+                />
+                <button onClick={commitRename} className="text-[8px] bg-vga-cyan text-vga-black px-2 py-0.5 font-bold">✓</button>
+                <button onClick={() => setEditingName(false)} className="text-[8px] text-vga-gray">✕</button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 mt-1">
+                {managerName && <p className="text-vga-bright-white text-xs">{managerName}</p>}
+                {onRename && (
+                  <button
+                    onClick={() => { setNameInput(managerName); setEditingName(true); }}
+                    className="text-[8px] text-vga-gray hover:text-vga-cyan underline decoration-dotted"
+                  >
+                    {t('career.editName')}
+                  </button>
+                )}
+              </div>
             )}
           </div>
-          <button
-            onClick={onBack}
-            className="text-[8px] bg-vga-gray text-vga-black px-2 py-1 border border-vga-white hover:bg-vga-red hover:text-vga-bright-white"
-          >
-            {t('btn.back')}
-          </button>
+          <div className="flex gap-2 items-center shrink-0">
+            {onImport && (
+              <>
+                <button
+                  onClick={handleExport}
+                  className="text-[7px] bg-vga-blue text-vga-cyan px-2 py-1 border border-vga-cyan hover:bg-vga-cyan hover:text-vga-black"
+                  title={t('career.exportTitle')}
+                >
+                  {t('career.export')}
+                </button>
+                <button
+                  onClick={() => fileRef.current?.click()}
+                  className="text-[7px] bg-vga-blue text-vga-yellow px-2 py-1 border border-vga-yellow hover:bg-vga-yellow hover:text-vga-black"
+                  title={t('career.importTitle')}
+                >
+                  {t('career.import')}
+                </button>
+                <input ref={fileRef} type="file" accept=".json" className="hidden" onChange={handleImportFile} />
+              </>
+            )}
+            <button
+              onClick={onBack}
+              className="text-[8px] bg-vga-gray text-vga-black px-2 py-1 border border-vga-white hover:bg-vga-red hover:text-vga-bright-white"
+            >
+              {t('btn.back')}
+            </button>
+          </div>
         </div>
+
+        {importError && (
+          <p className="text-vga-light-red text-[7px] mb-2">{importError}</p>
+        )}
 
         {/* Career summary stats */}
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-4">

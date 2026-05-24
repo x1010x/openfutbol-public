@@ -1051,8 +1051,9 @@ export const generateIncomingOffers = (state: LeagueState): LeagueState => {
 
   for (const player of userTeam.players) {
     if (offers.length >= 5) break;
+    if (!player.forSale) continue; // only generate offers for players listed on the market
     const price = computePrice(player, state.year);
-    const listed = !!player.forSale;
+    const listed = true;
     const group = groupFor(player.position);
     for (const rival of state.teams) {
       if (offers.length >= 5) break;
@@ -1234,8 +1235,8 @@ export const simulateAiClausulazos = (state: LeagueState): LeagueState => {
         : 0;
       if (player.media <= weakestMedia + 5) continue; // must be a substantial upgrade
 
-      // ~10% chance per eligible rival → averages 1-2 clausulazos per window
-      if (Math.random() > 0.10) continue;
+      // ~5% chance per eligible rival → averages ~1 clausulazo per window
+      if (Math.random() > 0.05) continue;
 
       // Execute the clausulazo
       const newTeams = state.teams.map(t => {
