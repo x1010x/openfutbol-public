@@ -1,4 +1,5 @@
 import { countryName, flagPath } from '../data/countries';
+import { useT } from '../i18n';
 
 interface Props {
   code: string;
@@ -6,8 +7,9 @@ interface Props {
 }
 
 export const CountryBadge = ({ code, size = 'lg' }: Props) => {
+  const t = useT();
   if (code === 'editor') {
-    return <span className="text-vga-magenta font-bold">{size === 'sm' ? '★' : 'MIS EQUIPOS'}</span>;
+    return <span className="text-vga-magenta font-bold">{size === 'sm' ? '★' : t('setup.myTeams')}</span>;
   }
 
   const name = countryName(code);

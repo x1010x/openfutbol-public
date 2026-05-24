@@ -4,8 +4,12 @@ import { TeamCrest } from './TeamCrest';
 import { PlayerPhoto } from './PlayerPhoto';
 import { groupFor } from '../store/leagueStore';
 import { usePlayerTooltip } from '../contexts/PlayerTooltipContext';
+import { t, useT as useTranslation } from '../i18n';
 
 type DraftPos = 'POR' | 'DEF' | 'MED' | 'DEL';
+
+const POS_KEY: Record<string, string> = { POR: 'pos.GK', DEF: 'pos.DEF', MED: 'pos.MID', DEL: 'pos.FWD', ALL: 'pos.ALL' };
+const posLabel = (pos: string) => t(POS_KEY[pos] ?? pos);
 
 interface Props {
   year: number;
@@ -96,7 +100,7 @@ const PoolRow = ({
       }`}
     >
       <PlayerPhoto playerId={player.id} size="xs" className="shrink-0 border border-vga-gray" />
-      <span className={`text-[7px] font-bold px-1 shrink-0 ${POS_BADGE[pos]}`}>{pos}</span>
+      <span className={`text-[7px] font-bold px-1 shrink-0 ${POS_BADGE[pos]}`}>{posLabel(pos)}</span>
       <span className="text-vga-bright-white text-[8px] flex-1 min-w-0">{player.fullName}</span>
       <div className="hidden sm:flex items-center gap-2 shrink-0">
         {keyStats.map(s => (
@@ -130,7 +134,7 @@ const SquadPanel = ({ picks, label, isUser, cap, spent }: {
       </div>
       {cap !== null && isUser && (
         <div className={`px-2 py-0.5 text-[7px] font-bold border-b border-vga-gray ${remaining! < 60 ? 'text-vga-light-red' : remaining! < 150 ? 'text-vga-yellow' : 'text-vga-cyan'}`}>
-          CAP {spent}/{cap} · RESTO {remaining}
+          {t('draft.capStatus', { spent: String(spent), cap: String(cap), remaining: String(remaining) })}
         </div>
       )}
       {sorted.length === 0 ? (
@@ -142,7 +146,7 @@ const SquadPanel = ({ picks, label, isUser, cap, spent }: {
             if (group.length === 0) return null;
             return (
               <div key={pos}>
-                <div className={`px-2 py-0.5 text-[6px] font-bold uppercase border-b border-vga-gray ${POS_SECTION_COLOR[pos]}`}>{pos}</div>
+                <div className={`px-2 py-0.5 text-[6px] font-bold uppercase border-b border-vga-gray ${POS_SECTION_COLOR[pos]}`}>{posLabel(pos)}</div>
                 {group.map(p => (
                   <div key={p.id} className="flex items-center gap-1.5 px-2 py-1 border-b border-vga-gray last:border-0"
                     onMouseMove={e => show(p, e.clientX, e.clientY)} onMouseLeave={hide}>
@@ -185,7 +189,7 @@ const RivalPanel = ({ team, picks, isCurrent }: {
             if (group.length === 0) return null;
             return (
               <div key={pos}>
-                <div className={`px-2 py-0.5 text-[6px] font-bold ${POS_SECTION_COLOR[pos]} border-b border-vga-gray`}>{pos}</div>
+                <div className={`px-2 py-0.5 text-[6px] font-bold ${POS_SECTION_COLOR[pos]} border-b border-vga-gray`}>{posLabel(pos)}</div>
                 {group.map(p => (
                   <div key={p.id} className="flex items-center gap-1.5 px-2 py-0.5 border-b border-vga-gray last:border-0"
                     onMouseMove={e => show(p, e.clientX, e.clientY)} onMouseLeave={hide}>
@@ -207,6 +211,7 @@ const RivalPanel = ({ team, picks, isCurrent }: {
 export const FantasyDraftView = ({
   year, teamIds, userTeamId, cap, allTeams, pool: initialPool, onComplete, onBack,
 }: Props) => {
+  const tr = useTranslation();
   const [pool, setPool] = useState<Player[]>(initialPool);
   const [teamPicks, setTeamPicks] = useState<Record<string, Player[]>>(() =>
     Object.fromEntries(teamIds.map(id => [id, []]))
@@ -272,7 +277,7 @@ export const FantasyDraftView = ({
     return (
       <div className="w-full max-w-2xl flex flex-col gap-6 animate-in fade-in duration-500">
         <div className="bg-vga-blue p-4 border-4 border-vga-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-          <h2 className="text-vga-yellow text-center text-sm underline decoration-double mb-6">SORTEO TERMINADO</h2>
+          <h2 className="text-vga-yellow text-center text-sm underline decoration-double mb-6">{tr('draft.draftDone')}</h2>
           <div className="flex flex-col gap-3 mb-4">
             {teamIds.map(id => {
               const t = getTeam(id);
@@ -282,7 +287,7 @@ export const FantasyDraftView = ({
                   <div className="flex items-center gap-2 mb-2">
                     <TeamCrest colors={t?.colors} size="sm" title={t?.name} teamId={id} />
                     <span className={`text-[9px] font-bold ${id === userTeamId ? 'text-vga-yellow' : 'text-vga-bright-white'}`}>
-                      {t?.name ?? id}{id === userTeamId ? ' (TÚ)' : ''}
+                      {t?.name ?? id}{id === userTeamId ? ` (${tr('draft.youLabel')})` : ''}
                     </span>
                   </div>
                   <div className="flex flex-wrap gap-1">
@@ -301,7 +306,7 @@ export const FantasyDraftView = ({
           onClick={() => onComplete(teamPicks)}
           className="w-full bg-vga-green text-vga-bright-white border-b-4 border-r-4 border-vga-black p-3 text-[10px] font-bold uppercase tracking-wider hover:bg-vga-light-green"
         >
-          COMENZAR LIGA
+          {tr('draft.startLeague')}
         </button>
       </div>
     );
@@ -312,23 +317,23 @@ export const FantasyDraftView = ({
       {/* Header */}
       <div className="bg-vga-blue p-2 border-4 border-vga-white shadow-[4px_4px_0_rgba(0,0,0,1)] flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <span className="text-vga-yellow text-[9px] font-bold">RONDA {round + 1}/{TOTAL_ROUNDS}</span>
-          <span className={`text-[8px] font-bold px-2 py-0.5 ${POS_BADGE[roundPos]}`}>{roundPos}</span>
+          <span className="text-vga-yellow text-[9px] font-bold">{tr('draft.round', { n: String(round + 1), total: String(TOTAL_ROUNDS) })}</span>
+          <span className={`text-[8px] font-bold px-2 py-0.5 ${POS_BADGE[roundPos]}`}>{posLabel(roundPos)}</span>
         </div>
         <div className="flex items-center gap-2">
           {pickingTeam && <TeamCrest colors={pickingTeam.colors} size="sm" title={pickingTeam.name} teamId={pickingTeam.id} />}
           <span className={`text-[9px] font-bold ${isUserTurn ? 'text-vga-yellow' : 'text-vga-bright-white'}`}>
-            {isUserTurn ? 'TU TURNO' : (pickingTeam?.name ?? currentTeamId)}
+            {isUserTurn ? tr('draft.yourTurn') : (pickingTeam?.name ?? currentTeamId)}
           </span>
         </div>
         <button onClick={onBack} className="text-[7px] text-vga-gray border border-vga-gray px-2 py-1 hover:text-vga-bright-white hover:border-vga-white">
-          SALIR
+          {tr('draft.exit')}
         </button>
       </div>
 
       {isUserTurn && (
         <div className="bg-vga-black border-2 border-vga-yellow px-3 py-2 text-[8px] text-vga-yellow font-bold text-center">
-          ES TU TURNO — POSICIÓN RECOMENDADA: <span className={`px-2 py-0.5 ml-1 ${POS_BADGE[roundPos]}`}>{roundPos}</span>
+          {tr('draft.turnBanner')} <span className={`px-2 py-0.5 ml-1 ${POS_BADGE[roundPos]}`}>{posLabel(roundPos)}</span>
         </div>
       )}
 
@@ -336,7 +341,7 @@ export const FantasyDraftView = ({
         {/* Pool */}
         <div className="flex-1 min-w-0 flex flex-col">
           <div className="bg-vga-blue px-3 py-2 border-2 border-vga-white mb-0 flex items-center justify-between">
-            <span className="text-vga-yellow text-[8px] font-bold">POOL DE JUGADORES</span>
+            <span className="text-vga-yellow text-[8px] font-bold">{tr('draft.pool')}</span>
             <div className="flex gap-1">
               {(['ALL', 'POR', 'DEF', 'MED', 'DEL'] as const).map(pos => (
                 <button
@@ -344,14 +349,14 @@ export const FantasyDraftView = ({
                   onClick={() => setPosFilter(pos)}
                   className={`text-[7px] px-2 py-0.5 border font-bold ${posFilter === pos ? 'bg-vga-yellow text-vga-black border-vga-yellow' : 'bg-vga-black text-vga-gray border-vga-gray hover:border-vga-white hover:text-vga-bright-white'}`}
                 >
-                  {pos}
+                  {posLabel(pos)}
                 </button>
               ))}
             </div>
           </div>
           <div className="bg-vga-black border-2 border-t-0 border-vga-white overflow-y-auto" style={{ maxHeight: '520px' }}>
             {displayPool.length === 0 ? (
-              <div className="text-vga-gray text-[8px] text-center py-8">SIN JUGADORES DISPONIBLES</div>
+              <div className="text-vga-gray text-[8px] text-center py-8">{tr('draft.noPlayers')}</div>
             ) : (
               displayPool.slice(0, 60).map(p => {
                 const overBudget = isUserTurn && cap !== null && p.media > userRemaining;

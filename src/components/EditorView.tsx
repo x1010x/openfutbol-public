@@ -9,6 +9,7 @@ import { getTeamDefaults, extractDbId, buildPlayerForYear, getAllDBPlayerEntries
 import { exportTeamPack, exportPlayerPack, loadPackFromFile } from '../data/packLoader';
 import { pickBestFormation, computePositionWeightedMedia } from '../engine/formations';
 import { PlayerName } from './PlayerName';
+import { useT as useTranslation } from '../i18n';
 
 interface Props {
   league: LeagueState;
@@ -155,6 +156,7 @@ const TeamMetaEditor = ({ team, onSave, onBack, onExport, onClone }: {
 
 // ---- Main editor ----
 export const EditorView = ({ league, onUpdateLeague, onBack }: Props) => {
+  const tr = useTranslation();
   const [tab, setTab] = useState<Tab>('TEAMS');
   const [sub, setSub] = useState<SubView>({ kind: 'LIST' });
   const [teamSearch, setTeamSearch] = useState('');
@@ -701,7 +703,7 @@ export const EditorView = ({ league, onUpdateLeague, onBack }: Props) => {
       {tab === 'TEAMS' && (
         <div className="flex flex-col gap-2">
           <div className="flex gap-2">
-            <input value={teamSearch} onChange={e => setTeamSearch(e.target.value)} placeholder="Buscar equipo..."
+            <input value={teamSearch} onChange={e => setTeamSearch(e.target.value)} placeholder={tr('placeholder.searchTeam')}
               className="flex-1 bg-vga-bright-white text-vga-black text-[9px] px-2 py-1 border-2 border-vga-black font-mono" />
             <button onClick={() => setSub({ kind: 'NEW_TEAM' })}
               className="bg-vga-green text-vga-bright-white px-3 py-1 text-[8px] border border-vga-black font-bold uppercase hover:opacity-80">+ NUEVO</button>
@@ -731,7 +733,7 @@ export const EditorView = ({ league, onUpdateLeague, onBack }: Props) => {
       {tab === 'FREE_AGENTS' && (
         <div className="flex flex-col gap-2">
           <div className="flex gap-2">
-            <input value={faSearch} onChange={e => setFaSearch(e.target.value)} placeholder="Buscar jugador..."
+            <input value={faSearch} onChange={e => setFaSearch(e.target.value)} placeholder={tr('placeholder.searchPlayer')}
               className="flex-1 bg-vga-bright-white text-vga-black text-[9px] px-2 py-1 border-2 border-vga-black font-mono" />
             <button onClick={() => setSub({ kind: 'NEW_PLAYER' })}
               className="bg-vga-blue text-vga-bright-white px-3 py-1 text-[8px] border border-vga-black font-bold uppercase hover:opacity-80">+ NUEVO</button>

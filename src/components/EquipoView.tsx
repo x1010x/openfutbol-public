@@ -5,6 +5,7 @@ import { extractDbId, getPlayerNameByDbId } from '../data/mockTeams';
 import { formatJornadaDate } from '../engine/calendar';
 import { TeamCrest } from './TeamCrest';
 import { PlayerName } from './PlayerName';
+import { useT } from '../i18n';
 
 interface Props {
   team: Team;
@@ -60,6 +61,7 @@ const formatStreak = (count: number, span: StreakSpan | null): string => {
 };
 
 export const EquipoView = ({ team, league, onPlayerClick, onBack }: Props) => {
+  const t = useT();
   const [sortKey, setSortKey] = useState<SortKey>('appearances');
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
 
@@ -198,40 +200,37 @@ export const EquipoView = ({ team, league, onPlayerClick, onBack }: Props) => {
   return (
     <div className="w-full max-w-4xl flex flex-col gap-4 animate-in fade-in duration-300">
       <div className="bg-vga-blue p-2 border-2 border-vga-white flex justify-between items-center vga-panel">
-        <h2 className="text-vga-yellow text-xs uppercase font-bold truncate">EQUIPO: {team.name}</h2>
+        <h2 className="text-vga-yellow text-xs uppercase font-bold truncate">{t('section.teamTitle', { name: team.name })}</h2>
         <button onClick={onBack} className="bg-vga-red text-vga-bright-white px-3 py-1 text-[8px] border border-vga-black hover:bg-vga-light-red shrink-0">
-          VOLVER
+          {t('btn.back')}
         </button>
       </div>
 
-      {/* Identidad */}
       <div className="bg-vga-gray border-2 border-vga-blue p-3 flex items-center gap-4">
         <TeamCrest colors={team.colors} size="lg" title={team.name} teamId={team.id} />
         <div className="flex-1 grid grid-cols-2 gap-2 text-[8px]">
-          <div><span className="text-vga-blue uppercase">Entrenador:</span> <span className="text-vga-black font-bold">{team.manager}</span></div>
-          <div><span className="text-vga-blue uppercase">Estadio:</span> <span className="text-vga-black font-bold">{team.stadiumName}</span></div>
-          <div><span className="text-vga-blue uppercase">Aforo:</span> <span className="text-vga-black font-bold">{team.stadiumCapacity.toLocaleString()}</span></div>
-          <div><span className="text-vga-blue uppercase">Formación:</span> <span className="text-vga-black font-bold">{team.formation}</span></div>
+          <div><span className="text-vga-blue uppercase">{t('misc.teamIdentityCoach')}</span> <span className="text-vga-black font-bold">{team.manager}</span></div>
+          <div><span className="text-vga-blue uppercase">{t('misc.teamIdentityStadium')}</span> <span className="text-vga-black font-bold">{team.stadiumName}</span></div>
+          <div><span className="text-vga-blue uppercase">{t('misc.teamIdentityAforo')}</span> <span className="text-vga-black font-bold">{team.stadiumCapacity.toLocaleString()}</span></div>
+          <div><span className="text-vga-blue uppercase">{t('misc.teamIdentityFormation')}</span> <span className="text-vga-black font-bold">{team.formation}</span></div>
         </div>
       </div>
 
-      {/* Records */}
       <div className="bg-vga-gray border-2 border-vga-magenta p-2">
-        <h3 className="text-vga-magenta text-[10px] font-bold mb-2 uppercase border-b border-vga-magenta pb-1">Récords del club</h3>
+        <h3 className="text-vga-magenta text-[10px] font-bold mb-2 uppercase border-b border-vga-magenta pb-1">{t('section.clubRecords')}</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[8px]">
-          <div className="bg-vga-black p-2 border border-vga-gray"><span className="text-vga-cyan uppercase">Mayor victoria</span><div className="text-vga-light-green font-bold">{formatRecord(records.biggestWin, opponentNameById)}</div></div>
-          <div className="bg-vga-black p-2 border border-vga-gray"><span className="text-vga-cyan uppercase">Mayor derrota</span><div className="text-vga-light-red font-bold">{formatRecord(records.heaviestDefeat, opponentNameById)}</div></div>
-          <div className="bg-vga-black p-2 border border-vga-gray"><span className="text-vga-cyan uppercase">Más goles en un partido</span><div className="text-vga-light-green font-bold">{formatRecord(records.mostGoalsInMatch, opponentNameById)}</div></div>
-          <div className="bg-vga-black p-2 border border-vga-gray"><span className="text-vga-cyan uppercase">Racha sin perder</span><div className="text-vga-yellow font-bold">{formatStreak(records.longestUnbeaten, records.longestUnbeatenSpan)}{records.currentUnbeaten > 0 ? <span className="text-[7px] text-vga-cyan ml-1">(actual: {formatStreak(records.currentUnbeaten, records.currentUnbeatenStart ? { from: records.currentUnbeatenStart, to: { jornada: league.currentJornada - 1 >= 0 ? Math.max(1, league.currentJornada - 1) : 1, year: league.year } } : null)})</span> : null}</div></div>
-          <div className="bg-vga-black p-2 border border-vga-gray"><span className="text-vga-cyan uppercase">Racha ganadora</span><div className="text-vga-yellow font-bold">{formatStreak(records.longestWinning, records.longestWinningSpan)}{records.currentWinning > 0 ? <span className="text-[7px] text-vga-cyan ml-1">(actual: {formatStreak(records.currentWinning, records.currentWinningStart ? { from: records.currentWinningStart, to: { jornada: league.currentJornada - 1 >= 0 ? Math.max(1, league.currentJornada - 1) : 1, year: league.year } } : null)})</span> : null}</div></div>
+          <div className="bg-vga-black p-2 border border-vga-gray"><span className="text-vga-cyan uppercase">{t('misc.recordBiggestWin')}</span><div className="text-vga-light-green font-bold">{formatRecord(records.biggestWin, opponentNameById)}</div></div>
+          <div className="bg-vga-black p-2 border border-vga-gray"><span className="text-vga-cyan uppercase">{t('misc.recordHeaviestDefeat')}</span><div className="text-vga-light-red font-bold">{formatRecord(records.heaviestDefeat, opponentNameById)}</div></div>
+          <div className="bg-vga-black p-2 border border-vga-gray"><span className="text-vga-cyan uppercase">{t('misc.recordMostGoals')}</span><div className="text-vga-light-green font-bold">{formatRecord(records.mostGoalsInMatch, opponentNameById)}</div></div>
+          <div className="bg-vga-black p-2 border border-vga-gray"><span className="text-vga-cyan uppercase">{t('misc.recordUnbeaten')}</span><div className="text-vga-yellow font-bold">{formatStreak(records.longestUnbeaten, records.longestUnbeatenSpan)}{records.currentUnbeaten > 0 ? <span className="text-[7px] text-vga-cyan ml-1">{t('misc.recordCurrent', { streak: formatStreak(records.currentUnbeaten, records.currentUnbeatenStart ? { from: records.currentUnbeatenStart, to: { jornada: Math.max(1, league.currentJornada - 1), year: league.year } } : null) })}</span> : null}</div></div>
+          <div className="bg-vga-black p-2 border border-vga-gray"><span className="text-vga-cyan uppercase">{t('misc.recordWinning')}</span><div className="text-vga-yellow font-bold">{formatStreak(records.longestWinning, records.longestWinningSpan)}{records.currentWinning > 0 ? <span className="text-[7px] text-vga-cyan ml-1">{t('misc.recordCurrent', { streak: formatStreak(records.currentWinning, records.currentWinningStart ? { from: records.currentWinningStart, to: { jornada: Math.max(1, league.currentJornada - 1), year: league.year } } : null) })}</span> : null}</div></div>
         </div>
       </div>
 
-      {/* Mejor jugador esta temporada */}
       <div className="bg-vga-gray border-2 border-vga-yellow p-2">
-        <h3 className="text-vga-yellow text-[10px] font-bold mb-2 uppercase border-b border-vga-yellow pb-1 bg-vga-black px-1">Mejor jugador · temporada actual</h3>
+        <h3 className="text-vga-yellow text-[10px] font-bold mb-2 uppercase border-b border-vga-yellow pb-1 bg-vga-black px-1">{t('misc.bestPlayerSeason')}</h3>
         {mejorJugadorActual.every(p => p.seasonStats.ratingSum === 0) ? (
-          <div className="text-[8px] text-vga-black p-2 text-center">Aún no se ha jugado ningún partido este año.</div>
+          <div className="text-[8px] text-vga-black p-2 text-center">{t('misc.noMatchesThisYear')}</div>
         ) : (
           <table className="w-full text-[8px]">
             <thead className="text-vga-blue text-left border-b border-vga-blue">
@@ -265,7 +264,7 @@ export const EquipoView = ({ team, league, onPlayerClick, onBack }: Props) => {
 
       {/* Plantilla histórica */}
       <div className="bg-vga-gray border-2 border-vga-cyan p-2">
-        <h3 className="text-vga-cyan text-[10px] font-bold mb-2 uppercase border-b border-vga-cyan pb-1">Plantilla histórica</h3>
+        <h3 className="text-vga-cyan text-[10px] font-bold mb-2 uppercase border-b border-vga-cyan pb-1">{t('misc.historicSquad')}</h3>
         <div className="overflow-x-auto">
           <table className="w-full text-[8px]">
             <thead className="text-vga-blue text-left border-b border-vga-blue">
@@ -283,7 +282,7 @@ export const EquipoView = ({ team, league, onPlayerClick, onBack }: Props) => {
             </thead>
             <tbody>
               {sorted.length === 0 ? (
-                <tr><td colSpan={9} className="p-3 text-center text-vga-black">Sin partidos jugados todavía.</td></tr>
+                <tr><td colSpan={9} className="p-3 text-center text-vga-black">{t('misc.noMatchesYet')}</td></tr>
               ) : sorted.map((r, i) => (
                 <tr key={r.dbId} className={`${i % 2 === 0 ? 'bg-vga-black' : 'bg-vga-gray/20'}`}>
                   <td className={`p-1 ${r.playerId ? 'cursor-pointer hover:underline' : ''} ${r.currentlyOnTeam ? 'text-vga-bright-white' : 'text-vga-light-cyan italic'}`}
@@ -291,7 +290,7 @@ export const EquipoView = ({ team, league, onPlayerClick, onBack }: Props) => {
                     <div className="flex flex-col">
                       <span>{r.name || `#${r.dbId.slice(0, 6)}`}</span>
                       {!r.currentlyOnTeam && r.nowAt && (
-                        <span className="text-[6px] text-vga-light-magenta not-italic">ahora en {r.nowAt}</span>
+                        <span className="text-[6px] text-vga-light-magenta not-italic">{t('misc.nowAt', { team: r.nowAt })}</span>
                       )}
                     </div>
                   </td>
@@ -312,19 +311,19 @@ export const EquipoView = ({ team, league, onPlayerClick, onBack }: Props) => {
 
       {/* Salón de trofeos */}
       <div className="bg-vga-gray border-2 border-vga-blue p-2">
-        <h3 className="text-vga-blue text-[10px] font-bold mb-2 uppercase border-b border-vga-blue pb-1">Salón de trofeos</h3>
+        <h3 className="text-vga-blue text-[10px] font-bold mb-2 uppercase border-b border-vga-blue pb-1">{t('section.trophies')}</h3>
         {historyForTeam.length === 0 ? (
-          <div className="text-[8px] text-vga-black p-2 text-center">Aún no se ha completado ninguna temporada.</div>
+          <div className="text-[8px] text-vga-black p-2 text-center">{t('misc.noSeasonsCompleted')}</div>
         ) : (
           <table className="w-full text-[8px]">
             <thead className="text-vga-blue text-left border-b border-vga-blue">
               <tr>
-                <th className="p-1">AÑO</th>
-                <th className="p-1 text-center">POSICIÓN</th>
-                <th className="p-1">CAMPEÓN</th>
-                <th className="p-1">PICHICHI</th>
-                <th className="p-1">ZAMORA</th>
-                <th className="p-1">MEJOR DEL EQUIPO</th>
+                <th className="p-1">{t('trophy.year')}</th>
+                <th className="p-1 text-center">{t('trophy.position')}</th>
+                <th className="p-1">{t('trophy.champion')}</th>
+                <th className="p-1">{t('trophy.pichichi')}</th>
+                <th className="p-1">{t('trophy.zamora')}</th>
+                <th className="p-1">{t('trophy.best')}</th>
               </tr>
             </thead>
             <tbody>

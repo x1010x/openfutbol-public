@@ -1,12 +1,14 @@
 import type { LeagueState } from '../store/leagueStore';
 import { formatEuros } from '../data/economy';
 import { TeamCrest } from './TeamCrest';
+import { useT } from '../i18n';
 
 interface Props {
   league: LeagueState;
 }
 
 export const StatusBar = ({ league }: Props) => {
+  const t = useT();
   if (!league.isStarted) return null;
   const userTeam = league.teams.find(t => t.id === league.userTeamId);
   if (!userTeam) return null;
@@ -39,23 +41,23 @@ export const StatusBar = ({ league }: Props) => {
         <span className="text-vga-bright-white truncate max-w-[180px] cool:text-rc-accent">{userTeam.name}</span>
       </div>
       <div className="flex items-center gap-1">
-        <span className="text-vga-cyan cool:text-rc-accent">POS</span>
+        <span className="text-vga-cyan cool:text-rc-accent">{t('status.pos')}</span>
         <span className={`font-bold ${posColor}`}>{pos}/{total}</span>
       </div>
       <div className="flex items-center gap-1">
-        <span className="text-vga-cyan cool:text-rc-accent">JOR</span>
+        <span className="text-vga-cyan cool:text-rc-accent">{t('status.round')}</span>
         <span className="text-vga-bright-white cool:text-rc-accent">{league.currentJornada}/{league.schedule.length}</span>
       </div>
       <div className="flex items-center gap-1">
-        <span className="text-vga-cyan cool:text-rc-accent">PTS</span>
+        <span className="text-vga-cyan cool:text-rc-accent">{t('status.points')}</span>
         <span className="text-vga-yellow font-bold cool:text-rc-primary">{my?.points ?? 0}</span>
       </div>
       <div className="flex items-center gap-1">
-        <span className="text-vga-cyan cool:text-rc-accent">DIF</span>
+        <span className="text-vga-cyan cool:text-rc-accent">{t('status.diff')}</span>
         <span className={diff >= 0 ? 'text-vga-light-green' : 'text-vga-light-red'}>{diffStr}</span>
       </div>
       <div className="flex items-center gap-1 ml-auto">
-        <span className="text-vga-cyan cool:text-rc-accent">CAJA</span>
+        <span className="text-vga-cyan cool:text-rc-accent">{t('status.cash')}</span>
         <span className={`font-bold ${cashColor}`}>{formatEuros(userTeam.budget)}</span>
       </div>
     </div>

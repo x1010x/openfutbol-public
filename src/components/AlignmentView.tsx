@@ -6,6 +6,7 @@ import { ALL_FORMATIONS, FORMATIONS, effectiveMedia, isOOP, liveMed, pickBestXI,
 import { PitchDiagram } from './PitchDiagram';
 import { moodStateOf, MOOD } from '../engine/playerMood';
 import { PlayerName } from './PlayerName';
+import { useT } from '../i18n';
 
 interface IngameProps {
   subsUsed: number;
@@ -100,7 +101,7 @@ const PickerRows = ({
         </td>
         <td style={{ fontSize: 7, color: '#ffffff', padding: '2px 3px', borderRight: '1px solid #222244', maxWidth: 80, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
           <PlayerName player={p} />
-          {isTitular && <span style={{ fontSize: 5, color: '#55ffff', marginLeft: 3 }}>(campo)</span>}
+          {isTitular && <span style={{ fontSize: 5, color: '#55ffff', marginLeft: 3 }}>{t('misc.onFieldShort')}</span>}
         </td>
         <td style={{ width: 26, textAlign: 'center', fontSize: 7, fontFamily: 'monospace', color: oopFlag ? '#ff5555' : '#55ff55', borderRight: '1px solid #222244', padding: '2px 2px' }}>
           {effMed}
@@ -115,16 +116,17 @@ const PickerRows = ({
     );
   };
 
+  const t = useT();
   if (inPos.length === 0 && oop.length === 0 && field.length === 0) {
-    return <tr><td colSpan={6} style={{ padding: 8, textAlign: 'center', fontSize: 6, color: '#555577', fontStyle: 'italic' }}>Sin jugadores disponibles</td></tr>;
+    return <tr><td colSpan={6} style={{ padding: 8, textAlign: 'center', fontSize: 6, color: '#555577', fontStyle: 'italic' }}>{t('misc.noSquadAvail')}</td></tr>;
   }
 
   return (
     <>
       {inPos.map(p => makeRow(p, false))}
-      {oop.length > 0 && <Divider label="fuera de posición" color="#ff5555" bg="#1a0000" border="#442222" />}
+      {oop.length > 0 && <Divider label={t('misc.outOfPosition')} color="#ff5555" bg="#1a0000" border="#442222" />}
       {oop.map(p => makeRow(p, false))}
-      {field.length > 0 && <Divider label="en campo" color="#55ffff" bg="#000033" border="#224444" />}
+      {field.length > 0 && <Divider label={t('misc.onField')} color="#55ffff" bg="#000033" border="#224444" />}
       {field.map(p => makeRow(p, true))}
     </>
   );
@@ -138,6 +140,7 @@ const RosterRows = ({
   slotOfPlayer: Map<string, number>; selectedSlot: number | null;
   setSelectedSlot: (s: number | null) => void; togglePlayer: (pid: string) => void;
 }) => {
+  const t = useT();
   const rows: ReactNode[] = [];
   let suplenteDivider = false;
 
@@ -160,7 +163,7 @@ const RosterRows = ({
       rows.push(
         <tr key="div-suplentes">
           <td colSpan={6} style={{ background: '#001800', borderTop: '1px solid #114411', borderBottom: '1px solid #114411', padding: '1px 4px', fontSize: 5, color: '#55aa55', textAlign: 'center', textTransform: 'uppercase', letterSpacing: 2 }}>
-            ─── suplentes ───
+            ─── {t('misc.reserves')} ───
           </td>
         </tr>
       );
@@ -235,6 +238,7 @@ const RosterRows = ({
 
 // ═══ MAIN COMPONENT ═══════════════════════════════════════════════════
 export const AlignmentView = ({ team, onUpdate, onBack, onToggleDiscipline, ingame }: Props) => {
+  const t = useT();
   const teamMED = Math.floor(calculateTeamStrength(team));
   const slots = FORMATIONS[team.formation];
   const [selectedSlot, setSelectedSlot] = useState<number | null>(null);
@@ -367,8 +371,8 @@ export const AlignmentView = ({ team, onUpdate, onBack, onToggleDiscipline, inga
         <div style={headerStyle}>
           <div>
             <div style={{ fontSize: 9, color: '#ffff55', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: 2 }}>
-              {ingame ? '▶ CAMBIOS' : '▶ ALINEACIÓN'} — {team.name}
-              {ingame?.htPaused && <span style={{ marginLeft: 8, fontSize: 6, color: '#55ffff' }}>DESCANSO</span>}
+              {ingame ? t('misc.changesHeader') : t('misc.alignmentHeader')} — {team.name}
+              {ingame?.htPaused && <span style={{ marginLeft: 8, fontSize: 6, color: '#55ffff' }}>{t('misc.halftime')}</span>}
             </div>
             <div style={{ fontSize: 6, color: '#aaaaaa', textTransform: 'uppercase', marginTop: 2 }}>
               ENT: {team.manager}
@@ -380,7 +384,7 @@ export const AlignmentView = ({ team, onUpdate, onBack, onToggleDiscipline, inga
             </div>
             {ingame ? (
               <div style={{ background: '#000000', border: `2px solid ${ingame.subsUsed >= ingame.maxSubs ? '#ff5555' : '#55ff55'}`, padding: '2px 6px', fontSize: 8, color: ingame.subsUsed >= ingame.maxSubs ? '#ff5555' : '#55ff55', fontFamily: 'monospace', fontWeight: 'bold' }}>
-                CAMBIOS {ingame.subsUsed}/{ingame.maxSubs}
+                {t('misc.subsCountFmt', { used: String(ingame.subsUsed), max: String(ingame.maxSubs) })}
               </div>
             ) : (
               <div style={{ background: '#000000', border: `2px solid ${titularCount === 11 ? '#55ff55' : '#ff5555'}`, padding: '2px 6px', fontSize: 8, color: titularCount === 11 ? '#55ff55' : '#ff5555', fontFamily: 'monospace', fontWeight: 'bold' }}>
@@ -393,7 +397,7 @@ export const AlignmentView = ({ team, onUpdate, onBack, onToggleDiscipline, inga
               onMouseEnter={e => { (e.target as HTMLElement).style.background = ingame ? '#0004e0' : '#ff5555'; }}
               onMouseLeave={e => { (e.target as HTMLElement).style.background = ingame ? '#0000aa' : '#aa0000'; }}
             >
-              {ingame ? '■ CONTINUAR' : '■ GUARDAR Y SALIR'}
+              {ingame ? t('misc.continueIngame') : t('misc.saveAndExit')}
             </button>
           </div>
         </div>
@@ -404,7 +408,7 @@ export const AlignmentView = ({ team, onUpdate, onBack, onToggleDiscipline, inga
           {/* ─── LEFT: PITCH ─────────────────────────────────────── */}
           <div style={{ width: '40%', flexShrink: 0, borderRight: '4px solid #aaaaaa' }}>
             <div style={{ ...sectionLabel, color: inPickMode ? '#55ffff' : '#ffff55' }}>
-              {inPickMode ? `◉ SLOT ${slotPos} — ELIGE →` : `◈ CAMPO — ${team.formation}`}
+              {inPickMode ? t('misc.slotMode', { pos: slotPos ?? '' }) : t('misc.fieldMode', { formation: team.formation })}
             </div>
             <PitchDiagram
               team={team}
@@ -421,12 +425,12 @@ export const AlignmentView = ({ team, onUpdate, onBack, onToggleDiscipline, inga
                 onMouseEnter={e => { (e.target as HTMLElement).style.background = '#ff5555'; }}
                 onMouseLeave={e => { (e.target as HTMLElement).style.background = '#aa0000'; }}
               >
-                ✕ VACIAR SLOT
+                {t('misc.clearSlot')}
               </button>
             )}
             {inPickMode && !currentSlotPlayerId && (
               <div style={{ textAlign: 'center', padding: '3px 0', fontSize: 6, color: '#555577', borderTop: '2px solid #333344' }}>
-                slot vacío
+                {t('misc.emptySlot')}
               </div>
             )}
           </div>
@@ -434,7 +438,7 @@ export const AlignmentView = ({ team, onUpdate, onBack, onToggleDiscipline, inga
           {/* ─── RIGHT: ROSTER / PICKER ──────────────────────────── */}
           <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
             <div style={{ ...sectionLabel, color: inPickMode ? '#55ffff' : '#ffff55' }}>
-              {inPickMode ? `▶ ELIGE PARA ${slotPos}` : '▶ PLANTILLA COMPLETA'}
+              {inPickMode ? t('misc.chooseFor', { pos: slotPos ?? '' }) : t('misc.fullSquad')}
               {inPickMode && (
                 <button
                   onClick={() => setSelectedSlot(null)}
@@ -484,7 +488,7 @@ export const AlignmentView = ({ team, onUpdate, onBack, onToggleDiscipline, inga
 
         {/* ═══ FORMATION BAR ════════════════════════════════════════ */}
         <div style={{ background: 'linear-gradient(180deg, #0002cc 0%, #000088 100%)', borderTop: '4px solid #aaaaaa', borderBottom: '2px solid #333366', padding: '4px 8px', display: 'flex', alignItems: 'center', gap: 4, flexWrap: 'wrap' }}>
-          <span style={{ fontSize: 6, color: '#ffff55', fontWeight: 'bold', textTransform: 'uppercase', marginRight: 4, letterSpacing: 1 }}>FORMACIÓN:</span>
+          <span style={{ fontSize: 6, color: '#ffff55', fontWeight: 'bold', textTransform: 'uppercase', marginRight: 4, letterSpacing: 1 }}>{t('misc.formation')}</span>
           {ALL_FORMATIONS.map(f => {
             const active = f === team.formation;
             return (
@@ -516,7 +520,7 @@ export const AlignmentView = ({ team, onUpdate, onBack, onToggleDiscipline, inga
         <div style={{ background: '#000008', borderTop: '2px solid #333344', padding: '4px 8px', display: 'flex', alignItems: 'center', gap: 6 }}>
           {!ingame && (
             <CmdButton onClick={handleAutoFix} color="#55ff55" hoverBg="#00aa00">
-              ■ AUTO-11
+              {t('misc.auto11')}
             </CmdButton>
           )}
           <CmdButton
@@ -524,17 +528,17 @@ export const AlignmentView = ({ team, onUpdate, onBack, onToggleDiscipline, inga
             color={team.tacticalDiscipline ? '#55ffff' : '#ff55ff'}
             hoverBg={team.tacticalDiscipline ? '#00aaaa' : '#aa00aa'}
           >
-            ■ {team.tacticalDiscipline ? 'TAC:POS' : 'TAC:LIB'}
+            ■ {team.tacticalDiscipline ? t('misc.tactPos') : t('misc.tactFree')}
           </CmdButton>
           {inPickMode && (
             <CmdButton onClick={() => setSelectedSlot(null)} color="#ffff55" hoverBg="#888800">
-              ■ CANCELAR
+              ■ {t('btn.cancel')}
             </CmdButton>
           )}
           <div style={{ marginLeft: 'auto', fontSize: 6, color: '#333355' }}>
             {ingame
-              ? (ingame.subsUsed >= ingame.maxSubs ? '✕ CAMBIOS AGOTADOS' : inPickMode ? 'ELIGE QUIÉN ENTRA' : 'CLIC EN UN TITULAR PARA SUSTITUIRLO')
-              : (inPickMode ? 'CLIC EN UN JUGADOR PARA ASIGNARLO AL SLOT' : 'CLIC EN EL CAMPO PARA SELECCIONAR UN SLOT')}
+              ? (ingame.subsUsed >= ingame.maxSubs ? t('misc.subsExhausted') : inPickMode ? t('misc.pickIncoming') : t('misc.clickTitular'))
+              : (inPickMode ? t('misc.clickPlayer') : t('misc.clickSlot'))}
           </div>
         </div>
 

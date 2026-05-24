@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useT } from '../i18n';
 import type { Player, Position, Team } from '../types/game.d.ts';
 import { PlayerName } from './PlayerName';
 
@@ -35,12 +36,12 @@ interface Props {
   onCounterIncomingOffer?: (offerId: string, requestedCash: number, requestedPlayerIds: string[]) => void;
 }
 
-const GROUPS: { label: string; positions: Position[] }[] = [
-  { label: 'PORTEROS',     positions: ['POR'] },
-  { label: 'DEFENSAS',     positions: ['DEF'] },
-  { label: 'CENTROCAMPO',  positions: ['MED'] },
-  { label: 'EXTREMOS',     positions: ['AML', 'AMR'] },
-  { label: 'DELANTEROS',   positions: ['DEL'] },
+const POS_GROUPS: { key: string; positions: Position[] }[] = [
+  { key: 'pos.POR', positions: ['POR'] },
+  { key: 'pos.DEF', positions: ['DEF'] },
+  { key: 'pos.MED', positions: ['MED'] },
+  { key: 'pos.EXT', positions: ['AML', 'AMR'] },
+  { key: 'pos.DEL', positions: ['DEL'] },
 ];
 
 export const SquadView = ({
@@ -57,6 +58,7 @@ export const SquadView = ({
   onRejectIncomingOffer,
   onCounterIncomingOffer,
 }: Props) => {
+  const t = useT();
   const [counterOfferId, setCounterOfferId] = useState<string | null>(null);
   const [counterCash, setCounterCash] = useState(0);
   const [counterPlayerIds, setCounterPlayerIds] = useState<Set<string>>(new Set());
@@ -91,26 +93,26 @@ export const SquadView = ({
   return (
     <div className="w-full max-w-5xl flex flex-col gap-4">
       <div className="flex justify-between items-center bg-vga-blue p-2 border-2 border-vga-white vga-panel">
-        <h2 className="text-vga-yellow text-xs">PLANTILLA: {team.name}</h2>
+        <h2 className="text-vga-yellow text-xs">{t('section.squad', { team: team.name })}</h2>
         <button
           onClick={onBack}
           className="bg-vga-red text-vga-bright-white px-2 py-1 text-[8px] border border-vga-black"
         >
-          VOLVER
+          {t('btn.back')}
         </button>
       </div>
 
       <div className="grid grid-cols-3 gap-2 text-[8px]">
         <div className="bg-vga-gray border border-vga-blue p-2 text-center">
-          <div className="text-vga-black uppercase">Presupuesto</div>
+          <div className="text-vga-black uppercase">{t('label.budget')}</div>
           <div className="text-vga-blue font-bold text-[10px]">{formatEuros(team.budget)}</div>
         </div>
         <div className="bg-vga-gray border border-vga-blue p-2 text-center">
-          <div className="text-vga-black uppercase">Jugadores</div>
+          <div className="text-vga-black uppercase">{t('label.players')}</div>
           <div className="text-vga-blue font-bold text-[10px]">{team.players.length}</div>
         </div>
         <div className="bg-vga-gray border border-vga-blue p-2 text-center">
-          <div className="text-vga-black uppercase">En mercado</div>
+          <div className="text-vga-black uppercase">{t('label.market')}</div>
           <div className="text-vga-blue font-bold text-[10px]">{listedCount}</div>
         </div>
       </div>
@@ -118,17 +120,17 @@ export const SquadView = ({
 
       {!readOnly && !canList && (
         <div className="bg-vga-magenta border-2 border-vga-white text-[8px] text-vga-bright-white text-center p-2 uppercase">
-          Necesitas más de 11 jugadores para poner alguno en venta.
+          {t('misc.minSquadWarn')}
         </div>
       )}
 
-      {GROUPS.map(group => {
+      {POS_GROUPS.map(group => {
         const players = groupPlayers(group.positions);
         if (players.length === 0) return null;
         return (
-          <div key={group.label} className="border-2 border-vga-cyan bg-vga-blue p-2">
+          <div key={group.key} className="border-2 border-vga-cyan bg-vga-blue p-2">
             <h3 className="text-vga-cyan text-[10px] font-bold mb-2 uppercase border-b border-vga-cyan pb-1">
-              {group.label} <span className="text-vga-gray">({players.length})</span>
+              {t(group.key)} <span className="text-vga-gray">({players.length})</span>
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
               {players.map(player => {
@@ -177,7 +179,7 @@ export const SquadView = ({
                               onClick={() => toggleOfferPlayer(player.id)}
                               className="px-2 py-1 text-[7px] border border-vga-black bg-vga-yellow text-vga-black font-bold hover:bg-vga-bright-white"
                             >
-                              {isOfferOpen ? 'CERRAR' : `VER OFERTA${playerOffers.length > 1 ? 'S' : ''}`}
+                              {isOfferOpen ? t('btn.close') : playerOffers.length > 1 ? t('btn.viewOffers') : t('btn.viewOffer')}
                             </button>
                           </div>
                         ) : (
@@ -194,7 +196,7 @@ export const SquadView = ({
                                   : 'bg-vga-red text-vga-bright-white hover:bg-vga-light-red'
                               }`}
                             >
-                              {listed ? 'QUITAR DEL MERCADO' : 'PONER EN MERCADO'}
+                              {listed ? t('btn.delist') : t('btn.listForSale')}
                             </button>
                           </div>
                         )}
@@ -224,19 +226,19 @@ export const SquadView = ({
                               <div className="p-2 flex items-start justify-between gap-2">
                                 <div className="flex-1 min-w-0">
                                   <div className="text-[7px] text-vga-cyan">
-                                    DE <span className="text-vga-bright-white">{bidder.name}</span>
+                                    {t('misc.fromTeam')} <span className="text-vga-bright-white">{bidder.name}</span>
                                     {offer.expiresAt != null && currentJornada != null && (() => {
                                       const rem = offer.expiresAt - currentJornada;
                                       return rem <= 1 ? (
-                                        <span className="ml-2 text-vga-light-red font-bold">EXPIRA HOY</span>
+                                        <span className="ml-2 text-vga-light-red font-bold">{t('misc.expiresNow')}</span>
                                       ) : (
-                                        <span className="ml-2 text-vga-yellow">EXP J{offer.expiresAt}</span>
+                                        <span className="ml-2 text-vga-yellow">{t('misc.expiresAt', { j: String(offer.expiresAt) })}</span>
                                       );
                                     })()}
                                   </div>
                                   {isSwap && (
                                     <div className="text-[7px] text-vga-magenta mt-0.5">
-                                      + INCLUYE:{' '}
+                                      {t('misc.includes')}{' '}
                                       {offeredPlayers.map((p, i) => (
                                         <span key={p.id}>
                                           {i > 0 && ', '}
@@ -253,30 +255,30 @@ export const SquadView = ({
                                     </div>
                                   )}
                                   <div className="text-[9px] mt-0.5">
-                                    {isSwap ? 'TOTAL' : 'OFERTA'}{' '}
+                                    {isSwap ? t('misc.total') : t('misc.offer')}{' '}
                                     <span className={`font-bold ${offerRatioClass}`}>{formatEuros(totalValue)}</span>
                                     <span className="text-vga-gray ml-1">({Math.round(ratio * 100)}%)</span>
                                     {isSwap && offer.amount > 0 && (
-                                      <span className="text-vga-cyan ml-2 text-[7px]">+{formatEuros(offer.amount)} efectivo</span>
+                                      <span className="text-vga-cyan ml-2 text-[7px]">+{formatEuros(offer.amount)} {t('misc.cashSuffix')}</span>
                                     )}
                                   </div>
                                 </div>
                                 <div className="flex flex-col gap-1 shrink-0">
-                                  <button onClick={() => onAcceptIncomingOffer!(offer.id)} className="bg-vga-green text-vga-bright-white px-2 py-1 text-[7px] border border-vga-black hover:bg-vga-light-green">ACEPTAR</button>
+                                  <button onClick={() => onAcceptIncomingOffer!(offer.id)} className="bg-vga-green text-vga-bright-white px-2 py-1 text-[7px] border border-vga-black hover:bg-vga-light-green">{t('btn.accept')}</button>
                                   {onCounterIncomingOffer && (
                                     <button
                                       onClick={() => isCountering ? closeCounter() : openCounter(offer.id, offer.amount)}
                                       className={`px-2 py-1 text-[7px] border border-vga-black font-bold ${isCountering ? 'bg-vga-gray text-vga-black' : 'bg-vga-yellow text-vga-black hover:bg-vga-bright-white'}`}
-                                    >CONTRA</button>
+                                    >{t('btn.counter')}</button>
                                   )}
-                                  <button onClick={() => onRejectIncomingOffer!(offer.id)} className="bg-vga-red text-vga-bright-white px-2 py-1 text-[7px] border border-vga-black hover:bg-vga-light-red">RECHAZAR</button>
+                                  <button onClick={() => onRejectIncomingOffer!(offer.id)} className="bg-vga-red text-vga-bright-white px-2 py-1 text-[7px] border border-vga-black hover:bg-vga-light-red">{t('btn.reject')}</button>
                                 </div>
                               </div>
                               {isCountering && (
                                 <div className="border-t border-vga-yellow bg-vga-blue/20 p-2 flex flex-col gap-2">
-                                  <div className="text-[7px] text-vga-yellow font-bold uppercase">Contraoferta a {bidder.name}</div>
+                                  <div className="text-[7px] text-vga-yellow font-bold uppercase">{t('misc.counterTitle', { team: bidder.name })}</div>
                                   <div className="flex items-center gap-2">
-                                    <span className="text-[7px] text-vga-bright-white">Efectivo:</span>
+                                    <span className="text-[7px] text-vga-bright-white">{t('label.cash')}:</span>
                                     <button onClick={() => setCounterCash(c => Math.max(0, c - counterStep))} className="bg-vga-gray text-vga-black px-1.5 border border-vga-black text-[8px]">−</button>
                                     <span className="text-vga-yellow font-bold text-[9px] min-w-[110px] text-center">{formatEuros(counterCash)}</span>
                                     <button onClick={() => setCounterCash(c => c + counterStep)} className="bg-vga-gray text-vga-black px-1.5 border border-vga-black text-[8px]">+</button>
@@ -285,7 +287,7 @@ export const SquadView = ({
                                   </div>
                                   {bidderBench.length > 0 && (
                                     <div className="flex flex-col gap-0.5">
-                                      <div className="text-[7px] text-vga-bright-white">Pedir jugadores de {bidder.name} (máx. 2):</div>
+                                      <div className="text-[7px] text-vga-bright-white">{t('misc.requestPlayers', { team: bidder.name })}</div>
                                       <div className="max-h-32 overflow-y-auto flex flex-col gap-0.5">
                                         {bidderBench.map(p => {
                                           const sel = counterPlayerIds.has(p.id);
@@ -312,19 +314,19 @@ export const SquadView = ({
                                   )}
                                   <div className="flex items-center justify-between gap-2 mt-1">
                                     <div className="text-[7px]">
-                                      <span className="text-vga-gray">Total pedido: </span>
+                                      <span className="text-vga-gray">{t('misc.totalRequested')} </span>
                                       <span className="text-vga-yellow font-bold">{formatEuros(counterTotal)}</span>
-                                      <span className="text-vga-gray ml-1">({Math.round((counterTotal / price) * 100)}% del valor)</span>
+                                      <span className="text-vga-gray ml-1">{t('misc.pctOfValue', { pct: String(Math.round((counterTotal / price) * 100)) })}</span>
                                     </div>
                                     <div className="flex gap-1">
-                                      <button onClick={closeCounter} className="bg-vga-gray text-vga-black px-2 py-1 text-[7px] border border-vga-black">CANCELAR</button>
+                                      <button onClick={closeCounter} className="bg-vga-gray text-vga-black px-2 py-1 text-[7px] border border-vga-black">{t('btn.cancel')}</button>
                                       <button
                                         onClick={() => {
                                           onCounterIncomingOffer!(offer.id, counterCash, [...counterPlayerIds]);
                                           closeCounter();
                                         }}
                                         className="bg-vga-green text-vga-bright-white px-2 py-1 text-[7px] border border-vga-black hover:bg-vga-light-green font-bold"
-                                      >ENVIAR</button>
+                                      >{t('btn.send')}</button>
                                     </div>
                                   </div>
                                 </div>

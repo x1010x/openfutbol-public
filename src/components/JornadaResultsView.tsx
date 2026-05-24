@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { Team, MatchEvent } from '../types/game.d.ts';
 import type { Jornada, MatchInfo } from '../engine/calendar';
 import { TeamCrest } from './TeamCrest';
+import { useT } from '../i18n';
 
 interface Props {
   jornada: Jornada | null;
@@ -20,14 +21,15 @@ const findPlayerName = (teams: Team[], playerId?: string): string => {
 };
 
 export const MatchDetails = ({ match, teams }: { match: MatchInfo; teams: Team[] }) => {
+  const t = useT();
   if (!match.played || !match.events || match.events.length === 0) return null;
 
   const eventsForTeam = (teamId: string, type: MatchEvent['type']) =>
     (match.events ?? [])
       .filter(e => e.type === type && e.playerId)
       .filter(e => {
-        const t = teams.find(team => team.id === teamId);
-        return !!t?.players.some(p => p.id === e.playerId);
+        const team = teams.find(team => team.id === teamId);
+        return !!team?.players.some(p => p.id === e.playerId);
       })
       .sort((a, b) => a.minute - b.minute);
 
@@ -62,14 +64,14 @@ export const MatchDetails = ({ match, teams }: { match: MatchInfo; teams: Team[]
     <div className="border-t-2 border-vga-gray mt-1 pt-2 px-3 pb-2">
       <div className="grid grid-cols-2 gap-4">
         <div className="text-right space-y-2">
-          <Section label="Goles" items={homeGoals} color="text-vga-light-green" />
-          <Section label="Amarillas" items={homeYellows} color="text-vga-yellow" />
-          <Section label="Rojas" items={homeReds} color="text-vga-light-red" />
+          <Section label={t('label.goals')} items={homeGoals} color="text-vga-light-green" />
+          <Section label={t('label.yellows')} items={homeYellows} color="text-vga-yellow" />
+          <Section label={t('label.redCards')} items={homeReds} color="text-vga-light-red" />
         </div>
         <div className="text-left space-y-2">
-          <Section label="Goles" items={awayGoals} color="text-vga-light-green" />
-          <Section label="Amarillas" items={awayYellows} color="text-vga-yellow" />
-          <Section label="Rojas" items={awayReds} color="text-vga-light-red" />
+          <Section label={t('label.goals')} items={awayGoals} color="text-vga-light-green" />
+          <Section label={t('label.yellows')} items={awayYellows} color="text-vga-yellow" />
+          <Section label={t('label.redCards')} items={awayReds} color="text-vga-light-red" />
         </div>
       </div>
     </div>
@@ -77,8 +79,9 @@ export const MatchDetails = ({ match, teams }: { match: MatchInfo; teams: Team[]
 };
 
 export const JornadaResultsView = ({ jornada, teams, userTeamId, onContinue }: Props) => {
-  const teamName = (id: string) => teams.find(t => t.id === id)?.name ?? '—';
-  const teamColors = (id: string) => teams.find(t => t.id === id)?.colors;
+  const t = useT();
+  const teamName = (id: string) => teams.find(team => team.id === id)?.name ?? '—';
+  const teamColors = (id: string) => teams.find(team => team.id === id)?.colors;
 
   const [expandedMatches, setExpandedMatches] = useState<Set<number>>(() => {
     const s = new Set<number>();
@@ -101,14 +104,14 @@ export const JornadaResultsView = ({ jornada, teams, userTeamId, onContinue }: P
     <div className="w-full max-w-2xl flex flex-col gap-4 animate-in fade-in duration-300">
       <div className="bg-vga-blue p-2 border-2 border-vga-white flex justify-between items-center vga-panel">
         <h2 className="text-vga-yellow text-xs uppercase font-bold">
-          {jornada ? `Resultados Jornada ${jornada.number}` : 'Resultados'}
+          {jornada ? t('section.results', { n: String(jornada.number) }) : t('section.leagueResults')}
         </h2>
       </div>
 
       <div className="bg-vga-gray border-4 border-vga-blue p-3 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
         {!jornada || jornada.matches.length === 0 ? (
           <div className="bg-vga-black border border-vga-gray p-4 text-center text-[9px] text-vga-gray">
-            Sin partidos en esta jornada.
+            {t('misc.noMatchesThisRound')}
           </div>
         ) : (
           <div className="flex flex-col gap-2">
@@ -157,7 +160,7 @@ export const JornadaResultsView = ({ jornada, teams, userTeamId, onContinue }: P
         onClick={onContinue}
         className="w-full bg-vga-green hover:bg-vga-light-green text-vga-bright-white py-3 border-b-4 border-r-4 border-vga-black active:border-0 text-xs font-bold uppercase tracking-wider"
       >
-        CONTINUAR
+        {t('btn.continue')}
       </button>
     </div>
   );

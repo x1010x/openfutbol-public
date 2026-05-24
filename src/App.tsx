@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { t, useT, getLang, setLang, getSupportedLangs } from './i18n';
 
 import { getAvailableYears, getAvailableYearsWithStats, getTeamColorsForYear, migrateTeam, buildFreeAgentFromDB, buildTeamFromSeason, getTeamTemplatesForYear, getFantasyPool, buildFantasyTeam } from './data/mockTeams';
 import type { FormationId, MatchEvent, MatchState, Team } from './types/game.d.ts';
@@ -45,6 +46,7 @@ import type { OfferResult } from './data/economy';
 type View = 'LEAGUE' | 'SQUAD' | 'ALIGNMENT' | 'RESULTS' | 'STATS' | 'FINANCES' | 'TRANSFERS' | 'JORNADA_RESULTS' | 'END_OF_SEASON' | 'PLAYER_DETAIL' | 'BACKUP' | 'EDITOR' | 'EQUIPO';
 
 function App() {
+  useT(); // subscribe to language changes so nav labels and messages re-render
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
   const [league, setLeague] = useState<LeagueState>(() => {
     const saved = localStorage.getItem('openfutbol_league');
@@ -153,14 +155,7 @@ function App() {
     history.replaceState(null, '', `#${slug}`);
   }, [view, showInstructions, showFantasyFlow, fantasyConfig, league.isStarted]);
 
-  const DB_WIPE_JOKES = [
-    'Tu guardado era de una version anterior. Lo hemos eliminado con mucho respeto y poca ceremonia. Moment of silence.',
-    'La base de datos ha sufrido un accidente laboral. Nadie ha resultado herido... excepto tu temporada.',
-    'Hemos encontrado datos incompatibles con esta version. Los hemos reciclado. El medioambiente lo agradece.',
-    'Tu guardado era tan antiguo que ya no reconociamos los datos. Como un contrato de Ronaldo en el Madrid, habia que cancelarlo.',
-    'Error de compatibilidad detectado. Tu temporada anterior ha pasado a mejor vida. Descanse en paz, campeon.',
-    'Guardado corrompido. O eso, o alguien metio la mano en la base de datos. Sospechamos de Florentino.',
-  ];
+  const DB_WIPE_JOKES = [0, 1, 2, 3, 4, 5].map(i => t(`dbWipe.${i}`));
   const [dbWipeMsg] = useState<string | null>(() => {
     if (localStorage.getItem('openfutbol_db_wiped') !== '1') return null;
     localStorage.removeItem('openfutbol_db_wiped');
@@ -512,14 +507,14 @@ function App() {
     // Pre-validamos contra el estado actual para poder explicar el motivo si falla.
     const offer = league.incomingOffers.find(o => o.id === offerId);
     if (!offer) {
-      setMessage({ title: 'Oferta no encontrada', body: 'Esta oferta ya no existe. Puede que la temporada haya avanzado.', tone: 'warning' });
+      setMessage({ title: t('msg.offerNotFound.title'), body: t('msg.offerNotFound.body'), tone: 'warning' });
       return;
     }
     const userTeam = league.teams.find(t => t.id === league.userTeamId);
     const buyer = league.teams.find(t => t.id === offer.fromTeamId);
     const player = userTeam?.players.find(p => p.id === offer.playerId);
     if (!userTeam || !buyer || !player) {
-      setMessage({ title: 'Oferta inválida', body: 'No se ha podido localizar al jugador o al club ofertante.', tone: 'danger' });
+      setMessage({ title: t('msg.offerInvalid.title'), body: t('msg.offerInvalid.body'), tone: 'danger' });
       return;
     }
     if (buyer.budget < offer.amount) {
@@ -527,7 +522,7 @@ function App() {
         ...prev,
         incomingOffers: prev.incomingOffers.filter(o => o.id !== offerId),
       }));
-      setMessage({ title: 'Oferta retirada', body: `${buyer.name} ya no puede afrontar ${offer.amount.toLocaleString()}€ por ${player.name}. La oferta se ha retirado.`, tone: 'warning' });
+      setMessage({ title: t('msg.offerWithdrawn.title'), body: t('msg.offerWithdrawn.body', { buyer: buyer.name, amount: `${offer.amount.toLocaleString()}€`, player: player.name }), tone: 'warning' });
       return;
     }
     const offeredIds = offer.offeredPlayerIds ?? [];
@@ -535,17 +530,17 @@ function App() {
       .map(id => buyer.players.find(p => p.id === id))
       .filter((p): p is NonNullable<typeof p> => Boolean(p));
     if (offeredPlayers.length !== offeredIds.length) {
-      setMessage({ title: 'Jugador no disponible', body: `Algún jugador del intercambio ya no está en la plantilla de ${buyer.name}.`, tone: 'warning' });
+      setMessage({ title: t('msg.playerUnavailable.title'), body: t('msg.playerUnavailable.body', { team: buyer.name }), tone: 'warning' });
       return;
     }
     const userFinalSize = userTeam.players.length - 1 + offeredPlayers.length;
     const buyerFinalSize = buyer.players.length - offeredPlayers.length + 1;
     if (userFinalSize < 11) {
-      setMessage({ title: 'Plantilla mínima 11', body: `Si aceptas, tu plantilla quedaría en ${userFinalSize} jugadores. Necesitas al menos 11.`, tone: 'warning' });
+      setMessage({ title: t('msg.minSquad.title'), body: t('msg.minSquad.body', { n: String(userFinalSize) }), tone: 'warning' });
       return;
     }
     if (buyerFinalSize < 11) {
-      setMessage({ title: 'Plantilla rival insuficiente', body: `${buyer.name} quedaría con ${buyerFinalSize} jugadores tras el trato.`, tone: 'warning' });
+      setMessage({ title: t('msg.minSquadRival.title'), body: t('msg.minSquadRival.body', { team: buyer.name, n: String(buyerFinalSize) }), tone: 'warning' });
       return;
     }
     setLeague(prev => {
@@ -631,7 +626,7 @@ function App() {
       .filter((p): p is NonNullable<typeof p> => Boolean(p));
 
     if (requestedPlayers.length !== requestedPlayerIds.length) {
-      setMessage({ title: 'Jugador no disponible', body: 'Alguno de los jugadores pedidos ya no está en la plantilla rival.', tone: 'warning' });
+      setMessage({ title: t('msg.playerUnavailable.title'), body: t('msg.playerUnavailableRival.body'), tone: 'warning' });
       return;
     }
 
@@ -650,7 +645,7 @@ function App() {
           blockedSignings: [...prev.blockedSignings, signingBlockKey(offer.fromTeamId, offer.playerId)],
         }));
       }
-      setMessage({ title: `${buyer.name} rechaza`, body: result.message, tone: 'warning' });
+      setMessage({ title: t('msg.rejected.title', { team: buyer.name }), body: result.message, tone: 'warning' });
       return;
     }
 
@@ -658,15 +653,15 @@ function App() {
     const userFinalSize = userTeam.players.length - 1 + requestedPlayers.length;
     const buyerFinalSize = buyer.players.length - requestedPlayers.length + 1;
     if (userFinalSize < 11) {
-      setMessage({ title: 'Plantilla mínima 11', body: `Tu plantilla quedaría en ${userFinalSize} jugadores tras el trato.`, tone: 'warning' });
+      setMessage({ title: t('msg.minSquad.title'), body: t('msg.minSquadCounter.body', { n: String(userFinalSize) }), tone: 'warning' });
       return;
     }
     if (buyerFinalSize < 11) {
-      setMessage({ title: 'Plantilla rival insuficiente', body: `${buyer.name} quedaría con ${buyerFinalSize} jugadores.`, tone: 'warning' });
+      setMessage({ title: t('msg.minSquadRival.title'), body: t('msg.minSquadRival.body', { team: buyer.name, n: String(buyerFinalSize) }), tone: 'warning' });
       return;
     }
     if (buyer.budget < requestedCash) {
-      setMessage({ title: 'Presupuesto insuficiente', body: `${buyer.name} no puede afrontar ${formatEuros(requestedCash)} en efectivo.`, tone: 'warning' });
+      setMessage({ title: t('msg.budgetShort.title'), body: t('msg.budgetShort.body', { team: buyer.name, amount: formatEuros(requestedCash) }), tone: 'warning' });
       return;
     }
 
@@ -711,7 +706,9 @@ function App() {
         transferLog: records.reduce((log, rec) => appendTransfer(log, rec), prev.transferLog),
       };
     });
-    setMessage({ title: '¡Trato cerrado!', body: `${buyer.name} acepta la contraoferta. ${player.name} fichado.${requestedPlayers.length > 0 ? ` Recibes: ${requestedPlayers.map(p => p.name).join(', ')}.` : ''}`, tone: 'info' });
+    setMessage({ title: t('msg.dealDone.title'), body: requestedPlayers.length > 0
+      ? t('msg.dealDoneWith.body', { buyer: buyer.name, player: player.name, players: requestedPlayers.map(p => p.name).join(', ') })
+      : t('msg.dealDone.body', { buyer: buyer.name, player: player.name }), tone: 'info' });
   };
 
   // Encontrar el próximo partido del usuario
@@ -729,12 +726,12 @@ function App() {
     const userTeam = homeTeam.id === league.userTeamId ? homeTeam : awayTeam;
     const hasGk = userTeam.players.some(p => userTeam.lineup.includes(p.id) && p.position === 'POR');
     if (!hasGk) {
-      alert('No puedes jugar sin un portero en la alineación.');
+      alert(t('msg.noGK'));
       return;
     }
     const injuredInLineup = userTeam.players.filter(p => userTeam.lineup.includes(p.id) && (p.injuryWeeksRemaining ?? 0) > 0);
     if (injuredInLineup.length > 0) {
-      alert(`Hay jugadores lesionados en la alineación: ${injuredInLineup.map(p => p.name).join(', ')}`);
+      alert(t('msg.injuredInLineup', { players: injuredInLineup.map(p => p.name).join(', ') }));
       return;
     }
 
@@ -1198,37 +1195,37 @@ function App() {
               onClick={() => setShowPlayFlow(true)}
               className="w-full bg-vga-green text-vga-bright-white py-4 text-sm border-b-4 border-r-4 border-vga-black font-bold uppercase tracking-widest hover:opacity-90 rc-btn-play"
             >
-              JUGAR
+              {t('btn.play')}
             </button>
             <button
               onClick={() => setShowFantasyFlow(true)}
               className="w-full bg-vga-yellow text-vga-black py-4 text-sm border-b-4 border-r-4 border-vga-black font-bold uppercase tracking-widest hover:opacity-90 rc-btn-fantasy"
             >
-              FANTASY
+              {t('btn.fantasy')}
             </button>
             <button
               onClick={() => setShowInstructions(true)}
               className="w-full bg-vga-blue text-vga-bright-white py-3 text-[10px] border-b-4 border-r-4 border-vga-black font-bold uppercase tracking-widest hover:opacity-90"
             >
-              AYUDA / NOVEDADES
+              {t('nav.helpChangelog')}
             </button>
             <button
               onClick={() => setView('EDITOR')}
               className="w-full bg-vga-magenta text-vga-bright-white py-3 text-[10px] border-b-4 border-r-4 border-vga-black font-bold uppercase tracking-widest hover:opacity-90"
             >
-              EDITOR
+              {t('nav.editor')}
             </button>
             <button
               onClick={() => setView('BACKUP')}
               className="w-full bg-vga-gray text-vga-black py-3 text-[10px] border-2 border-vga-black font-bold uppercase tracking-widest hover:bg-vga-bright-white"
             >
-              AJUSTES
+              {t('btn.settings')}
             </button>
             <button
               onClick={() => setShowColaborar(true)}
               className="w-full bg-vga-black text-vga-cyan py-3 text-[10px] border-2 border-vga-cyan font-bold uppercase tracking-widest hover:bg-vga-cyan hover:text-vga-black"
             >
-              COLABORAR
+              {t('nav.collaborate')}
             </button>
           </div>
         );
@@ -1476,26 +1473,26 @@ function App() {
     return (
       <div className="w-full max-w-4xl flex flex-col gap-6">
         <nav className="flex flex-wrap gap-2 rc-nav-tabs">
-          {navBtn('LIGA',       'LEAGUE',    { isActive: currentView === 'LEAGUE' })}
-          {navBtn('PLANTILLA',  'SQUAD',     {
+          {navBtn(t('nav.league'),    'LEAGUE',    { isActive: currentView === 'LEAGUE' })}
+          {navBtn(t('nav.squad'),     'SQUAD',     {
             isActive: currentView === 'SQUAD' && !viewingTeamId,
             onClick: () => { setViewingTeamId(null); setView('SQUAD'); },
             alert: offers > 0 && !(currentView === 'SQUAD' && !viewingTeamId) ? 'yellow' : undefined,
             badge: offers > 0 && !(currentView === 'SQUAD' && !viewingTeamId) ? `!${offers}` : undefined,
           })}
-          {navBtn('ALINEACIÓN', 'ALIGNMENT', {
+          {navBtn(t('nav.alignment'), 'ALIGNMENT', {
             isActive: currentView === 'ALIGNMENT',
             alert: missing && currentView !== 'ALIGNMENT' ? 'red' : undefined,
             badge: missing && currentView !== 'ALIGNMENT' ? 11 - userTeam.lineup.length : undefined,
           })}
-          {navBtn('RESULTADOS', 'RESULTS',   { isActive: currentView === 'RESULTS' })}
-          {navBtn('STATS',      'STATS',     { isActive: currentView === 'STATS' })}
-          {navBtn('FINANZAS',   'FINANCES',  { isActive: currentView === 'FINANCES' })}
-          {navBtn('FICHAJES',   'TRANSFERS', { isActive: currentView === 'TRANSFERS' })}
-          {navBtn('EQUIPO',     'EQUIPO',    { isActive: currentView === 'EQUIPO' })}
-          {navBtn('EDITAR',     'EDITOR',    { isActive: currentView === 'EDITOR' })}
-          {navBtn('SISTEMA',    'BACKUP',    { isActive: currentView === 'BACKUP' })}
-          {navBtn('AYUDA', 'INSTRUCTIONS')}
+          {navBtn(t('nav.results'),   'RESULTS',   { isActive: currentView === 'RESULTS' })}
+          {navBtn(t('nav.stats'),     'STATS',     { isActive: currentView === 'STATS' })}
+          {navBtn(t('nav.finances'),  'FINANCES',  { isActive: currentView === 'FINANCES' })}
+          {navBtn(t('nav.transfers'), 'TRANSFERS', { isActive: currentView === 'TRANSFERS' })}
+          {navBtn(t('nav.team'),      'EQUIPO',    { isActive: currentView === 'EQUIPO' })}
+          {navBtn(t('nav.editor'),    'EDITOR',    { isActive: currentView === 'EDITOR' })}
+          {navBtn(t('nav.backup'),    'BACKUP',    { isActive: currentView === 'BACKUP' })}
+          {navBtn(t('nav.help'), 'INSTRUCTIONS')}
         </nav>
         <div className="flex flex-col gap-6 min-w-0">
 
@@ -1511,10 +1508,10 @@ function App() {
         <div className="border-4 border-vga-blue p-4 bg-vga-gray text-vga-black">
           <div className="flex justify-between items-center mb-2">
             <h2 className="text-vga-blue text-[10px] font-bold uppercase">
-              Jornada {league.currentJornada}
+              {t('label.jornada')} {league.currentJornada}
               <span className="ml-2 text-vga-black text-[8px] font-normal normal-case">{formatJornadaDate(league.year, league.currentJornada)}</span>
             </h2>
-            <span className="text-[7px] bg-vga-black text-vga-bright-white px-2 py-1">{userMatch ? 'PRÓXIMO PARTIDO' : 'DESCANSO'}</span>
+            <span className="text-[7px] bg-vga-black text-vga-bright-white px-2 py-1">{userMatch ? t('misc.nextMatch') : t('misc.halftime')}</span>
           </div>
 
           {userMatch ? (
@@ -1536,7 +1533,7 @@ function App() {
                     onClick={() => setShowPreview(true)}
                     className="w-full bg-vga-green hover:bg-vga-light-green text-vga-bright-white py-2 px-4 border-b-4 border-r-4 border-vga-black active:border-0 text-xs font-bold shadow-sm rc-btn-primary"
                   >
-                    JUGAR PARTIDO
+                    {t('btn.playMatch')}
                   </button>
                 </>
               ) : (
@@ -1602,7 +1599,7 @@ function App() {
                     return bonus > 0 ? (
                       <div className="bg-vga-black border border-vga-yellow px-2 py-1 mb-2 text-[7px] text-center">
                         <span className="text-vga-yellow font-bold">TV</span>
-                        <span className="text-vga-bright-white ml-1">BONUS POR ESTE PARTIDO:</span>
+                        <span className="text-vga-bright-white ml-1">{t('misc.tvBonus')}</span>
                         <span className="text-vga-light-green font-bold ml-1">{formatEuros(bonus)}</span>
                       </div>
                     ) : null;
@@ -1611,10 +1608,10 @@ function App() {
                     onClick={() => setView('ALIGNMENT')}
                     className="w-full text-[7px] text-vga-cyan border border-vga-cyan py-1 mb-2 hover:bg-vga-cyan hover:text-vga-black"
                   >
-                    Ajustar alineacion
+                    {t('btn.adjustLineup')}
                   </button>
                   <div className="mb-3">
-                    <label className="text-[8px] block mb-1 font-bold text-vga-blue">DURACIÓN (SEG):</label>
+                    <label className="text-[8px] block mb-1 font-bold text-vga-blue">{t('misc.durationSecs')}</label>
                     <div className="grid grid-cols-7 gap-1">
                       {[0, 10, 20, 30, 40, 50, 60].map((sec) => (
                         <button
@@ -1622,7 +1619,7 @@ function App() {
                           onClick={() => setMatchDuration(sec)}
                           className={`text-[7px] py-1 border font-bold ${matchDuration === sec ? 'bg-vga-blue text-vga-bright-white border-vga-bright-white' : 'bg-vga-black text-vga-bright-white border-vga-gray hover:border-vga-light-green'}`}
                         >
-                          {sec === 0 ? 'INST.' : sec}
+                          {sec === 0 ? t('misc.instant') : sec}
                         </button>
                       ))}
                     </div>
@@ -1632,13 +1629,13 @@ function App() {
                       onClick={() => setShowPreview(false)}
                       className="bg-vga-gray text-vga-black py-2 px-3 border border-vga-black text-[8px] hover:bg-vga-white"
                     >
-                      VOLVER
+                      {t('btn.back')}
                     </button>
                     <button
                       onClick={startNextMatch}
                       className="flex-1 bg-vga-green hover:bg-vga-light-green text-vga-bright-white py-2 px-4 border-b-4 border-r-4 border-vga-black active:border-0 text-xs font-bold rc-btn-primary"
                     >
-                      JUGAR PARTIDO
+                      {t('btn.playMatch')}
                     </button>
                   </div>
                 </>
@@ -1647,13 +1644,13 @@ function App() {
           ) : (
             <>
               <div className="bg-vga-black p-3 border border-vga-white mb-4 text-center">
-                <span className="text-[9px] text-vga-yellow">Tu equipo descansa esta jornada</span>
+                <span className="text-[9px] text-vga-yellow">{t('misc.restDay')}</span>
               </div>
               <button
                 onClick={handleByeRound}
                 className="w-full bg-vga-blue hover:bg-vga-light-blue text-vga-bright-white py-2 px-4 border-b-4 border-r-4 border-vga-black active:border-0 text-xs font-bold shadow-sm"
               >
-                SIGUIENTE JORNADA
+                {t('btn.nextRound')}
               </button>
             </>
           )}
@@ -1671,12 +1668,12 @@ function App() {
 
       {updateAvailable && (
         <div className="fixed top-0 left-0 right-0 z-40 bg-vga-yellow text-vga-black flex items-center justify-between px-4 py-1.5 text-[8px] font-bold uppercase border-b-2 border-vga-black">
-          <span>Hay una actualizacion disponible. La tuya huele a polvo.</span>
+          <span>{t('misc.updateAvailable')}</span>
           <button
             onClick={() => { localStorage.setItem('openfutbol_show_changelog', '1'); window.location.reload(); }}
             className="ml-4 bg-vga-black text-vga-yellow px-2 py-0.5 border border-vga-black hover:bg-vga-blue shrink-0"
           >
-            RECARGAR
+            {t('btn.reload')}
           </button>
         </div>
       )}
@@ -1685,19 +1682,19 @@ function App() {
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-40 p-6">
           <div className="bg-vga-black border-4 border-vga-light-red max-w-md w-full p-6 font-mono flex flex-col gap-4">
             <div className="text-vga-light-red text-sm font-bold uppercase tracking-widest">
-              GUARDADO INCOMPATIBLE
+              {t('misc.savedIncompatible')}
             </div>
             <div className="text-vga-bright-white text-base leading-relaxed">
               {dbWipeMsg}
             </div>
             <div className="text-vga-gray text-[9px]">
-              (Esto pasa cuando actualizamos cosas importantes. No es culpa tuya. Bueno, un poco si.)
+              {t('misc.wipeNote')}
             </div>
             <button
               onClick={() => setDbWipeDismissed(true)}
               className="bg-vga-light-red text-vga-black font-bold py-2 px-4 text-sm border-2 border-vga-black hover:bg-vga-bright-white mt-2"
             >
-              VALE, LO PILLO
+              {t('btn.wipeAck')}
             </button>
           </div>
         </div>
@@ -1736,8 +1733,20 @@ function App() {
             >
               {theme === 'retrocool' ? 'RETROCOOL' : 'RETROCUTRE'}
             </button>
+            <div className="flex items-center gap-1">
+              {getSupportedLangs().map(lang => (
+                <button
+                  key={lang}
+                  type="button"
+                  onClick={() => setLang(lang)}
+                  className={`text-[7px] font-bold px-1.5 py-0.5 border ${getLang() === lang ? 'border-vga-yellow text-vga-yellow' : 'border-vga-gray text-vga-gray hover:text-vga-bright-white hover:border-vga-bright-white'}`}
+                >
+                  {lang.toUpperCase()}
+                </button>
+              ))}
+            </div>
             <span className="text-vga-bright-white text-[8px] uppercase cool:text-rc-accent">
-              {league.isStarted ? league.teams.find(t => t.id === league.userTeamId)?.name : 'ESPERANDO SELECCIÓN'}
+              {league.isStarted ? league.teams.find(team => team.id === league.userTeamId)?.name : t('misc.waitingSelection')}
             </span>
           </div>
         </div>
@@ -1760,17 +1769,17 @@ function App() {
             <div className="bg-vga-black border-2 border-vga-gray p-2 text-[8px]">
               <div className={`${colorClass} font-bold mb-1 border-b border-vga-gray pb-1 truncate`}>{team.name}</div>
               {goals.length === 0 && yellows.length === 0 && reds.length === 0 && (
-                <div className="text-vga-gray text-[7px]">Sin incidencias</div>
+                <div className="text-vga-gray text-[7px]">{t('misc.noIncidents')}</div>
               )}
               {goals.length > 0 && (
                 <div className="mb-1">
-                  <div className="text-vga-yellow text-[7px] uppercase mb-0.5">Goles</div>
+                  <div className="text-vga-yellow text-[7px] uppercase mb-0.5">{t('label.goals')}</div>
                   {goals.map((g, i) => {
                     const scorer = findP(g.playerId);
                     const asst = findP(g.assistantId);
                     return (
                       <div key={`g${i}`} className="text-vga-bright-white">
-                        {g.minute}' {scorer ? <PlayerName player={scorer} /> : '—'}{asst ? <> (asist. <PlayerName player={asst} />)</> : ''}
+                        {g.minute}' {scorer ? <PlayerName player={scorer} /> : '—'}{asst ? <> ({t('misc.asist')} <PlayerName player={asst} />)</> : ''}
                       </div>
                     );
                   })}
@@ -1778,7 +1787,7 @@ function App() {
               )}
               {(yellows.length > 0 || reds.length > 0) && (
                 <div>
-                  <div className="text-vga-yellow text-[7px] uppercase mb-0.5">Tarjetas</div>
+                  <div className="text-vga-yellow text-[7px] uppercase mb-0.5">{t('misc.tarjetas')}</div>
                   {yellows.map((c, i) => (
                     <div key={`y${i}`} className="flex items-center gap-1 text-vga-bright-white">
                       <div className="w-1.5 h-2.5 bg-vga-yellow border border-black flex-shrink-0"></div>
@@ -1836,7 +1845,7 @@ function App() {
                 </div>
                 <div className="flex justify-between text-[7px] mt-0.5">
                   <span className="text-vga-light-red">{homePossPct}%</span>
-                  <span className="text-vga-cyan uppercase">Posesión</span>
+                  <span className="text-vga-cyan uppercase">{t('label.possession')}</span>
                   <span className="text-vga-light-cyan">{awayPossPct}%</span>
                 </div>
               </div>
@@ -1867,7 +1876,7 @@ function App() {
                       onClick={() => { setIsPlaying(false); setShowSubPanel(true); }}
                       className="flex-1 bg-vga-yellow text-vga-black py-1 px-2 text-[8px] border border-vga-black hover:bg-vga-bright-white font-bold uppercase"
                     >
-                      CAMBIOS ({userSubsUsed}/3)
+                      {t('misc.subsCountFmt', { used: String(userSubsUsed), max: '3' })}
                     </button>
                   )}
                   {!isPlaying && !showSubPanel && (
@@ -1875,7 +1884,7 @@ function App() {
                       onClick={() => setIsPlaying(true)}
                       className="flex-1 bg-vga-green text-vga-bright-white py-1 px-2 text-[8px] border border-vga-black hover:bg-vga-light-green font-bold uppercase"
                     >
-                      REANUDAR
+                      {t('btn.resume')}
                     </button>
                   )}
                   {isPlaying && (
@@ -1883,7 +1892,7 @@ function App() {
                       onClick={() => setIsPlaying(false)}
                       className="bg-vga-gray text-vga-black py-1 px-2 text-[8px] border border-vga-black hover:bg-vga-white font-bold uppercase"
                     >
-                      PAUSA
+                      {t('btn.pause')}
                     </button>
                   )}
                 </div>
@@ -1895,7 +1904,7 @@ function App() {
                 onClick={handleMatchEnd}
                 className="mt-4 w-full bg-vga-red hover:bg-vga-light-red text-vga-bright-white py-2 px-4 border-b-4 border-r-4 border-vga-black text-xs"
               >
-                CONTINUAR
+                {t('btn.continue')}
               </button>
             )}
 
