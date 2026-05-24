@@ -6,7 +6,7 @@ import type { FormationId, MatchEvent, MatchState, Team } from './types/game.d.t
 import { applyMoodToTeam } from './engine/playerMood';
 import { simulateMinute, calculateTeamStrength } from './engine/simEngine';
 import { FORMATIONS } from './engine/formations';
-import { getInitialLeagueState, getFantasyLeagueState, updateLeagueStats, deductWeeklySalaries, generateIncomingOffers, autoListAiPlayers, simulateAiMarketSignings, advanceSeason, simulateAiTrades, simulateAiFreeAgentSignings, simulateAiClausulazos, appendTransfer, decrementSuspensions, signingBlockKey, squadNeeds, groupFor, repickAiFormations, writebackMatchStamina, decayTeamStaminaAfterMatch, decrementInjuries, applyStaminaRecovery, computeTvBonus, applyTvBonus, isTransferWindowOpen, windowJornadasLeft, jornadasUntilWindowOpen } from './store/leagueStore';
+import { getInitialLeagueState, getFantasyLeagueState, updateLeagueStats, deductWeeklySalaries, generateIncomingOffers, autoListAiPlayers, simulateAiMarketSignings, advanceSeason, simulateAiTrades, simulateAiFreeAgentSignings, simulateAiClausulazos, appendTransfer, decrementSuspensions, signingBlockKey, transferredKey, squadNeeds, groupFor, repickAiFormations, writebackMatchStamina, decayTeamStaminaAfterMatch, decrementInjuries, applyStaminaRecovery, computeTvBonus, applyTvBonus, isTransferWindowOpen, windowJornadasLeft, jornadasUntilWindowOpen } from './store/leagueStore';
 import type { TransferRecord, ManagerSeasonRecord } from './store/leagueStore';
 import type { LeagueState } from './store/leagueStore';
 import { computeBoardObjective, computeTransferDelta, firingChance, clampMeter, applyMeterDelta, METER_DELTAS, isObjectiveMet, computeMatchMeterDelta, computeMatchReputationDelta, computeSeasonReputationDelta } from './engine/florentinometro';
@@ -452,6 +452,9 @@ function App() {
     if (league.blockedSignings.includes(blockKey)) {
       return { accepted: false, message: 'El club no acepta más ofertas por este jugador esta temporada.' };
     }
+    if (league.blockedSignings.includes(transferredKey(playerId))) {
+      return { accepted: false, message: t('msg.alreadyTransferred.body', { player: player.name }) };
+    }
     if (buyer.budget < amount) {
       return { accepted: false, message: 'No tienes presupuesto suficiente.' };
     }
@@ -560,6 +563,10 @@ function App() {
         florentinometroPeak: Math.max(prev.florentinometroPeak ?? 5, newMeter),
         florentinometroMin: Math.min(prev.florentinometroMin ?? 5, newMeter),
         seasonTransferSpent: (prev.seasonTransferSpent ?? 0) + amount,
+        blockedSignings: [...prev.blockedSignings,
+          transferredKey(playerId),
+          ...offeredPlayers.map(p => transferredKey(p.id)),
+        ],
       };
     });
     return result;
@@ -646,6 +653,10 @@ function App() {
     const player = userTeam?.players.find(p => p.id === offer.playerId);
     if (!userTeam || !buyer || !player) {
       setMessage({ title: t('msg.offerInvalid.title'), body: t('msg.offerInvalid.body'), tone: 'danger' });
+      return;
+    }
+    if (league.blockedSignings.includes(transferredKey(offer.playerId))) {
+      setMessage({ title: t('msg.alreadyTransferred.title'), body: t('msg.alreadyTransferred.body', { player: player.name }), tone: 'warning' });
       return;
     }
     if (buyer.budget < offer.amount) {
@@ -742,6 +753,10 @@ function App() {
         florentinometroPeak: Math.max(prev.florentinometroPeak ?? 5, newMeter),
         florentinometroMin: Math.min(prev.florentinometroMin ?? 5, newMeter),
         seasonTransferEarned: (prev.seasonTransferEarned ?? 0) + offer.amount,
+        blockedSignings: [...prev.blockedSignings,
+          transferredKey(offer.playerId),
+          ...offeredPlayers.map(p => transferredKey(p.id)),
+        ],
       };
     });
   };
@@ -844,6 +859,10 @@ function App() {
         }),
         incomingOffers: prev.incomingOffers.filter(o => o.playerId !== offer.playerId),
         transferLog: records.reduce((log, rec) => appendTransfer(log, rec), prev.transferLog),
+        blockedSignings: [...prev.blockedSignings,
+          transferredKey(offer.playerId),
+          ...requestedPlayers.map(p => transferredKey(p.id)),
+        ],
       };
     });
     setMessage({ title: t('msg.dealDone.title'), body: requestedPlayers.length > 0

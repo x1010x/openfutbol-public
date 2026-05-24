@@ -244,6 +244,8 @@
   "msg.rejected.title":           "{team} rechaza",
   "msg.budgetShort.title":        "Presupuesto insuficiente",
   "msg.budgetShort.body":         "{team} no puede afrontar {amount} en efectivo.",
+  "msg.alreadyTransferred.title":  "Traspaso bloqueado",
+  "msg.alreadyTransferred.body":   "{player} ya fue traspasado esta temporada. Solo se permite un movimiento por jugador.",
   "msg.noGK":                     "No puedes jugar sin un portero en la alineación.",
   "msg.injuredInLineup":          "Hay jugadores lesionados en la alineación: {players}",
 

@@ -2,7 +2,7 @@ import type { Team, Player, MatchEvent, Position } from '../types/game.d.ts';
 import type { BoardObjective } from '../engine/florentinometro';
 import { getTeamsForYearWithOverflow, getFreeAgents, getEligibleFreeAgents, advancePlayerToYear, extractDbId } from '../data/mockTeams';
 import { generateSchedule } from '../engine/calendar';
-import { pickBestFormation } from '../engine/formations';
+import { pickBestFormation, computePositionWeightedMedia } from '../engine/formations';
 import type { Jornada } from '../engine/calendar';
 import { computeAttendance, computePrice, teamWeeklySalary } from '../data/economy';
 
@@ -261,6 +261,9 @@ export const emptyTeamRecords = (): TeamRecords => ({
 
 export const signingBlockKey = (sellerTeamId: string | null, playerId: string): string =>
   `${sellerTeamId ?? 'free'}:${playerId}`;
+
+// Marks a player as already transferred this season — prevents second move.
+export const transferredKey = (playerId: string): string => `transferred:${playerId}`;
 
 export const getInitialLeagueState = (
   year: number = 2024,
@@ -814,6 +817,65 @@ export const simulateAiMarketSignings = (state: LeagueState): LeagueState => {
 
 export const MAX_SEASON_YEAR = 2030;
 
+const clampStat = (v: number) => Math.max(1, Math.min(99, Math.round(v)));
+
+// Deterministic hash for generating a stable junior ID from parent name + year.
+const juniorHash = (s: string): number =>
+  s.split('').reduce((acc, c) => (((acc << 5) - acc + c.charCodeAt(0)) >>> 0), 0);
+
+export const generateJuniorPlayer = (parent: Player, nextYear: number): Player => {
+  // Reverse the age-curve degradation to recover approximate peak stats
+  const retiredAge = nextYear - 1 - parent.birthYear;
+  const ageFactor = Math.max(0.70, 1 - Math.abs(retiredAge - parent.peakAge) * 0.04);
+  const peak = (v: number) => clampStat(v / ageFactor);
+
+  // Natural selection: each stat varies ±10 independently
+  const vary = () => Math.floor(Math.random() * 21) - 10;
+  const isGK = parent.preferredPos === 'POR';
+
+  const stats = {
+    speed:       clampStat(peak(parent.stats.speed)       + vary()),
+    dribbling:   clampStat(peak(parent.stats.dribbling)   + vary()),
+    passing:     clampStat(peak(parent.stats.passing)     + vary()),
+    shooting:    clampStat(peak(parent.stats.shooting)    + vary()),
+    defending:   clampStat(peak(parent.stats.defending)   + vary()),
+    physical:    clampStat(peak(parent.stats.physical)    + vary()),
+    goalkeeping: isGK
+      ? clampStat(peak(parent.stats.goalkeeping) + vary())
+      : Math.max(1, Math.min(20, parent.stats.goalkeeping + Math.floor(vary() / 4))),
+  };
+
+  const media = Math.floor(computePositionWeightedMedia(stats, parent.preferredPos));
+
+  // Unique ID: last segment has no underscore so extractDbId works cleanly
+  const h = juniorHash(`${parent.name}|${nextYear}|${parent.birthYear}`);
+  const id = `FA_JR${(h % 900000 + 100000).toString()}`;
+
+  const juniorName = parent.name + ' Jr.';
+  const peakAge = Math.max(23, Math.min(31, parent.peakAge + Math.floor(Math.random() * 7) - 3));
+
+  return {
+    id,
+    name: juniorName,
+    fullName: juniorName,
+    position: parent.position,
+    preferredPos: parent.preferredPos,
+    allowedPositions: parent.allowedPositions,
+    number: Math.floor(Math.random() * 99) + 1,
+    stats,
+    media,
+    birthYear: nextYear - 17,
+    peakAge,
+    forSale: false,
+    seasonStats: {
+      goals: 0, assists: 0, yellowCards: 0, redCards: 0,
+      appearances: 0, minutes: 0, ratingSum: 0, cleanSheets: 0, goalsAgainst: 0,
+    },
+    suspensionMatches: 0,
+    stamina: 99,
+    injuryWeeksRemaining: 0,
+  };
+};
 
 export const advanceSeason = (state: LeagueState): LeagueState => {
   const nextYear = state.year + 1;
@@ -884,6 +946,7 @@ export const advanceSeason = (state: LeagueState): LeagueState => {
   };
 
   const retirements: TransferRecord[] = [];
+  const retiredPlayers: Player[] = [];
   const newTeams: Team[] = state.teams.map(team => {
     const survivors: Player[] = [];
     for (const p of team.players) {
@@ -891,6 +954,7 @@ export const advanceSeason = (state: LeagueState): LeagueState => {
       if (advanced) {
         survivors.push(advanced);
       } else {
+        retiredPlayers.push(p);
         retirements.push({
           id: `retire_${state.year}_${p.id}`,
           jornada: 0,
@@ -920,7 +984,25 @@ export const advanceSeason = (state: LeagueState): LeagueState => {
   for (const team of newTeams) {
     for (const p of team.players) rosteredDbIds.add(extractDbId(p.id));
   }
-  const freeAgents = getEligibleFreeAgents(nextYear, rosteredDbIds);
+  const dbFreeAgents = getEligibleFreeAgents(nextYear, rosteredDbIds);
+
+  // Carry forward unsigned junior free agents from last season, advancing them one year
+  const prevJuniorFreeAgents = (state.freeAgents ?? [])
+    .filter(p => p.id.startsWith('FA_JR'))
+    .map(p => advancePlayerToYear(p, nextYear))
+    .filter((p): p is Player => p !== null);
+
+  // Generate a new junior for each player who retired from a team this season
+  const newJuniors = retiredPlayers.map(p => generateJuniorPlayer(p, nextYear));
+
+  // Merge, preventing ID duplicates
+  const takenIds = new Set([
+    ...dbFreeAgents.map(p => p.id),
+    ...prevJuniorFreeAgents.map(p => p.id),
+  ]);
+  const uniqueNewJuniors = newJuniors.filter(j => !takenIds.has(j.id));
+
+  const freeAgents = [...dbFreeAgents, ...prevJuniorFreeAgents, ...uniqueNewJuniors];
 
   const stats: Record<string, TeamStats> = {};
   const finances: Record<string, TeamFinances> = {};
@@ -1220,6 +1302,9 @@ export const simulateAiClausulazos = (state: LeagueState): LeagueState => {
   const shuffledAi = [...aiTeams].sort(() => Math.random() - 0.5);
 
   for (const player of shuffledTargets) {
+    // Skip players already moved this season
+    if (state.blockedSignings.includes(transferredKey(player.id))) continue;
+
     const price = computePrice(player, state.year);
     const clausulaPrice = price * 2;
     const group = groupFor(player.position);
@@ -1281,6 +1366,7 @@ export const simulateAiClausulazos = (state: LeagueState): LeagueState => {
         teams: newTeams,
         transferLog: appendTransfer(state.transferLog, record),
         aiClausulazoNews: news,
+        blockedSignings: [...(state.blockedSignings ?? []), transferredKey(player.id)],
       };
     }
   }
