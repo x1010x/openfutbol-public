@@ -305,6 +305,7 @@ function App() {
         florentinometroMin: 5,
         seasonTransferSpent: 0,
         seasonTransferEarned: 0,
+        managerStartJornada: 1,
       };
       for (let i = 0; i < 4; i++) {
         next = autoListAiPlayers(next);
@@ -1036,26 +1037,38 @@ function App() {
     } else if (newLeague.currentJornada < newLeague.schedule.length) {
       newLeague.currentJornada++;
     }
-    // Florentinometro: firing check (only mid-season)
+    // Florentinometro: firing check (only mid-season, after grace period)
+    const GRACE_JORNADAS = 5;
+    const FIRE_THRESHOLD = 4;
+    const jornadasManaged = newLeague.currentJornada - (newLeague.managerStartJornada ?? 1);
     if (newLeague.gameMode === 'promanager' && !newLeague.boardFired && !newLeague.seasonFinished) {
-      const chance = firingChance(newLeague.florentinometro ?? 5);
-      if (chance > 0 && Math.random() < chance) {
-        const warnings = (newLeague.boardWarnings ?? 0) + 1;
-        if (warnings >= 3) {
-          newLeague = { ...newLeague, boardFired: true, boardWarnings: warnings, seasonFinished: true };
-          const firedIdx = Math.floor(Math.random() * 4);
-          const firedMsg = { title: t('florentino.fired'), body: t(`florentino.firedBody.${firedIdx}`), tone: 'danger' as const };
-          setTimeout(() => { setBoardAlert(firedMsg); setLastBoardAlert(firedMsg); }, 100);
-        } else {
-          newLeague = { ...newLeague, boardWarnings: warnings };
-          const isSecond = warnings === 2;
-          const warnTitle = isSecond ? t('florentino.warning2') : t('florentino.warning');
-          const warnBody = isSecond
-            ? t(`florentino.warning2Body.${Math.floor(Math.random() * 3)}`)
-            : t(`florentino.warningBody.${Math.floor(Math.random() * 7)}`);
-          const warnMsg = { title: warnTitle, body: warnBody, tone: 'warning' as const };
-          setTimeout(() => { setBoardAlert(warnMsg); setLastBoardAlert(warnMsg); }, 100);
+      if (jornadasManaged >= GRACE_JORNADAS) {
+        const chance = firingChance(newLeague.florentinometro ?? 5);
+        if (chance > 0 && Math.random() < chance) {
+          const warnings = (newLeague.boardWarnings ?? 0) + 1;
+          if (warnings >= FIRE_THRESHOLD) {
+            newLeague = { ...newLeague, boardFired: true, boardWarnings: warnings, seasonFinished: true };
+            const firedIdx = Math.floor(Math.random() * 4);
+            const firedMsg = { title: t('florentino.fired'), body: t(`florentino.firedBody.${firedIdx}`), tone: 'danger' as const };
+            setTimeout(() => { setBoardAlert(firedMsg); setLastBoardAlert(firedMsg); }, 100);
+          } else {
+            newLeague = { ...newLeague, boardWarnings: warnings };
+            const isLastWarning = warnings === FIRE_THRESHOLD - 1;
+            const isFirst = warnings === 1;
+            const warnTitle = isLastWarning ? t('florentino.warning2') : t('florentino.warning');
+            const warnBody = isLastWarning
+              ? t(`florentino.warning2Body.${Math.floor(Math.random() * 3)}`)
+              : t(`florentino.warningBody.${Math.floor(Math.random() * (isFirst ? 7 : 4))}`);
+            const warnMsg = { title: warnTitle, body: warnBody, tone: 'warning' as const };
+            setTimeout(() => { setBoardAlert(warnMsg); setLastBoardAlert(warnMsg); }, 100);
+          }
         }
+      }
+      // Warning reduction: meter in safe zone forgives 1 warning per jornada
+      const meter = newLeague.florentinometro ?? 5;
+      const currentWarnings = newLeague.boardWarnings ?? 0;
+      if (meter >= 5 && currentWarnings > 0 && !newLeague.boardFired) {
+        newLeague = { ...newLeague, boardWarnings: currentWarnings - 1 };
       }
     }
     // Florentinometro: positive threshold rewards (only mid-season)
@@ -1194,6 +1207,7 @@ function App() {
           florentinometroMin: 5,
           seasonTransferSpent: 0,
           seasonTransferEarned: 0,
+          managerStartJornada: 1,
         };
       } else {
         // Mid-season fire — continue current season with new team
@@ -1210,6 +1224,7 @@ function App() {
           florentinometroPeak: 5,
           florentinometroMin: 5,
           managerCareer: updatedCareer,
+          managerStartJornada: prev.currentJornada,
         };
       }
     });

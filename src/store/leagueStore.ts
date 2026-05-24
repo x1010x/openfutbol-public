@@ -209,6 +209,7 @@ export interface LeagueState {
   seasonTransferEarned?: number;
   managerCareer?: ManagerSeasonRecord[];
   boardRewardThreshold?: number; // 0 = none, 7 = praise given, 9 = marbella given
+  managerStartJornada?: number;  // jornada when current manager took over (for grace period)
 }
 
 export const emptyTeamRecords = (): TeamRecords => ({
