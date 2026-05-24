@@ -9,7 +9,7 @@ import { FORMATIONS } from './engine/formations';
 import { getInitialLeagueState, getFantasyLeagueState, updateLeagueStats, deductWeeklySalaries, generateIncomingOffers, autoListAiPlayers, simulateAiMarketSignings, advanceSeason, simulateAiTrades, simulateAiFreeAgentSignings, simulateAiClausulazos, appendTransfer, decrementSuspensions, signingBlockKey, transferredKey, squadNeeds, groupFor, repickAiFormations, writebackMatchStamina, decayTeamStaminaAfterMatch, decrementInjuries, applyStaminaRecovery, computeTvBonus, applyTvBonus, isTransferWindowOpen, windowJornadasLeft, jornadasUntilWindowOpen } from './store/leagueStore';
 import type { TransferRecord, ManagerSeasonRecord } from './store/leagueStore';
 import type { LeagueState } from './store/leagueStore';
-import { computeBoardObjective, computeTransferDelta, firingChance, clampMeter, applyMeterDelta, METER_DELTAS, isObjectiveMet, computeMatchMeterDelta, computeMatchReputationDelta, computeSeasonReputationDelta } from './engine/florentinometro';
+import { computeBoardObjective, computeTransferDelta, firingChance, applyMeterDelta, METER_DELTAS, isObjectiveMet, computeMatchMeterDelta, computeMatchReputationDelta, computeSeasonReputationDelta } from './engine/florentinometro';
 import { LeagueTable } from './components/LeagueTable';
 import { StatusBar } from './components/StatusBar';
 import { SquadView } from './components/SquadView';
