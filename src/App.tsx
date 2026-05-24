@@ -6,7 +6,7 @@ import type { FormationId, MatchEvent, MatchState, Team } from './types/game.d.t
 import { applyMoodToTeam } from './engine/playerMood';
 import { simulateMinute, calculateTeamStrength } from './engine/simEngine';
 import { FORMATIONS } from './engine/formations';
-import { getInitialLeagueState, getFantasyLeagueState, updateLeagueStats, deductWeeklySalaries, generateIncomingOffers, autoListAiPlayers, simulateAiMarketSignings, advanceSeason, simulateAiTrades, simulateAiFreeAgentSignings, simulateAiClausulazos, appendTransfer, decrementSuspensions, signingBlockKey, squadNeeds, groupFor, repickAiFormations, writebackMatchStamina, decayTeamStaminaAfterMatch, decrementInjuries, applyStaminaRecovery, computeTvBonus, applyTvBonus } from './store/leagueStore';
+import { getInitialLeagueState, getFantasyLeagueState, updateLeagueStats, deductWeeklySalaries, generateIncomingOffers, autoListAiPlayers, simulateAiMarketSignings, advanceSeason, simulateAiTrades, simulateAiFreeAgentSignings, simulateAiClausulazos, appendTransfer, decrementSuspensions, signingBlockKey, squadNeeds, groupFor, repickAiFormations, writebackMatchStamina, decayTeamStaminaAfterMatch, decrementInjuries, applyStaminaRecovery, computeTvBonus, applyTvBonus, isTransferWindowOpen, windowJornadasLeft, jornadasUntilWindowOpen } from './store/leagueStore';
 import type { TransferRecord, ManagerSeasonRecord } from './store/leagueStore';
 import type { LeagueState } from './store/leagueStore';
 import { computeBoardObjective, computeTransferDelta, firingChance, clampMeter, METER_DELTAS, isObjectiveMet } from './engine/florentinometro';
@@ -368,6 +368,9 @@ function App() {
   };
 
   const handleOfferForFreeAgent = (playerId: string, amount: number): OfferResult => {
+    if (!windowOpen) {
+      return { accepted: false, message: t('transfer.windowClosedAction') };
+    }
     const player = league.freeAgents.find(p => p.id === playerId);
     const buyer = league.teams.find(t => t.id === league.userTeamId);
     if (!player || !buyer) {
@@ -430,6 +433,9 @@ function App() {
     amount: number,
     offeredPlayerIds: string[] = [],
   ): OfferResult => {
+    if (!windowOpen) {
+      return { accepted: false, message: t('transfer.windowClosedAction') };
+    }
     const seller = league.teams.find(t => t.id === fromTeamId);
     const player = seller?.players.find(p => p.id === playerId);
     const buyer = league.teams.find(t => t.id === league.userTeamId);
@@ -554,6 +560,9 @@ function App() {
   };
 
   const handleClausula = (playerId: string, fromTeamId: string): OfferResult => {
+    if (!windowOpen) {
+      return { accepted: false, message: t('transfer.windowClosedAction') };
+    }
     const seller = league.teams.find(t => t.id === fromTeamId);
     const player = seller?.players.find(p => p.id === playerId);
     const buyer = league.teams.find(t => t.id === league.userTeamId);
@@ -616,6 +625,10 @@ function App() {
   };
 
   const handleAcceptIncomingOffer = (offerId: string) => {
+    if (!windowOpen) {
+      setMessage({ title: t('transfer.windowClosed'), body: t('transfer.windowClosedAction'), tone: 'warning' });
+      return;
+    }
     // Pre-validamos contra el estado actual para poder explicar el motivo si falla.
     const offer = league.incomingOffers.find(o => o.id === offerId);
     if (!offer) {
@@ -832,6 +845,12 @@ function App() {
       : t('msg.dealDone.body', { buyer: buyer.name, player: player.name }), tone: 'info' });
   };
 
+  // Transfer window state (computed from current jornada)
+  const totalJornadas = league.schedule.length;
+  const windowOpen = isTransferWindowOpen(league.currentJornada, totalJornadas) || !!(league.transferWindowEmergency);
+  const winLeft = windowJornadasLeft(league.currentJornada, totalJornadas);
+  const winUntil = jornadasUntilWindowOpen(league.currentJornada, totalJornadas);
+
   // Encontrar el próximo partido del usuario
   const currentJornadaData = league.schedule.find(j => j.number === league.currentJornada);
   const userMatch = currentJornadaData?.matches.find(m =>
@@ -993,6 +1012,8 @@ function App() {
 
   const advanceAfterJornada = (newLeague: LeagueState) => {
     const playedJornada = newLeague.currentJornada;
+    // Clear emergency signing flag from previous window close
+    newLeague = { ...newLeague, transferWindowEmergency: false };
     newLeague = decrementSuspensions(newLeague);
     newLeague = decrementInjuries(newLeague);
     // Remove unavailable players from lineups so empty slots appear in pre-match preview
@@ -1033,12 +1054,19 @@ function App() {
     newLeague = simulateAiFreeAgentSignings(newLeague);
     const afterClausulazo = simulateAiClausulazos(newLeague);
     const clausulazoNews = afterClausulazo.aiClausulazoNews ?? [];
+    const clausulazoWasLastDay = windowJornadasLeft(playedJornada, newLeague.schedule.length) === 1;
     newLeague = { ...afterClausulazo, aiClausulazoNews: [] };
     if (clausulazoNews.length > 0) {
       const n = clausulazoNews[0];
+      if (clausulazoWasLastDay) {
+        newLeague = { ...newLeague, transferWindowEmergency: true };
+      }
+      const emergencySuffix = clausulazoWasLastDay
+        ? ` ${t('transfer.emergencyWindow')}`
+        : winLeft > 1 ? ` ${t('transfer.windowOpenLeft', { n: String(winLeft - 1) })}` : '';
       setTimeout(() => setMessage({
         title: t('ai.clausulazoTitle'),
-        body: t('ai.clausulazoBody', { player: n.playerName, team: n.teamName, amount: formatEuros(n.amount) }),
+        body: t('ai.clausulazoBody', { player: n.playerName, team: n.teamName, amount: formatEuros(n.amount) }) + emergencySuffix,
         tone: 'danger',
       }), 100);
     }
@@ -1767,6 +1795,9 @@ function App() {
           onClausula={handleClausula}
           onPlayerClick={showPlayerDetail}
           blockedSignings={league.blockedSignings}
+          windowOpen={windowOpen}
+          windowJornadasLeft={winLeft}
+          jornadasUntilOpen={winUntil}
           onBack={() => setView('LEAGUE')}
         />
       );
@@ -1856,7 +1887,11 @@ function App() {
           {navBtn(t('nav.results'),   'RESULTS',   { isActive: currentView === 'RESULTS' })}
           {navBtn(t('nav.stats'),     'STATS',     { isActive: currentView === 'STATS' })}
           {navBtn(t('nav.finances'),  'FINANCES',  { isActive: currentView === 'FINANCES' })}
-          {navBtn(t('nav.transfers'), 'TRANSFERS', { isActive: currentView === 'TRANSFERS' })}
+          {navBtn(t('nav.transfers'), 'TRANSFERS', {
+            isActive: currentView === 'TRANSFERS',
+            alert: windowOpen && winLeft <= 3 && currentView !== 'TRANSFERS' ? 'yellow' : undefined,
+            badge: windowOpen ? (winLeft <= 3 ? winLeft : undefined) : undefined,
+          })}
           {navBtn(t('nav.team'),      'EQUIPO',    { isActive: currentView === 'EQUIPO' })}
           {navBtn(t('nav.editor'),    'EDITOR',    { isActive: currentView === 'EDITOR' })}
           {navBtn(t('nav.backup'),    'BACKUP',    { isActive: currentView === 'BACKUP' })}

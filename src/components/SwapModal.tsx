@@ -119,7 +119,7 @@ export const SwapModal = ({ slotPos, currentPlayer, candidates, inLineup, onSele
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50, padding: 8 }}>
       {/* ═══ MODAL FRAME ═══════════════════════════════════════════ */}
       <div style={{
-        maxWidth: 360,
+        maxWidth: 720,
         width: '100%',
         maxHeight: '92vh',
         display: 'flex',

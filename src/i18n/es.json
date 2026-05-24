@@ -536,5 +536,13 @@
   "career.missedObj":       "OBJ FALLADO",
 
   "ai.clausulazoTitle":     "CLAUSULAZO",
-  "ai.clausulazoBody":      "{team} ha ejecutado la cláusula de {player} y ha pagado {amount} directamente. El jugador ya se ha ido."
+  "ai.clausulazoBody":      "{team} ha ejecutado la cláusula de {player} y ha pagado {amount} directamente. El jugador ya se ha ido.",
+
+  "transfer.windowOpen":          "MERCADO ABIERTO",
+  "transfer.windowOpenLeft":      "Cierra en {n} jornada(s)",
+  "transfer.windowClosed":        "MERCADO CERRADO",
+  "transfer.windowClosedUntil":   "Abre en {n} jornada(s)",
+  "transfer.windowClosedSeason":  "Próximo mercado: inicio de temporada",
+  "transfer.windowClosedAction":  "El mercado de fichajes está cerrado. Espera al próximo periodo.",
+  "transfer.emergencyWindow":     "Ventana de emergencia: puedes fichar un sustituto."
 }

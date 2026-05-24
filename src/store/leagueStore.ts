@@ -10,6 +10,32 @@ export type PosGroup = 'POR' | 'DEF' | 'MED' | 'DEL';
 
 export const SQUAD_TARGETS: Record<PosGroup, number> = { POR: 3, DEF: 6, MED: 6, DEL: 5 };
 
+// Transfer window: open for first SUMMER jornadas, then WINTER jornadas around mid-season
+export const SUMMER_WINDOW_SIZE = 10;
+export const WINTER_WINDOW_SIZE = 8;
+
+export const isTransferWindowOpen = (jornada: number, totalJornadas: number): boolean => {
+  const midStart = Math.floor(totalJornadas / 2);
+  return (jornada >= 1 && jornada <= SUMMER_WINDOW_SIZE) ||
+         (jornada >= midStart && jornada < midStart + WINTER_WINDOW_SIZE);
+};
+
+// How many jornadas remain in the current open window (0 if closed)
+export const windowJornadasLeft = (jornada: number, totalJornadas: number): number => {
+  const midStart = Math.floor(totalJornadas / 2);
+  if (jornada >= 1 && jornada <= SUMMER_WINDOW_SIZE) return SUMMER_WINDOW_SIZE - jornada + 1;
+  if (jornada >= midStart && jornada < midStart + WINTER_WINDOW_SIZE) return (midStart + WINTER_WINDOW_SIZE) - jornada;
+  return 0;
+};
+
+// Jornadas until the next window opens (0 if currently open)
+export const jornadasUntilWindowOpen = (jornada: number, totalJornadas: number): number => {
+  if (isTransferWindowOpen(jornada, totalJornadas)) return 0;
+  const midStart = Math.floor(totalJornadas / 2);
+  if (jornada < midStart) return midStart - jornada;
+  return 999; // after winter window — next is next season
+};
+
 export const groupFor = (pos: Position): PosGroup => {
   if (pos === 'POR') return 'POR';
   if (pos === 'DEF') return 'DEF';
@@ -214,6 +240,7 @@ export interface LeagueState {
   managerDraws?: number;
   managerLosses?: number;
   aiClausulazoNews?: { playerName: string; teamName: string; amount: number }[];
+  transferWindowEmergency?: boolean; // allow one extra signing after clausulazo on last window day
 }
 
 export const emptyTeamRecords = (): TeamRecords => ({
@@ -1006,6 +1033,10 @@ export const applyTvBonus = (
 
 export const generateIncomingOffers = (state: LeagueState): LeagueState => {
   if (!state.userTeamId) return state;
+  // Outside transfer windows, clear all pending offers — no new ones generated
+  if (!isTransferWindowOpen(state.currentJornada, state.schedule.length)) {
+    return { ...state, incomingOffers: [] };
+  }
   const userTeam = state.teams.find(t => t.id === state.userTeamId);
   if (!userTeam) return state;
 
@@ -1030,18 +1061,20 @@ export const generateIncomingOffers = (state: LeagueState): LeagueState => {
       const rivalNeeds = squadNeeds(rival);
       if (rivalNeeds[group] < -1) continue;
 
-      // Quality filter: rival only bids if player genuinely improves their squad
+      // Quality filter: rival only bids if player genuinely improves their squad.
+      // Listed players get more lenient filter — rival just needs any improvement.
       const rivalInGroup = rival.players.filter(p => groupFor(p.position) === group);
       if (rivalInGroup.length > 0) {
         const weakestMedia = Math.min(...rivalInGroup.map(p => p.media));
-        if (player.media <= weakestMedia + 3) continue; // must be a meaningful upgrade
+        const minGain = listed ? 1 : 4; // listed = any gain, unlisted = must be clear upgrade
+        if (player.media <= weakestMedia + minGain) continue;
       }
 
       // Stronger appetite when rival is short of bodies.
       const needBoost = clamp(rivalNeeds[group] * 0.06, -0.05, 0.15);
       const surplus = Math.max(0, rival.budget - price * 1.2);
       const interestBoost = Math.min(0.2, surplus / (price * 5 || 1));
-      const baseChance = listed ? 0.07 : 0.012; // much lower than before
+      const baseChance = listed ? 0.15 : 0.012; // listed players get much stronger interest
       const chance = baseChance + (listed ? interestBoost : interestBoost * 0.3) + needBoost;
       if (Math.random() > chance) continue;
 
@@ -1165,9 +1198,10 @@ export const simulateAiFreeAgentSignings = (state: LeagueState): LeagueState => 
 };
 
 // AI team triggers a clausulazo on a high-value user player (unlisted, pays 2× price immediately).
-// Max 1 clausulazo per jornada. Returns updated state with aiClausulazoNews populated.
+// Only happens during open transfer windows. Max 1 clausulazo per jornada.
 export const simulateAiClausulazos = (state: LeagueState): LeagueState => {
   if (!state.userTeamId) return state;
+  if (!isTransferWindowOpen(state.currentJornada, state.schedule.length)) return state;
   const userTeam = state.teams.find(t => t.id === state.userTeamId);
   if (!userTeam) return state;
 
@@ -1198,8 +1232,8 @@ export const simulateAiClausulazos = (state: LeagueState): LeagueState => {
         : 0;
       if (player.media <= weakestMedia + 5) continue; // must be a substantial upgrade
 
-      // Small chance per eligible rival (about 3%)
-      if (Math.random() > 0.03) continue;
+      // ~10% chance per eligible rival → averages 1-2 clausulazos per window
+      if (Math.random() > 0.10) continue;
 
       // Execute the clausulazo
       const newTeams = state.teams.map(t => {
