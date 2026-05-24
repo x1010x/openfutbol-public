@@ -261,6 +261,13 @@ export const InstructionsView = ({ onBack, onColaborar, scrollTo }: Props) => {
         <Section title="CAMBIOS RECIENTES">
           <ul className="list-disc pl-5 space-y-1">
             <li>
+              <span className="text-vga-cyan">v1.2.0</span> — Idiomas.
+              Selector de idioma en la cabecera (ES / EN). Toda la interfaz traducida al inglés:
+              navegación, fichas de jugador, mercado de fichajes, alineación, finanzas, clasificación,
+              configuración de liga, Fantasy Draft y nombres de países.
+              Sistema de i18n propio sin dependencias externas.
+            </li>
+            <li>
               <span className="text-vga-cyan">v1.1.0</span> — Comunidad y países.
               Pantalla COLABORAR con canal de Telegram para proponer equipos y jugadores.
               Banderas por país en las pantallas de selección.
