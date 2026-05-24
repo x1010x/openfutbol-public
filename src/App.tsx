@@ -7,8 +7,9 @@ import { applyMoodToTeam } from './engine/playerMood';
 import { simulateMinute, calculateTeamStrength } from './engine/simEngine';
 import { FORMATIONS } from './engine/formations';
 import { getInitialLeagueState, getFantasyLeagueState, updateLeagueStats, deductWeeklySalaries, generateIncomingOffers, autoListAiPlayers, simulateAiMarketSignings, advanceSeason, simulateAiTrades, simulateAiFreeAgentSignings, appendTransfer, decrementSuspensions, signingBlockKey, squadNeeds, groupFor, repickAiFormations, writebackMatchStamina, decayTeamStaminaAfterMatch, decrementInjuries, applyStaminaRecovery, computeTvBonus, applyTvBonus } from './store/leagueStore';
-import type { TransferRecord } from './store/leagueStore';
+import type { TransferRecord, ManagerSeasonRecord } from './store/leagueStore';
 import type { LeagueState } from './store/leagueStore';
+import { computeBoardObjective, computeTransferDelta, firingChance, clampMeter, METER_DELTAS, isObjectiveMet } from './engine/florentinometro';
 import { LeagueTable } from './components/LeagueTable';
 import { StatusBar } from './components/StatusBar';
 import { SquadView } from './components/SquadView';
@@ -26,11 +27,15 @@ import { PlayerDetailView } from './components/PlayerDetailView';
 import { BackupView } from './components/BackupView';
 import { EditorView } from './components/EditorView';
 import { LeagueSetupView } from './components/LeagueSetupView';
+import { ManagerCareerView } from './components/ManagerCareerView';
+import { ProManagerEndView } from './components/ProManagerEndView';
+import { ProManagerSetupView } from './components/ProManagerSetupView';
 import { EquipoView } from './components/EquipoView';
 import { TeamCrest } from './components/TeamCrest';
 import { PitchDiagram } from './components/PitchDiagram';
 import { StatDrillDown } from './components/StatDrillDown';
 import { MessageModal } from './components/MessageModal';
+import { BoardAlertModal } from './components/BoardAlertModal';
 import { DisclaimerView } from './components/DisclaimerView';
 import { SwapModal } from './components/SwapModal';
 import { FantasySetupView } from './components/FantasySetupView';
@@ -43,7 +48,7 @@ import { PlayerName } from './components/PlayerName';
 import { formatJornadaDate } from './engine/calendar';
 import type { OfferResult } from './data/economy';
 
-type View = 'LEAGUE' | 'SQUAD' | 'ALIGNMENT' | 'RESULTS' | 'STATS' | 'FINANCES' | 'TRANSFERS' | 'JORNADA_RESULTS' | 'END_OF_SEASON' | 'PLAYER_DETAIL' | 'BACKUP' | 'EDITOR' | 'EQUIPO';
+type View = 'LEAGUE' | 'SQUAD' | 'ALIGNMENT' | 'RESULTS' | 'STATS' | 'FINANCES' | 'TRANSFERS' | 'JORNADA_RESULTS' | 'END_OF_SEASON' | 'PLAYER_DETAIL' | 'BACKUP' | 'EDITOR' | 'EQUIPO' | 'MANAGER_CAREER';
 
 function App() {
   useT(); // subscribe to language changes so nav labels and messages re-render
@@ -129,10 +134,13 @@ function App() {
   const [previousView, setPreviousView] = useState<View>('LEAGUE');
   const [viewingTeamId, setViewingTeamId] = useState<string | null>(null);
   const [message, setMessage] = useState<{ title: string; body: string; tone?: 'info' | 'danger' | 'warning' } | null>(null);
+  const [boardAlert, setBoardAlert] = useState<{ title: string; body: string; tone: 'danger' | 'warning' | 'success' } | null>(null);
+  const [lastBoardAlert, setLastBoardAlert] = useState<{ title: string; body: string; tone: 'danger' | 'warning' | 'success' } | null>(null);
   const [htPaused, setHtPaused] = useState(false);
   const [showSubPanel, setShowSubPanel] = useState(false);
   const [previewSwapSlot, setPreviewSwapSlot] = useState<number | null>(null);
   const [showFantasyFlow, setShowFantasyFlow] = useState(false);
+  const [showProManagerFlow, setShowProManagerFlow] = useState(false);
   const [fantasyYear, setFantasyYear] = useState(0);
   const [fantasyConfig, setFantasyConfig] = useState<{ teamIds: string[]; userTeamId: string; cap: number | null } | null>(null);
   const [returnToFantasy, setReturnToFantasy] = useState(false);
@@ -261,12 +269,81 @@ function App() {
 
   const handleSelectTeam = (teamId: string) => {
     setLeague(prev => {
-      let next: LeagueState = { ...prev, userTeamId: teamId, isStarted: true };
+      const team = prev.teams.find(t => t.id === teamId)!;
+      const objective = computeBoardObjective(team, prev.teams);
+      let next: LeagueState = { ...prev, userTeamId: teamId, isStarted: true, boardObjective: objective, florentinometro: 5, florentinometroPeak: 5, florentinometroMin: 5 };
       for (let i = 0; i < 4; i++) {
         next = autoListAiPlayers(next);
       }
       return next;
     });
+  };
+
+  const handleProManagerSelectYear = (year: number) => {
+    if (year === 0) {
+      setSelectedYear(null);
+      return;
+    }
+    setSelectedYear(year);
+    const allTeamIds = getTeamTemplatesForYear(year).map(t => t.id);
+    setLeague(getInitialLeagueState(year, allTeamIds, [], []));
+  };
+
+  const handleSelectTeamProManager = (teamId: string, managerName: string) => {
+    setLeague(prev => {
+      const team = prev.teams.find(t => t.id === teamId)!;
+      const objective = computeBoardObjective(team, prev.teams);
+      let next: LeagueState = {
+        ...prev,
+        userTeamId: teamId,
+        isStarted: true,
+        gameMode: 'promanager',
+        managerName,
+        boardObjective: objective,
+        florentinometro: 5,
+        florentinometroPeak: 5,
+        florentinometroMin: 5,
+        seasonTransferSpent: 0,
+        seasonTransferEarned: 0,
+      };
+      for (let i = 0; i < 4; i++) {
+        next = autoListAiPlayers(next);
+      }
+      return next;
+    });
+    setShowProManagerFlow(false);
+    setSelectedYear(null);
+    setView('LEAGUE');
+  };
+
+  const buildSeasonCareerRecord = (prev: LeagueState, fired: boolean): ManagerSeasonRecord => {
+    const sortedStats = Object.values(prev.stats).sort((a, b) => {
+      if (b.points !== a.points) return b.points - a.points;
+      return (b.goalsFor - b.goalsAgainst) - (a.goalsFor - a.goalsAgainst);
+    });
+    const userRank = sortedStats.findIndex(s => s.teamId === prev.userTeamId) + 1;
+    const totalTeams = sortedStats.length;
+    const userTeam = prev.teams.find(t => t.id === prev.userTeamId);
+    const userStats = prev.stats[prev.userTeamId];
+    const objective = prev.boardObjective ?? 'avoid_relegation';
+    return {
+      year: prev.year,
+      teamName: userTeam?.name ?? '',
+      teamId: prev.userTeamId,
+      finalPosition: userRank,
+      totalTeams,
+      objective,
+      objectiveMet: isObjectiveMet(objective, userRank, totalTeams),
+      florentinometroFinal: prev.florentinometro ?? 5,
+      florentinometroPeak: prev.florentinometroPeak ?? 5,
+      florentinometroMin: prev.florentinometroMin ?? 5,
+      gamesManaged: (userStats?.won ?? 0) + (userStats?.drawn ?? 0) + (userStats?.lost ?? 0),
+      wins: userStats?.won ?? 0,
+      draws: userStats?.drawn ?? 0,
+      losses: userStats?.lost ?? 0,
+      transferBalance: (prev.seasonTransferEarned ?? 0) - (prev.seasonTransferSpent ?? 0),
+      fired,
+    };
   };
 
   const handleUpdateAlignment = (patch: { lineup: string[]; formation: FormationId }) => {
@@ -321,6 +398,11 @@ function App() {
         toTeamName: userTeam?.name ?? '',
         amount,
       };
+      const marketValue = computePrice(player, prev.year);
+      const florentinoDelta = (prev.gameMode === 'promanager' && !prev.boardFired)
+        ? computeTransferDelta(player, amount, marketValue, true, prev.year)
+        : 0;
+      const newMeter = florentinoDelta !== 0 ? clampMeter((prev.florentinometro ?? 5) + florentinoDelta) : (prev.florentinometro ?? 5);
       return {
         ...prev,
         teams: prev.teams.map(t =>
@@ -330,6 +412,10 @@ function App() {
         ),
         freeAgents: prev.freeAgents.filter(p => p.id !== playerId),
         transferLog: appendTransfer(prev.transferLog, entry),
+        florentinometro: newMeter,
+        florentinometroPeak: Math.max(prev.florentinometroPeak ?? 5, newMeter),
+        florentinometroMin: Math.min(prev.florentinometroMin ?? 5, newMeter),
+        seasonTransferSpent: (prev.seasonTransferSpent ?? 0) + amount,
       };
     });
     return result;
@@ -424,6 +510,11 @@ function App() {
       });
 
       const offeredIdSet = new Set(offeredPlayerIds);
+      const marketValue = computePrice(player, prev.year);
+      const florentinoDelta = (prev.gameMode === 'promanager' && !prev.boardFired)
+        ? computeTransferDelta(player, amount, marketValue, true, prev.year)
+        : 0;
+      const newMeter = florentinoDelta !== 0 ? clampMeter((prev.florentinometro ?? 5) + florentinoDelta) : (prev.florentinometro ?? 5);
       return {
         ...prev,
         teams: prev.teams.map(t => {
@@ -450,6 +541,10 @@ function App() {
           return t;
         }),
         transferLog: records.reduce((log, rec) => appendTransfer(log, rec), prev.transferLog),
+        florentinometro: newMeter,
+        florentinometroPeak: Math.max(prev.florentinometroPeak ?? 5, newMeter),
+        florentinometroMin: Math.min(prev.florentinometroMin ?? 5, newMeter),
+        seasonTransferSpent: (prev.seasonTransferSpent ?? 0) + amount,
       };
     });
     return result;
@@ -472,6 +567,11 @@ function App() {
         fromTeamName: seller.name, toTeamName: buyer.name,
         amount: clausulaCost,
       };
+      const marketValue = computePrice(player, prev.year);
+      const florentinoDelta = (prev.gameMode === 'promanager' && !prev.boardFired)
+        ? computeTransferDelta(player, clausulaCost, marketValue, true, prev.year)
+        : 0;
+      const newMeter = florentinoDelta !== 0 ? clampMeter((prev.florentinometro ?? 5) + florentinoDelta) : (prev.florentinometro ?? 5);
       return {
         ...prev,
         teams: prev.teams.map(t => {
@@ -480,6 +580,10 @@ function App() {
           return t;
         }),
         transferLog: appendTransfer(prev.transferLog, entry),
+        florentinometro: newMeter,
+        florentinometroPeak: Math.max(prev.florentinometroPeak ?? 5, newMeter),
+        florentinometroMin: Math.min(prev.florentinometroMin ?? 5, newMeter),
+        seasonTransferSpent: (prev.seasonTransferSpent ?? 0) + clausulaCost,
       };
     });
     return { accepted: true, message: `Cláusula ejecutada. ${formatEuros(clausulaCost)} pagados a TEBAS.` };
@@ -580,6 +684,11 @@ function App() {
       });
 
       const offeredIdSet = new Set(offeredIds);
+      const marketValue = computePrice(player, prev.year);
+      const florentinoDelta = (prev.gameMode === 'promanager' && !prev.boardFired)
+        ? computeTransferDelta(player, offer.amount, marketValue, false, prev.year)
+        : 0;
+      const newMeter = florentinoDelta !== 0 ? clampMeter((prev.florentinometro ?? 5) + florentinoDelta) : (prev.florentinometro ?? 5);
       return {
         ...prev,
         teams: prev.teams.map(t => {
@@ -607,6 +716,10 @@ function App() {
         }),
         incomingOffers: prev.incomingOffers.filter(o => o.playerId !== offer.playerId),
         transferLog: records.reduce((log, rec) => appendTransfer(log, rec), prev.transferLog),
+        florentinometro: newMeter,
+        florentinometroPeak: Math.max(prev.florentinometroPeak ?? 5, newMeter),
+        florentinometroMin: Math.min(prev.florentinometroMin ?? 5, newMeter),
+        seasonTransferEarned: (prev.seasonTransferEarned ?? 0) + offer.amount,
       };
     });
   };
@@ -894,6 +1007,23 @@ function App() {
     };
     newLeague = applyStaminaRecovery(newLeague);
     newLeague = deductWeeklySalaries(newLeague);
+    // Florentinometro: weekly financial delta
+    if (newLeague.gameMode === 'promanager' && !newLeague.boardFired) {
+      const teamFinances = newLeague.finances[newLeague.userTeamId];
+      const weeks = teamFinances?.weeks;
+      const lastWeek = weeks?.[weeks.length - 1];
+      if (lastWeek) {
+        const net = (lastWeek.income ?? 0) - (lastWeek.salaries ?? 0);
+        const weekDelta = net >= 0 ? METER_DELTAS.weeklyPositive : METER_DELTAS.weeklyNegative;
+        const newMeter = clampMeter((newLeague.florentinometro ?? 5) + weekDelta);
+        newLeague = {
+          ...newLeague,
+          florentinometro: newMeter,
+          florentinometroPeak: Math.max(newLeague.florentinometroPeak ?? 5, newMeter),
+          florentinometroMin: Math.min(newLeague.florentinometroMin ?? 5, newMeter),
+        };
+      }
+    }
     newLeague = autoListAiPlayers(newLeague);
     newLeague = simulateAiMarketSignings(newLeague);
     newLeague = simulateAiTrades(newLeague);
@@ -905,6 +1035,56 @@ function App() {
       newLeague.seasonFinished = true;
     } else if (newLeague.currentJornada < newLeague.schedule.length) {
       newLeague.currentJornada++;
+    }
+    // Florentinometro: firing check (only mid-season)
+    if (newLeague.gameMode === 'promanager' && !newLeague.boardFired && !newLeague.seasonFinished) {
+      const chance = firingChance(newLeague.florentinometro ?? 5);
+      if (chance > 0 && Math.random() < chance) {
+        const warnings = (newLeague.boardWarnings ?? 0) + 1;
+        if (warnings >= 3) {
+          newLeague = { ...newLeague, boardFired: true, boardWarnings: warnings, seasonFinished: true };
+          const firedIdx = Math.floor(Math.random() * 4);
+          const firedMsg = { title: t('florentino.fired'), body: t(`florentino.firedBody.${firedIdx}`), tone: 'danger' as const };
+          setTimeout(() => { setBoardAlert(firedMsg); setLastBoardAlert(firedMsg); }, 100);
+        } else {
+          newLeague = { ...newLeague, boardWarnings: warnings };
+          const isSecond = warnings === 2;
+          const warnTitle = isSecond ? t('florentino.warning2') : t('florentino.warning');
+          const warnBody = isSecond
+            ? t(`florentino.warning2Body.${Math.floor(Math.random() * 3)}`)
+            : t(`florentino.warningBody.${Math.floor(Math.random() * 7)}`);
+          const warnMsg = { title: warnTitle, body: warnBody, tone: 'warning' as const };
+          setTimeout(() => { setBoardAlert(warnMsg); setLastBoardAlert(warnMsg); }, 100);
+        }
+      }
+    }
+    // Florentinometro: positive threshold rewards (only mid-season)
+    if (newLeague.gameMode === 'promanager' && !newLeague.boardFired && !newLeague.seasonFinished) {
+      const meter = newLeague.florentinometro ?? 5;
+      const threshold = newLeague.boardRewardThreshold ?? 0;
+      if (meter < 7 && threshold > 0) {
+        // Reset so they can earn rewards again when they climb back up
+        newLeague = { ...newLeague, boardRewardThreshold: 0 };
+      } else if (meter >= 9 && threshold < 9) {
+        const BONUS = 2_000_000;
+        newLeague = {
+          ...newLeague,
+          boardRewardThreshold: 9,
+          teams: newLeague.teams.map(t =>
+            t.id === newLeague.userTeamId
+              ? { ...t, budget: t.budget + BONUS, players: t.players.map(p => ({ ...p, stamina: Math.min(99, (p.stamina ?? 99) + 10) })) }
+              : t
+          ),
+        };
+        const marbellaIdx = Math.floor(Math.random() * 3);
+        const marbellaMsg = { title: t('florentino.excellent'), body: t(`florentino.marbellaBody.${marbellaIdx}`), tone: 'success' as const };
+        setTimeout(() => { setBoardAlert(marbellaMsg); setLastBoardAlert(marbellaMsg); }, 100);
+      } else if (meter >= 7 && threshold < 7) {
+        newLeague = { ...newLeague, boardRewardThreshold: 7 };
+        const praiseIdx = Math.floor(Math.random() * 4);
+        const praiseMsg = { title: t('florentino.praise'), body: t(`florentino.praiseBody.${praiseIdx}`), tone: 'success' as const };
+        setTimeout(() => { setBoardAlert(praiseMsg); setLastBoardAlert(praiseMsg); }, 100);
+      }
     }
     newLeague.lastPlayedJornada = playedJornada;
     setLeague(newLeague);
@@ -935,6 +1115,20 @@ function App() {
       finalMatch.awayStartingLineup,
     );
     newLeague = applyTvBonus(newLeague, league.userTeamId, tvBonus);
+    // Florentinometro: adjust based on user match result
+    if (newLeague.gameMode === 'promanager' && !newLeague.boardFired) {
+      const userIsHome = finalMatch.homeTeam.id === newLeague.userTeamId;
+      const userGoals = userIsHome ? finalMatch.homeScore : finalMatch.awayScore;
+      const oppGoals = userIsHome ? finalMatch.awayScore : finalMatch.homeScore;
+      const delta = userGoals > oppGoals ? METER_DELTAS.win : userGoals === oppGoals ? METER_DELTAS.draw : METER_DELTAS.loss;
+      const newMeter = clampMeter((newLeague.florentinometro ?? 5) + delta);
+      newLeague = {
+        ...newLeague,
+        florentinometro: newMeter,
+        florentinometroPeak: Math.max(newLeague.florentinometroPeak ?? 5, newMeter),
+        florentinometroMin: Math.min(newLeague.florentinometroMin ?? 5, newMeter),
+      };
+    }
     newLeague = simulateOtherMatches(newLeague, league.userTeamId);
     advanceAfterJornada(newLeague);
   };
@@ -949,17 +1143,90 @@ function App() {
   };
 
   const handleAdvanceSameTeam = () => {
-    setLeague(prev => advanceSeason(prev));
+    setLeague(prev => {
+      if (prev.gameMode === 'promanager') {
+        const record = buildSeasonCareerRecord(prev, prev.boardFired ?? false);
+        const next = advanceSeason({ ...prev, managerCareer: [...(prev.managerCareer ?? []), record] });
+        const userTeam = next.teams.find(t => t.id === prev.userTeamId);
+        const objective = userTeam ? computeBoardObjective(userTeam, next.teams) : 'avoid_relegation' as const;
+        return { ...next, boardObjective: objective };
+      }
+      return advanceSeason(prev);
+    });
     setView('LEAGUE');
   };
 
   const handleAdvanceChangeTeam = () => {
     setLeague(prev => {
+      if (prev.gameMode === 'promanager') {
+        const record = buildSeasonCareerRecord(prev, prev.boardFired ?? false);
+        const advanced = advanceSeason({ ...prev, managerCareer: [...(prev.managerCareer ?? []), record] });
+        setSelectedYear(advanced.year);
+        return { ...advanced, userTeamId: '', isStarted: false };
+      }
       const advanced = advanceSeason(prev);
       setSelectedYear(advanced.year);
       return { ...advanced, userTeamId: '', isStarted: false };
     });
     setView('LEAGUE');
+  };
+
+  const handleProManagerPickTeam = (teamId: string) => {
+    setLeague(prev => {
+      const allMatchesPlayed = prev.schedule.every(j => j.matches.every(m => m.played));
+      const record = buildSeasonCareerRecord(prev, prev.boardFired ?? false);
+      const updatedCareer = [...(prev.managerCareer ?? []), record];
+
+      if (allMatchesPlayed) {
+        // True season end — advance to next year
+        const next = advanceSeason({ ...prev, managerCareer: updatedCareer });
+        const team = next.teams.find(t => t.id === teamId);
+        const objective = team ? computeBoardObjective(team, next.teams) : 'avoid_relegation' as const;
+        return {
+          ...next,
+          userTeamId: teamId,
+          isStarted: true,
+          gameMode: 'promanager' as const,
+          managerName: prev.managerName ?? '',
+          boardObjective: objective,
+          florentinometro: 5,
+          florentinometroPeak: 5,
+          florentinometroMin: 5,
+          seasonTransferSpent: 0,
+          seasonTransferEarned: 0,
+        };
+      } else {
+        // Mid-season fire — continue current season with new team
+        const team = prev.teams.find(t => t.id === teamId);
+        const objective = team ? computeBoardObjective(team, prev.teams) : 'avoid_relegation' as const;
+        return {
+          ...prev,
+          userTeamId: teamId,
+          boardFired: false,
+          boardWarnings: 0,
+          seasonFinished: false,
+          boardObjective: objective,
+          florentinometro: 5,
+          florentinometroPeak: 5,
+          florentinometroMin: 5,
+          managerCareer: updatedCareer,
+        };
+      }
+    });
+    setView('LEAGUE');
+  };
+
+  const handleProManagerRetire = () => {
+    setLeague(prev => {
+      const record = buildSeasonCareerRecord(prev, prev.boardFired ?? false);
+      return {
+        ...prev,
+        managerCareer: [...(prev.managerCareer ?? []), record],
+        isStarted: false,
+        userTeamId: '',
+      };
+    });
+    setView('MANAGER_CAREER');
   };
 
   const handleResetGame = () => {
@@ -1186,6 +1453,33 @@ function App() {
       );
     }
 
+    if (view === 'MANAGER_CAREER') {
+      return (
+        <ManagerCareerView
+          managerName={league.managerName ?? ''}
+          career={league.managerCareer ?? []}
+          currentMeter={league.florentinometro ?? 5}
+          onBack={() => setView(league.isStarted ? 'LEAGUE' : 'LEAGUE')}
+        />
+      );
+    }
+
+    if (showProManagerFlow) {
+      return (
+        <ProManagerSetupView
+          teams={league.teams}
+          managerName={league.managerName ?? ''}
+          managerCareer={league.managerCareer ?? []}
+          currentMeter={league.florentinometro ?? 5}
+          yearStats={getAvailableYearsWithStats()}
+          selectedYear={selectedYear}
+          onSelectYear={handleProManagerSelectYear}
+          onSelectTeam={handleSelectTeamProManager}
+          onBack={() => { setShowProManagerFlow(false); setSelectedYear(null); }}
+        />
+      );
+    }
+
     if (!league.isStarted) {
       const availableYears = getAvailableYears();
 
@@ -1208,6 +1502,20 @@ function App() {
             >
               {t('btn.fantasy')}
             </button>
+            <button
+              onClick={() => setShowProManagerFlow(true)}
+              className="w-full bg-vga-magenta text-vga-bright-white py-4 text-sm border-b-4 border-r-4 border-vga-black font-bold uppercase tracking-widest hover:opacity-90"
+            >
+              {t('btn.proManager')}
+            </button>
+            {(league.managerCareer?.length ?? 0) > 0 && (
+              <button
+                onClick={() => setView('MANAGER_CAREER')}
+                className="w-full bg-vga-black text-vga-magenta py-3 text-[10px] border-2 border-vga-magenta font-bold uppercase tracking-widest hover:bg-vga-magenta hover:text-vga-bright-white"
+              >
+                {t('btn.managerCareer')}
+              </button>
+            )}
             <button
               onClick={() => setShowInstructions(true)}
               className="w-full bg-vga-blue text-vga-bright-white py-3 text-[10px] border-b-4 border-r-4 border-vga-black font-bold uppercase tracking-widest hover:opacity-90"
@@ -1263,6 +1571,22 @@ function App() {
     const userTeam = league.teams.find(t => t.id === league.userTeamId)!;
 
     if (view === 'END_OF_SEASON') {
+      if (league.gameMode === 'promanager') {
+        return (
+          <ProManagerEndView
+            teams={league.teams}
+            stats={league.stats}
+            userTeamId={league.userTeamId}
+            managerName={league.managerName ?? ''}
+            florentinometro={league.florentinometro ?? 5}
+            boardObjective={league.boardObjective ?? 'avoid_relegation'}
+            managerCareer={league.managerCareer ?? []}
+            year={league.year}
+            onPickTeam={handleProManagerPickTeam}
+            onRetire={handleProManagerRetire}
+          />
+        );
+      }
       return (
         <EndOfSeasonView
           teams={league.teams}
@@ -1497,6 +1821,7 @@ function App() {
           {navBtn(t('nav.team'),      'EQUIPO',    { isActive: currentView === 'EQUIPO' })}
           {navBtn(t('nav.editor'),    'EDITOR',    { isActive: currentView === 'EDITOR' })}
           {navBtn(t('nav.backup'),    'BACKUP',    { isActive: currentView === 'BACKUP' })}
+          {league.gameMode === 'promanager' && navBtn(t('nav.managerCareer'), 'MANAGER_CAREER', { isActive: currentView === 'MANAGER_CAREER' })}
           {navBtn(t('nav.help'), 'INSTRUCTIONS')}
         </nav>
         <div className="flex flex-col gap-6 min-w-0">
@@ -1758,7 +2083,11 @@ function App() {
       </header>
 
       <div className="w-full max-w-4xl">
-        <StatusBar league={league} />
+        <StatusBar
+          league={league}
+          onBoardAlert={lastBoardAlert ? () => setBoardAlert(lastBoardAlert) : undefined}
+          onCareer={league.gameMode === 'promanager' && (league.managerCareer?.length ?? 0) > 0 ? () => setView('MANAGER_CAREER') : undefined}
+        />
       </div>
 
       {!match ? renderMainContent() : (() => {
@@ -2035,6 +2364,15 @@ function App() {
         >
           {message.body}
         </MessageModal>
+      )}
+
+      {boardAlert && (
+        <BoardAlertModal
+          title={boardAlert.title}
+          body={boardAlert.body}
+          tone={boardAlert.tone}
+          onClose={() => setBoardAlert(null)}
+        />
       )}
     </div>
     </PlayerTooltipProvider>

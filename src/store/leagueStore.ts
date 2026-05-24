@@ -1,4 +1,5 @@
 import type { Team, Player, MatchEvent, Position } from '../types/game.d.ts';
+import type { BoardObjective } from '../engine/florentinometro';
 import { getTeamsForYearWithOverflow, getFreeAgents, getEligibleFreeAgents, advancePlayerToYear, extractDbId } from '../data/mockTeams';
 import { generateSchedule } from '../engine/calendar';
 import { pickBestFormation } from '../engine/formations';
@@ -155,6 +156,25 @@ export interface SeasonHistoryEntry {
   mejorPorEquipo: Record<string, { playerName: string; ratingSum: number }>;
 }
 
+export interface ManagerSeasonRecord {
+  year: number;
+  teamName: string;
+  teamId: string;
+  finalPosition: number;
+  totalTeams: number;
+  objective: BoardObjective;
+  objectiveMet: boolean;
+  florentinometroFinal: number;
+  florentinometroPeak: number;
+  florentinometroMin: number;
+  gamesManaged: number;
+  wins: number;
+  draws: number;
+  losses: number;
+  transferBalance: number;
+  fired: boolean;
+}
+
 // LeagueState is the save format (persisted to localStorage as 'openfutbol_league').
 // Any field added here that old saves won't have must also get a needsReset check in App.tsx.
 export interface LeagueState {
@@ -176,6 +196,19 @@ export interface LeagueState {
   leagueHistory: SeasonHistoryEntry[];
   // Keys "sellerTeamId:playerId" or "free:playerId" the user can't bid for this season.
   blockedSignings: string[];
+  // Florentinometro / PROMANAGER fields (optional so old saves load without reset).
+  gameMode?: 'classic' | 'promanager';
+  managerName?: string;
+  florentinometro?: number;
+  boardObjective?: BoardObjective;
+  boardWarnings?: number;
+  boardFired?: boolean;
+  florentinometroPeak?: number;
+  florentinometroMin?: number;
+  seasonTransferSpent?: number;
+  seasonTransferEarned?: number;
+  managerCareer?: ManagerSeasonRecord[];
+  boardRewardThreshold?: number; // 0 = none, 7 = praise given, 9 = marbella given
 }
 
 export const emptyTeamRecords = (): TeamRecords => ({
@@ -265,6 +298,17 @@ export const getInitialLeagueState = (
     teamRecords: initialRecords,
     leagueHistory: [],
     blockedSignings: [],
+    gameMode: 'classic',
+    managerName: '',
+    florentinometro: 5,
+    boardObjective: 'avoid_relegation' as BoardObjective,
+    boardWarnings: 0,
+    boardFired: false,
+    florentinometroPeak: 5,
+    florentinometroMin: 5,
+    seasonTransferSpent: 0,
+    seasonTransferEarned: 0,
+    managerCareer: [],
   };
 };
 
@@ -879,6 +923,14 @@ export const advanceSeason = (state: LeagueState): LeagueState => {
     leagueHistory: [...(state.leagueHistory ?? []), historyEntry],
     teamRecords: state.teamRecords ?? {},
     blockedSignings: [],
+    florentinometro: 5,
+    boardObjective: 'avoid_relegation' as BoardObjective,
+    boardWarnings: 0,
+    boardFired: false,
+    florentinometroPeak: 5,
+    florentinometroMin: 5,
+    seasonTransferSpent: 0,
+    seasonTransferEarned: 0,
   };
 };
 
