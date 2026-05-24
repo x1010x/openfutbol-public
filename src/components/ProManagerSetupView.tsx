@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import type { Team } from '../types/game.d.ts';
 import type { ManagerSeasonRecord } from '../store/leagueStore';
 import type { BoardObjective } from '../engine/florentinometro';
@@ -17,6 +17,12 @@ const OBJ_KEYS: Record<BoardObjective, string> = {
   avoid_relegation: 'florentino.obj.avoid_relegation',
 };
 
+interface CareerImport {
+  managerName?: string;
+  managerCareer?: ManagerSeasonRecord[];
+  managerReputation?: number;
+}
+
 interface Props {
   teams: Team[];
   managerName: string;
@@ -26,6 +32,7 @@ interface Props {
   selectedYear: number | null;
   onSelectYear: (year: number) => void;
   onSelectTeam: (teamId: string, name: string) => void;
+  onImport?: (data: CareerImport) => void;
   onBack: () => void;
 }
 
@@ -38,11 +45,30 @@ export const ProManagerSetupView = ({
   selectedYear,
   onSelectYear,
   onSelectTeam,
+  onImport,
   onBack,
 }: Props) => {
   const t = useT();
   const [name, setName] = useState(initialName);
   const [expanded, setExpanded] = useState<string | null>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const handleImportFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      try {
+        const data = JSON.parse(ev.target?.result as string) as CareerImport;
+        if (data && typeof data === 'object') {
+          onImport?.(data);
+          if (data.managerName) setName(data.managerName);
+        }
+      } catch { /* ignore bad files */ }
+      if (fileRef.current) fileRef.current.value = '';
+    };
+    reader.readAsText(file);
+  };
 
   const allOffers = teamsOfferingJobs(teams, '', managerReputation);
 
@@ -55,12 +81,25 @@ export const ProManagerSetupView = ({
             <h2 className="text-vga-magenta text-sm underline decoration-double uppercase">
               {t('promanager.title')}
             </h2>
-            <button
-              onClick={onBack}
-              className="text-[8px] bg-vga-gray text-vga-black px-2 py-1 border border-vga-white hover:bg-vga-red hover:text-vga-bright-white"
-            >
-              {t('btn.back')}
-            </button>
+            <div className="flex gap-2 items-center">
+              {onImport && (
+                <>
+                  <button
+                    onClick={() => fileRef.current?.click()}
+                    className="text-[8px] bg-vga-black text-vga-magenta px-2 py-1 border border-vga-magenta hover:bg-vga-magenta hover:text-vga-bright-white font-bold uppercase"
+                  >
+                    {t('btn.importManager')}
+                  </button>
+                  <input ref={fileRef} type="file" accept=".json" className="hidden" onChange={handleImportFile} />
+                </>
+              )}
+              <button
+                onClick={onBack}
+                className="text-[8px] bg-vga-gray text-vga-black px-2 py-1 border border-vga-white hover:bg-vga-red hover:text-vga-bright-white"
+              >
+                {t('btn.back')}
+              </button>
+            </div>
           </div>
 
           <div className="flex flex-col gap-4 mb-6">

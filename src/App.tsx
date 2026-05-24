@@ -143,7 +143,6 @@ function App() {
   const [showFantasyFlow, setShowFantasyFlow] = useState(false);
   const [showProManagerFlow, setShowProManagerFlow] = useState(false);
   const [showProManagerTutorial, setShowProManagerTutorial] = useState(false);
-  const importCareerRef = useRef<HTMLInputElement>(null);
   const [fantasyYear, setFantasyYear] = useState(0);
   const [fantasyConfig, setFantasyConfig] = useState<{ teamIds: string[]; userTeamId: string; cap: number | null } | null>(null);
   const [returnToFantasy, setReturnToFantasy] = useState(false);
@@ -1363,23 +1362,6 @@ function App() {
     }));
   };
 
-  const handleImportCareerFile = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = ev => {
-      try {
-        const data = JSON.parse(ev.target?.result as string);
-        if (data && typeof data === 'object') {
-          handleImportCareer(data);
-          setShowProManagerFlow(true);
-        }
-      } catch { /* ignore bad files */ }
-      if (importCareerRef.current) importCareerRef.current.value = '';
-    };
-    reader.readAsText(file);
-  };
-
   const handleResetGame = () => {
     localStorage.removeItem('openfutbol_league');
     localStorage.removeItem('openfutbol_welcomed');
@@ -1628,6 +1610,7 @@ function App() {
           selectedYear={selectedYear}
           onSelectYear={handleProManagerSelectYear}
           onSelectTeam={handleSelectTeamProManager}
+          onImport={handleImportCareer}
           onBack={() => { setShowProManagerFlow(false); setSelectedYear(null); }}
         />
       );
@@ -1661,13 +1644,6 @@ function App() {
             >
               {t('btn.proManager')}
             </button>
-            <button
-              onClick={() => importCareerRef.current?.click()}
-              className="w-full bg-vga-black text-vga-magenta py-3 text-[10px] border-2 border-vga-magenta font-bold uppercase tracking-widest hover:bg-vga-magenta hover:text-vga-bright-white"
-            >
-              {t('btn.importManager')}
-            </button>
-            <input ref={importCareerRef} type="file" accept=".json" className="hidden" onChange={handleImportCareerFile} />
             {(league.managerCareer?.length ?? 0) > 0 && (
               <button
                 onClick={() => setView('MANAGER_CAREER')}
