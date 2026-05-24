@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { LeagueState } from '../store/leagueStore';
 import { getAllDBPlayerEntries, extractDbId } from '../data/mockTeams';
 import { PlayerName } from './PlayerName';
+import { useT } from '../i18n';
 
 interface Props {
   teamId: string;
@@ -12,6 +13,7 @@ interface Props {
 }
 
 export const PlayerPickerPanel = ({ teamId, year: _year, league, onPick, onBack }: Props) => {
+  const t = useT();
   const [search, setSearch] = useState('');
 
   const allDB = getAllDBPlayerEntries();
@@ -54,13 +56,13 @@ export const PlayerPickerPanel = ({ teamId, year: _year, league, onPick, onBack 
         type="text"
         value={search}
         onChange={e => setSearch(e.target.value)}
-        placeholder="Buscar jugador..."
+        placeholder={t('placeholder.searchPlayer')}
         className="bg-vga-bright-white text-vga-black text-[9px] px-2 py-1 border-2 border-vga-black font-mono w-full"
       />
 
       <div className="flex flex-col gap-1">
         {filtered.length === 0 && (
-          <span className="text-vga-black text-[8px] opacity-60 p-2">Sin resultados.</span>
+          <span className="text-vga-black text-[8px] opacity-60 p-2">{t('misc.noResults')}</span>
         )}
         {filtered.map(p => {
           const where = whereInLeague.get(p.dbId);

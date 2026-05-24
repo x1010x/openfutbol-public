@@ -1,5 +1,6 @@
 import type { Team, MatchState, MatchEvent, Player, Position } from '../types/game.d.ts';
 import { FORMATIONS, buildSlotMap, effectiveStat, rawMedia, slotPenalty } from './formations';
+import { t } from '../i18n';
 
 export const calculateTeamStrength = (team: Team, sentOff: string[] = [], stamina?: Record<string, number>) => {
   if (!team.lineup || !team.formation) return 0;
@@ -105,7 +106,7 @@ export const simulateMinute = (state: MatchState, userTeamId?: string): MatchSta
           newEvents.push({
             minute: nextMinute,
             type: 'sub',
-            description: `Cambio en ${team.name}: entra ${playerIn.fullName}, sale ${playerOut.fullName}.`,
+            description: t('commentary.sub', { team: team.name, in: playerIn.fullName, out: playerOut.fullName }),
             teamId: team.id,
             playerId: playerIn.id,
             playerOffId: playerOutId,
@@ -220,7 +221,9 @@ export const simulateMinute = (state: MatchState, userTeamId?: string): MatchSta
         newEvents.push({
           minute: nextMinute,
           type: 'goal',
-          description: `¡GOOOOOL de ${attackingTeam.name}! Marca ${scorer.fullName}${assistant ? ` tras pase de ${assistant.fullName}` : ''}`,
+          description: assistant
+            ? t('commentary.goalAssist', { team: attackingTeam.name, scorer: scorer.fullName, assist: assistant.fullName })
+            : t('commentary.goal', { team: attackingTeam.name, scorer: scorer.fullName }),
           teamId: attackingTeam.id,
           playerId: scorer.id,
           assistantId: assistant?.id
@@ -230,18 +233,18 @@ export const simulateMinute = (state: MatchState, userTeamId?: string): MatchSta
         const onTarget = Math.random() < 0.4;
         if (onTarget) {
           if (isHomeEvent) homeShotsOnTarget++; else awayShotsOnTarget++;
-          const gkLabel = gk ? gk.fullName : 'el portero';
+          const gkLabel = gk ? gk.fullName : t('label.player');
           newEvents.push({
             minute: nextMinute,
             type: 'shot',
-            description: `¡Disparo de ${shooterLabel}! Atajada de ${gkLabel}.`,
+            description: t('commentary.shot', { shooter: shooterLabel, keeper: gkLabel }),
             teamId: attackingTeam.id
           });
         } else {
           newEvents.push({
             minute: nextMinute,
             type: 'shot',
-            description: `¡Ocasión para ${attackingTeam.name}! Disparo de ${shooterLabel} fuera.`,
+            description: t('commentary.shotWide', { team: attackingTeam.name, shooter: shooterLabel }),
             teamId: attackingTeam.id
           });
         }
@@ -290,7 +293,7 @@ export const simulateMinute = (state: MatchState, userTeamId?: string): MatchSta
             newEvents.push({
               minute: nextMinute,
               type: 'red',
-              description: `¡Segunda amarilla! ${defender.fullName} (${defendingTeam.name}) se va expulsado tras una falta sobre ${attacker.fullName}.`,
+              description: t('commentary.yellowRed', { defender: defender.fullName, team: defendingTeam.name, attacker: attacker.fullName }),
               teamId: defendingTeam.id,
               playerId: defender.id,
             });
@@ -299,7 +302,7 @@ export const simulateMinute = (state: MatchState, userTeamId?: string): MatchSta
             newEvents.push({
               minute: nextMinute,
               type: 'yellow',
-              description: `Falta de ${defender.fullName} sobre ${attacker.fullName}. Amarilla para ${defender.fullName} (${defendingTeam.name}).`,
+              description: t('commentary.yellow', { defender: defender.fullName, attacker: attacker.fullName, team: defendingTeam.name }),
               teamId: defendingTeam.id,
               playerId: defender.id,
             });
@@ -309,7 +312,7 @@ export const simulateMinute = (state: MatchState, userTeamId?: string): MatchSta
           newEvents.push({
             minute: nextMinute,
             type: 'red',
-            description: `¡ROJA DIRECTA para ${defender.fullName} (${defendingTeam.name})! Entrada terrible sobre ${attacker.fullName}.`,
+            description: t('commentary.red', { defender: defender.fullName, team: defendingTeam.name, attacker: attacker.fullName }),
             teamId: defendingTeam.id,
             playerId: defender.id,
           });
@@ -351,7 +354,7 @@ export const simulateMinute = (state: MatchState, userTeamId?: string): MatchSta
       newEvents.push({
         minute: nextMinute,
         type: 'injury',
-        description: `¡Lesión de ${player.fullName} (${team.name})!`,
+        description: t('commentary.injury', { player: player.fullName, team: team.name }),
         teamId: team.id,
         playerId: pid,
       });
@@ -374,7 +377,7 @@ export const simulateMinute = (state: MatchState, userTeamId?: string): MatchSta
         newEvents.push({
           minute: nextMinute,
           type: 'sub',
-          description: `Cambio en ${team.name}: entra ${sub.fullName}, sale ${player.fullName}.`,
+          description: t('commentary.sub', { team: team.name, in: sub.fullName, out: player.fullName }),
           teamId: team.id,
           playerId: sub.id,
           playerOffId: pid,
@@ -395,17 +398,17 @@ export const simulateMinute = (state: MatchState, userTeamId?: string): MatchSta
   // Compute stoppage time at the end of each half
   if (nextMinute === 45 && stoppageTime1 === 0) {
     stoppageTime1 = calcStoppage(newEvents, 0, 45);
-    newEvents.push({ minute: 45, type: 'commentary', description: `Se añaden ${stoppageTime1} min al primer tiempo.` });
+    newEvents.push({ minute: 45, type: 'commentary', description: t('commentary.stoppageFirst', { min: String(stoppageTime1) }) });
   }
   if (nextMinute === 90 && stoppageTime2 === 0) {
     stoppageTime2 = calcStoppage(newEvents, 45, 90);
-    newEvents.push({ minute: 90, type: 'commentary', description: `Se añaden ${stoppageTime2} min al segundo tiempo.` });
+    newEvents.push({ minute: 90, type: 'commentary', description: t('commentary.stoppageSecond', { min: String(stoppageTime2) }) });
   }
 
   const isFinished = nextMinute >= 90 + stoppageTime2;
 
   if (isFinished) {
-    newEvents.push({ minute: 90 + stoppageTime2, type: 'commentary', description: '¡Final del partido!' });
+    newEvents.push({ minute: 90 + stoppageTime2, type: 'commentary', description: t('commentary.fulltime') });
   }
 
   return {

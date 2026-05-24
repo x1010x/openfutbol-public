@@ -5,6 +5,7 @@ import { getTeamCountry } from '../data/mockTeams';
 import { calculateTeamStrength } from '../engine/simEngine';
 import { TeamCrest } from './TeamCrest';
 import { CountryBadge } from './CountryBadge';
+import { useT } from '../i18n';
 
 interface Props {
   teams: Team[];
@@ -17,6 +18,7 @@ interface Props {
 }
 
 export const TeamSelection = ({ teams, selectedYear, yearStats, onSelectYear, onSelect, onBack }: Props) => {
+  const t = useT();
   const [openCountries, setOpenCountries] = useState<Set<string>>(new Set());
 
   const toggleCountry = (c: string) =>
@@ -32,18 +34,18 @@ export const TeamSelection = ({ teams, selectedYear, yearStats, onSelectYear, on
         <div className="bg-vga-blue p-4 border-4 border-vga-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-vga-yellow text-sm underline decoration-double">
-              SELECCIONE TEMPORADA
+              {t('setup.selectSeason')}
             </h2>
             <button
               onClick={onBack}
               className="text-[8px] bg-vga-gray text-vga-black px-2 py-1 border border-vga-white hover:bg-vga-red hover:text-vga-bright-white"
             >
-              VOLVER
+              {t('btn.back')}
             </button>
           </div>
 
           <div className="flex flex-col gap-2 max-h-[480px] overflow-y-auto pr-1">
-            {yearStats.map(({ year, teams: t, leagues: l, players: p }) => (
+            {yearStats.map(({ year, teams: tc, leagues: l, players: p }) => (
               <button
                 key={year}
                 onClick={() => onSelectYear(year)}
@@ -53,11 +55,11 @@ export const TeamSelection = ({ teams, selectedYear, yearStats, onSelectYear, on
                   {year}/{(year + 1).toString().slice(-2)}
                 </span>
                 <span className="text-[7px] text-vga-gray">
-                  <span className="text-vga-yellow">{t} equipos</span>
+                  <span className="text-vga-yellow">{t('setup.teamsCount', { n: String(tc) })}</span>
                   {'  ·  '}
-                  <span className="text-vga-cyan">{l} {l === 1 ? 'liga' : 'ligas'}</span>
+                  <span className="text-vga-cyan">{l} {t('setup.leagues')}</span>
                   {'  ·  '}
-                  {p.toLocaleString()} jug.
+                  {p.toLocaleString()} {t('setup.playersShort')}
                 </span>
               </button>
             ))}
@@ -65,7 +67,7 @@ export const TeamSelection = ({ teams, selectedYear, yearStats, onSelectYear, on
         </div>
 
         <div className="bg-vga-magenta p-2 text-[8px] text-vga-bright-white text-center border-2 border-vga-white">
-          SELECCIONE UNA TEMPORADA PARA COMENZAR.
+          {t('setup.seasonHint')}
         </div>
       </div>
     );
@@ -85,13 +87,13 @@ export const TeamSelection = ({ teams, selectedYear, yearStats, onSelectYear, on
       <div className="bg-vga-blue p-4 border-4 border-vga-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-vga-yellow text-sm underline decoration-double">
-            SELECCIONE CLUB — {selectedYear}/{(selectedYear + 1).toString().slice(-2)}
+            {t('setup.selectClub', { year: String(selectedYear), yy: (selectedYear + 1).toString().slice(-2) })}
           </h2>
           <button
             onClick={() => onSelectYear(0)}
             className="text-[8px] bg-vga-gray text-vga-black px-2 py-1 border border-vga-white hover:bg-vga-red hover:text-vga-bright-white"
           >
-            CAMBIAR TEMPORADA
+            {t('setup.changeSeason')}
           </button>
         </div>
 
@@ -107,7 +109,7 @@ export const TeamSelection = ({ teams, selectedYear, yearStats, onSelectYear, on
                   <span className="text-vga-yellow text-[9px] font-bold">
                     <CountryBadge code={country} size="lg" />
                   </span>
-                  <span className="text-vga-gray text-[7px]">{countryTeams.length} equipos  {open ? '▲' : '▼'}</span>
+                  <span className="text-vga-gray text-[7px]">{t('setup.teamsCount', { n: String(countryTeams.length) })}  {open ? '▲' : '▼'}</span>
                 </button>
                 {open && (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-1 pl-2">
@@ -127,12 +129,12 @@ export const TeamSelection = ({ teams, selectedYear, yearStats, onSelectYear, on
                               <span className="text-[8px] bg-vga-blue px-2 text-vga-yellow shrink-0">STR: {strength}</span>
                             </div>
                             <div className="flex items-center gap-1 text-[7px] self-start">
-                              <span className="text-vga-cyan">ESTRELLA:</span>
+                              <span className="text-vga-cyan">{t('setup.starLabel')}</span>
                               <span className="text-vga-white">{star?.name ?? '—'} ({star?.media ?? 0})</span>
                             </div>
                           </div>
                           <button className="w-full mt-3 bg-vga-gray group-hover:bg-vga-green text-[8px] py-1 text-vga-bright-white border border-vga-white">
-                            ELEGIR EQUIPO
+                            {t('setup.chooseTeam')}
                           </button>
                         </div>
                       );
@@ -146,7 +148,7 @@ export const TeamSelection = ({ teams, selectedYear, yearStats, onSelectYear, on
       </div>
 
       <div className="bg-vga-magenta p-2 text-[8px] text-vga-bright-white text-center border-2 border-vga-white">
-        RECUERDE: EL ÉXITO DEPENDE DE SU GESTIÓN Y DEL SENTIDO COMÚN.
+        {t('setup.successHint')}
       </div>
     </div>
   );

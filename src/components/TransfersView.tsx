@@ -7,6 +7,7 @@ import { computePrice, formatEuros, offerStep, playerAge } from '../data/economy
 import type { OfferResult } from '../data/economy';
 import { PlayerCard } from './PlayerCard';
 import { MessageModal } from './MessageModal';
+import { useT } from '../i18n';
 
 interface Props {
   userTeam: Team;
@@ -85,6 +86,7 @@ const OfferModal = ({
   onCancel: () => void;
   onSubmit: (amount: number, offeredPlayerIds: string[]) => void;
 }) => {
+  const t = useT();
   const price = computePrice(entry.player, seasonYear);
   const [offer, setOffer] = useState<number>(price);
   const [selectedOffered, setSelectedOffered] = useState<Set<string>>(new Set());
@@ -123,14 +125,14 @@ const OfferModal = ({
     <div onClick={onCancel} className="fixed inset-0 z-40 bg-black/80 flex items-center justify-center p-4 animate-in fade-in duration-150">
       <div onClick={(e) => e.stopPropagation()} className="max-w-sm w-full border-4 border-vga-bright-white bg-vga-blue shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] max-h-[90vh] overflow-y-auto">
         <div className="bg-vga-black px-3 py-2 text-center border-b-2 border-vga-bright-white">
-          <div className="text-vga-yellow text-[10px] uppercase font-bold">OFERTA POR</div>
+          <div className="text-vga-yellow text-[10px] uppercase font-bold">{t('misc.offerFor')}</div>
           <div className="text-vga-bright-white text-[12px] mt-1">
             <span className="text-vga-yellow mr-2">{entry.player.position}</span><PlayerName player={entry.player} />
           </div>
-          <div className="text-[8px] text-vga-cyan mt-1">{entry.isFreeAgent ? 'LIBRE' : entry.teamName} · valor {formatEuros(price)}</div>
+          <div className="text-[8px] text-vga-cyan mt-1">{entry.isFreeAgent ? t('label.freeAgent') : entry.teamName} · {t('misc.totalValueOf', { amount: formatEuros(price) })}</div>
         </div>
         <div className="p-3 flex flex-col gap-3 text-vga-bright-white">
-          <div className="text-[7px] text-vga-cyan uppercase text-center">Efectivo</div>
+          <div className="text-[7px] text-vga-cyan uppercase text-center">{t('label.cash')}</div>
           <div className="flex items-center justify-center gap-2">
             <button onClick={() => adjust(-step)} className="bg-vga-red text-vga-bright-white px-3 py-1 border border-black text-[10px]">−</button>
             <span className="text-vga-yellow font-bold text-[14px] min-w-[140px] text-center">{formatEuros(offer)}</span>
@@ -138,9 +140,9 @@ const OfferModal = ({
           </div>
           <div className="flex justify-center gap-1 text-[7px]">
             <button onClick={() => setOffer(Math.round(price * 0.8 / 100_000) * 100_000)} className="bg-vga-gray text-vga-black px-2 py-0.5 border border-vga-black">80%</button>
-            <button onClick={() => setOffer(price)} className="bg-vga-gray text-vga-black px-2 py-0.5 border border-vga-black">BASE</button>
+            <button onClick={() => setOffer(price)} className="bg-vga-gray text-vga-black px-2 py-0.5 border border-vga-black">{t('btn.base')}</button>
             <button onClick={() => setOffer(Math.round(price * 1.5 / 100_000) * 100_000)} className="bg-vga-gray text-vga-black px-2 py-0.5 border border-vga-black">+50%</button>
-            <button onClick={() => setOffer(price * 2)} className="bg-vga-gray text-vga-black px-2 py-0.5 border border-vga-black">DOBLAR</button>
+            <button onClick={() => setOffer(price * 2)} className="bg-vga-gray text-vga-black px-2 py-0.5 border border-vga-black">{t('btn.double')}</button>
           </div>
 
           {canSwap && (
@@ -149,13 +151,13 @@ const OfferModal = ({
                 onClick={() => setPickerOpen(o => !o)}
                 className="w-full bg-vga-black text-vga-magenta px-2 py-1 text-[8px] uppercase font-bold flex justify-between items-center"
               >
-                <span>Incluir jugadores ({selectedOffered.size})</span>
+                <span>{t('misc.includePlayers', { n: String(selectedOffered.size) })}</span>
                 <span>{pickerOpen ? '−' : '+'}</span>
               </button>
               {pickerOpen && (
                 <div className="bg-vga-black border-t border-vga-magenta p-2 max-h-44 overflow-y-auto flex flex-col gap-1">
                   {sortedSquad.length === 0 && (
-                    <div className="text-[7px] text-vga-gray">Tu plantilla está vacía.</div>
+                    <div className="text-[7px] text-vga-gray">{t('misc.squadEmpty')}</div>
                   )}
                   {sortedSquad.map(p => {
                     const checked = selectedOffered.has(p.id);
@@ -181,26 +183,26 @@ const OfferModal = ({
               )}
               {selectedOffered.size > 0 && (
                 <div className="bg-vga-black border-t border-vga-magenta px-2 py-1 text-[7px] text-vga-light-cyan">
-                  Jugadores ofrecidos: {formatEuros(offeredValue)}
+                  {t('misc.playersOffered', { amount: formatEuros(offeredValue) })}
                 </div>
               )}
             </div>
           )}
 
           <div className="bg-vga-black border border-vga-yellow p-2 text-center">
-            <div className="text-[7px] text-vga-yellow uppercase">Valor total</div>
+            <div className="text-[7px] text-vga-yellow uppercase">{t('misc.total')}</div>
             <div className="text-vga-bright-white text-[14px] font-bold">{formatEuros(totalValue)}</div>
             <div className="text-[7px] text-vga-cyan mt-1">
-              {Math.round((totalValue / Math.max(price, 1)) * 100)}% del valor del jugador
+              {t('misc.pctOfPlayerValue', { pct: String(Math.round((totalValue / Math.max(price, 1)) * 100)) })}
             </div>
           </div>
 
           <div className="text-[7px] text-vga-cyan text-center">
-            Sugerencia: ofertas con valor total entre el 70% y el 200% pueden ser aceptadas.
+            {t('misc.offerHint')}
           </div>
         </div>
         <div className="bg-vga-black p-2 border-t-2 border-vga-bright-white flex gap-2">
-          <button onClick={onCancel} className="flex-1 bg-vga-red text-vga-bright-white py-2 text-[9px] border border-vga-bright-white">CANCELAR</button>
+          <button onClick={onCancel} className="flex-1 bg-vga-red text-vga-bright-white py-2 text-[9px] border border-vga-bright-white">{t('btn.cancel')}</button>
           <button
             onClick={() => onSubmit(offer, [...selectedOffered])}
             disabled={tooExpensive || wouldBeUnderMin}
@@ -210,7 +212,7 @@ const OfferModal = ({
                 : 'bg-vga-green text-vga-bright-white hover:bg-vga-light-green border-vga-bright-white'
             }`}
           >
-            {tooExpensive ? 'SIN PRESUPUESTO' : wouldBeUnderMin ? 'PLANTILLA MUY CORTA' : 'ENVIAR OFERTA'}
+            {tooExpensive ? t('misc.noBudget') : wouldBeUnderMin ? t('misc.shortSquad') : t('btn.sendOffer')}
           </button>
         </div>
       </div>
@@ -233,6 +235,7 @@ const MarketCard = ({
   onPlayerClick?: () => void;
   blocked?: boolean;
 }) => {
+  const t = useT();
   const price = computePrice(entry.player, seasonYear);
   const isClausula = !entry.isFreeAgent && !entry.player.forSale && !!onClausulaClick;
   const highlight = entry.isFreeAgent ? 'free' : entry.player.forSale ? 'listed' : 'rival';
@@ -246,7 +249,7 @@ const MarketCard = ({
         <div className="flex flex-col gap-1">
           <div className="flex items-center justify-between gap-2 text-[7px]">
             <span className={entry.isFreeAgent ? 'text-vga-light-green font-bold' : 'text-vga-cyan truncate'}>
-              {entry.isFreeAgent ? 'LIBRE' : entry.teamName}
+              {entry.isFreeAgent ? t('label.freeAgent') : entry.teamName}
             </span>
             <span className="font-bold text-[9px] text-vga-light-green">
               {formatEuros(price)}
@@ -254,22 +257,22 @@ const MarketCard = ({
           </div>
           {blocked ? (
             <button disabled className="w-full px-2 py-1 text-[8px] border border-vga-black bg-vga-gray text-vga-black opacity-60 cursor-not-allowed">
-              BLOQUEADO
+              {t('misc.blocked')}
             </button>
           ) : onClausulaClick && !entry.isFreeAgent ? (
             <div className="flex gap-1">
               {!isClausula && (
                 <button onClick={onOfferClick} className="flex-1 px-1 py-1 text-[8px] border border-vga-black bg-vga-green text-vga-bright-white hover:bg-vga-light-green">
-                  OFERTAR
+                  {t('btn.makeOffer')}
                 </button>
               )}
               <button onClick={onClausulaClick} className="flex-1 px-1 py-1 text-[8px] border border-vga-black bg-vga-red text-vga-bright-white hover:bg-vga-light-red font-bold">
-                CLAUSULAZO
+                {t('misc.clausulazo')}
               </button>
             </div>
           ) : (
             <button onClick={onOfferClick} className="w-full px-2 py-1 text-[8px] border border-vga-black bg-vga-green text-vga-bright-white hover:bg-vga-light-green">
-              OFERTAR
+              {t('btn.makeOffer')}
             </button>
           )}
         </div>
@@ -291,6 +294,7 @@ const ClausulaModal = ({
   onConfirm: () => void;
   onCancel: () => void;
 }) => {
+  const t = useT();
   const price = computePrice(entry.player, seasonYear);
   const clausulaCost = price * 2;
   const canAfford = userBudget >= clausulaCost;
@@ -298,7 +302,7 @@ const ClausulaModal = ({
     <div onClick={onCancel} className="fixed inset-0 z-40 bg-black/80 flex items-center justify-center p-4 animate-in fade-in duration-150">
       <div onClick={(e) => e.stopPropagation()} className="max-w-xs w-full border-4 border-vga-light-red bg-vga-blue shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
         <div className="bg-vga-red px-3 py-2 text-center border-b-2 border-vga-bright-white">
-          <div className="text-vga-bright-white text-[10px] uppercase font-bold">CLAUSULAZO TEBAS</div>
+          <div className="text-vga-bright-white text-[10px] uppercase font-bold">{t('misc.clausulazoFull')}</div>
           <div className="text-vga-bright-white text-[12px] mt-1">
             <span className="text-vga-yellow mr-2">{entry.player.position}</span><PlayerName player={entry.player} />
           </div>
@@ -306,30 +310,30 @@ const ClausulaModal = ({
         </div>
         <div className="p-3 flex flex-col gap-3 text-vga-bright-white text-[8px]">
           <div className="bg-vga-black border border-vga-light-red p-2 text-center">
-            <div className="text-vga-gray uppercase text-[7px]">Coste clausulazo</div>
+            <div className="text-vga-gray uppercase text-[7px]">{t('misc.clausulazoCost')}</div>
             <div className="text-vga-light-red font-bold text-[16px]">{formatEuros(clausulaCost)}</div>
             <div className="text-[7px] text-vga-gray mt-1 flex justify-center gap-3">
-              <span>Al club: {formatEuros(price)}</span>
-              <span className="text-vga-light-red">Tebas se lleva su parte: {formatEuros(price)}</span>
+              <span>{t('misc.clausulazoNote', { amount: formatEuros(price) })}</span>
+              <span className="text-vga-light-red">{t('misc.clausulazoFee', { amount: formatEuros(price) })}</span>
             </div>
           </div>
           <div className="text-vga-yellow text-[7px] text-center">
-            El jugador se traspasa directamente. No hay negociación.
+            {t('misc.clausulazoDirectTransfer')}
           </div>
           {!canAfford && (
             <div className="bg-vga-red/40 border border-vga-light-red p-1 text-center text-[7px] text-vga-light-red font-bold">
-              SIN PRESUPUESTO — necesitas {formatEuros(clausulaCost - userBudget)} más
+              {t('misc.noBudgetNeed', { amount: formatEuros(clausulaCost - userBudget) })}
             </div>
           )}
         </div>
         <div className="bg-vga-black p-2 border-t-2 border-vga-bright-white flex gap-2">
-          <button onClick={onCancel} className="flex-1 bg-vga-gray text-vga-black py-2 text-[9px] border border-vga-bright-white">CANCELAR</button>
+          <button onClick={onCancel} className="flex-1 bg-vga-gray text-vga-black py-2 text-[9px] border border-vga-bright-white">{t('btn.cancel')}</button>
           <button
             onClick={canAfford ? onConfirm : undefined}
             disabled={!canAfford}
             className={`flex-1 py-2 text-[9px] border font-bold ${canAfford ? 'bg-vga-red text-vga-bright-white hover:bg-vga-light-red border-vga-bright-white' : 'bg-vga-gray text-vga-black opacity-50 cursor-not-allowed border-vga-black'}`}
           >
-            {canAfford ? 'EJECUTAR CLAUSULAZO' : 'SIN PRESUPUESTO'}
+            {canAfford ? t('btn.executeClausula') : t('misc.noBudget')}
           </button>
         </div>
       </div>
@@ -351,6 +355,7 @@ export const TransfersView = ({
   blockedSignings,
   onBack,
 }: Props) => {
+  const t = useT();
   const blockedSet = new Set(blockedSignings);
   const [offerEntry, setOfferEntry] = useState<MarketEntry | null>(null);
   const [clausulaEntry, setClausulaEntry] = useState<MarketEntry | null>(null);
@@ -410,29 +415,29 @@ export const TransfersView = ({
   return (
     <div className="w-full max-w-5xl flex flex-col gap-4 animate-in fade-in duration-300">
       <div className="bg-vga-blue p-2 border-2 border-vga-white flex justify-between items-center vga-panel">
-        <h2 className="text-vga-yellow text-xs uppercase font-bold">MERCADO DE FICHAJES</h2>
+        <h2 className="text-vga-yellow text-xs uppercase font-bold">{t('section.transfers')}</h2>
         <button onClick={onBack} className="bg-vga-red text-vga-bright-white px-3 py-1 text-[8px] border border-vga-black hover:bg-vga-light-red">
-          VOLVER
+          {t('btn.back')}
         </button>
       </div>
 
       <div className="bg-vga-gray border-2 border-vga-blue p-3">
-        <div className="text-[7px] text-vga-black uppercase font-bold mb-2">Estado del mercado · J{currentJornada}</div>
+        <div className="text-[7px] text-vga-black uppercase font-bold mb-2">{t('misc.marketStatus', { j: String(currentJornada) })}</div>
         <div className="flex justify-between items-start">
           <div>
-            <div className="text-[7px] text-vga-black uppercase">Presupuesto</div>
+            <div className="text-[7px] text-vga-black uppercase">{t('label.budget')}</div>
             <div className="text-[12px] text-vga-blue font-bold">{formatEuros(userTeam.budget)}</div>
           </div>
           <div className="text-center">
-            <div className="text-[7px] text-vga-black uppercase">Plantilla</div>
+            <div className="text-[7px] text-vga-black uppercase">{t('label.players')}</div>
             <div className="text-[10px] text-vga-blue font-bold">{userTeam.players.length}</div>
           </div>
           <div className="text-center">
-            <div className="text-[7px] text-vga-black uppercase">Libres</div>
+            <div className="text-[7px] text-vga-black uppercase">{t('label.freeAgents')}</div>
             <div className="text-[10px] text-vga-blue font-bold">{freeAgents.length}</div>
           </div>
           <div className="text-right">
-            <div className="text-[7px] text-vga-black uppercase">En venta</div>
+            <div className="text-[7px] text-vga-black uppercase">{t('label.forSale')}</div>
             <div className="text-[10px] text-vga-blue font-bold">{listedEntries.length}</div>
           </div>
         </div>
@@ -440,16 +445,16 @@ export const TransfersView = ({
 
       <div className="border-2 border-vga-cyan p-2 bg-vga-blue">
         <div className="flex justify-between items-center mb-2">
-          <h3 className="text-vga-cyan text-[10px] font-bold uppercase">Bolsa de fichajes</h3>
+          <h3 className="text-vga-cyan text-[10px] font-bold uppercase">{t('section.freeAgentPool')}</h3>
           <span className="text-[7px] text-vga-gray">
-            {listedEntries.length} en venta · {freeAgents.length} libres ({rotatedFreeAgents.length} esta jornada)
+            {t('misc.marketCounts', { listed: String(listedEntries.length), free: String(freeAgents.length), shown: String(rotatedFreeAgents.length) })}
           </span>
         </div>
         <div className="flex flex-wrap gap-1 mb-2">
-          {(['all', 'listed', 'free'] as const).map(t => (
-            <button key={t} onClick={() => setTypeFilter(t)}
-              className={`text-[7px] px-2 py-0.5 border ${typeFilter === t ? 'bg-vga-cyan text-vga-black border-vga-cyan' : 'bg-vga-black text-vga-gray border-vga-gray hover:text-vga-bright-white'}`}>
-              {t === 'all' ? 'TODOS' : t === 'listed' ? 'EN VENTA' : 'LIBRES'}
+          {(['all', 'listed', 'free'] as const).map(type => (
+            <button key={type} onClick={() => setTypeFilter(type)}
+              className={`text-[7px] px-2 py-0.5 border ${typeFilter === type ? 'bg-vga-cyan text-vga-black border-vga-cyan' : 'bg-vga-black text-vga-gray border-vga-gray hover:text-vga-bright-white'}`}>
+              {type === 'all' ? 'ALL' : type === 'listed' ? t('label.forSale') : t('label.freeAgents')}
             </button>
           ))}
           <span className="text-vga-gray text-[7px] self-center mx-1">|</span>
@@ -465,7 +470,7 @@ export const TransfersView = ({
             .filter(e => typeFilter === 'all' || (typeFilter === 'listed' ? !e.isFreeAgent : e.isFreeAgent))
             .filter(e => posFilter === 'ALL' || e.player.position === posFilter);
           return filtered.length === 0 ? (
-            <div className="text-[8px] text-vga-gray text-center p-2">No hay jugadores disponibles con estos filtros.</div>
+            <div className="text-[8px] text-vga-gray text-center p-2">{t('misc.noPlayersFilter')}</div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
               {filtered.map(entry => (
@@ -485,10 +490,8 @@ export const TransfersView = ({
       </div>
 
       <div className="border-2 border-vga-cyan p-2 bg-vga-blue">
-        <h3 className="text-vga-cyan text-[10px] font-bold mb-2 uppercase">Otros equipos</h3>
-        <div className="text-[7px] text-vga-gray mb-2">
-          Jugadores en venta: oferta normal. Jugadores sin carteler: <span className="text-vga-light-red font-bold">CLAUSULAZO</span> — pago inmediato × 2 sin negociación.
-        </div>
+        <h3 className="text-vga-cyan text-[10px] font-bold mb-2 uppercase">{t('section.otherTeams')}</h3>
+        <div className="text-[7px] text-vga-gray mb-2">{t('misc.clausulazoHint')}</div>
         <div className="flex flex-col gap-1">
           {rivalTeams.map(rival => {
             const open = expandedTeamId === rival.id;
@@ -503,7 +506,7 @@ export const TransfersView = ({
                   <span className="flex items-center gap-2">
                     {listedCount > 0 && (
                       <span className="text-[7px] bg-vga-yellow text-vga-black px-1 border border-vga-black uppercase">
-                        {listedCount} en venta
+                        {t('misc.listedCount', { n: String(listedCount) })}
                       </span>
                     )}
                     <span className="text-vga-yellow">{open ? '−' : '+'}</span>
@@ -536,9 +539,9 @@ export const TransfersView = ({
       </div>
 
       <div className="border-2 border-vga-magenta p-2 bg-vga-blue">
-        <h3 className="text-vga-magenta text-[10px] font-bold mb-2 uppercase">Top fichajes {seasonYear}</h3>
+        <h3 className="text-vga-magenta text-[10px] font-bold mb-2 uppercase">{t('section.topTransfers', { year: String(seasonYear) })}</h3>
         {topThisSeason.length === 0 ? (
-          <div className="text-[8px] text-vga-gray text-center p-2">Sin fichajes esta temporada.</div>
+          <div className="text-[8px] text-vga-gray text-center p-2">{t('misc.noTransfersSeason')}</div>
         ) : (
           <div className="flex flex-col gap-1">
             {topThisSeason.map((r, i) => (
@@ -549,9 +552,9 @@ export const TransfersView = ({
       </div>
 
       <div className="border-2 border-vga-magenta p-2 bg-vga-blue">
-        <h3 className="text-vga-magenta text-[10px] font-bold mb-2 uppercase">Top fichajes histórico</h3>
+        <h3 className="text-vga-magenta text-[10px] font-bold mb-2 uppercase">{t('section.topTransfersAll')}</h3>
         {topAllTime.length === 0 ? (
-          <div className="text-[8px] text-vga-gray text-center p-2">Sin fichajes registrados.</div>
+          <div className="text-[8px] text-vga-gray text-center p-2">{t('misc.noTransfersAll')}</div>
         ) : (
           <div className="flex flex-col gap-1">
             {topAllTime.map((r, i) => (
@@ -562,7 +565,7 @@ export const TransfersView = ({
       </div>
 
       <div className="bg-vga-magenta p-2 border-2 border-vga-white text-[7px] text-vga-bright-white text-center uppercase">
-        Aviso: puedes poner jugadores en venta desde tu PLANTILLA. Vender un titular libera su hueco en la alineación.
+        {t('misc.transfersWarning')}
       </div>
 
       {offerEntry && (
@@ -592,7 +595,7 @@ export const TransfersView = ({
 
       {lastResult && (
         <MessageModal
-          title={lastResult.accepted ? 'Oferta aceptada' : 'Oferta rechazada'}
+          title={lastResult.accepted ? t('misc.offerAccepted') : t('misc.offerRejected')}
           subtitle={lastResult.playerName}
           tone={lastResult.accepted ? 'success' : 'danger'}
           onClose={() => setLastResult(null)}

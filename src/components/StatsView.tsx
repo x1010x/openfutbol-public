@@ -1,5 +1,6 @@
 import type { Team } from '../types/game.d.ts';
 import { PlayerName } from './PlayerName';
+import { useT } from '../i18n';
 
 interface Props {
   teams: Team[];
@@ -8,7 +9,8 @@ interface Props {
 }
 
 export const StatsView = ({ teams, onPlayerClick, onBack }: Props) => {
-  const allPlayers = teams.flatMap(t => t.players.map(p => ({ ...p, teamName: t.name, teamId: t.id })));
+  const t = useT();
+  const allPlayers = teams.flatMap(team => team.players.map(p => ({ ...p, teamName: team.name, teamId: team.id })));
 
   const pichichi = [...allPlayers]
     .filter(p => p.seasonStats.goals > 0)
@@ -28,21 +30,20 @@ export const StatsView = ({ teams, onPlayerClick, onBack }: Props) => {
   return (
     <div className="w-full flex flex-col gap-4 animate-in fade-in duration-300">
       <div className="bg-vga-blue p-2 border-2 border-vga-white flex justify-between items-center vga-panel">
-        <h2 className="text-vga-yellow text-xs uppercase font-bold">RANKINGS DE LA TEMPORADA</h2>
+        <h2 className="text-vga-yellow text-xs uppercase font-bold">{t('section.rankings')}</h2>
         <button onClick={onBack} className="bg-vga-red text-vga-bright-white px-3 py-1 text-[8px] border border-vga-black">
-          VOLVER
+          {t('btn.back')}
         </button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* PICHICHI */}
         <div className="bg-vga-gray border-4 border-vga-blue p-2">
-          <h3 className="text-vga-blue text-[10px] font-bold mb-2 text-center border-b border-vga-blue">MÁXIMOS GOLEADORES</h3>
+          <h3 className="text-vga-blue text-[10px] font-bold mb-2 text-center border-b border-vga-blue">{t('section.topScorers')}</h3>
           <table className="w-full text-[7px]">
             <thead>
               <tr className="text-vga-gray-700">
-                <th className="text-left">JUGADOR</th>
-                <th className="text-left">CLUB</th>
+                <th className="text-left">{t('label.player')}</th>
+                <th className="text-left">{t('label.club')}</th>
                 <th className="text-right">G</th>
               </tr>
             </thead>
@@ -62,14 +63,13 @@ export const StatsView = ({ teams, onPlayerClick, onBack }: Props) => {
           </table>
         </div>
 
-        {/* ASISTENTES */}
         <div className="bg-vga-gray border-4 border-vga-blue p-2">
-          <h3 className="text-vga-blue text-[10px] font-bold mb-2 text-center border-b border-vga-blue">MÁXIMOS ASISTENTES</h3>
+          <h3 className="text-vga-blue text-[10px] font-bold mb-2 text-center border-b border-vga-blue">{t('section.topAssists')}</h3>
           <table className="w-full text-[7px]">
             <thead>
               <tr className="text-vga-gray-700">
-                <th className="text-left">JUGADOR</th>
-                <th className="text-left">CLUB</th>
+                <th className="text-left">{t('label.player')}</th>
+                <th className="text-left">{t('label.club')}</th>
                 <th className="text-right">A</th>
               </tr>
             </thead>
@@ -89,9 +89,8 @@ export const StatsView = ({ teams, onPlayerClick, onBack }: Props) => {
           </table>
         </div>
 
-        {/* DISCIPLINA */}
         <div className="bg-vga-gray border-4 border-vga-red p-2 md:col-span-2">
-          <h3 className="text-vga-red text-[10px] font-bold mb-2 text-center border-b border-vga-red">RANKING DISCIPLINARIO</h3>
+          <h3 className="text-vga-red text-[10px] font-bold mb-2 text-center border-b border-vga-red">{t('section.discipline')}</h3>
           <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
             {badBoys.map((p, i) => (
               <div key={i} className="bg-vga-black p-1 border border-vga-white flex flex-col items-center">

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { Team } from '../types/game.d.ts';
 import { getTeamTemplatesForYear, type TeamTemplate } from '../data/mockTeams';
 import { TeamCrest } from './TeamCrest';
+import { useT as useTranslation } from '../i18n';
 
 interface Props {
   availableYears: number[];
@@ -18,6 +19,7 @@ import { CountryBadge } from './CountryBadge';
 const CAP_LIMIT = 1350;
 
 export const FantasySetupView = ({ availableYears, existingTeams, onConfirm, onBack, onOpenEditor }: Props) => {
+  const tr = useTranslation();
   const [year, setYear] = useState<number | null>(null);
   const [mode, setMode] = useState<'libre' | 'cap'>('libre');
   const [selected, setSelected] = useState<string[]>([]);
@@ -29,12 +31,12 @@ export const FantasySetupView = ({ availableYears, existingTeams, onConfirm, onB
       <div className="w-full max-w-2xl flex flex-col gap-6 animate-in fade-in duration-500">
         <div className="bg-vga-blue p-4 border-4 border-vga-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
           <h2 className="text-vga-yellow text-center mb-2 text-sm underline decoration-double">
-            LIGA FANTASY
+            {tr('setup.fantasyTitle')}
           </h2>
           <div className="bg-vga-black border border-vga-gray p-3 mb-4 text-[8px] text-vga-cyan leading-relaxed">
-            SELECCIONA UN AÑO Y CREA TU PROPIA LIGA CON HASTA 20 EQUIPOS. TODOS LOS JUGADORES ACTIVOS DE ESA ÉPOCA ESTARÁN DISPONIBLES PARA EL SORTEO. CADA EQUIPO ELIGE 18 JUGADORES.
+            {tr('setup.fantasySubtitle')}
           </div>
-          <h3 className="text-vga-yellow text-[8px] mb-3 uppercase">SELECCIONAR TEMPORADA</h3>
+          <h3 className="text-vga-yellow text-[8px] mb-3 uppercase">{tr('setup.selectSeason')}</h3>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
             {availableYears.map((y) => (
               <button
@@ -53,7 +55,7 @@ export const FantasySetupView = ({ availableYears, existingTeams, onConfirm, onB
           onClick={onBack}
           className="bg-vga-black border-2 border-vga-gray hover:border-vga-light-green p-2 text-[8px] text-vga-gray hover:text-vga-bright-white text-center transition-colors"
         >
-          VOLVER
+          {tr('btn.back')}
         </button>
       </div>
     );
@@ -109,7 +111,7 @@ export const FantasySetupView = ({ availableYears, existingTeams, onConfirm, onB
         disabled={atMax}
         className={`text-[8px] px-3 py-0.5 border shrink-0 ${atMax ? 'bg-vga-gray text-vga-black opacity-50 cursor-not-allowed border-vga-gray' : 'bg-vga-gray text-vga-black border-vga-white hover:bg-vga-white'}`}
       >
-        AÑADIR
+        {tr('setup.addTeam')}
       </button>
     </div>
   );
@@ -119,43 +121,42 @@ export const FantasySetupView = ({ availableYears, existingTeams, onConfirm, onB
       <div className="bg-vga-blue p-4 border-4 border-vga-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-vga-yellow text-sm underline decoration-double">
-            LIGA FANTASY — {year}/{(year + 1).toString().slice(-2)}
+            {tr('setup.fantasyHeader', { year: String(year), yy: (year + 1).toString().slice(-2) })}
           </h2>
           <button
             onClick={() => { setYear(null); setSelected([]); setUserTeamId(''); setOpenGroups(new Set()); }}
             className="text-[8px] bg-vga-gray text-vga-black px-2 py-1 border border-vga-white hover:bg-vga-red hover:text-vga-bright-white"
           >
-            CAMBIAR AÑO
+            {tr('setup.changeYear')}
           </button>
         </div>
         <div className="flex items-center gap-2 mb-3">
-          <span className="text-[8px] text-vga-cyan flex-1">EQUIPOS: {selected.length}/{MAX_TEAMS} — SELECCIONA TU EQUIPO CON [YO]</span>
+          <span className="text-[8px] text-vga-cyan flex-1">{tr('setup.teamsSelected', { n: String(selected.length), max: String(MAX_TEAMS) })}</span>
         </div>
         <div className="flex gap-2 mb-3">
           <button
             onClick={() => setMode('libre')}
             className={`flex-1 px-3 py-1.5 border text-[8px] font-bold transition-colors ${mode === 'libre' ? 'bg-vga-green text-vga-black border-vga-light-green' : 'bg-vga-black text-vga-gray border-vga-gray hover:border-vga-white hover:text-vga-bright-white'}`}
           >
-            LIBRE
+            {tr('setup.modeFree')}
           </button>
           <button
             onClick={() => setMode('cap')}
             className={`flex-1 px-3 py-1.5 border text-[8px] font-bold transition-colors ${mode === 'cap' ? 'bg-vga-cyan text-vga-black border-vga-cyan' : 'bg-vga-black text-vga-gray border-vga-gray hover:border-vga-white hover:text-vga-bright-white'}`}
           >
-            CON CAP · {CAP_LIMIT} MED
+            {tr('setup.modeCap', { cap: String(CAP_LIMIT) })}
           </button>
         </div>
         {mode === 'cap' && (
           <div className="bg-vga-black border border-vga-cyan p-2 mb-3 text-[7px] text-vga-cyan leading-relaxed">
-            MODO CAP: cada equipo tiene un presupuesto de {CAP_LIMIT} puntos MED repartidos entre 18 jugadores.
-            Puedes fichar un par de cracks, pero el resto de la plantilla tendrá que ajustarse.
+            {tr('setup.capDescFull', { cap: String(CAP_LIMIT) })}
           </div>
         )}
 
         {/* Selected teams — always visible */}
         {selected.length > 0 && (
           <div className="mb-4">
-            <div className="text-[7px] text-vga-gray uppercase mb-2">Tu selección</div>
+            <div className="text-[7px] text-vga-gray uppercase mb-2">{tr('setup.yourSelection')}</div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
               {[...dbTemplates, ...editorTeams].filter(t => selected.includes(t.id)).map(t => {
                 const isUser = userTeamId === t.id;
@@ -167,7 +168,7 @@ export const FantasySetupView = ({ availableYears, existingTeams, onConfirm, onB
                       onClick={() => setUserTeamId(isUser ? '' : t.id)}
                       className={`text-[8px] px-2 py-0.5 border font-bold shrink-0 ${isUser ? 'bg-vga-cyan text-vga-black border-vga-cyan' : 'bg-vga-black text-vga-cyan border-vga-cyan hover:bg-vga-cyan hover:text-vga-black'}`}
                     >
-                      {isUser ? 'YO' : 'YO?'}
+                      {isUser ? tr('setup.meActive') : tr('setup.meInactive')}
                     </button>
                     <button
                       onClick={() => toggle(t.id)}
@@ -195,7 +196,7 @@ export const FantasySetupView = ({ availableYears, existingTeams, onConfirm, onB
                 >
                   <span className="font-bold"><CountryBadge code={c} size="lg" /></span>
                   <span className="flex items-center gap-2">
-                    <span className="text-[7px] opacity-60">{teams.length} equipo{teams.length !== 1 ? 's' : ''}</span>
+                    <span className="text-[7px] opacity-60">{tr('setup.teamsCount', { n: String(teams.length) })}</span>
                     <span>{open ? '−' : '+'}</span>
                   </span>
                 </button>
@@ -214,9 +215,9 @@ export const FantasySetupView = ({ availableYears, existingTeams, onConfirm, onB
                 onClick={() => toggleGroup('__editor')}
                 className="w-full flex justify-between items-center px-2 py-1 bg-vga-black text-[8px] text-vga-gray hover:text-vga-bright-white hover:bg-vga-blue"
               >
-                <span className="font-bold">EQUIPOS PERSONALIZADOS</span>
+                <span className="font-bold">{tr('setup.customTeams')}</span>
                 <span className="flex items-center gap-2">
-                  <span className="text-[7px] opacity-60">{unselectedEditor.length} equipo{unselectedEditor.length !== 1 ? 's' : ''}</span>
+                  <span className="text-[7px] opacity-60">{tr('setup.teamsCount', { n: String(unselectedEditor.length) })}</span>
                   <span>{openGroups.has('__editor') ? '−' : '+'}</span>
                 </span>
               </button>
@@ -229,7 +230,7 @@ export const FantasySetupView = ({ availableYears, existingTeams, onConfirm, onB
           )}
 
           {unselectedDb.length === 0 && unselectedEditor.length === 0 && (
-            <div className="text-[8px] text-vga-gray text-center py-2">Todos los equipos seleccionados.</div>
+            <div className="text-[8px] text-vga-gray text-center py-2">{tr('setup.allTeamsSelected')}</div>
           )}
         </div>
       </div>
@@ -245,20 +246,20 @@ export const FantasySetupView = ({ availableYears, existingTeams, onConfirm, onB
           onClick={onBack}
           className="bg-vga-black border-2 border-vga-gray hover:border-vga-white p-2 text-[8px] text-vga-gray hover:text-vga-bright-white transition-colors px-4"
         >
-          VOLVER
+          {tr('btn.back')}
         </button>
         <button
           disabled={!canStart}
           onClick={() => canStart && onConfirm(year, selected, userTeamId, mode === 'cap' ? CAP_LIMIT : null)}
           className={`flex-1 p-2 text-[8px] border-2 font-bold transition-colors ${canStart ? 'bg-vga-green text-vga-bright-white border-vga-light-green hover:bg-vga-light-green cursor-pointer' : 'bg-vga-black text-vga-gray border-vga-gray cursor-not-allowed'}`}
         >
-          COMENZAR SORTEO
+          {tr('setup.startDraft')}
         </button>
       </div>
 
       {!canStart && (
         <div className="bg-vga-magenta p-2 text-[8px] text-vga-bright-white text-center border-2 border-vga-white">
-          {selected.length < 2 ? 'SELECCIONA AL MENOS 2 EQUIPOS.' : 'INDICA TU EQUIPO CON EL BOTÓN [YO].'}
+          {selected.length < 2 ? tr('setup.needMore') : tr('setup.setUserTeam')}
         </div>
       )}
     </div>

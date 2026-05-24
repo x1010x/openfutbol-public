@@ -5,6 +5,7 @@ import { getTeamTemplatesForYear, getTeamCountry, type TeamTemplate } from '../d
 import { loadPackFromFile } from '../data/packLoader';
 import { TeamCrest } from './TeamCrest';
 import { CountryBadge } from './CountryBadge';
+import { useT as useTranslation } from '../i18n';
 
 interface Props {
   year: number;
@@ -17,6 +18,7 @@ const MIN_TEAMS = 4;
 const MAX_TEAMS = 24;
 
 export const LeagueSetupView = ({ year, existingTeams, onConfirm, onBack }: Props) => {
+  const tr = useTranslation();
   const templates = getTeamTemplatesForYear(year);
   const dbIds = new Set(templates.map(t => t.id));
 
@@ -125,7 +127,7 @@ export const LeagueSetupView = ({ year, existingTeams, onConfirm, onBack }: Prop
       >
         <TeamCrest colors={t.colors ?? ['#888', '#888', '#888']} size="lg" title={t.name} teamId={t.id} />
         <span className="text-vga-bright-white text-[9px] font-bold uppercase leading-tight">{t.name}</span>
-        <span className={`text-[7px] ${accent}`}>{t.playerCount} jug.</span>
+        <span className={`text-[7px] ${accent}`}>{t.playerCount} {tr('setup.playersShort')}</span>
         <span className={`text-[10px] font-bold ${active ? 'text-vga-light-green' : 'text-vga-gray'}`}>
           {active ? '✓' : '○'}
         </span>
@@ -137,10 +139,10 @@ export const LeagueSetupView = ({ year, existingTeams, onConfirm, onBack }: Prop
     <div className="w-full max-w-2xl flex flex-col gap-4 animate-in fade-in duration-300">
       <div className="bg-vga-blue p-2 border-2 border-vga-white flex justify-between items-center vga-panel">
         <h2 className="text-vga-yellow text-xs uppercase font-bold">
-          CONFIGURAR LIGA — {year}/{(year + 1).toString().slice(-2)}
+          {tr('setup.leagueTitle', { year: String(year), yy: (year + 1).toString().slice(-2) })}
         </h2>
         <button onClick={onBack} className="bg-vga-red text-vga-bright-white px-3 py-1 text-[8px] border border-vga-black hover:bg-vga-light-red">
-          VOLVER
+          {tr('btn.back')}
         </button>
       </div>
 
@@ -149,7 +151,7 @@ export const LeagueSetupView = ({ year, existingTeams, onConfirm, onBack }: Prop
           <input
             value={teamSearch}
             onChange={e => setTeamSearch(e.target.value)}
-            placeholder="Buscar equipo..."
+            placeholder={tr('placeholder.searchTeam')}
             className="flex-1 bg-vga-bright-white text-vga-black text-[9px] px-2 py-1 border-2 border-vga-black font-mono"
           />
           <span className="text-vga-blue text-[8px] font-bold shrink-0">{n}/{MAX_TEAMS}</span>
@@ -160,7 +162,7 @@ export const LeagueSetupView = ({ year, existingTeams, onConfirm, onBack }: Prop
             <div className="grid grid-cols-3 gap-2">
               {filteredFlat!.map(renderTeamButton)}
               {filteredFlat!.length === 0 && (
-                <span className="col-span-2 text-vga-black text-[8px] opacity-60 p-2">Sin resultados.</span>
+                <span className="col-span-2 text-vga-black text-[8px] opacity-60 p-2">{tr('misc.noResults')}</span>
               )}
             </div>
           ) : (
@@ -176,7 +178,7 @@ export const LeagueSetupView = ({ year, existingTeams, onConfirm, onBack }: Prop
                       <span className="text-vga-yellow text-[9px] font-bold">
                         <CountryBadge code={country} size="lg" />
                       </span>
-                      <span className="text-vga-gray text-[7px]">{countryTeams.length} equipos  {open ? '▲' : '▼'}</span>
+                      <span className="text-vga-gray text-[7px]">{tr('setup.teamsCount', { n: String(countryTeams.length) })}  {open ? '▲' : '▼'}</span>
                     </button>
                     {open && (
                       <div className="grid grid-cols-3 gap-2 mt-1 pl-2">
@@ -193,17 +195,17 @@ export const LeagueSetupView = ({ year, existingTeams, onConfirm, onBack }: Prop
         <div className="border-t-2 border-vga-blue pt-3 flex flex-col gap-2">
           <div className="flex items-center justify-between">
             <div className="flex gap-4">
-              <span className="text-vga-blue text-[9px] font-bold uppercase">{n} equipos</span>
+              <span className="text-vga-blue text-[9px] font-bold uppercase">{tr('setup.teamsCount', { n: String(n) })}</span>
               {n >= 2 && (
                 <>
-                  <span className="text-vga-black text-[9px]">→ {jornadas} jornadas</span>
-                  <span className="text-vga-black text-[9px]">→ {partidos} partidos</span>
+                  <span className="text-vga-black text-[9px]">→ {tr('setup.roundsCount', { n: String(jornadas) })}</span>
+                  <span className="text-vga-black text-[9px]">→ {tr('setup.matchesCount', { n: String(partidos) })}</span>
                 </>
               )}
             </div>
             {!canConfirm && (
               <span className="text-vga-red text-[8px]">
-                {n < MIN_TEAMS ? `Mínimo ${MIN_TEAMS}` : `Máximo ${MAX_TEAMS}`}
+                {n < MIN_TEAMS ? tr('setup.minTeams', { n: String(MIN_TEAMS) }) : tr('setup.maxTeams', { n: String(MAX_TEAMS) })}
               </span>
             )}
           </div>
@@ -218,20 +220,20 @@ export const LeagueSetupView = ({ year, existingTeams, onConfirm, onBack }: Prop
 
         <div className="border-t-2 border-vga-blue pt-3 flex flex-col gap-2">
           <div className="flex items-center gap-3">
-            <span className="text-vga-black text-[8px] uppercase font-bold">Packs importados</span>
+            <span className="text-vga-black text-[8px] uppercase font-bold">{tr('setup.importedPacks')}</span>
             <button onClick={() => fileRef.current?.click()} className="bg-vga-blue text-vga-bright-white px-3 py-1 text-[8px] border border-vga-black hover:opacity-80">
-              IMPORTAR PACK
+              {tr('setup.importPack')}
             </button>
             <input ref={fileRef} type="file" accept=".ofb,.json" onChange={handleImport} className="hidden" />
           </div>
           {importError && <span className="text-vga-red text-[8px]">{importError}</span>}
           {importedPacks.length === 0 ? (
-            <span className="text-vga-black text-[7px] opacity-60">Ninguno — usa los datos oficiales</span>
+            <span className="text-vga-black text-[7px] opacity-60">{tr('setup.noPacks')}</span>
           ) : (
             <ul className="flex flex-col gap-1">
               {importedPacks.map((p, i) => <li key={i} className="text-vga-black text-[8px]">+ {p}</li>)}
               {extraPlayers.length > 0 && (
-                <li className="text-vga-blue text-[7px]">{extraPlayers.length} jugadores extra en agentes libres</li>
+                <li className="text-vga-blue text-[7px]">{tr('setup.extraPlayers', { n: String(extraPlayers.length) })}</li>
               )}
             </ul>
           )}
@@ -243,7 +245,7 @@ export const LeagueSetupView = ({ year, existingTeams, onConfirm, onBack }: Prop
         disabled={!canConfirm}
         className="bg-vga-green hover:bg-vga-light-green disabled:bg-vga-gray disabled:text-vga-black disabled:cursor-not-allowed text-vga-bright-white py-3 border-b-4 border-r-4 border-vga-black active:border-0 text-[10px] font-bold uppercase tracking-wider"
       >
-        CONFIRMAR LIGA
+        {tr('setup.confirmLeague')}
       </button>
     </div>
   );

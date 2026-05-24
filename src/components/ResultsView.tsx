@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { Jornada } from '../engine/calendar';
 import type { Team } from '../types/game.d.ts';
 import { MatchDetails } from './JornadaResultsView';
+import { useT } from '../i18n';
 
 interface Props {
   schedule: Jornada[];
@@ -12,18 +13,19 @@ interface Props {
 }
 
 export const ResultsView = ({ schedule, teams, onBack, currentJornada, userTeamId }: Props) => {
+  const t = useT();
   const [openKey, setOpenKey] = useState<string | null>(null);
-  const getTeamName = (id: string) => teams.find(t => t.id === id)?.name || '???';
+  const getTeamName = (id: string) => teams.find(team => team.id === id)?.name || '???';
 
   return (
     <div className="w-full flex flex-col gap-4 animate-in fade-in duration-300">
       <div className="bg-vga-blue p-2 border-2 border-vga-white flex justify-between items-center vga-panel">
-        <h2 className="text-vga-yellow text-xs uppercase font-bold">RESULTADOS DE LA LIGA</h2>
+        <h2 className="text-vga-yellow text-xs uppercase font-bold">{t('section.leagueResults')}</h2>
         <button
           onClick={onBack}
           className="bg-vga-red text-vga-bright-white px-3 py-1 text-[8px] border border-vga-black hover:bg-vga-light-red"
         >
-          VOLVER
+          {t('btn.back')}
         </button>
       </div>
 
@@ -31,7 +33,7 @@ export const ResultsView = ({ schedule, teams, onBack, currentJornada, userTeamI
         {schedule.map((jornada) => (
           <div key={jornada.number} className="mb-6 border-b border-vga-gray pb-4">
             <h3 className={`text-[10px] text-center mb-3 ${jornada.number === currentJornada ? 'text-vga-light-green' : 'text-vga-cyan'}`}>
-              JORNADA {jornada.number} {jornada.number === currentJornada ? '(ACTUAL)' : ''}
+              {t('misc.jornada', { n: String(jornada.number) })} {jornada.number === currentJornada ? t('misc.jornadaCurrent') : ''}
             </h3>
             <div className="flex flex-col gap-2">
               {jornada.matches.map((match, i) => {
@@ -66,7 +68,7 @@ export const ResultsView = ({ schedule, teams, onBack, currentJornada, userTeamI
       </div>
 
       <div className="bg-vga-blue p-2 border-2 border-vga-white text-[7px] text-vga-bright-white text-center">
-        TOCA UN PARTIDO PARA VER GOLES Y TARJETAS
+        {t('misc.clickMatchHint')}
       </div>
     </div>
   );

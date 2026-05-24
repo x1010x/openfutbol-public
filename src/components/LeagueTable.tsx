@@ -3,6 +3,7 @@ import type { Jornada } from '../engine/calendar';
 import type { Team } from '../types/game.d.ts';
 import { TeamCrest } from './TeamCrest';
 import type { StatKey } from './StatDrillDown';
+import { useT } from '../i18n';
 
 interface Props {
   stats: Record<string, TeamStats>;
@@ -35,6 +36,7 @@ const formColor = (c: FormChar) =>
   c === 'W' ? 'bg-vga-light-green' : c === 'D' ? 'bg-vga-yellow' : 'bg-vga-light-red';
 
 export const LeagueTable = ({ stats, schedule, userTeamId, teams, onCellClick, onTeamClick }: Props) => {
+  const t = useT();
   const colorsById = new Map<string, string[] | undefined>();
   const namesById = new Map<string, string>();
   teams?.forEach(t => {
@@ -63,20 +65,20 @@ export const LeagueTable = ({ stats, schedule, userTeamId, teams, onCellClick, o
 
   return (
     <div className="w-full overflow-x-auto border-4 border-vga-white bg-vga-gray p-2 vga-panel">
-      <h2 className="text-vga-yellow text-center mb-4 text-sm">CLASIFICACIÓN - DIVISIÓN DE HONOR</h2>
+      <h2 className="text-vga-yellow text-center mb-4 text-sm">{t('section.leagueTitle')}</h2>
       <table className="w-full text-[8px] text-left border-collapse">
         <thead>
           <tr className="bg-vga-blue text-vga-bright-white uppercase text-[7px]">
-            <th className="p-1 border border-vga-white">POS</th>
-            <th className="p-1 border border-vga-white text-left">EQUIPO</th>
-            <th className="p-1 border border-vga-white text-center">PJ</th>
-            <th className="p-1 border border-vga-white text-center">PG</th>
-            <th className="p-1 border border-vga-white text-center">PE</th>
-            <th className="p-1 border border-vga-white text-center">PP</th>
-            <th className="p-1 border border-vga-white text-center">GF</th>
-            <th className="p-1 border border-vga-white text-center">GC</th>
-            <th className="p-1 border border-vga-white text-center">PTS</th>
-            {schedule && <th className="p-1 border border-vga-white text-center">FORMA</th>}
+            <th className="p-1 border border-vga-white">{t('table.pos')}</th>
+            <th className="p-1 border border-vga-white text-left">{t('table.team')}</th>
+            <th className="p-1 border border-vga-white text-center">{t('table.played')}</th>
+            <th className="p-1 border border-vga-white text-center">{t('table.won')}</th>
+            <th className="p-1 border border-vga-white text-center">{t('table.drawn')}</th>
+            <th className="p-1 border border-vga-white text-center">{t('table.lost')}</th>
+            <th className="p-1 border border-vga-white text-center">{t('table.gf')}</th>
+            <th className="p-1 border border-vga-white text-center">{t('table.gc')}</th>
+            <th className="p-1 border border-vga-white text-center">{t('table.points')}</th>
+            {schedule && <th className="p-1 border border-vga-white text-center">{t('table.form')}</th>}
           </tr>
         </thead>
         <tbody>

@@ -5,10 +5,11 @@ import { StatBar } from './StatBar';
 import { StatRadar } from './StatRadar';
 import { PlayerPhoto } from './PlayerPhoto';
 import { PlayerName } from './PlayerName';
+import { useT } from '../i18n';
 
 interface Props {
   player: Player;
-  teamName: string | null; // null if free agent
+  teamName: string | null;
   history: PlayerSeasonRecord[];
   seasonYear: number;
   onBack: () => void;
@@ -46,20 +47,21 @@ const mediaAtAge = (currentMedia: number, currentAge: number, peakAge: number, t
 };
 
 export const PlayerDetailView = ({ player, teamName, history, seasonYear, onBack }: Props) => {
+  const t = useT();
   const age = playerAge(player, seasonYear);
   const price = computePrice(player, seasonYear);
   const sortedHistory = [...history].sort((a, b) => a.year - b.year);
   const totalGoals = sortedHistory.reduce((s, r) => s + r.goals, 0) + player.seasonStats.goals;
   const totalAssists = sortedHistory.reduce((s, r) => s + r.assists, 0) + player.seasonStats.assists;
   const totalSeasons = sortedHistory.length + 1;
-
+  const yy = (y: number) => (y + 1).toString().slice(-2);
 
   return (
     <div className="w-full max-w-3xl flex flex-col gap-4 animate-in fade-in duration-300">
       <div className="bg-vga-blue p-2 border-2 border-vga-white flex justify-between items-center vga-panel">
-        <h2 className="text-vga-yellow text-xs uppercase font-bold truncate">FICHA DE JUGADOR</h2>
+        <h2 className="text-vga-yellow text-xs uppercase font-bold truncate">{t('section.playerFile')}</h2>
         <button onClick={onBack} className="bg-vga-red text-vga-bright-white px-3 py-1 text-[8px] border border-vga-black hover:bg-vga-light-red shrink-0">
-          VOLVER
+          {t('btn.back')}
         </button>
       </div>
 
@@ -73,19 +75,19 @@ export const PlayerDetailView = ({ player, teamName, history, seasonYear, onBack
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-3 text-[8px]">
           <div className="bg-vga-black border border-vga-gray p-2">
-            <div className="text-vga-cyan text-[7px] uppercase">Equipo</div>
-            <div className="text-vga-bright-white text-[10px] truncate">{teamName ?? 'LIBRE'}</div>
+            <div className="text-vga-cyan text-[7px] uppercase">{t('label.team')}</div>
+            <div className="text-vga-bright-white text-[10px] truncate">{teamName ?? t('label.freeAgent')}</div>
           </div>
           <div className="bg-vga-black border border-vga-gray p-2">
-            <div className="text-vga-cyan text-[7px] uppercase">Edad</div>
-            <div className="text-vga-bright-white text-[10px]">{age} años</div>
+            <div className="text-vga-cyan text-[7px] uppercase">{t('label.age')}</div>
+            <div className="text-vga-bright-white text-[10px]">{t('misc.ageYears', { age: String(age) })}</div>
           </div>
           <div className="bg-vga-black border border-vga-gray p-2">
-            <div className="text-vga-cyan text-[7px] uppercase">Pico</div>
-            <div className="text-vga-bright-white text-[10px]">{player.peakAge} años</div>
+            <div className="text-vga-cyan text-[7px] uppercase">{t('label.peak')}</div>
+            <div className="text-vga-bright-white text-[10px]">{t('misc.ageYears', { age: String(player.peakAge) })}</div>
           </div>
           <div className="bg-vga-black border border-vga-gray p-2">
-            <div className="text-vga-cyan text-[7px] uppercase">Valor</div>
+            <div className="text-vga-cyan text-[7px] uppercase">{t('label.value')}</div>
             <div className="text-vga-light-green text-[10px]">{formatEuros(price)}</div>
           </div>
         </div>
@@ -93,7 +95,7 @@ export const PlayerDetailView = ({ player, teamName, history, seasonYear, onBack
         <div className="flex gap-3 items-stretch flex-wrap">
           <div className="flex flex-col items-center justify-center bg-vga-black vga-panel-inset px-3 py-2 min-w-[80px]">
             <PlayerPhoto playerId={player.id} size="lg" className="mb-1" />
-            <span className="text-[8px] text-vga-cyan">MEDIA</span>
+            <span className="text-[8px] text-vga-cyan">{t('label.media').toUpperCase()}</span>
             <span className="text-3xl text-vga-light-green leading-none">{player.media}</span>
           </div>
           <div className="flex-1 flex flex-col gap-1 justify-center min-w-[180px]">
@@ -109,31 +111,31 @@ export const PlayerDetailView = ({ player, teamName, history, seasonYear, onBack
 
       <div className="bg-vga-gray border-2 border-vga-blue p-2">
         <h3 className="text-vga-blue text-[10px] font-bold mb-2 uppercase border-b border-vga-blue pb-1">
-          Temporada actual {seasonYear}/{(seasonYear + 1).toString().slice(-2)}
+          {t('section.currentSeason', { year: String(seasonYear), yy: yy(seasonYear) })}
         </h3>
         <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 text-[10px] text-center">
           <div className="bg-vga-black border border-vga-gray p-2">
-            <div className="text-[7px] text-vga-cyan uppercase">Part.</div>
+            <div className="text-[7px] text-vga-cyan uppercase">{t('label.apps.s')}</div>
             <div className="text-vga-bright-white font-bold">{player.seasonStats.appearances}</div>
           </div>
           <div className="bg-vga-black border border-vga-gray p-2">
-            <div className="text-[7px] text-vga-cyan uppercase">Min.</div>
+            <div className="text-[7px] text-vga-cyan uppercase">{t('label.minutes.s')}</div>
             <div className="text-vga-bright-white font-bold">{player.seasonStats.minutes}</div>
           </div>
           <div className="bg-vga-black border border-vga-gray p-2">
-            <div className="text-[7px] text-vga-cyan uppercase">Goles</div>
+            <div className="text-[7px] text-vga-cyan uppercase">{t('label.goals.s')}</div>
             <div className="text-vga-light-green font-bold">{player.seasonStats.goals}</div>
           </div>
           <div className="bg-vga-black border border-vga-gray p-2">
-            <div className="text-[7px] text-vga-cyan uppercase">Asist.</div>
+            <div className="text-[7px] text-vga-cyan uppercase">{t('label.assists.s')}</div>
             <div className="text-vga-light-cyan font-bold">{player.seasonStats.assists}</div>
           </div>
           <div className="bg-vga-black border border-vga-gray p-2">
-            <div className="text-[7px] text-vga-cyan uppercase">Amar.</div>
+            <div className="text-[7px] text-vga-cyan uppercase">{t('label.yellows.s')}</div>
             <div className="text-vga-yellow font-bold">{player.seasonStats.yellowCards}</div>
           </div>
           <div className="bg-vga-black border border-vga-gray p-2">
-            <div className="text-[7px] text-vga-cyan uppercase">Rojas</div>
+            <div className="text-[7px] text-vga-cyan uppercase">{t('label.reds.s')}</div>
             <div className="text-vga-light-red font-bold">{player.seasonStats.redCards}</div>
           </div>
         </div>
@@ -141,22 +143,22 @@ export const PlayerDetailView = ({ player, teamName, history, seasonYear, onBack
 
       <div className="bg-vga-gray border-2 border-vga-magenta p-2">
         <h3 className="text-vga-magenta text-[10px] font-bold mb-2 uppercase border-b border-vga-magenta pb-1">
-          Trayectoria · {totalSeasons} temporada{totalSeasons === 1 ? '' : 's'} · {totalGoals}G · {totalAssists}A
+          {t('label.matches')} · {totalSeasons}T · {totalGoals}G · {totalAssists}A
         </h3>
         {sortedHistory.length === 0 ? (
           <div className="text-[8px] text-vga-black text-center p-2">
-            Sin temporadas anteriores registradas. El historial se guarda al avanzar de temporada.
+            {t('misc.noMatchesYet')}
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-[8px]">
               <thead>
                 <tr className="text-vga-blue text-left border-b border-vga-blue">
-                  <th className="px-1 py-1">AÑO</th>
-                  <th className="px-1 py-1">EQUIPO</th>
-                  <th className="px-1 py-1 text-center">POS</th>
-                  <th className="px-1 py-1 text-center">EDAD</th>
-                  <th className="px-1 py-1 text-center">MED</th>
+                  <th className="px-1 py-1">{t('trophy.year')}</th>
+                  <th className="px-1 py-1">{t('label.team')}</th>
+                  <th className="px-1 py-1 text-center">{t('label.position')}</th>
+                  <th className="px-1 py-1 text-center">{t('label.age')}</th>
+                  <th className="px-1 py-1 text-center">{t('label.media').toUpperCase()}</th>
                   <th className="px-1 py-1 text-right">G</th>
                   <th className="px-1 py-1 text-right">A</th>
                   <th className="px-1 py-1 text-right">TA</th>
