@@ -9,7 +9,7 @@ import { FORMATIONS } from './engine/formations';
 import { getInitialLeagueState, getFantasyLeagueState, updateLeagueStats, deductWeeklySalaries, generateIncomingOffers, autoListAiPlayers, simulateAiMarketSignings, advanceSeason, simulateAiTrades, simulateAiFreeAgentSignings, simulateAiClausulazos, appendTransfer, decrementSuspensions, signingBlockKey, squadNeeds, groupFor, repickAiFormations, writebackMatchStamina, decayTeamStaminaAfterMatch, decrementInjuries, applyStaminaRecovery, computeTvBonus, applyTvBonus, isTransferWindowOpen, windowJornadasLeft, jornadasUntilWindowOpen } from './store/leagueStore';
 import type { TransferRecord, ManagerSeasonRecord } from './store/leagueStore';
 import type { LeagueState } from './store/leagueStore';
-import { computeBoardObjective, computeTransferDelta, firingChance, clampMeter, METER_DELTAS, isObjectiveMet } from './engine/florentinometro';
+import { computeBoardObjective, computeTransferDelta, firingChance, clampMeter, METER_DELTAS, isObjectiveMet, computeMatchMeterDelta, computeMatchReputationDelta, computeSeasonReputationDelta } from './engine/florentinometro';
 import { LeagueTable } from './components/LeagueTable';
 import { StatusBar } from './components/StatusBar';
 import { SquadView } from './components/SquadView';
@@ -293,6 +293,7 @@ function App() {
     setLeague(prev => {
       const team = prev.teams.find(t => t.id === teamId)!;
       const objective = computeBoardObjective(team, prev.teams);
+      const initialSquadValue = team.budget + team.players.reduce((s, p) => s + computePrice(p, prev.year), 0);
       let next: LeagueState = {
         ...prev,
         userTeamId: teamId,
@@ -309,6 +310,8 @@ function App() {
         managerWins: 0,
         managerDraws: 0,
         managerLosses: 0,
+        managerReputation: prev.managerReputation ?? 50,
+        managerInitialSquadValue: initialSquadValue,
       };
       for (let i = 0; i < 4; i++) {
         next = autoListAiPlayers(next);
@@ -1169,20 +1172,32 @@ function App() {
       finalMatch.awayStartingLineup,
     );
     newLeague = applyTvBonus(newLeague, league.userTeamId, tvBonus);
-    // Florentinometro: adjust based on user match result + track per-manager record
+    // Florentinometro + reputation: context-aware match delta
     if (newLeague.gameMode === 'promanager' && !newLeague.boardFired) {
       const userIsHome = finalMatch.homeTeam.id === newLeague.userTeamId;
+      const userTeamObj = userIsHome ? finalMatch.homeTeam : finalMatch.awayTeam;
+      const oppTeamObj  = userIsHome ? finalMatch.awayTeam : finalMatch.homeTeam;
       const userGoals = userIsHome ? finalMatch.homeScore : finalMatch.awayScore;
-      const oppGoals = userIsHome ? finalMatch.awayScore : finalMatch.homeScore;
+      const oppGoals  = userIsHome ? finalMatch.awayScore : finalMatch.homeScore;
       const isWin = userGoals > oppGoals;
       const isDraw = userGoals === oppGoals;
-      const delta = isWin ? METER_DELTAS.win : isDraw ? METER_DELTAS.draw : METER_DELTAS.loss;
-      const newMeter = clampMeter((newLeague.florentinometro ?? 5) + delta);
+      const userAvgMedia = userTeamObj.players.length > 0
+        ? userTeamObj.players.reduce((s, p) => s + p.media, 0) / userTeamObj.players.length : 50;
+      const oppAvgMedia = oppTeamObj.players.length > 0
+        ? oppTeamObj.players.reduce((s, p) => s + p.media, 0) / oppTeamObj.players.length : 50;
+      const yellowCards = finalMatch.events.filter(e => e.type === 'yellow' && e.teamId === newLeague.userTeamId).length;
+      const redCards = finalMatch.events.filter(e => e.type === 'red' && e.teamId === newLeague.userTeamId).length;
+
+      const meterDelta = computeMatchMeterDelta({ userGoals, oppGoals, isHome: userIsHome, userAvgMedia, oppAvgMedia, yellowCards, redCards });
+      const repDelta = computeMatchReputationDelta({ userGoals, oppGoals, isHome: userIsHome, userAvgMedia, oppAvgMedia });
+      const newMeter = clampMeter((newLeague.florentinometro ?? 5) + meterDelta);
+      const newRep = Math.max(0, Math.min(100, (newLeague.managerReputation ?? 50) + repDelta));
       newLeague = {
         ...newLeague,
         florentinometro: newMeter,
         florentinometroPeak: Math.max(newLeague.florentinometroPeak ?? 5, newMeter),
         florentinometroMin: Math.min(newLeague.florentinometroMin ?? 5, newMeter),
+        managerReputation: newRep,
         managerWins: (newLeague.managerWins ?? 0) + (isWin ? 1 : 0),
         managerDraws: (newLeague.managerDraws ?? 0) + (isDraw ? 1 : 0),
         managerLosses: (newLeague.managerLosses ?? 0) + (!isWin && !isDraw ? 1 : 0),
@@ -1201,14 +1216,36 @@ function App() {
     advanceAfterJornada(newLeague);
   };
 
+  const applySeasonReputationDelta = (prev: LeagueState, fired: boolean): number => {
+    const userTeam = prev.teams.find(t => t.id === prev.userTeamId);
+    const currentSquadValue = userTeam
+      ? userTeam.budget + userTeam.players.reduce((s, p) => s + computePrice(p, prev.year), 0)
+      : 0;
+    const initialSquadValue = prev.managerInitialSquadValue ?? currentSquadValue;
+    const squadValueChangePct = initialSquadValue > 0 ? (currentSquadValue - initialSquadValue) / initialSquadValue : 0;
+    const sortedStats = Object.values(prev.stats).sort((a, b) => b.points - a.points || (b.goalsFor - b.goalsAgainst) - (a.goalsFor - a.goalsAgainst));
+    const userRank = sortedStats.findIndex(s => s.teamId === prev.userTeamId) + 1;
+    const totalTeams = sortedStats.length;
+    const objective = prev.boardObjective ?? 'avoid_relegation';
+    const objectiveMet = isObjectiveMet(objective, userRank, totalTeams);
+    const delta = computeSeasonReputationDelta({ objective, objectiveMet, fired, squadValueChangePct });
+    return Math.max(0, Math.min(100, (prev.managerReputation ?? 50) + delta));
+  };
+
   const handleAdvanceSameTeam = () => {
     setLeague(prev => {
       if (prev.gameMode === 'promanager') {
-        const record = buildSeasonCareerRecord(prev, prev.boardFired ?? false);
-        const next = advanceSeason({ ...prev, managerCareer: [...(prev.managerCareer ?? []), record] });
+        const fired = prev.boardFired ?? false;
+        const newRep = applySeasonReputationDelta(prev, fired);
+        const prevWithRep = { ...prev, managerReputation: newRep };
+        const record = buildSeasonCareerRecord(prevWithRep, fired);
+        const next = advanceSeason({ ...prevWithRep, managerCareer: [...(prev.managerCareer ?? []), record] });
         const userTeam = next.teams.find(t => t.id === prev.userTeamId);
         const objective = userTeam ? computeBoardObjective(userTeam, next.teams) : 'avoid_relegation' as const;
-        return { ...next, boardObjective: objective };
+        const initialSquadValue = userTeam
+          ? userTeam.budget + userTeam.players.reduce((s, p) => s + computePrice(p, next.year), 0)
+          : 0;
+        return { ...next, boardObjective: objective, managerReputation: newRep, managerInitialSquadValue: initialSquadValue };
       }
       return advanceSeason(prev);
     });
@@ -1218,10 +1255,13 @@ function App() {
   const handleAdvanceChangeTeam = () => {
     setLeague(prev => {
       if (prev.gameMode === 'promanager') {
-        const record = buildSeasonCareerRecord(prev, prev.boardFired ?? false);
-        const advanced = advanceSeason({ ...prev, managerCareer: [...(prev.managerCareer ?? []), record] });
+        const fired = prev.boardFired ?? false;
+        const newRep = applySeasonReputationDelta(prev, fired);
+        const prevWithRep = { ...prev, managerReputation: newRep };
+        const record = buildSeasonCareerRecord(prevWithRep, fired);
+        const advanced = advanceSeason({ ...prevWithRep, managerCareer: [...(prev.managerCareer ?? []), record] });
         setSelectedYear(advanced.year);
-        return { ...advanced, userTeamId: '', isStarted: false };
+        return { ...advanced, userTeamId: '', isStarted: false, managerReputation: newRep };
       }
       const advanced = advanceSeason(prev);
       setSelectedYear(advanced.year);
@@ -1241,6 +1281,9 @@ function App() {
         const next = advanceSeason({ ...prev, managerCareer: updatedCareer });
         const team = next.teams.find(t => t.id === teamId);
         const objective = team ? computeBoardObjective(team, next.teams) : 'avoid_relegation' as const;
+        const initialSquadValue = team
+          ? team.budget + team.players.reduce((s, p) => s + computePrice(p, next.year), 0)
+          : 0;
         return {
           ...next,
           userTeamId: teamId,
@@ -1257,11 +1300,16 @@ function App() {
           managerWins: 0,
           managerDraws: 0,
           managerLosses: 0,
+          managerReputation: prev.managerReputation ?? 50,
+          managerInitialSquadValue: initialSquadValue,
         };
       } else {
         // Mid-season fire — continue current season with new team
         const team = prev.teams.find(t => t.id === teamId);
         const objective = team ? computeBoardObjective(team, prev.teams) : 'avoid_relegation' as const;
+        const initialSquadValue = team
+          ? team.budget + team.players.reduce((s, p) => s + computePrice(p, prev.year), 0)
+          : 0;
         return {
           ...prev,
           userTeamId: teamId,
@@ -1277,6 +1325,8 @@ function App() {
           managerWins: 0,
           managerDraws: 0,
           managerLosses: 0,
+          managerReputation: prev.managerReputation ?? 50,
+          managerInitialSquadValue: initialSquadValue,
         };
       }
     });
@@ -1526,6 +1576,7 @@ function App() {
           managerName={league.managerName ?? ''}
           career={league.managerCareer ?? []}
           currentMeter={league.florentinometro ?? 5}
+          managerReputation={league.managerReputation}
           onBack={() => setView(league.isStarted ? 'LEAGUE' : 'LEAGUE')}
         />
       );
@@ -1537,7 +1588,7 @@ function App() {
           teams={league.teams}
           managerName={league.managerName ?? ''}
           managerCareer={league.managerCareer ?? []}
-          currentMeter={league.florentinometro ?? 5}
+          managerReputation={league.managerReputation ?? 50}
           yearStats={getAvailableYearsWithStats()}
           selectedYear={selectedYear}
           onSelectYear={handleProManagerSelectYear}
@@ -1647,7 +1698,7 @@ function App() {
             managerName={league.managerName ?? ''}
             florentinometro={league.florentinometro ?? 5}
             boardObjective={league.boardObjective ?? 'avoid_relegation'}
-            managerCareer={league.managerCareer ?? []}
+            managerReputation={league.managerReputation ?? 50}
             year={league.year}
             onPickTeam={handleProManagerPickTeam}
             onRetire={handleProManagerRetire}

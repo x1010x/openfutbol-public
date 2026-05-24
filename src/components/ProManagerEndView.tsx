@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import type { Team } from '../types/game.d.ts';
-import type { TeamStats, ManagerSeasonRecord } from '../store/leagueStore';
+import type { TeamStats } from '../store/leagueStore';
 import type { BoardObjective } from '../engine/florentinometro';
-import { isObjectiveMet, teamsOfferingJobs, computeCareerRating, clampMeter, computeBoardObjective } from '../engine/florentinometro';
+import { isObjectiveMet, teamsOfferingJobs, clampMeter, computeBoardObjective } from '../engine/florentinometro';
 import { calculateTeamStrength } from '../engine/simEngine';
 import { formatEuros } from '../data/economy';
 import { TeamCrest } from './TeamCrest';
@@ -22,7 +22,7 @@ interface Props {
   managerName: string;
   florentinometro: number;
   boardObjective: BoardObjective;
-  managerCareer: ManagerSeasonRecord[];
+  managerReputation: number;
   year: number;
   onPickTeam: (teamId: string) => void;
   onRetire: () => void;
@@ -35,7 +35,7 @@ export const ProManagerEndView = ({
   managerName,
   florentinometro,
   boardObjective,
-  managerCareer,
+  managerReputation,
   year,
   onPickTeam,
   onRetire,
@@ -66,8 +66,7 @@ export const ProManagerEndView = ({
     meter >= 2 ? '#ff5555' :
     '#aa0000';
 
-  const careerRating = computeCareerRating(managerCareer, meter);
-  const jobOffers = teamsOfferingJobs(teams, userTeamId, careerRating)
+  const jobOffers = teamsOfferingJobs(teams, userTeamId, managerReputation)
     .sort((a, b) => calculateTeamStrength(b) - calculateTeamStrength(a));
   const currentTeam = teams.find(t => t.id === userTeamId);
   const yy = (y: number) => (y + 1).toString().slice(-2);
@@ -202,20 +201,20 @@ export const ProManagerEndView = ({
             </p>
           </div>
 
-          {/* Career rep bar */}
+          {/* Career rep bar (0-100) */}
           <div className="flex items-center gap-2">
             <span className="text-[7px] uppercase shrink-0" style={{ color: '#888888' }}>{t('promanager.reputation')}</span>
             <div className="flex-1 h-2 border" style={{ borderColor: '#444466', background: '#000010' }}>
               <div
                 style={{
-                  width: `${(careerRating / 10) * 100}%`,
-                  background: careerRating >= 7 ? '#55ff55' : careerRating >= 5 ? '#ffff55' : '#ff5555',
+                  width: `${managerReputation}%`,
+                  background: managerReputation >= 70 ? '#55ff55' : managerReputation >= 45 ? '#ffff55' : '#ff5555',
                   height: '100%',
                 }}
               />
             </div>
-            <span className="text-[8px] font-bold" style={{ color: careerRating >= 7 ? '#55ff55' : careerRating >= 5 ? '#ffff55' : '#ff5555' }}>
-              {careerRating.toFixed(1)}
+            <span className="text-[8px] font-bold" style={{ color: managerReputation >= 70 ? '#55ff55' : managerReputation >= 45 ? '#ffff55' : '#ff5555' }}>
+              {Math.round(managerReputation)}
             </span>
           </div>
 

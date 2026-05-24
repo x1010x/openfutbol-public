@@ -120,6 +120,11 @@ export const StatusBar = ({ league, onBoardAlert, onCareer }: Props) => {
           {league.boardFired && !onBoardAlert && (
             <span className="text-vga-light-red font-bold animate-pulse shrink-0">{t('florentino.fired')}</span>
           )}
+          {league.managerReputation !== undefined && (
+            <span className="text-vga-gray text-[6px] shrink-0">
+              REP <span className={`font-bold ${league.managerReputation >= 70 ? 'text-vga-light-green' : league.managerReputation >= 45 ? 'text-vga-yellow' : 'text-vga-light-red'}`}>{Math.round(league.managerReputation)}</span>
+            </span>
+          )}
           {league.managerName && onCareer && (
             <button
               onClick={onCareer}

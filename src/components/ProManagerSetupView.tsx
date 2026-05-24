@@ -2,7 +2,7 @@ import { useState } from 'react';
 import type { Team } from '../types/game.d.ts';
 import type { ManagerSeasonRecord } from '../store/leagueStore';
 import type { BoardObjective } from '../engine/florentinometro';
-import { teamsOfferingJobs, computeCareerRating, computeBoardObjective } from '../engine/florentinometro';
+import { teamsOfferingJobs, computeBoardObjective } from '../engine/florentinometro';
 import { calculateTeamStrength } from '../engine/simEngine';
 import { TeamCrest } from './TeamCrest';
 import { formatEuros } from '../data/economy';
@@ -21,7 +21,7 @@ interface Props {
   teams: Team[];
   managerName: string;
   managerCareer: ManagerSeasonRecord[];
-  currentMeter: number;
+  managerReputation: number;
   yearStats: { year: number; teams: number; leagues: number; players: number }[];
   selectedYear: number | null;
   onSelectYear: (year: number) => void;
@@ -33,7 +33,7 @@ export const ProManagerSetupView = ({
   teams,
   managerName: initialName,
   managerCareer,
-  currentMeter,
+  managerReputation,
   yearStats,
   selectedYear,
   onSelectYear,
@@ -44,8 +44,7 @@ export const ProManagerSetupView = ({
   const [name, setName] = useState(initialName);
   const [expanded, setExpanded] = useState<string | null>(null);
 
-  const careerRating = computeCareerRating(managerCareer, currentMeter);
-  const allOffers = teamsOfferingJobs(teams, '', careerRating);
+  const allOffers = teamsOfferingJobs(teams, '', managerReputation);
 
   // Year / name selection screen
   if (!selectedYear) {
@@ -137,12 +136,12 @@ export const ProManagerSetupView = ({
           <span className="text-vga-gray text-[7px] uppercase shrink-0">{t('promanager.reputation')}</span>
           <div className="flex-1 bg-vga-black h-2 border border-vga-gray">
             <div
-              className={`h-full ${careerRating >= 7 ? 'bg-vga-light-green' : careerRating >= 5 ? 'bg-vga-yellow' : 'bg-vga-light-red'}`}
-              style={{ width: `${(careerRating / 10) * 100}%` }}
+              className={`h-full ${managerReputation >= 70 ? 'bg-vga-light-green' : managerReputation >= 45 ? 'bg-vga-yellow' : 'bg-vga-light-red'}`}
+              style={{ width: `${managerReputation}%` }}
             />
           </div>
-          <span className={`text-[8px] font-bold shrink-0 ${careerRating >= 7 ? 'text-vga-light-green' : careerRating >= 5 ? 'text-vga-yellow' : 'text-vga-light-red'}`}>
-            {careerRating.toFixed(1)}
+          <span className={`text-[8px] font-bold shrink-0 ${managerReputation >= 70 ? 'text-vga-light-green' : managerReputation >= 45 ? 'text-vga-yellow' : 'text-vga-light-red'}`}>
+            {Math.round(managerReputation)}
           </span>
           {managerCareer.length === 0 && (
             <span className="text-vga-gray text-[6px] shrink-0">({t('promanager.rookie')})</span>

@@ -241,6 +241,8 @@ export interface LeagueState {
   managerLosses?: number;
   aiClausulazoNews?: { playerName: string; teamName: string; amount: number }[];
   transferWindowEmergency?: boolean; // allow one extra signing after clausulazo on last window day
+  managerReputation?: number;        // 0-100, persistent career reputation
+  managerInitialSquadValue?: number; // budget + sum(playerPrices) when manager took over this stint
 }
 
 export const emptyTeamRecords = (): TeamRecords => ({

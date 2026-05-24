@@ -103,12 +103,12 @@ export const computeCareerRating = (
   return total / (managerCareer.length + 1);
 };
 
-// Returns which teams are willing to offer a job based on career rating.
-// Always includes the weakest team. Better rating = better clubs available.
+// Returns which teams are willing to offer a job based on manager reputation (0-100).
+// Always includes the weakest team. Higher reputation = more prestigious clubs available.
 export const teamsOfferingJobs = (
   allTeams: Team[],
   excludeTeamId: string,
-  careerRating: number,
+  reputation: number,
 ): Team[] => {
   const candidates = allTeams.filter(t => t.id !== excludeTeamId);
   if (candidates.length === 0) return [];
@@ -117,19 +117,129 @@ export const teamsOfferingJobs = (
   const N = sorted.length;
 
   let cutoffPct: number;
-  if (careerRating < 3) cutoffPct = 0.35;
-  else if (careerRating < 5) cutoffPct = 0.60;
-  else if (careerRating < 7) cutoffPct = 0.85;
+  if (reputation < 30) cutoffPct = 0.35;
+  else if (reputation < 45) cutoffPct = 0.55;
+  else if (reputation < 60) cutoffPct = 0.75;
+  else if (reputation < 75) cutoffPct = 0.90;
   else cutoffPct = 1.0;
 
   const cutoff = Math.max(1, Math.ceil(N * cutoffPct));
   const eligible = sorted.slice(0, cutoff);
 
-  // Always add the absolute weakest if not already included.
   if (eligible.length === 0 || eligible[0].id !== sorted[0].id) {
     eligible.unshift(sorted[0]);
   }
 
-  // Return sorted strongest-first for display.
   return eligible.sort((a, b) => avgMedia(b) - avgMedia(a));
+};
+
+// Context-aware match delta for florentinometro. Replaces the simple win/draw/loss lookup.
+export const computeMatchMeterDelta = (params: {
+  userGoals: number;
+  oppGoals: number;
+  isHome: boolean;
+  userAvgMedia: number;
+  oppAvgMedia: number;
+  yellowCards: number;
+  redCards: number;
+}): number => {
+  const { userGoals, oppGoals, isHome, userAvgMedia, oppAvgMedia, yellowCards, redCards } = params;
+  const isWin = userGoals > oppGoals;
+  const isDraw = userGoals === oppGoals;
+  const strengthDiff = userAvgMedia - oppAvgMedia; // positive = user is stronger
+  const goalDiff = userGoals - oppGoals;
+  const cleanSheet = oppGoals === 0;
+
+  let delta = isWin ? 0.30 : isDraw ? 0.00 : -0.35;
+
+  if (isWin) {
+    if (strengthDiff < -5) delta += isHome ? 0.20 : 0.30; // upset win
+    if (goalDiff >= 4) delta += 0.15; // dominant win
+  } else if (isDraw) {
+    if (strengthDiff < -5) delta += isHome ? 0.12 : 0.20; // respectable draw vs stronger
+    else if (strengthDiff > 5) delta -= isHome ? 0.15 : 0.08; // poor draw vs weaker
+  } else {
+    if (strengthDiff < -8) delta += 0.15; // forgive heavy loss to a much better team
+    if (strengthDiff > 5) delta -= isHome ? 0.30 : 0.15; // embarrassing loss vs weaker
+    if (oppGoals - userGoals >= 4) delta -= 0.20; // thrashing penalty
+  }
+
+  // Match performance
+  delta += Math.min(userGoals * 0.04, 0.16);
+  if (cleanSheet) delta += 0.12;
+  delta -= yellowCards * 0.015;
+  delta -= redCards * 0.08;
+
+  return delta;
+};
+
+// Per-match reputation delta (0-100 scale, small amounts that accumulate over a career).
+export const computeMatchReputationDelta = (params: {
+  userGoals: number;
+  oppGoals: number;
+  isHome: boolean;
+  userAvgMedia: number;
+  oppAvgMedia: number;
+}): number => {
+  const { userGoals, oppGoals, isHome, userAvgMedia, oppAvgMedia } = params;
+  const isWin = userGoals > oppGoals;
+  const isDraw = userGoals === oppGoals;
+  const strengthDiff = userAvgMedia - oppAvgMedia;
+
+  let delta = 0;
+
+  if (isWin) {
+    if (strengthDiff < -8) delta = isHome ? 0.18 : 0.25;      // upset vs much stronger
+    else if (strengthDiff < -3) delta = isHome ? 0.14 : 0.18; // beat stronger team
+    else if (strengthDiff > 5) delta = 0.07;                   // expected win vs weaker
+    else delta = 0.11;                                         // even match
+  } else if (isDraw) {
+    if (!isHome && strengthDiff < -5) delta = 0.14;  // great away draw vs stronger
+    else if (strengthDiff < -3) delta = 0.08;        // draw vs stronger
+    else if (strengthDiff > 5) delta = -0.06;        // disappointing draw vs weaker
+    else delta = 0.04;                               // even draw
+  } else {
+    if (strengthDiff < -8) delta = -0.04;                        // lost to much better, forgiven
+    else if (strengthDiff < -3) delta = -0.08;                   // lost to stronger
+    else if (strengthDiff > 5 && isHome) delta = -0.30;          // shameful home loss to weaker
+    else if (strengthDiff > 5) delta = -0.18;                    // away loss to weaker
+    else delta = -0.12;                                          // even loss
+    if (oppGoals - userGoals >= 4) delta -= 0.25;                // thrashing
+  }
+
+  return delta;
+};
+
+// Season-end reputation adjustment after a completed stint.
+export const computeSeasonReputationDelta = (params: {
+  objective: BoardObjective;
+  objectiveMet: boolean;
+  fired: boolean;
+  squadValueChangePct: number; // (finalValue - initialValue) / initialValue
+}): number => {
+  let delta = 0;
+
+  if (params.objectiveMet) {
+    switch (params.objective) {
+      case 'win_league':        delta += 10; break;
+      case 'top_4':             delta += 6;  break;
+      case 'top_half':          delta += 3;  break;
+      case 'avoid_relegation':  delta += 2;  break;
+    }
+  } else {
+    switch (params.objective) {
+      case 'win_league':        delta -= 4; break;
+      case 'top_4':             delta -= 3; break;
+      case 'top_half':          delta -= 2; break;
+      case 'avoid_relegation':  delta -= 6; break; // relegated = very bad for reputation
+    }
+  }
+
+  if (params.fired) delta -= 4;
+
+  // Squad value significantly improved/worsened
+  if (params.squadValueChangePct > 0.25) delta += 2;
+  else if (params.squadValueChangePct < -0.25) delta -= 2;
+
+  return delta;
 };

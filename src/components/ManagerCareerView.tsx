@@ -7,6 +7,7 @@ interface Props {
   managerName: string;
   career: ManagerSeasonRecord[];
   currentMeter: number;
+  managerReputation?: number;
   onBack: () => void;
 }
 
@@ -17,7 +18,7 @@ const OBJECTIVE_KEYS: Record<BoardObjective, string> = {
   avoid_relegation: 'florentino.obj.avoid_relegation',
 };
 
-export const ManagerCareerView = ({ managerName, career, currentMeter, onBack }: Props) => {
+export const ManagerCareerView = ({ managerName, career, currentMeter, managerReputation, onBack }: Props) => {
   const t = useT();
 
   const uniqueSeasons = new Set(career.map(r => r.year)).size;
@@ -67,6 +68,11 @@ export const ManagerCareerView = ({ managerName, career, currentMeter, onBack }:
             { label: t('career.winPct'), value: `${winPct}%`, color: 'text-vga-light-green' },
             { label: t('career.titles'), value: String(titles), color: 'text-vga-yellow' },
             { label: t('career.bestMeter'), value: peakMeter.toFixed(1), color: 'text-vga-cyan' },
+            ...(managerReputation !== undefined ? [{
+              label: t('promanager.reputation'),
+              value: String(Math.round(managerReputation)),
+              color: managerReputation >= 70 ? 'text-vga-light-green' : managerReputation >= 45 ? 'text-vga-yellow' : 'text-vga-light-red',
+            }] : []),
           ].map(({ label, value, color }) => (
             <div key={label} className="bg-vga-blue border border-vga-white p-2 text-center">
               <div className="text-vga-gray text-[7px] uppercase mb-1">{label}</div>
