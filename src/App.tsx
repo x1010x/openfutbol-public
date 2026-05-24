@@ -1841,6 +1841,7 @@ function App() {
           finances={league.finances[league.userTeamId] ?? { seasonIncome: 0, seasonSalaries: 0 }}
           rivalTeams={league.teams.filter(t => t.id !== league.userTeamId)}
           seasonYear={league.year}
+          transferLog={league.transferLog}
           onUpdateTicketPrice={handleUpdateTicketPrice}
           onBack={() => setView('LEAGUE')}
         />
