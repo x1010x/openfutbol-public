@@ -1598,7 +1598,6 @@ function App() {
         <ManagerCareerView
           managerName={league.managerName ?? ''}
           career={league.managerCareer ?? []}
-          currentMeter={league.florentinometro ?? 5}
           managerReputation={league.managerReputation}
           onRename={handleRenameManager}
           onBack={() => setView(league.isStarted ? 'LEAGUE' : 'LEAGUE')}
