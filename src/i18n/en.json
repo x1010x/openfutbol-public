@@ -457,6 +457,7 @@
   "pos.ALL": "ALL",
 
   "btn.proManager":    "PRO MANAGER",
+  "btn.importManager": "IMPORTAR MANAGER",
   "btn.managerCareer": "MY CAREER",
   "nav.managerCareer": "CAREER",
 
@@ -554,5 +555,30 @@
   "transfer.windowClosedUntil":   "Opens in {n} jornada(s)",
   "transfer.windowClosedSeason":  "Next window: start of next season",
   "transfer.windowClosedAction":  "The transfer window is closed. Wait for the next window to make signings.",
-  "transfer.emergencyWindow":     "Emergency window: you can sign one replacement."
+  "transfer.emergencyWindow":     "Emergency window: you can sign one replacement.",
+
+  "tutorial.title":       "PRO MANAGER — HOW TO PLAY",
+  "tutorial.welcome":     "Welcome, {name}. Here's what you need to know.",
+  "tutorial.start":       "START CAREER",
+  "tutorial.objective":   "YOUR OBJECTIVE",
+  "tutorial.obj1":        "The board assigns you a seasonal objective: win the league, finish top 4, top half, or avoid relegation.",
+  "tutorial.obj2":        "Meet it and the board stays happy. Fail it and the pressure builds.",
+  "tutorial.obj3":        "Win trophies and manage multiple clubs to build your reputation.",
+  "tutorial.florentino":  "BOARD METER (FLORENTINÓMETRO)",
+  "tutorial.flo1":        "The board meter (0–10) tracks how the president sees you — starts at 5.",
+  "tutorial.flo2":        "It rises with wins, clean sheets, goals scored, and good results vs stronger teams.",
+  "tutorial.flo3":        "It drops with losses (especially at home vs weaker sides), red cards, and heavy defeats.",
+  "tutorial.flo4":        "If it drops below 2 the board may fire you. Warnings appear in the status bar.",
+  "tutorial.reputation":  "REPUTATION (0–100)",
+  "tutorial.rep1":        "Your personal reputation persists across clubs and seasons — starts at 50.",
+  "tutorial.rep2":        "It grows with wins, trophies, and improving squad value. It decays with bad seasons or being fired.",
+  "tutorial.rep3":        "Higher reputation = better job offers from bigger clubs. You can see it in the career screen.",
+  "tutorial.transfers":   "TRANSFER MARKET",
+  "tutorial.tra1":        "The market opens for 10 jornadas at the start of the season and 8 jornadas at mid-season.",
+  "tutorial.tra2":        "List players in your squad to attract offers from rival clubs.",
+  "tutorial.tra3":        "Rival teams can trigger a release clause (clausulazo) on your best unlisted players during an open window.",
+  "tutorial.finances":    "FINANCES",
+  "tutorial.fin1":        "Your budget covers wages each jornada. Gate revenue from home matches adds income.",
+  "tutorial.fin2":        "Track income, salaries, squad value, and transfers in the Finances screen.",
+  "tutorial.tip":         "Tip: check the Finances screen for the full transfer history and the Career screen to export your save."
 }

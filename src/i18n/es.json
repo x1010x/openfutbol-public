@@ -457,6 +457,7 @@
   "pos.ALL": "TODOS",
 
   "btn.proManager":    "PRO MANAGER",
+  "btn.importManager": "IMPORTAR MANAGER",
   "btn.managerCareer": "MI CARRERA",
   "nav.managerCareer": "CARRERA",
 
@@ -554,5 +555,30 @@
   "transfer.windowClosedUntil":   "Abre en {n} jornada(s)",
   "transfer.windowClosedSeason":  "Próximo mercado: inicio de temporada",
   "transfer.windowClosedAction":  "El mercado de fichajes está cerrado. Espera al próximo periodo.",
-  "transfer.emergencyWindow":     "Ventana de emergencia: puedes fichar un sustituto."
+  "transfer.emergencyWindow":     "Ventana de emergencia: puedes fichar un sustituto.",
+
+  "tutorial.title":       "PRO MANAGER — CÓMO SE JUEGA",
+  "tutorial.welcome":     "Bienvenido, {name}. Esto es lo que necesitas saber.",
+  "tutorial.start":       "EMPEZAR CARRERA",
+  "tutorial.objective":   "TU OBJETIVO",
+  "tutorial.obj1":        "La junta te asigna un objetivo cada temporada: ganar la liga, quedar top 4, primera mitad o salvar el descenso.",
+  "tutorial.obj2":        "Cúmplelo y la junta estará contenta. Fállalo y la presión aumenta.",
+  "tutorial.obj3":        "Gana trofeos y gestiona varios clubes para construir tu reputación.",
+  "tutorial.florentino":  "FLORENTINÓMETRO (JUNTA)",
+  "tutorial.flo1":        "El medidor de junta (0–10) refleja cómo te ve el presidente — empieza en 5.",
+  "tutorial.flo2":        "Sube con victorias, porterías a cero, goles marcados y buenos resultados ante rivales más fuertes.",
+  "tutorial.flo3":        "Baja con derrotas (especialmente en casa contra rivales débiles), tarjetas rojas y goleadas en contra.",
+  "tutorial.flo4":        "Si baja de 2 la junta puede despedirte. Las advertencias aparecen en la barra de estado.",
+  "tutorial.reputation":  "REPUTACIÓN (0–100)",
+  "tutorial.rep1":        "Tu reputación personal persiste entre clubes y temporadas — empieza en 50.",
+  "tutorial.rep2":        "Crece con victorias, títulos y mejorando el valor de la plantilla. Cae con malas temporadas o siendo despedido.",
+  "tutorial.rep3":        "Más reputación = mejores ofertas de trabajo de clubes más grandes. La ves en la pantalla de carrera.",
+  "tutorial.transfers":   "MERCADO DE FICHAJES",
+  "tutorial.tra1":        "El mercado abre 10 jornadas al inicio de temporada y 8 a mitad de temporada.",
+  "tutorial.tra2":        "Pon jugadores en venta para atraer ofertas de clubes rivales.",
+  "tutorial.tra3":        "Los rivales pueden activar la cláusula de rescisión (clausulazo) de tus mejores jugadores durante el mercado.",
+  "tutorial.finances":    "FINANZAS",
+  "tutorial.fin1":        "Tu presupuesto cubre los salarios cada jornada. Los ingresos de taquilla de partidos en casa suman.",
+  "tutorial.fin2":        "Consulta ingresos, salarios, valor de plantilla y fichajes en la pantalla de Finanzas.",
+  "tutorial.tip":         "Tip: revisa Finanzas para el historial de fichajes y Carrera para exportar tu guardado."
 }

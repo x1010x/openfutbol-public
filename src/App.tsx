@@ -30,6 +30,7 @@ import { LeagueSetupView } from './components/LeagueSetupView';
 import { ManagerCareerView } from './components/ManagerCareerView';
 import { ProManagerEndView } from './components/ProManagerEndView';
 import { ProManagerSetupView } from './components/ProManagerSetupView';
+import { ProManagerTutorialModal } from './components/ProManagerTutorialModal';
 import { EquipoView } from './components/EquipoView';
 import { TeamCrest } from './components/TeamCrest';
 import { PitchDiagram } from './components/PitchDiagram';
@@ -141,6 +142,8 @@ function App() {
   const [previewSwapSlot, setPreviewSwapSlot] = useState<number | null>(null);
   const [showFantasyFlow, setShowFantasyFlow] = useState(false);
   const [showProManagerFlow, setShowProManagerFlow] = useState(false);
+  const [showProManagerTutorial, setShowProManagerTutorial] = useState(false);
+  const importCareerRef = useRef<HTMLInputElement>(null);
   const [fantasyYear, setFantasyYear] = useState(0);
   const [fantasyConfig, setFantasyConfig] = useState<{ teamIds: string[]; userTeamId: string; cap: number | null } | null>(null);
   const [returnToFantasy, setReturnToFantasy] = useState(false);
@@ -320,6 +323,7 @@ function App() {
     });
     setShowProManagerFlow(false);
     setSelectedYear(null);
+    setShowProManagerTutorial(true);
     setView('LEAGUE');
   };
 
@@ -1359,6 +1363,23 @@ function App() {
     }));
   };
 
+  const handleImportCareerFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      try {
+        const data = JSON.parse(ev.target?.result as string);
+        if (data && typeof data === 'object') {
+          handleImportCareer(data);
+          setShowProManagerFlow(true);
+        }
+      } catch { /* ignore bad files */ }
+      if (importCareerRef.current) importCareerRef.current.value = '';
+    };
+    reader.readAsText(file);
+  };
+
   const handleResetGame = () => {
     localStorage.removeItem('openfutbol_league');
     localStorage.removeItem('openfutbol_welcomed');
@@ -1591,7 +1612,6 @@ function App() {
           currentMeter={league.florentinometro ?? 5}
           managerReputation={league.managerReputation}
           onRename={handleRenameManager}
-          onImport={handleImportCareer}
           onBack={() => setView(league.isStarted ? 'LEAGUE' : 'LEAGUE')}
         />
       );
@@ -1641,6 +1661,13 @@ function App() {
             >
               {t('btn.proManager')}
             </button>
+            <button
+              onClick={() => importCareerRef.current?.click()}
+              className="w-full bg-vga-black text-vga-magenta py-3 text-[10px] border-2 border-vga-magenta font-bold uppercase tracking-widest hover:bg-vga-magenta hover:text-vga-bright-white"
+            >
+              {t('btn.importManager')}
+            </button>
+            <input ref={importCareerRef} type="file" accept=".json" className="hidden" onChange={handleImportCareerFile} />
             {(league.managerCareer?.length ?? 0) > 0 && (
               <button
                 onClick={() => setView('MANAGER_CAREER')}
@@ -2516,6 +2543,12 @@ function App() {
           body={boardAlert.body}
           tone={boardAlert.tone}
           onClose={() => setBoardAlert(null)}
+        />
+      )}
+      {showProManagerTutorial && (
+        <ProManagerTutorialModal
+          managerName={league.managerName ?? ''}
+          onClose={() => setShowProManagerTutorial(false)}
         />
       )}
     </div>

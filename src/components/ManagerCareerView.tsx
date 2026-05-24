@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import type { ManagerSeasonRecord } from '../store/leagueStore';
 import { useT } from '../i18n';
 import { formatEuros } from '../data/economy';
@@ -16,7 +16,6 @@ interface Props {
   currentMeter: number;
   managerReputation?: number;
   onRename?: (name: string) => void;
-  onImport?: (data: Partial<CareerExport>) => void;
   onBack: () => void;
 }
 
@@ -27,12 +26,10 @@ const OBJECTIVE_KEYS: Record<BoardObjective, string> = {
   avoid_relegation: 'florentino.obj.avoid_relegation',
 };
 
-export const ManagerCareerView = ({ managerName, career, currentMeter, managerReputation, onRename, onImport, onBack }: Props) => {
+export const ManagerCareerView = ({ managerName, career, currentMeter, managerReputation, onRename, onBack }: Props) => {
   const t = useT();
   const [editingName, setEditingName] = useState(false);
   const [nameInput, setNameInput] = useState(managerName);
-  const [importError, setImportError] = useState('');
-  const fileRef = useRef<HTMLInputElement>(null);
 
   const uniqueSeasons = new Set(career.map(r => r.year)).size;
   const totalGames = career.reduce((s, r) => s + r.gamesManaged, 0);
@@ -67,24 +64,6 @@ export const ManagerCareerView = ({ managerName, career, currentMeter, managerRe
     a.download = `openfutbol_career_${managerName.replace(/\s+/g, '_') || 'manager'}.json`;
     a.click();
     URL.revokeObjectURL(url);
-  };
-
-  const handleImportFile = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = ev => {
-      try {
-        const data = JSON.parse(ev.target?.result as string) as Partial<CareerExport>;
-        if (!data || typeof data !== 'object') throw new Error('Invalid format');
-        onImport?.(data);
-        setImportError('');
-      } catch {
-        setImportError('Invalid file');
-      }
-      if (fileRef.current) fileRef.current.value = '';
-    };
-    reader.readAsText(file);
   };
 
   const commitRename = () => {
@@ -126,25 +105,13 @@ export const ManagerCareerView = ({ managerName, career, currentMeter, managerRe
             )}
           </div>
           <div className="flex gap-2 items-center shrink-0">
-            {onImport && (
-              <>
-                <button
-                  onClick={handleExport}
-                  className="text-[7px] bg-vga-blue text-vga-cyan px-2 py-1 border border-vga-cyan hover:bg-vga-cyan hover:text-vga-black"
-                  title={t('career.exportTitle')}
-                >
-                  {t('career.export')}
-                </button>
-                <button
-                  onClick={() => fileRef.current?.click()}
-                  className="text-[7px] bg-vga-blue text-vga-yellow px-2 py-1 border border-vga-yellow hover:bg-vga-yellow hover:text-vga-black"
-                  title={t('career.importTitle')}
-                >
-                  {t('career.import')}
-                </button>
-                <input ref={fileRef} type="file" accept=".json" className="hidden" onChange={handleImportFile} />
-              </>
-            )}
+            <button
+              onClick={handleExport}
+              className="text-[7px] bg-vga-blue text-vga-cyan px-2 py-1 border border-vga-cyan hover:bg-vga-cyan hover:text-vga-black"
+              title={t('career.exportTitle')}
+            >
+              {t('career.export')}
+            </button>
             <button
               onClick={onBack}
               className="text-[8px] bg-vga-gray text-vga-black px-2 py-1 border border-vga-white hover:bg-vga-red hover:text-vga-bright-white"
@@ -153,10 +120,6 @@ export const ManagerCareerView = ({ managerName, career, currentMeter, managerRe
             </button>
           </div>
         </div>
-
-        {importError && (
-          <p className="text-vga-light-red text-[7px] mb-2">{importError}</p>
-        )}
 
         {/* Career summary stats */}
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-4">
