@@ -9,7 +9,7 @@ import { FORMATIONS } from './engine/formations';
 import { getInitialLeagueState, getFantasyLeagueState, updateLeagueStats, deductWeeklySalaries, generateIncomingOffers, autoListAiPlayers, simulateAiMarketSignings, advanceSeason, simulateAiTrades, simulateAiFreeAgentSignings, simulateAiClausulazos, appendTransfer, decrementSuspensions, signingBlockKey, squadNeeds, groupFor, repickAiFormations, writebackMatchStamina, decayTeamStaminaAfterMatch, decrementInjuries, applyStaminaRecovery, computeTvBonus, applyTvBonus, isTransferWindowOpen, windowJornadasLeft, jornadasUntilWindowOpen } from './store/leagueStore';
 import type { TransferRecord, ManagerSeasonRecord } from './store/leagueStore';
 import type { LeagueState } from './store/leagueStore';
-import { computeBoardObjective, computeTransferDelta, firingChance, clampMeter, METER_DELTAS, isObjectiveMet, computeMatchMeterDelta, computeMatchReputationDelta, computeSeasonReputationDelta } from './engine/florentinometro';
+import { computeBoardObjective, computeTransferDelta, firingChance, clampMeter, applyMeterDelta, METER_DELTAS, isObjectiveMet, computeMatchMeterDelta, computeMatchReputationDelta, computeSeasonReputationDelta } from './engine/florentinometro';
 import { LeagueTable } from './components/LeagueTable';
 import { StatusBar } from './components/StatusBar';
 import { SquadView } from './components/SquadView';
@@ -414,7 +414,7 @@ function App() {
       const florentinoDelta = (prev.gameMode === 'promanager' && !prev.boardFired)
         ? computeTransferDelta(player, amount, marketValue, true, prev.year)
         : 0;
-      const newMeter = florentinoDelta !== 0 ? clampMeter((prev.florentinometro ?? 5) + florentinoDelta) : (prev.florentinometro ?? 5);
+      const newMeter = florentinoDelta !== 0 ? applyMeterDelta(prev.florentinometro ?? 5, florentinoDelta) : (prev.florentinometro ?? 5);
       return {
         ...prev,
         teams: prev.teams.map(t =>
@@ -529,7 +529,7 @@ function App() {
       const florentinoDelta = (prev.gameMode === 'promanager' && !prev.boardFired)
         ? computeTransferDelta(player, amount, marketValue, true, prev.year)
         : 0;
-      const newMeter = florentinoDelta !== 0 ? clampMeter((prev.florentinometro ?? 5) + florentinoDelta) : (prev.florentinometro ?? 5);
+      const newMeter = florentinoDelta !== 0 ? applyMeterDelta(prev.florentinometro ?? 5, florentinoDelta) : (prev.florentinometro ?? 5);
       return {
         ...prev,
         teams: prev.teams.map(t => {
@@ -589,7 +589,7 @@ function App() {
       const florentinoDelta = (prev.gameMode === 'promanager' && !prev.boardFired)
         ? computeTransferDelta(player, clausulaCost, marketValue, true, prev.year)
         : 0;
-      const newMeter = florentinoDelta !== 0 ? clampMeter((prev.florentinometro ?? 5) + florentinoDelta) : (prev.florentinometro ?? 5);
+      const newMeter = florentinoDelta !== 0 ? applyMeterDelta(prev.florentinometro ?? 5, florentinoDelta) : (prev.florentinometro ?? 5);
       return {
         ...prev,
         teams: prev.teams.map(t => {
@@ -710,7 +710,7 @@ function App() {
       const florentinoDelta = (prev.gameMode === 'promanager' && !prev.boardFired)
         ? computeTransferDelta(player, offer.amount, marketValue, false, prev.year)
         : 0;
-      const newMeter = florentinoDelta !== 0 ? clampMeter((prev.florentinometro ?? 5) + florentinoDelta) : (prev.florentinometro ?? 5);
+      const newMeter = florentinoDelta !== 0 ? applyMeterDelta(prev.florentinometro ?? 5, florentinoDelta) : (prev.florentinometro ?? 5);
       return {
         ...prev,
         teams: prev.teams.map(t => {
@@ -1045,7 +1045,7 @@ function App() {
       if (lastWeek) {
         const net = (lastWeek.income ?? 0) - (lastWeek.salaries ?? 0);
         const weekDelta = net >= 0 ? METER_DELTAS.weeklyPositive : METER_DELTAS.weeklyNegative;
-        const newMeter = clampMeter((newLeague.florentinometro ?? 5) + weekDelta);
+        const newMeter = applyMeterDelta(newLeague.florentinometro ?? 5, weekDelta);
         newLeague = {
           ...newLeague,
           florentinometro: newMeter,
@@ -1200,7 +1200,7 @@ function App() {
 
       const meterDelta = computeMatchMeterDelta({ userGoals, oppGoals, isHome: userIsHome, userAvgMedia, oppAvgMedia, yellowCards, redCards });
       const repDelta = computeMatchReputationDelta({ userGoals, oppGoals, isHome: userIsHome, userAvgMedia, oppAvgMedia });
-      const newMeter = clampMeter((newLeague.florentinometro ?? 5) + meterDelta);
+      const newMeter = applyMeterDelta(newLeague.florentinometro ?? 5, meterDelta);
       const newRep = Math.max(0, Math.min(100, (newLeague.managerReputation ?? 50) + repDelta));
       newLeague = {
         ...newLeague,
