@@ -20,6 +20,7 @@ const OBJECTIVE_KEYS: Record<BoardObjective, string> = {
 export const ManagerCareerView = ({ managerName, career, currentMeter, onBack }: Props) => {
   const t = useT();
 
+  const uniqueSeasons = new Set(career.map(r => r.year)).size;
   const totalGames = career.reduce((s, r) => s + r.gamesManaged, 0);
   const totalWins = career.reduce((s, r) => s + r.wins, 0);
   const totalDraws = career.reduce((s, r) => s + r.draws, 0);
@@ -61,7 +62,7 @@ export const ManagerCareerView = ({ managerName, career, currentMeter, onBack }:
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-4">
           {[
             { label: t('career.rating'), value: careerRating, color: 'text-vga-magenta' },
-            { label: t('career.seasons'), value: String(career.length), color: 'text-vga-yellow' },
+            { label: t('career.seasons'), value: String(uniqueSeasons), color: 'text-vga-yellow' },
             { label: t('career.totalGames'), value: String(totalGames), color: 'text-vga-bright-white' },
             { label: t('career.winPct'), value: `${winPct}%`, color: 'text-vga-light-green' },
             { label: t('career.titles'), value: String(titles), color: 'text-vga-yellow' },

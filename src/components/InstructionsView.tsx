@@ -38,6 +38,17 @@ const ContentES = ({ onColaborar, changelogRef, engineRef }: {
         Compites en una liga con otros once equipos igual de dudosos. Gana el que menos vergüenza pase.
       </p>
       <p>
+        <span className="text-vga-yellow">PRO MANAGER</span> — El modo difícil. Eres un entrenador con
+        carrera propia: eliges año, te pones nombre y recibes ofertas de trabajo según tu reputación.
+        La junta te evalúa cada jornada con el{' '}
+        <span className="text-vga-cyan">Florentinómetro</span> (0–10). Gana partidos, haz buenos fichajes
+        y cúmplete el objetivo marcado para mantenerlos contentos. Si el medidor cae demasiado,
+        Florentino llama por teléfono. La primera vez avisa. La segunda avisa más fuerte.
+        La tercera… recoges tus cosas. Cuando te echan (o acabas la temporada) recibes
+        ofertas de nuevos clubes según tu historial. Buenas temporadas abren puertas a equipos mejores.
+        Si llegas a 9 puntos, Florentino te regala Marbella y da bonus a los jugadores.
+      </p>
+      <p>
         <span className="text-vga-yellow">FANTASY</span> — Crea tu propia liga y haz un draft de jugadores
         como si supieras lo que estás haciendo. Modo <span className="text-vga-cyan">LIBRE</span> para los
         que se creen Florentino, o modo <span className="text-vga-cyan">CON CAP</span> con un límite de
@@ -47,6 +58,30 @@ const ContentES = ({ onColaborar, changelogRef, engineRef }: {
         <span className="text-vga-yellow">EDITOR</span> — Crea equipos desde cero, ponle un nombre ridículo,
         unos colores horribles y compártelo. Los equipos del editor se pueden meter directamente en una liga
         FANTASY para hacerle la vida imposible a tus amigos.
+      </p>
+    </Section>
+
+    <Section title="PRO MANAGER — FLORENTINÓMETRO">
+      <p>
+        El Florentinómetro mide la satisfacción de la junta en tiempo real (0–10, empieza en 5).
+        Sube con victorias, buenos fichajes y finanzas saneadas. Baja con derrotas, malos fichajes
+        y números en rojo.
+      </p>
+      <ul className="list-disc pl-5 space-y-1">
+        <li><span className="text-vga-light-green">≥ 7</span> — La junta está contenta. Recibes mensajes de apoyo.</li>
+        <li><span className="text-vga-yellow">5 – 7</span> — Zona neutral. Nadie dice nada (todavía).</li>
+        <li><span className="text-vga-light-red">{'< 5'}</span> — Zona de peligro. Cada jornada hay probabilidad de recibir un aviso de la directiva.</li>
+        <li><span className="text-vga-light-red font-bold">≥ 9</span> — Florentino te promete Marbella, da bonus a los jugadores y transfiere €2M al club.</li>
+      </ul>
+      <p>
+        Los <span className="text-vga-yellow">avisos</span> acumulan (máximo 3 antes del despido).
+        Si recuperas el medidor por encima de 5, los avisos se perdonan de uno en uno.
+        Los primeros 5 partidos tras llegar a un club son de gracia — la junta espera a ver cómo respondes.
+      </p>
+      <p>
+        Los mensajes de la junta aparecen después del resultado del partido.
+        Puedes releerlos pinchando en el icono de advertencia ⚠ en la barra de estado.
+        Tu nombre de entrenador en la barra también es un acceso directo a tu carrera.
       </p>
     </Section>
 
@@ -241,6 +276,16 @@ const ContentES = ({ onColaborar, changelogRef, engineRef }: {
       <Section title="CAMBIOS RECIENTES">
         <ul className="list-disc pl-5 space-y-1">
           <li>
+            <span className="text-vga-cyan">v1.3.0</span> — Modo Pro Manager.
+            Nuevo modo de carrera completo: nombre de entrenador, reputación acumulada entre temporadas
+            y ofertas de trabajo según tu historial. Florentinómetro (0–10) que mide la satisfacción
+            de la junta en tiempo real — avisos con mensajes graciosos, despidos dramáticos y premios
+            si llegas a lo más alto (incluida Marbella). Modal de Florentino con su pixel art al teléfono.
+            Período de gracia los primeros partidos, avisos que se perdonan con buen rendimiento,
+            y pantalla de fin de temporada con estadísticas burlonas y fichas de clubes expandibles.
+            Entrenadores de la IA renombrados con técnicos de la NBA. Equipos ordenados por fuerza.
+          </li>
+          <li>
             <span className="text-vga-cyan">v1.2.0</span> — Idiomas.
             Selector de idioma en la cabecera (ES / EN). Toda la interfaz traducida al inglés:
             navegación, fichas de jugador, mercado de fichajes, alineación, finanzas, clasificación,
@@ -300,6 +345,17 @@ const ContentEN = ({ onColaborar, changelogRef, engineRef }: {
         You compete in a league against eleven other equally dubious clubs. May the least embarrassing team win.
       </p>
       <p>
+        <span className="text-vga-yellow">PRO MANAGER</span> — Hard mode. You're a manager with a real career:
+        pick a year, give yourself a name, and receive job offers based on your reputation.
+        The board evaluates you every round with the{' '}
+        <span className="text-vga-cyan">Florentinometer</span> (0–10). Win matches, make smart signings,
+        and meet your objective to keep them happy. If the meter drops too low, Florentino calls.
+        First time he warns you. Second time he's blunter. Third time — pack your things.
+        When you're sacked (or finish the season) you get new offers based on your track record.
+        Good seasons open doors to better clubs. Hit 9 on the meter and Florentino gives you Marbella,
+        hands out bonuses to the players, and wires €2M to the club.
+      </p>
+      <p>
         <span className="text-vga-yellow">FANTASY</span> — Build your own league and run a player draft
         as if you know what you're doing. <span className="text-vga-cyan">FREE</span> mode for those who
         think they're Florentino, or <span className="text-vga-cyan">CAP</span> mode with a 1350 MED
@@ -309,6 +365,30 @@ const ContentEN = ({ onColaborar, changelogRef, engineRef }: {
         <span className="text-vga-yellow">EDITOR</span> — Create teams from scratch, give them a ridiculous
         name, horrible colours, and share them. Editor teams can be dropped straight into a FANTASY league
         to ruin your friends' evenings.
+      </p>
+    </Section>
+
+    <Section title="PRO MANAGER — FLORENTINOMETER">
+      <p>
+        The Florentinometer tracks board satisfaction in real time (0–10, starts at 5).
+        It rises with wins, smart transfers, and healthy finances. It falls with defeats,
+        bad signings, and running at a loss.
+      </p>
+      <ul className="list-disc pl-5 space-y-1">
+        <li><span className="text-vga-light-green">≥ 7</span> — Board is pleased. You get encouraging messages.</li>
+        <li><span className="text-vga-yellow">5 – 7</span> — Neutral zone. Nobody says anything (yet).</li>
+        <li><span className="text-vga-light-red">{'< 5'}</span> — Danger zone. Each round there's a chance of a board warning.</li>
+        <li><span className="text-vga-light-green font-bold">≥ 9</span> — Florentino promises you Marbella, gives bonuses to players, and transfers €2M to the club.</li>
+      </ul>
+      <p>
+        <span className="text-vga-yellow">Warnings</span> accumulate (3 strikes and you're fired).
+        If you recover the meter above 5, warnings are forgiven one per round.
+        Your first 5 matches at a new club are a grace period — the board waits to see how you respond.
+      </p>
+      <p>
+        Board messages appear after the match result screen.
+        You can re-read them by tapping the ⚠ warning icon in the status bar.
+        Your manager name in the status bar is also a shortcut to your career stats.
       </p>
     </Section>
 
@@ -491,6 +571,15 @@ const ContentEN = ({ onColaborar, changelogRef, engineRef }: {
     <div ref={changelogRef} id="changelog">
       <Section title="RECENT CHANGES">
         <ul className="list-disc pl-5 space-y-1">
+          <li>
+            <span className="text-vga-cyan">v1.3.0</span> — Pro Manager mode.
+            Full career mode: manager name, reputation that carries across seasons, and job offers
+            based on your track record. Florentinometer (0–10) tracks board satisfaction in real time —
+            funny warning messages, dramatic sackings, and rewards if you reach the top (including Marbella).
+            Florentino pixel art modal on the phone. Grace period for new managers, warnings forgiven
+            by good form, end-of-season screen with mocking stats and expandable club offer cards.
+            AI managers renamed with NBA coaches. Teams sorted by strength.
+          </li>
           <li>
             <span className="text-vga-cyan">v1.2.0</span> — Languages.
             Language selector in the header (ES / EN). Full English translation of the UI:
