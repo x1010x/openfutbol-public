@@ -244,6 +244,8 @@
   "msg.rejected.title":           "{team} rejects",
   "msg.budgetShort.title":        "Insufficient budget",
   "msg.budgetShort.body":         "{team} cannot afford {amount} in cash.",
+  "msg.alreadyTransferred.title":  "Transfer blocked",
+  "msg.alreadyTransferred.body":   "{player} was already transferred this season. Only one move per player allowed.",
   "msg.noGK":                     "You can't play without a goalkeeper in the lineup.",
   "msg.injuredInLineup":          "Injured players in the lineup: {players}",
 

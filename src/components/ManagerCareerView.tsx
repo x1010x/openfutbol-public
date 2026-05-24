@@ -13,7 +13,6 @@ interface CareerExport {
 interface Props {
   managerName: string;
   career: ManagerSeasonRecord[];
-  currentMeter: number;
   managerReputation?: number;
   onRename?: (name: string) => void;
   onBack: () => void;
@@ -26,7 +25,7 @@ const OBJECTIVE_KEYS: Record<BoardObjective, string> = {
   avoid_relegation: 'florentino.obj.avoid_relegation',
 };
 
-export const ManagerCareerView = ({ managerName, career, currentMeter, managerReputation, onRename, onBack }: Props) => {
+export const ManagerCareerView = ({ managerName, career, managerReputation, onRename, onBack }: Props) => {
   const t = useT();
   const [editingName, setEditingName] = useState(false);
   const [nameInput, setNameInput] = useState(managerName);
@@ -38,11 +37,11 @@ export const ManagerCareerView = ({ managerName, career, currentMeter, managerRe
   const totalLosses = career.reduce((s, r) => s + r.losses, 0);
   const winPct = totalGames > 0 ? ((totalWins / totalGames) * 100).toFixed(1) : '0.0';
   const titles = career.filter(r => r.finalPosition === 1).length;
-  const peakMeter = career.reduce((best, r) => Math.max(best, r.florentinometroPeak), currentMeter);
+  const peakMeter = career.reduce((best, r) => Math.max(best, r.florentinometroPeak), 0);
   const transferBalance = career.reduce((s, r) => s + r.transferBalance, 0);
   const careerRating = career.length > 0
     ? (career.reduce((s, r) => s + r.florentinometroFinal, 0) / career.length).toFixed(1)
-    : currentMeter.toFixed(1);
+    : '—';
 
   const ordinal = (n: number): string => {
     if (n === 1) return '1st';

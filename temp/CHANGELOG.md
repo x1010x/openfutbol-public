@@ -1,5 +1,36 @@
 # Changelog
 
+## [1.5.0] - 2026-05-24
+
+### Junior players (natural selection)
+- When a player retires, their child appears the next season as a 17-year-old free agent
+- Name: "{Name} Jr." — chains to "Jr. Jr.", "Jr. Jr. Jr." etc. for dynasty lines
+- Stats: parent's approximate peak stats recovered from retirement degradation, then each attribute varies ±10 independently (natural selection — some better, some worse)
+- Goalkeepers pass on GK ability; outfield players do not
+- Peak age inherited from parent with ±3 random variation
+- Juniors persist as free agents across seasons until they retire; they also generate their own juniors if they retire from a team
+
+### Florentinómetro tuning
+- Diminishing returns near extremes: resistance zone spans 0–3 and 7–10
+- Positive deltas shrink as meter approaches 10; negative deltas shrink near 0
+- Factor at zone boundary: 100% → floor of 15% at the extreme
+
+### ProManager end-of-season retention
+- Probabilistic: meter ≥ 9 → 97% kept; ≥ 7 → 80%; ≥ 6 → 60%; below 6 → exponential decay (5 → 24%, 4 → 10%, 3 → 4%)
+
+### Florentinómetro 6.0 milestone
+- New "LA JUNTA HA TOMADO NOTA" message band triggers at ≥ 6.0 (5 dark-humor variants)
+- Layered threshold reset: each band can re-trigger independently on re-climb
+
+### Clausulazo shows player MED in alert
+- Alert body now displays the transferred player's media rating in parentheses
+
+### Career view
+- Career stats are now purely historical — no live-state leakage between jornadas
+
+### Transfer one-per-season rule
+- Players can only be transferred between teams once per season
+
 ## [1.4.0] - 2026-05-24
 
 ### ProManager — Career Mode Expansion

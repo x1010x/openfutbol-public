@@ -44,6 +44,21 @@ export const objectiveLabel = (obj: BoardObjective): string => {
 
 export const clampMeter = (v: number): number => Math.max(0, Math.min(10, v));
 
+// Apply a delta with diminishing returns near 0 and 10.
+// Positive deltas are compressed as the meter approaches 10; negative near 0.
+// This makes reaching the extremes progressively harder.
+export const applyMeterDelta = (current: number, delta: number): number => {
+  const ZONE = 3;       // resistance zone spans 0–3 and 7–10
+  const MIN_FACTOR = 0.15;
+  let effective = delta;
+  if (delta > 0 && current > 10 - ZONE) {
+    effective = delta * Math.max(MIN_FACTOR, (10 - current) / ZONE);
+  } else if (delta < 0 && current < ZONE) {
+    effective = delta * Math.max(MIN_FACTOR, current / ZONE);
+  }
+  return clampMeter(current + effective);
+};
+
 export const METER_DELTAS = {
   win: 0.3,
   draw: -0.1,
