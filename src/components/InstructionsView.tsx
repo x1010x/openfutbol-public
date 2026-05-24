@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { getLang, useT } from '../i18n';
 
 interface Props {
   onBack: () => void;
@@ -24,9 +25,523 @@ const Tip = ({ children }: { children: React.ReactNode }) => (
   </div>
 );
 
+const ContentES = ({ onColaborar, changelogRef, engineRef }: {
+  onColaborar: () => void;
+  changelogRef: React.RefObject<HTMLDivElement | null>;
+  engineRef: React.RefObject<HTMLDivElement | null>;
+}) => (
+  <>
+    <Section title="MODOS DE JUEGO">
+      <p>
+        <span className="text-vga-yellow">JUGAR</span> — Elige una temporada y un equipo. Ninguno es real.
+        Los nombres son chistes malos, los jugadores son inventados y el estadio probablemente no existe.
+        Compites en una liga con otros once equipos igual de dudosos. Gana el que menos vergüenza pase.
+      </p>
+      <p>
+        <span className="text-vga-yellow">FANTASY</span> — Crea tu propia liga y haz un draft de jugadores
+        como si supieras lo que estás haciendo. Modo <span className="text-vga-cyan">LIBRE</span> para los
+        que se creen Florentino, o modo <span className="text-vga-cyan">CON CAP</span> con un límite de
+        1350 MED por equipo para los que prefieren sufrir con presupuesto. 18 rondas, muchos arrepentimientos.
+      </p>
+      <p>
+        <span className="text-vga-yellow">EDITOR</span> — Crea equipos desde cero, ponle un nombre ridículo,
+        unos colores horribles y compártelo. Los equipos del editor se pueden meter directamente en una liga
+        FANTASY para hacerle la vida imposible a tus amigos.
+      </p>
+    </Section>
+
+    <Section title="CICLO DE JUEGO (LIGA)">
+      <ol className="list-decimal pl-5 space-y-1">
+        <li>Elige temporada, país y equipo.</li>
+        <li>Configura tu ALINEACIÓN (11 titulares + suplentes).</li>
+        <li>Ajusta el PRECIO DE ENTRADA en DINERO.</li>
+        <li>Juega cada jornada hasta el final de la temporada.</li>
+      </ol>
+    </Section>
+
+    <Section title="CICLO DE JUEGO (FANTASY)">
+      <ol className="list-decimal pl-5 space-y-1">
+        <li>Selecciona el año de la liga y los equipos participantes (2–8).</li>
+        <li>Indica cuál es tu equipo con el botón <span className="text-vga-cyan">YO</span>.</li>
+        <li>El orden del sorteo se decide al azar una vez y no cambia. Si eres el 3.° siempre eliges 3.°.</li>
+        <li>Cada ronda indica la posición recomendada. Puedes fichar cualquier jugador del pool.</li>
+        <li>Tras 18 rondas la liga arranca con las plantillas que cada equipo ha elegido.</li>
+      </ol>
+    </Section>
+
+    <div ref={engineRef}>
+    <Section title="ESTADÍSTICAS DEL JUGADOR">
+      <p>Cada jugador tiene 6 estadísticas base (0-99):</p>
+      <ul className="list-disc pl-5 space-y-1">
+        <li><span className="text-vga-yellow">VEL</span> — Velocidad. Carrera y aceleración.</li>
+        <li><span className="text-vga-yellow">REG</span> — Regate. Capacidad de superar rivales.</li>
+        <li><span className="text-vga-yellow">PAS</span> — Pase. Precisión y visión de juego.</li>
+        <li><span className="text-vga-yellow">TIR</span> — Tiro. Cuanto más alto, más goles.</li>
+        <li><span className="text-vga-yellow">DEF</span> — Defensa. Robos, coberturas y duelos.</li>
+        <li><span className="text-vga-yellow">FIS</span> — Físico. Resistencia y aguante.</li>
+      </ul>
+      <p>
+        La <span className="text-vga-yellow">MED</span> no es una media simple — cada posición
+        pondera los atributos de forma distinta. El tiro vale mucho más para un delantero que
+        para un defensa, y el regate de un extremo pesa más que el de un centrocampista.
+        El resultado se ajusta además por condición física y estado de ánimo.
+      </p>
+      <p>
+        Las estadísticas dependen de la POSICIÓN: un mismo jugador tiene
+        valores distintos según dónde juegue. Ponerlo fuera de su posición natural
+        penaliza su rendimiento.
+      </p>
+      <p>
+        La EDAD también influye. Cerca de su pico (varía por posición) el jugador
+        rinde al máximo. Alejarse del prime penaliza el rendimiento, pero nunca por debajo del 70%.
+      </p>
+    </Section>
+
+    <Section title="SIMULACIÓN DEL PARTIDO">
+      <p>
+        La MED del equipo es la media de los titulares en el campo. Las expulsiones
+        la bajan en directo y se notan en el juego.
+      </p>
+      <p>
+        La posesión depende de la fuerza de cada equipo y de la ventaja del local.
+        El equipo con el balón ataca; el otro defiende con sus propias estadísticas.
+      </p>
+      <p>
+        <span className="text-vga-yellow">Disparos:</span> el rematador se enfrenta
+        al portero y la defensa rival. Un delantero top contra una zaga floja
+        marca mucho más que la media.
+      </p>
+      <p>
+        <span className="text-vga-yellow">Tarjetas:</span> los defensas agresivos
+        cometen más faltas. Una segunda amarilla es roja: expulsión inmediata
+        y el jugador se pierde el siguiente partido.
+      </p>
+      <p>
+        Antes de cada partido puedes ver ambas alineaciones en la pizarra táctica.
+        Toca cualquier jugador — tuyo o rival — para ver su ficha. Toca un círculo
+        tuyo para cambiarlo por un suplente sin gastar un cambio oficial.
+      </p>
+    </Section>
+
+    <Section title="CONDICIÓN FÍSICA (CAN)">
+      <p>
+        Los jugadores se cansan durante el partido y esa fatiga persiste
+        entre jornadas. Un jugador que llega agotado al siguiente partido rinde menos.
+      </p>
+      <p>
+        Cada jornada se recupera parte de la condición, pero no siempre al 100%.
+        La barra CAN es visible en PLANTILLA y en ALINEACIÓN.
+      </p>
+    </Section>
+
+    <Section title="ESTADO DE ÁNIMO (ANI)">
+      <p>
+        Cada jugador tiene un estado de ánimo entre cinco niveles:
+        <span className="text-vga-light-red"> ▼▼ </span>
+        <span className="text-vga-bright-white">▼ </span>
+        <span className="text-vga-yellow">— </span>
+        <span className="text-vga-light-cyan">▲ </span>
+        <span className="text-vga-light-green">▲▲</span>.
+        Se muestra junto a su MED en la ficha y en la alineación.
+      </p>
+      <p>
+        El ánimo afecta al rendimiento sin modificar los valores permanentes.
+        Depende de los minutos jugados, los goles, las asistencias y si el
+        jugador es titular habitual.
+      </p>
+    </Section>
+
+    <Section title="SUSTITUCIONES Y TÁCTICA EN DIRECTO">
+      <p>
+        Hasta 3 cambios por partido. El juego se pausa al llegar al descanso
+        y abre el panel automáticamente. También puedes abrirlo en cualquier momento
+        con el botón CAMBIOS. Haz todos los cambios que quieras y pulsa CONTINUAR cuando termines.
+      </p>
+      <p>
+        En el panel también puedes cambiar la <span className="text-vga-yellow">FORMACIÓN</span>,
+        usar <span className="text-vga-yellow">AUTO-11</span> para recomponer el mejor XI disponible,
+        o alternar entre <span className="text-vga-yellow">TAC:POS</span> y <span className="text-vga-yellow">TAC:LIBRE</span> sin salir del partido.
+      </p>
+    </Section>
+
+    <Section title="LESIONES Y SANCIONES">
+      <p>
+        Un jugador puede lesionarse durante el partido. El juego hace una
+        sustitución de emergencia automática (cuenta como uno de los 3 cambios).
+        El jugador lesionado no puede alinearse hasta que se recupere — verás
+        el badge <span className="text-vga-light-red">LES</span> con las jornadas que le quedan.
+      </p>
+      <p>
+        Los jugadores lesionados o sancionados se eliminan automáticamente de la
+        alineación dejando su hueco vacío. Toca el hueco en la previa para elegir
+        quién entra.
+      </p>
+    </Section>
+
+    <Section title="FICHAJES Y CLAUSULAZO">
+      <p>
+        El precio de un jugador depende de su MED y su edad respecto al pico.
+        Los jóvenes con proyección valen más que un veterano de la misma media.
+      </p>
+      <p>
+        Los rivales mandan ofertas por tus jugadores y pueden aceptar o rechazar
+        las tuyas. Las ofertas se agrupan por jugador en PLANTILLA — ábrelas para
+        ver todos los clubes interesados. La bolsa de fichajes rota cada jornada
+        con libres y jugadores en venta.
+      </p>
+      <p>
+        <span className="text-vga-yellow">Oferta normal</span> — jugadores en venta o agentes libres.
+        Negocias el precio y el club puede rechazarla.
+      </p>
+      <p>
+        <span className="text-vga-light-red font-bold">CLAUSULAZO TEBAS</span> — si quieres fichar
+        a un jugador que no está en el mercado, puedes activar su cláusula de rescisión.
+        El coste es el doble de su valor base y el traspaso es inmediato sin negociación.
+        No aplica a jugadores en venta ni a agentes libres.
+      </p>
+    </Section>
+
+    <Section title="FINANZAS">
+      <p>
+        Cada jornada ingresas por taquilla (depende del precio de entrada, el rival
+        y tu posición en la tabla) y pagas salarios. Si la caja llega a cero,
+        los fichajes se bloquean.
+      </p>
+    </Section>
+
+    <Section title="PARTIDOS AUTOMÁTICOS">
+      <p>
+        Los partidos que no juegas tú se resuelven con un modelo simplificado.
+        El equipo más fuerte tiene más probabilidades de ganar, pero siempre
+        hay margen para sorpresas. La ventaja local se aplica a todos los equipos.
+      </p>
+    </Section>
+    </div>
+
+    <Section title="CONSEJOS PARA GANAR">
+      <Tip>Pon siempre a cada jugador en su posición natural. Un delantero de centrocampista es MED tirada.</Tip>
+      <Tip>El portero gana partidos por sí solo. No escatimes en el POR.</Tip>
+      <Tip>Usa AUTO-FIX 11 si no sabes cómo alinear — te da el mejor XI posible con tu plantilla.</Tip>
+      <Tip>Vigila las barras CAN antes de cada partido. Un titular agotado vale menos que un suplente fresco.</Tip>
+      <Tip>Haz cambios en el descanso si hay jugadores en rojo — no esperes al 80.</Tip>
+      <Tip>Dale minutos a los suplentes en los partidos fáciles. Los jugadores sin minutos se frustran y rinden peor.</Tip>
+      <Tip>Un jugador en racha de goles tiene el ánimo alto — mantenlo en el campo.</Tip>
+      <Tip>Cuidado con los defensas con tarjeta amarilla. Una segunda = roja y se pierde el siguiente partido.</Tip>
+      <Tip>El precio de entrada óptimo no es el máximo — sube demasiado y la taquilla baja. Experimenta.</Tip>
+      <Tip>Los jugadores jóvenes cerca de su pico son la mejor inversión a largo plazo.</Tip>
+      <Tip>Si juegas fuera de casa contra un rival superior, aguanta bien atrás. La ventaja local funciona en los dos sentidos.</Tip>
+      <Tip>El clausulazo cuesta el doble pero es garantizado. Úsalo solo cuando el jugador vale realmente la pena.</Tip>
+      <Tip>La IA también rota a sus titulares cuando están cansados — no des por sentado que van a llegar al tope.</Tip>
+      <Tip>En FANTASY, los primeros turnos son para portero y defensas. Los rivales también los quieren.</Tip>
+      <Tip>En FANTASY, fichar 18 jugadores sin portero es válido, pero sufrirás en los duelos de disparo.</Tip>
+      <Tip>Un equipo del EDITOR añadido a una liga FANTASY parte sin plantilla — el sorteo se la da.</Tip>
+    </Section>
+
+    <div ref={changelogRef} id="changelog">
+      <Section title="CAMBIOS RECIENTES">
+        <ul className="list-disc pl-5 space-y-1">
+          <li>
+            <span className="text-vga-cyan">v1.2.0</span> — Idiomas.
+            Selector de idioma en la cabecera (ES / EN). Toda la interfaz traducida al inglés:
+            navegación, fichas de jugador, mercado de fichajes, alineación, finanzas, clasificación,
+            configuración de liga, Fantasy Draft y nombres de países.
+            Sistema de i18n propio sin dependencias externas.
+          </li>
+          <li>
+            <span className="text-vga-cyan">v1.1.0</span> — Comunidad y países.
+            Pantalla COLABORAR con canal de Telegram para proponer equipos y jugadores.
+            Banderas por país en las pantallas de selección.
+            Base de datos actualizada con equipos nuevos.
+          </li>
+          <li>
+            <span className="text-vga-cyan">v1.0.0</span> — Primera versión pública.
+            Arquitectura modular de datos basada en UUIDs. Simulación de partidos minuto a minuto,
+            sistema de temas (Retrocutre/Retrocool), modo Fantasy Draft, gestión económica,
+            editor de equipos y mercado de fichajes.
+          </li>
+        </ul>
+      </Section>
+    </div>
+
+    <div className="bg-vga-black p-4 border-2 border-vga-cyan text-[9px] text-vga-bright-white space-y-2">
+      <p className="text-vga-cyan font-bold">COLABORA EN EL JUEGO</p>
+      <p>
+        ¿Tienes una idea para un equipo? ¿Un chiste malo que merece ser un escudo?
+        ¿Quieres que tu cara aparezca en un jugador pixelado? Mándanoslo al canal de Telegram:
+      </p>
+      <p>
+        <a href="https://t.me/openfutbol" target="_blank" rel="noreferrer"
+          className="text-vga-cyan underline hover:text-vga-yellow">
+          t.me/openfutbol
+        </a>
+        {' '}— sin cuentas raras, sin tecnicismos, sin complicaciones.
+      </p>
+      <p>
+        Para más detalles sobre cómo proponer equipos, generar escudos con IA
+        y añadir jugadores,{' '}
+        <button onClick={onColaborar} className="text-vga-cyan underline hover:text-vga-yellow">
+          visita COLABORAR
+        </button>.
+      </p>
+    </div>
+  </>
+);
+
+const ContentEN = ({ onColaborar, changelogRef, engineRef }: {
+  onColaborar: () => void;
+  changelogRef: React.RefObject<HTMLDivElement | null>;
+  engineRef: React.RefObject<HTMLDivElement | null>;
+}) => (
+  <>
+    <Section title="GAME MODES">
+      <p>
+        <span className="text-vga-yellow">PLAY</span> — Pick a season and a team. None of it is real.
+        The names are bad puns, the players are made up, and the stadium probably doesn't exist.
+        You compete in a league against eleven other equally dubious clubs. May the least embarrassing team win.
+      </p>
+      <p>
+        <span className="text-vga-yellow">FANTASY</span> — Build your own league and run a player draft
+        as if you know what you're doing. <span className="text-vga-cyan">FREE</span> mode for those who
+        think they're Florentino, or <span className="text-vga-cyan">CAP</span> mode with a 1350 MED
+        limit per team for those who prefer to suffer on a budget. 18 rounds, many regrets.
+      </p>
+      <p>
+        <span className="text-vga-yellow">EDITOR</span> — Create teams from scratch, give them a ridiculous
+        name, horrible colours, and share them. Editor teams can be dropped straight into a FANTASY league
+        to ruin your friends' evenings.
+      </p>
+    </Section>
+
+    <Section title="HOW TO PLAY (LEAGUE)">
+      <ol className="list-decimal pl-5 space-y-1">
+        <li>Choose a season, country, and team.</li>
+        <li>Set your LINEUP (11 starters + substitutes).</li>
+        <li>Adjust the TICKET PRICE in FINANCES.</li>
+        <li>Play each round until the end of the season.</li>
+      </ol>
+    </Section>
+
+    <Section title="HOW TO PLAY (FANTASY)">
+      <ol className="list-decimal pl-5 space-y-1">
+        <li>Select the league year and participating teams (2–8).</li>
+        <li>Mark your team with the <span className="text-vga-cyan">ME</span> button.</li>
+        <li>Draft order is randomised once and stays fixed. If you pick 3rd, you always pick 3rd.</li>
+        <li>Each round suggests a position. You can pick any player from the pool.</li>
+        <li>After 18 rounds the league kicks off with each team's chosen squad.</li>
+      </ol>
+    </Section>
+
+    <div ref={engineRef}>
+    <Section title="PLAYER STATS">
+      <p>Each player has 6 base stats (0–99):</p>
+      <ul className="list-disc pl-5 space-y-1">
+        <li><span className="text-vga-yellow">VEL</span> — Speed. Sprint and acceleration.</li>
+        <li><span className="text-vga-yellow">REG</span> — Dribbling. Ability to beat opponents.</li>
+        <li><span className="text-vga-yellow">PAS</span> — Passing. Accuracy and vision.</li>
+        <li><span className="text-vga-yellow">TIR</span> — Shooting. The higher, the more goals.</li>
+        <li><span className="text-vga-yellow">DEF</span> — Defending. Tackles, covers, and duels.</li>
+        <li><span className="text-vga-yellow">FIS</span> — Physical. Stamina and strength.</li>
+      </ul>
+      <p>
+        <span className="text-vga-yellow">MED</span> is not a simple average — each position weights
+        stats differently. Shooting matters far more for a striker than a defender, and dribbling
+        counts more for a winger than a central midfielder. The result is also adjusted for fitness and morale.
+      </p>
+      <p>
+        Stats depend on <span className="text-vga-yellow">POSITION</span>: the same player gets different
+        values depending on where they play. Playing out of position penalises their rating.
+      </p>
+      <p>
+        <span className="text-vga-yellow">AGE</span> matters too. Near their peak (which varies by position)
+        a player performs at their best. Drifting from their prime hurts performance, but never below 70%.
+      </p>
+    </Section>
+
+    <Section title="MATCH SIMULATION">
+      <p>
+        A team's MED is the average of its starters on the pitch. Red cards lower it in real time
+        and you'll feel it immediately.
+      </p>
+      <p>
+        Possession depends on each team's strength and home advantage.
+        The team with the ball attacks; the other defends with their own stats.
+      </p>
+      <p>
+        <span className="text-vga-yellow">Shots:</span> the shooter goes up against the goalkeeper
+        and the opposing defence. A top striker against a weak backline scores far more than average.
+      </p>
+      <p>
+        <span className="text-vga-yellow">Cards:</span> aggressive defenders commit more fouls.
+        A second yellow means a red: immediate dismissal and the player misses the next match.
+      </p>
+      <p>
+        Before each match you can see both lineups on the tactical board. Tap any player —
+        yours or the opponent's — to view their profile. Tap one of your circles to swap them
+        for a substitute without spending an official change.
+      </p>
+    </Section>
+
+    <Section title="FITNESS (CAN)">
+      <p>
+        Players get tired during a match and that fatigue carries over between rounds.
+        A player who arrives exhausted performs below their usual level.
+      </p>
+      <p>
+        Some fitness recovers each round, but not always to 100%.
+        The CAN bar is visible in SQUAD and in LINEUP.
+      </p>
+    </Section>
+
+    <Section title="MORALE (ANI)">
+      <p>
+        Each player has a morale level across five tiers:
+        <span className="text-vga-light-red"> ▼▼ </span>
+        <span className="text-vga-bright-white">▼ </span>
+        <span className="text-vga-yellow">— </span>
+        <span className="text-vga-light-cyan">▲ </span>
+        <span className="text-vga-light-green">▲▲</span>.
+        It's shown alongside their MED in their profile and in the lineup.
+      </p>
+      <p>
+        Morale affects performance without changing permanent values.
+        It depends on minutes played, goals, assists, and whether the player is a regular starter.
+      </p>
+    </Section>
+
+    <Section title="SUBSTITUTIONS & LIVE TACTICS">
+      <p>
+        Up to 3 substitutions per match. The game pauses at half-time and opens the panel automatically.
+        You can also open it at any time with the SUBS button. Make as many changes as you like,
+        then press CONTINUE when you're done.
+      </p>
+      <p>
+        From the panel you can also change the <span className="text-vga-yellow">FORMATION</span>,
+        use <span className="text-vga-yellow">AUTO-11</span> to rebuild the best available XI,
+        or switch between <span className="text-vga-yellow">TAC:POS</span> and <span className="text-vga-yellow">TAC:FREE</span> without leaving the match.
+      </p>
+    </Section>
+
+    <Section title="INJURIES & SUSPENSIONS">
+      <p>
+        A player can get injured during a match. The game makes an automatic emergency substitution
+        (it counts as one of your 3 changes). The injured player can't be selected until they recover —
+        you'll see the <span className="text-vga-light-red">INJ</span> badge with the rounds remaining.
+      </p>
+      <p>
+        Injured or suspended players are automatically removed from the lineup, leaving their slot empty.
+        Tap the empty slot in the pre-match screen to choose a replacement.
+      </p>
+    </Section>
+
+    <Section title="TRANSFERS & BUYOUT CLAUSE">
+      <p>
+        A player's price depends on their MED and their age relative to their peak.
+        Young players with potential are worth more than an older player at the same rating.
+      </p>
+      <p>
+        Rivals will send offers for your players, and they can accept or reject yours.
+        Offers are grouped by player in SQUAD — open them to see all interested clubs.
+        The transfer market rotates each round with free agents and listed players.
+      </p>
+      <p>
+        <span className="text-vga-yellow">Standard offer</span> — for listed players or free agents.
+        You negotiate the price and the club can turn it down.
+      </p>
+      <p>
+        <span className="text-vga-light-red font-bold">BUYOUT CLAUSE</span> — if you want a player
+        who isn't on the market, you can trigger their release clause. The cost is double their base
+        value and the transfer is instant — no negotiation. Doesn't apply to listed players or free agents.
+      </p>
+    </Section>
+
+    <Section title="FINANCES">
+      <p>
+        Each round you earn gate receipts (based on ticket price, the opponent, and your league position)
+        and pay wages. If your balance hits zero, transfers are blocked.
+      </p>
+    </Section>
+
+    <Section title="SIMULATED MATCHES">
+      <p>
+        Matches you don't play are resolved with a simplified model. The stronger team is more likely
+        to win, but upsets always happen. Home advantage applies to every team.
+      </p>
+    </Section>
+    </div>
+
+    <Section title="TIPS TO WIN">
+      <Tip>Always play each player in their natural position. A striker in midfield is wasted MED.</Tip>
+      <Tip>A good goalkeeper wins matches on their own. Don't cut corners on GK.</Tip>
+      <Tip>Use AUTO-11 if you're unsure — it picks the best available XI from your squad.</Tip>
+      <Tip>Check CAN bars before each match. A tired starter is worth less than a fresh sub.</Tip>
+      <Tip>Make changes at half-time if anyone is in the red — don't wait until the 80th minute.</Tip>
+      <Tip>Give substitutes minutes in easy matches. Benched players lose morale and perform worse.</Tip>
+      <Tip>A player on a scoring streak has high morale — keep them on the pitch.</Tip>
+      <Tip>Watch defenders on a yellow card. A second one means a red and they miss the next match.</Tip>
+      <Tip>The optimal ticket price isn't the maximum — raise it too high and attendance drops. Experiment.</Tip>
+      <Tip>Young players near their peak are the best long-term investment.</Tip>
+      <Tip>Playing away against a stronger side? Sit deep. Home advantage cuts both ways.</Tip>
+      <Tip>The buyout clause costs double but is guaranteed. Only use it when the player is truly worth it.</Tip>
+      <Tip>The AI also rotates tired players — don't assume they'll always field their best eleven.</Tip>
+      <Tip>In FANTASY, early picks should go to goalkeeper and defenders. Your rivals want them too.</Tip>
+      <Tip>In FANTASY, picking 18 outfield players is valid, but you'll struggle in shooting duels.</Tip>
+      <Tip>An EDITOR team added to a FANTASY league starts with no squad — the draft fills it.</Tip>
+    </Section>
+
+    <div ref={changelogRef} id="changelog">
+      <Section title="RECENT CHANGES">
+        <ul className="list-disc pl-5 space-y-1">
+          <li>
+            <span className="text-vga-cyan">v1.2.0</span> — Languages.
+            Language selector in the header (ES / EN). Full English translation of the UI:
+            navigation, player profiles, transfers, lineup, finances, league table,
+            league setup, Fantasy Draft, and country names.
+            Custom i18n system with no external dependencies.
+          </li>
+          <li>
+            <span className="text-vga-cyan">v1.1.0</span> — Community and countries.
+            COLLABORATE screen with a Telegram channel to propose teams and players.
+            Country flags on selection screens. Database updated with new teams.
+          </li>
+          <li>
+            <span className="text-vga-cyan">v1.0.0</span> — First public release.
+            UUID-based modular data architecture. Minute-by-minute match simulation,
+            theme system (Retrocutre/Retrocool), Fantasy Draft mode, financial management,
+            team editor, and transfer market.
+          </li>
+        </ul>
+      </Section>
+    </div>
+
+    <div className="bg-vga-black p-4 border-2 border-vga-cyan text-[9px] text-vga-bright-white space-y-2">
+      <p className="text-vga-cyan font-bold">CONTRIBUTE TO THE GAME</p>
+      <p>
+        Got an idea for a team? A terrible pun that deserves to be a badge?
+        Want your face on a pixelated player? Send it to the Telegram channel:
+      </p>
+      <p>
+        <a href="https://t.me/openfutbol" target="_blank" rel="noreferrer"
+          className="text-vga-cyan underline hover:text-vga-yellow">
+          t.me/openfutbol
+        </a>
+        {' '}— no weird accounts, no technical know-how, no hassle.
+      </p>
+      <p>
+        For more details on how to propose teams, generate badges with AI,
+        and add players,{' '}
+        <button onClick={onColaborar} className="text-vga-cyan underline hover:text-vga-yellow">
+          visit COLLABORATE
+        </button>.
+      </p>
+    </div>
+  </>
+);
+
 export const InstructionsView = ({ onBack, onColaborar, scrollTo }: Props) => {
+  useT(); // subscribe to language changes
   const changelogRef = useRef<HTMLDivElement>(null);
   const engineRef = useRef<HTMLDivElement>(null);
+  const isEN = getLang() === 'en';
 
   useEffect(() => {
     if (scrollTo === 'changelog' && changelogRef.current) {
@@ -41,266 +556,24 @@ export const InstructionsView = ({ onBack, onColaborar, scrollTo }: Props) => {
       <div className="bg-vga-blue p-4 border-4 border-vga-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-vga-yellow text-sm underline decoration-double">
-            AYUDA
+            {isEN ? 'HELP' : 'AYUDA'}
           </h2>
           <button
             onClick={onBack}
             className="text-[8px] bg-vga-gray text-vga-black px-2 py-1 border border-vga-white hover:bg-vga-red hover:text-vga-bright-white"
           >
-            VOLVER
+            {isEN ? 'BACK' : 'VOLVER'}
           </button>
         </div>
 
-        <Section title="MODOS DE JUEGO">
-          <p>
-            <span className="text-vga-yellow">JUGAR</span> — Elige una temporada y un equipo. Ninguno es real.
-            Los nombres son chistes malos, los jugadores son inventados y el estadio probablemente no existe.
-            Compites en una liga con otros once equipos igual de dudosos. Gana el que menos vergüenza pase.
-          </p>
-          <p>
-            <span className="text-vga-yellow">FANTASY</span> — Crea tu propia liga y haz un draft de jugadores
-            como si supieras lo que estás haciendo. Modo <span className="text-vga-cyan">LIBRE</span> para los
-            que se creen Florentino, o modo <span className="text-vga-cyan">CON CAP</span> con un límite de
-            1350 MED por equipo para los que prefieren sufrir con presupuesto. 18 rondas, muchos arrepentimientos.
-          </p>
-          <p>
-            <span className="text-vga-yellow">EDITOR</span> — Crea equipos desde cero, ponle un nombre ridículo,
-            unos colores horribles y compártelo. Los equipos del editor se pueden meter directamente en una liga
-            FANTASY para hacerle la vida imposible a tus amigos.
-          </p>
-        </Section>
-
-        <Section title="CICLO DE JUEGO (LIGA)">
-          <ol className="list-decimal pl-5 space-y-1">
-            <li>Elige temporada, país y equipo.</li>
-            <li>Configura tu ALINEACIÓN (11 titulares + suplentes).</li>
-            <li>Ajusta el PRECIO DE ENTRADA en DINERO.</li>
-            <li>Juega cada jornada hasta el final de la temporada.</li>
-          </ol>
-        </Section>
-
-        <Section title="CICLO DE JUEGO (FANTASY)">
-          <ol className="list-decimal pl-5 space-y-1">
-            <li>Selecciona el año de la liga y los equipos participantes (2–8).</li>
-            <li>Indica cuál es tu equipo con el botón <span className="text-vga-cyan">YO</span>.</li>
-            <li>El orden del sorteo se decide al azar una vez y no cambia. Si eres el 3.° siempre eliges 3.°.</li>
-            <li>Cada ronda indica la posición recomendada. Puedes fichar cualquier jugador del pool.</li>
-            <li>Tras 18 rondas la liga arranca con las plantillas que cada equipo ha elegido.</li>
-          </ol>
-        </Section>
-
-        <div ref={engineRef}>
-        <Section title="ESTADÍSTICAS DEL JUGADOR">
-          <p>Cada jugador tiene 6 estadísticas base (0-99):</p>
-          <ul className="list-disc pl-5 space-y-1">
-            <li><span className="text-vga-yellow">VEL</span> — Velocidad. Carrera y aceleración.</li>
-            <li><span className="text-vga-yellow">REG</span> — Regate. Capacidad de superar rivales.</li>
-            <li><span className="text-vga-yellow">PAS</span> — Pase. Precisión y visión de juego.</li>
-            <li><span className="text-vga-yellow">TIR</span> — Tiro. Cuanto más alto, más goles.</li>
-            <li><span className="text-vga-yellow">DEF</span> — Defensa. Robos, coberturas y duelos.</li>
-            <li><span className="text-vga-yellow">FIS</span> — Físico. Resistencia y aguante.</li>
-          </ul>
-          <p>
-            La <span className="text-vga-yellow">MED</span> no es una media simple — cada posición
-            pondera los atributos de forma distinta. El tiro vale mucho más para un delantero que
-            para un defensa, y el regate de un extremo pesa más que el de un centrocampista.
-            El resultado se ajusta además por condición física y estado de ánimo.
-          </p>
-          <p>
-            Las estadísticas dependen de la POSICIÓN: un mismo jugador tiene
-            valores distintos según dónde juegue. Ponerlo fuera de su posición natural
-            penaliza su rendimiento.
-          </p>
-          <p>
-            La EDAD también influye. Cerca de su pico (varía por posición) el jugador
-            rinde al máximo. Alejarse del prime penaliza el rendimiento, pero nunca por debajo del 70%.
-          </p>
-        </Section>
-
-        <Section title="SIMULACIÓN DEL PARTIDO">
-          <p>
-            La MED del equipo es la media de los titulares en el campo. Las expulsiones
-            la bajan en directo y se notan en el juego.
-          </p>
-          <p>
-            La posesión depende de la fuerza de cada equipo y de la ventaja del local.
-            El equipo con el balón ataca; el otro defiende con sus propias estadísticas.
-          </p>
-          <p>
-            <span className="text-vga-yellow">Disparos:</span> el rematador se enfrenta
-            al portero y la defensa rival. Un delantero top contra una zaga floja
-            marca mucho más que la media.
-          </p>
-          <p>
-            <span className="text-vga-yellow">Tarjetas:</span> los defensas agresivos
-            cometen más faltas. Una segunda amarilla es roja: expulsión inmediata
-            y el jugador se pierde el siguiente partido.
-          </p>
-          <p>
-            Antes de cada partido puedes ver ambas alineaciones en la pizarra táctica.
-            Toca cualquier jugador — tuyo o rival — para ver su ficha. Toca un círculo
-            tuyo para cambiarlo por un suplente sin gastar un cambio oficial.
-          </p>
-        </Section>
-
-        <Section title="CONDICIÓN FÍSICA (CAN)">
-          <p>
-            Los jugadores se cansan durante el partido y esa fatiga persiste
-            entre jornadas. Un jugador que llega agotado al siguiente partido rinde menos.
-          </p>
-          <p>
-            Cada jornada se recupera parte de la condición, pero no siempre al 100%.
-            La barra CAN es visible en PLANTILLA y en ALINEACIÓN.
-          </p>
-        </Section>
-
-        <Section title="ESTADO DE ÁNIMO (ANI)">
-          <p>
-            Cada jugador tiene un estado de ánimo entre cinco niveles:
-            <span className="text-vga-light-red"> ▼▼ </span>
-            <span className="text-vga-bright-white">▼ </span>
-            <span className="text-vga-yellow">— </span>
-            <span className="text-vga-light-cyan">▲ </span>
-            <span className="text-vga-light-green">▲▲</span>.
-            Se muestra junto a su MED en la ficha y en la alineación.
-          </p>
-          <p>
-            El ánimo afecta al rendimiento sin modificar los valores permanentes.
-            Depende de los minutos jugados, los goles, las asistencias y si el
-            jugador es titular habitual.
-          </p>
-        </Section>
-
-        <Section title="SUSTITUCIONES Y TÁCTICA EN DIRECTO">
-          <p>
-            Hasta 3 cambios por partido. El juego se pausa al llegar al descanso
-            y abre el panel automáticamente. También puedes abrirlo en cualquier momento
-            con el botón CAMBIOS. Haz todos los cambios que quieras y pulsa CONTINUAR cuando termines.
-          </p>
-          <p>
-            En el panel también puedes cambiar la <span className="text-vga-yellow">FORMACIÓN</span>,
-            usar <span className="text-vga-yellow">AUTO-11</span> para recomponer el mejor XI disponible,
-            o alternar entre <span className="text-vga-yellow">TAC:POS</span> y <span className="text-vga-yellow">TAC:LIBRE</span> sin salir del partido.
-          </p>
-        </Section>
-
-        <Section title="LESIONES Y SANCIONES">
-          <p>
-            Un jugador puede lesionarse durante el partido. El juego hace una
-            sustitución de emergencia automática (cuenta como uno de los 3 cambios).
-            El jugador lesionado no puede alinearse hasta que se recupere — verás
-            el badge <span className="text-vga-light-red">LES</span> con las jornadas que le quedan.
-          </p>
-          <p>
-            Los jugadores lesionados o sancionados se eliminan automáticamente de la
-            alineación dejando su hueco vacío. Toca el hueco en la previa para elegir
-            quién entra.
-          </p>
-        </Section>
-
-        <Section title="FICHAJES Y CLAUSULAZO">
-          <p>
-            El precio de un jugador depende de su MED y su edad respecto al pico.
-            Los jóvenes con proyección valen más que un veterano de la misma media.
-          </p>
-          <p>
-            Los rivales mandan ofertas por tus jugadores y pueden aceptar o rechazar
-            las tuyas. Las ofertas se agrupan por jugador en PLANTILLA — ábrelas para
-            ver todos los clubes interesados. La bolsa de fichajes rota cada jornada
-            con libres y jugadores en venta.
-          </p>
-          <p>
-            <span className="text-vga-yellow">Oferta normal</span> — jugadores en venta o agentes libres.
-            Negocias el precio y el club puede rechazarla.
-          </p>
-          <p>
-            <span className="text-vga-light-red font-bold">CLAUSULAZO TEBAS</span> — si quieres fichar
-            a un jugador que no está en el mercado, puedes activar su cláusula de rescisión.
-            El coste es el doble de su valor base y el traspaso es inmediato sin negociación.
-            No aplica a jugadores en venta ni a agentes libres.
-          </p>
-        </Section>
-
-        <Section title="FINANZAS">
-          <p>
-            Cada jornada ingresas por taquilla (depende del precio de entrada, el rival
-            y tu posición en la tabla) y pagas salarios. Si la caja llega a cero,
-            los fichajes se bloquean.
-          </p>
-        </Section>
-
-        <Section title="PARTIDOS AUTOMÁTICOS">
-          <p>
-            Los partidos que no juegas tú se resuelven con un modelo simplificado.
-            El equipo más fuerte tiene más probabilidades de ganar, pero siempre
-            hay margen para sorpresas. La ventaja local se aplica a todos los equipos.
-          </p>
-        </Section>
-        </div>
-
-        <Section title="CONSEJOS PARA GANAR">
-          <Tip>Pon siempre a cada jugador en su posición natural. Un delantero de centrocampista es MED tirada.</Tip>
-          <Tip>El portero gana partidos por sí solo. No escatimes en el POR.</Tip>
-          <Tip>Usa AUTO-FIX 11 si no sabes cómo alinear — te da el mejor XI posible con tu plantilla.</Tip>
-          <Tip>Vigila las barras CAN antes de cada partido. Un titular agotado vale menos que un suplente fresco.</Tip>
-          <Tip>Haz cambios en el descanso si hay jugadores en rojo — no esperes al 80.</Tip>
-          <Tip>Dale minutos a los suplentes en los partidos fáciles. Los jugadores sin minutos se frustran y rinden peor.</Tip>
-          <Tip>Un jugador en racha de goles tiene el ánimo alto — mantenlo en el campo.</Tip>
-          <Tip>Cuidado con los defensas con tarjeta amarilla. Una segunda = roja y se pierde el siguiente partido.</Tip>
-          <Tip>El precio de entrada óptimo no es el máximo — sube demasiado y la taquilla baja. Experimenta.</Tip>
-          <Tip>Los jugadores jóvenes cerca de su pico son la mejor inversión a largo plazo.</Tip>
-          <Tip>Si juegas fuera de casa contra un rival superior, aguanta bien atrás. La ventaja local funciona en los dos sentidos.</Tip>
-          <Tip>El clausulazo cuesta el doble pero es garantizado. Úsalo solo cuando el jugador vale realmente la pena.</Tip>
-          <Tip>La IA también rota a sus titulares cuando están cansados — no des por sentado que van a llegar al tope.</Tip>
-          <Tip>En FANTASY, los primeros turnos son para portero y defensas. Los rivales también los quieren.</Tip>
-          <Tip>En FANTASY, fichar 18 jugadores sin portero es válido, pero sufrirás en los duelos de disparo.</Tip>
-          <Tip>Un equipo del EDITOR añadido a una liga FANTASY parte sin plantilla — el sorteo se la da.</Tip>
-        </Section>
-
-<div ref={changelogRef} id="changelog">
-        <Section title="CAMBIOS RECIENTES">
-          <ul className="list-disc pl-5 space-y-1">
-            <li>
-              <span className="text-vga-cyan">v1.1.0</span> — Comunidad y países.
-              Pantalla COLABORAR con canal de Telegram para proponer equipos y jugadores.
-              Banderas por país en las pantallas de selección.
-              Base de datos actualizada con equipos nuevos.
-            </li>
-            <li>
-              <span className="text-vga-cyan">v1.0.0</span> — Primera versión pública.
-              Arquitectura modular de datos basada en UUIDs. Simulación de partidos minuto a minuto,
-              sistema de temas (Retrocutre/Retrocool), modo Fantasy Draft, gestión económica,
-              editor de equipos y mercado de fichajes.
-            </li>
-          </ul>
-        </Section>
-        </div>
-      </div>
-
-      <div className="bg-vga-black p-4 border-2 border-vga-cyan text-[9px] text-vga-bright-white space-y-2">
-        <p className="text-vga-cyan font-bold">COLABORA EN EL JUEGO</p>
-        <p>
-          ¿Tienes una idea para un equipo? ¿Un chiste malo que merece ser un escudo?
-          ¿Quieres que tu cara aparezca en un jugador pixelado? Mándanoslo al canal de Telegram:
-        </p>
-        <p>
-          <a href="https://t.me/openfutbol" target="_blank" rel="noreferrer"
-            className="text-vga-cyan underline hover:text-vga-yellow">
-            t.me/openfutbol
-          </a>
-          {' '}— sin cuentas raras, sin tecnicismos, sin complicaciones.
-        </p>
-        <p>
-          Para más detalles sobre cómo proponer equipos, generar escudos con IA
-          y añadir jugadores,{' '}
-          <button onClick={onColaborar} className="text-vga-cyan underline hover:text-vga-yellow">
-            visita COLABORAR
-          </button>.
-        </p>
+        {isEN
+          ? <ContentEN onColaborar={onColaborar} changelogRef={changelogRef} engineRef={engineRef} />
+          : <ContentES onColaborar={onColaborar} changelogRef={changelogRef} engineRef={engineRef} />
+        }
       </div>
 
       <div className="bg-vga-magenta p-2 text-[8px] text-vga-bright-white text-center border-2 border-vga-white">
-        ESTA PÁGINA SE ACTUALIZA A MEDIDA QUE EL JUEGO EVOLUCIONA.
+        {isEN ? 'THIS PAGE IS UPDATED AS THE GAME EVOLVES.' : 'ESTA PÁGINA SE ACTUALIZA A MEDIDA QUE EL JUEGO EVOLUCIONA.'}
       </div>
     </div>
   );
