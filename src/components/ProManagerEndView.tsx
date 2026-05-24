@@ -3,17 +3,18 @@ import type { Team } from '../types/game.d.ts';
 import type { TeamStats } from '../store/leagueStore';
 import type { BoardObjective } from '../engine/florentinometro';
 import { isObjectiveMet, teamsOfferingJobs, clampMeter, computeBoardObjective } from '../engine/florentinometro';
+import { engineSettings } from '../engine/engineSettings';
 import { calculateTeamStrength } from '../engine/simEngine';
 import { formatEuros } from '../data/economy';
 import { TeamCrest } from './TeamCrest';
 import { useT } from '../i18n';
 
 function keepProbability(meter: number): number {
+  const thresh = engineSettings.boardKeepThreshold;
   if (meter >= 9) return 0.97;
-  if (meter >= 7) return 0.80;
-  if (meter >= 6) return 0.60;
-  // Exponential decay below 6
-  return Math.max(0, 0.60 * Math.pow(0.40, 6 - meter));
+  if (meter >= thresh + 1) return 0.80;
+  if (meter >= thresh) return 0.60;
+  return Math.max(0, 0.60 * Math.pow(0.40, thresh - meter));
 }
 
 const OBJ_KEYS: Record<BoardObjective, string> = {

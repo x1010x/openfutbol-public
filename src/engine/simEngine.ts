@@ -1,6 +1,7 @@
 import type { Team, MatchState, MatchEvent, Player, Position } from '../types/game.d.ts';
 import { FORMATIONS, buildSlotMap, effectiveStat, rawMedia, slotPenalty } from './formations';
 import { t } from '../i18n';
+import { engineSettings } from './engineSettings';
 
 export const calculateTeamStrength = (team: Team, sentOff: string[] = [], stamina?: Record<string, number>) => {
   if (!team.lineup || !team.formation) return 0;
@@ -199,7 +200,7 @@ export const simulateMinute = (state: MatchState, userTeamId?: string): MatchSta
       const attackerStrength = isHomeEvent ? homeStrength : awayStrength;
       const defenderStrength = isHomeEvent ? awayStrength : homeStrength;
       const teamRatio = attackerStrength / Math.max(defenderStrength, 1);
-      const goalChance = Math.max(0.04, Math.min(0.55, 0.22 * Math.pow(duelRatio, 1.8) * Math.pow(teamRatio, 0.6)));
+      const goalChance = Math.max(0.04, Math.min(0.55, 0.22 * engineSettings.goalChanceMult * Math.pow(duelRatio, 1.8) * Math.pow(teamRatio, 0.6)));
 
       if (isHomeEvent) homeShots++; else awayShots++;
 
@@ -283,8 +284,8 @@ export const simulateMinute = (state: MatchState, userTeamId?: string): MatchSta
         const defenderSkill = (effectiveStat(defender, 'defending', defenderSlot) + effectiveStat(defender, 'physical', defenderSlot)) * defBoost * sf(defender.id, defStamMap);
         const gap = attackerSkill - defenderSkill;
         const cardMod = Math.max(0.5, Math.min(1.7, 1 + gap * 0.01));
-        const yellowThreshold = 0.15 * cardMod;
-        const redThreshold = yellowThreshold + 0.02 * cardMod;
+        const yellowThreshold = 0.15 * cardMod * engineSettings.cardStrictness;
+        const redThreshold = yellowThreshold + 0.02 * cardMod * engineSettings.cardStrictness;
         const cardRand = Math.random();
 
         if (cardRand < yellowThreshold) {
@@ -326,14 +327,14 @@ export const simulateMinute = (state: MatchState, userTeamId?: string): MatchSta
     if (homeSentOff.includes(pid) || homeInjuredInMatch.includes(pid)) continue;
     const p = homeTeam.players.find(pp => pp.id === pid);
     if (!p || !homeTeam.lineup.includes(pid)) continue;
-    const rate = STAMINA_DECAY_BASE + (1 - p.stats.physical / 99) * STAMINA_DECAY_FIS;
+    const rate = (STAMINA_DECAY_BASE + (1 - p.stats.physical / 99) * STAMINA_DECAY_FIS) * engineSettings.staminaDecayMult;
     newHomeStamina[pid] = Math.max(1, stam - rate);
   }
   for (const [pid, stam] of Object.entries(newAwayStamina)) {
     if (awaySentOff.includes(pid) || awayInjuredInMatch.includes(pid)) continue;
     const p = awayTeam.players.find(pp => pp.id === pid);
     if (!p || !awayTeam.lineup.includes(pid)) continue;
-    const rate = STAMINA_DECAY_BASE + (1 - p.stats.physical / 99) * STAMINA_DECAY_FIS;
+    const rate = (STAMINA_DECAY_BASE + (1 - p.stats.physical / 99) * STAMINA_DECAY_FIS) * engineSettings.staminaDecayMult;
     newAwayStamina[pid] = Math.max(1, stam - rate);
   }
 
@@ -346,7 +347,7 @@ export const simulateMinute = (state: MatchState, userTeamId?: string): MatchSta
 
     for (const pid of team.lineup) {
       if (sentOff.includes(pid) || injured.includes(pid)) continue;
-      if (Math.random() >= INJURY_CHANCE_PER_MIN) continue;
+      if (Math.random() >= INJURY_CHANCE_PER_MIN * engineSettings.injuryMult) continue;
 
       const player = team.players.find(p => p.id === pid);
       if (!player) continue;

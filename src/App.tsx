@@ -9,7 +9,9 @@ import { FORMATIONS } from './engine/formations';
 import { getInitialLeagueState, getFantasyLeagueState, updateLeagueStats, deductWeeklySalaries, generateIncomingOffers, autoListAiPlayers, simulateAiMarketSignings, advanceSeason, simulateAiTrades, simulateAiFreeAgentSignings, simulateAiClausulazos, appendTransfer, decrementSuspensions, signingBlockKey, transferredKey, squadNeeds, groupFor, repickAiFormations, writebackMatchStamina, decayTeamStaminaAfterMatch, decrementInjuries, applyStaminaRecovery, computeTvBonus, applyTvBonus, isTransferWindowOpen, windowJornadasLeft, jornadasUntilWindowOpen } from './store/leagueStore';
 import type { TransferRecord, ManagerSeasonRecord } from './store/leagueStore';
 import type { LeagueState } from './store/leagueStore';
-import { computeBoardObjective, computeTransferDelta, firingChance, applyMeterDelta, METER_DELTAS, isObjectiveMet, computeMatchMeterDelta, computeMatchReputationDelta, computeSeasonReputationDelta } from './engine/florentinometro';
+import { computeBoardObjective, computeTransferDelta, firingChance, applyMeterDelta, isObjectiveMet, computeMatchMeterDelta, computeMatchReputationDelta, computeSeasonReputationDelta } from './engine/florentinometro';
+import { engineSettings, loadEngineSettings } from './engine/engineSettings';
+loadEngineSettings();
 import { LeagueTable } from './components/LeagueTable';
 import { StatusBar } from './components/StatusBar';
 import { SquadView } from './components/SquadView';
@@ -1063,7 +1065,7 @@ function App() {
       const lastWeek = weeks?.[weeks.length - 1];
       if (lastWeek) {
         const net = (lastWeek.income ?? 0) - (lastWeek.salaries ?? 0);
-        const weekDelta = net >= 0 ? METER_DELTAS.weeklyPositive : METER_DELTAS.weeklyNegative;
+        const weekDelta = net >= 0 ? engineSettings.meterWeeklyPositive : engineSettings.meterWeeklyNegative;
         const newMeter = applyMeterDelta(newLeague.florentinometro ?? 5, weekDelta);
         newLeague = {
           ...newLeague,
@@ -2162,7 +2164,7 @@ function App() {
 
   return (
     <PlayerTooltipProvider year={league?.year ?? selectedYear ?? new Date().getFullYear()}>
-    <div className="min-h-screen bg-vga-black cool:bg-rc-bg">
+    <div className="min-h-screen bg-vga-black cool:bg-rc-bg overflow-x-hidden">
       {showDisclaimer && <DisclaimerView onDismiss={dismissDisclaimer} />}
 
       {updateAvailable && (
@@ -2200,9 +2202,9 @@ function App() {
       )}
       <div id="rc-screen">
       <header className="mb-3 text-center w-full max-w-4xl">
-        <div className="bg-vga-blue border-4 border-vga-white p-2 vga-panel cool:bg-rc-panel cool:border-rc-primary">
+        <div className="bg-vga-blue border-4 border-vga-white p-2 vga-panel cool:bg-rc-panel cool:border-rc-primary overflow-hidden">
           <h1 className="text-vga-yellow text-2xl tracking-widest font-bold keep-pixel cool:text-rc-primary">OPENFUTBOL</h1>
-          <div className="flex justify-between items-center mt-1 px-2">
+          <div className="flex flex-wrap justify-between items-center mt-1 px-2 gap-y-0.5 min-w-0">
             <button
               type="button"
               onClick={() => { setInstructionsScroll('changelog'); setShowInstructions(true); setHasNewVersion(false); }}
@@ -2244,7 +2246,7 @@ function App() {
                 </button>
               ))}
             </div>
-            <span className="text-vga-bright-white text-[8px] uppercase cool:text-rc-accent">
+            <span className="text-vga-bright-white text-[8px] uppercase cool:text-rc-accent min-w-0 truncate max-w-[80px] sm:max-w-none">
               {league.isStarted ? league.teams.find(team => team.id === league.userTeamId)?.name : t('misc.waitingSelection')}
             </span>
           </div>
