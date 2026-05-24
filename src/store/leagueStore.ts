@@ -239,7 +239,7 @@ export interface LeagueState {
   managerWins?: number;          // wins since current manager took over (not full team season)
   managerDraws?: number;
   managerLosses?: number;
-  aiClausulazoNews?: { playerName: string; teamName: string; amount: number }[];
+  aiClausulazoNews?: { playerName: string; teamName: string; amount: number; playerMedia: number }[];
   transferWindowEmergency?: boolean; // allow one extra signing after clausulazo on last window day
   managerReputation?: number;        // 0-100, persistent career reputation
   managerInitialSquadValue?: number; // budget + sum(playerPrices) when manager took over this stint
@@ -1273,6 +1273,7 @@ export const simulateAiClausulazos = (state: LeagueState): LeagueState => {
         playerName: player.name,
         teamName: rival.name,
         amount: clausulaPrice,
+        playerMedia: player.media,
       }];
 
       return {

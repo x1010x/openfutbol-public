@@ -1072,7 +1072,7 @@ function App() {
         : winLeft > 1 ? ` ${t('transfer.windowOpenLeft', { n: String(winLeft - 1) })}` : '';
       setTimeout(() => setMessage({
         title: t('ai.clausulazoTitle'),
-        body: t('ai.clausulazoBody', { player: n.playerName, team: n.teamName, amount: formatEuros(n.amount) }) + emergencySuffix,
+        body: t('ai.clausulazoBody', { player: `${n.playerName} (${n.playerMedia})`, team: n.teamName, amount: formatEuros(n.amount) }) + emergencySuffix,
         tone: 'danger',
       }), 100);
     }
@@ -1122,9 +1122,11 @@ function App() {
     if (newLeague.gameMode === 'promanager' && !newLeague.boardFired && !newLeague.seasonFinished) {
       const meter = newLeague.florentinometro ?? 5;
       const threshold = newLeague.boardRewardThreshold ?? 0;
-      if (meter < 7 && threshold > 0) {
-        // Reset so they can earn rewards again when they climb back up
+      // Layered reset: dropping below a band allows that band's reward to trigger again on re-climb
+      if (meter < 6 && threshold > 0) {
         newLeague = { ...newLeague, boardRewardThreshold: 0 };
+      } else if (meter < 7 && threshold > 6) {
+        newLeague = { ...newLeague, boardRewardThreshold: 6 };
       } else if (meter >= 9 && threshold < 9) {
         const BONUS = 2_000_000;
         newLeague = {
@@ -1144,6 +1146,11 @@ function App() {
         const praiseIdx = Math.floor(Math.random() * 4);
         const praiseMsg = { title: t('florentino.praise'), body: t(`florentino.praiseBody.${praiseIdx}`), tone: 'success' as const };
         setTimeout(() => { setBoardAlert(praiseMsg); setLastBoardAlert(praiseMsg); }, 100);
+      } else if (meter >= 6 && threshold < 6) {
+        newLeague = { ...newLeague, boardRewardThreshold: 6 };
+        const okIdx = Math.floor(Math.random() * 5);
+        const okMsg = { title: t('florentino.ok'), body: t(`florentino.okBody.${okIdx}`), tone: 'success' as const };
+        setTimeout(() => { setBoardAlert(okMsg); setLastBoardAlert(okMsg); }, 100);
       }
     }
     newLeague.lastPlayedJornada = playedJornada;
