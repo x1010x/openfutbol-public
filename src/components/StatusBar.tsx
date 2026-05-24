@@ -85,10 +85,10 @@ export const StatusBar = ({ league, windowOpen, windowJornadasLeft, jornadasUnti
             </span>
             <span className={`font-bold ${windowOpen ? 'text-vga-light-green' : 'text-vga-light-red'}`}>
               {windowOpen
-                ? `MKT ${windowJornadasLeft}J`
+                ? `Mercado · Cierra en ${windowJornadasLeft}J`
                 : jornadasUntilOpen && jornadasUntilOpen < 900
-                  ? `MKT +${jornadasUntilOpen}J`
-                  : 'MKT ✗'}
+                  ? `Mercado · Abre en ${jornadasUntilOpen}J`
+                  : 'Mercado · Cerrado'}
             </span>
           </div>
         )}
