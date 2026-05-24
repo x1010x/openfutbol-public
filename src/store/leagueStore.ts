@@ -155,6 +155,8 @@ export interface SeasonHistoryEntry {
   mejorPorEquipo: Record<string, { playerName: string; ratingSum: number }>;
 }
 
+// LeagueState is the save format (persisted to localStorage as 'openfutbol_league').
+// Any field added here that old saves won't have must also get a needsReset check in App.tsx.
 export interface LeagueState {
   teams: Team[];
   stats: Record<string, TeamStats>;
@@ -671,6 +673,7 @@ export const autoListAiPlayers = (state: LeagueState): LeagueState => {
 };
 
 // AI teams buy listed players from rival AI teams when they're a clear upgrade.
+// AI teams buy players from other AI teams. See also: simulateAiFreeAgentSignings, simulateAiTrades.
 export const simulateAiMarketSignings = (state: LeagueState): LeagueState => {
   const aiTeams = state.teams.filter(t => t.id !== state.userTeamId);
   if (aiTeams.length < 2) return state;
@@ -1027,6 +1030,7 @@ export const generateIncomingOffers = (state: LeagueState): LeagueState => {
 
 // AI teams sign free agents, weighted by squad need x youth x media. Teams that
 // already have a full positional quota effectively stop signing in that group.
+// AI teams sign from the free agent pool. See also: simulateAiMarketSignings, simulateAiTrades.
 export const simulateAiFreeAgentSignings = (state: LeagueState): LeagueState => {
   if (state.freeAgents.length === 0) return state;
   const aiTeams = state.teams.filter(t => t.id !== state.userTeamId);
@@ -1094,6 +1098,7 @@ export const simulateAiFreeAgentSignings = (state: LeagueState): LeagueState => 
 // AI-vs-AI player swaps. One try per jornada. Players must share a position group
 // and the trade should plausibly help both squads (surplus <-> need where possible);
 // the team receiving the higher-valued player pays the cash difference.
+// Two AI teams swap bench players with each other. See also: simulateAiMarketSignings, simulateAiFreeAgentSignings.
 export const simulateAiTrades = (state: LeagueState): LeagueState => {
   const aiTeams = state.teams.filter(t => t.id !== state.userTeamId);
   if (aiTeams.length < 2) return state;

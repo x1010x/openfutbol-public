@@ -52,19 +52,24 @@ function App() {
       const parsed = JSON.parse(saved);
       const firstPlayer = parsed.teams?.[0]?.players?.[0];
       const hasOldStats = firstPlayer?.stats?.velocidad !== undefined;
-      const needsReset = parsed.isStarted === undefined ||
-                         !parsed.schedule ||
-                         !parsed.year ||
-                         !parsed.teams[0]?.lineup ||
-                         parsed.teams[0]?.players?.length < 9 ||
-                         parsed.teams[0]?.players?.[0]?.id?.includes('_p') ||
-                         hasOldStats ||
-                         firstPlayer?.birthYear === undefined ||
-                         !parsed.finances ||
-                         !Array.isArray(parsed.incomingOffers) ||
-                         !Array.isArray(parsed.freeAgents) ||
-                         !Array.isArray(parsed.finances[Object.keys(parsed.finances)[0]]?.weeks) ||
-                         typeof parsed.lastPlayedJornada !== 'number';
+      // Each line guards against a specific old save format. If a field is
+      // missing or in its legacy shape, wipe and start fresh rather than
+      // trying to patch a broken state. Add a check here whenever LeagueState
+      // gains a required field that old saves won't have.
+      const needsReset =
+        parsed.isStarted === undefined ||           // pre-isStarted saves
+        !parsed.schedule ||                         // pre-schedule saves
+        !parsed.year ||                             // pre-multi-year saves
+        !parsed.teams[0]?.lineup ||                 // pre-formation/lineup saves
+        parsed.teams[0]?.players?.length < 9 ||     // saves with undersized squads
+        parsed.teams[0]?.players?.[0]?.id?.includes('_p') || // old _p player ID format
+        hasOldStats ||                              // old Spanish stat names (velocidad etc.)
+        firstPlayer?.birthYear === undefined ||     // pre-age/retirement system
+        !parsed.finances ||                         // pre-finances system
+        !Array.isArray(parsed.incomingOffers) ||    // pre-transfer-offers system
+        !Array.isArray(parsed.freeAgents) ||        // pre-free-agent-market
+        !Array.isArray(parsed.finances[Object.keys(parsed.finances)[0]]?.weeks) || // pre-weekly-finance-tracking
+        typeof parsed.lastPlayedJornada !== 'number'; // pre-jornada-tracking
 
       if (needsReset) {
         localStorage.setItem('openfutbol_db_wiped', '1');
