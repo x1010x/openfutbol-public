@@ -533,5 +533,8 @@
   "career.noHistory":       "Aún no se ha completado ninguna temporada.",
   "career.fired":           "DESPEDIDO",
   "career.metObj":          "OBJ CUMPLIDO",
-  "career.missedObj":       "OBJ FALLADO"
+  "career.missedObj":       "OBJ FALLADO",
+
+  "ai.clausulazoTitle":     "CLAUSULAZO",
+  "ai.clausulazoBody":      "{team} ha ejecutado la cláusula de {player} y ha pagado {amount} directamente. El jugador ya se ha ido."
 }

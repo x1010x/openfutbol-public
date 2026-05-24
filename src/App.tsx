@@ -6,7 +6,7 @@ import type { FormationId, MatchEvent, MatchState, Team } from './types/game.d.t
 import { applyMoodToTeam } from './engine/playerMood';
 import { simulateMinute, calculateTeamStrength } from './engine/simEngine';
 import { FORMATIONS } from './engine/formations';
-import { getInitialLeagueState, getFantasyLeagueState, updateLeagueStats, deductWeeklySalaries, generateIncomingOffers, autoListAiPlayers, simulateAiMarketSignings, advanceSeason, simulateAiTrades, simulateAiFreeAgentSignings, appendTransfer, decrementSuspensions, signingBlockKey, squadNeeds, groupFor, repickAiFormations, writebackMatchStamina, decayTeamStaminaAfterMatch, decrementInjuries, applyStaminaRecovery, computeTvBonus, applyTvBonus } from './store/leagueStore';
+import { getInitialLeagueState, getFantasyLeagueState, updateLeagueStats, deductWeeklySalaries, generateIncomingOffers, autoListAiPlayers, simulateAiMarketSignings, advanceSeason, simulateAiTrades, simulateAiFreeAgentSignings, simulateAiClausulazos, appendTransfer, decrementSuspensions, signingBlockKey, squadNeeds, groupFor, repickAiFormations, writebackMatchStamina, decayTeamStaminaAfterMatch, decrementInjuries, applyStaminaRecovery, computeTvBonus, applyTvBonus } from './store/leagueStore';
 import type { TransferRecord, ManagerSeasonRecord } from './store/leagueStore';
 import type { LeagueState } from './store/leagueStore';
 import { computeBoardObjective, computeTransferDelta, firingChance, clampMeter, METER_DELTAS, isObjectiveMet } from './engine/florentinometro';
@@ -306,6 +306,9 @@ function App() {
         seasonTransferSpent: 0,
         seasonTransferEarned: 0,
         managerStartJornada: 1,
+        managerWins: 0,
+        managerDraws: 0,
+        managerLosses: 0,
       };
       for (let i = 0; i < 4; i++) {
         next = autoListAiPlayers(next);
@@ -325,7 +328,6 @@ function App() {
     const userRank = sortedStats.findIndex(s => s.teamId === prev.userTeamId) + 1;
     const totalTeams = sortedStats.length;
     const userTeam = prev.teams.find(t => t.id === prev.userTeamId);
-    const userStats = prev.stats[prev.userTeamId];
     const objective = prev.boardObjective ?? 'avoid_relegation';
     return {
       year: prev.year,
@@ -338,10 +340,10 @@ function App() {
       florentinometroFinal: prev.florentinometro ?? 5,
       florentinometroPeak: prev.florentinometroPeak ?? 5,
       florentinometroMin: prev.florentinometroMin ?? 5,
-      gamesManaged: (userStats?.won ?? 0) + (userStats?.drawn ?? 0) + (userStats?.lost ?? 0),
-      wins: userStats?.won ?? 0,
-      draws: userStats?.drawn ?? 0,
-      losses: userStats?.lost ?? 0,
+      gamesManaged: (prev.managerWins ?? 0) + (prev.managerDraws ?? 0) + (prev.managerLosses ?? 0),
+      wins: prev.managerWins ?? 0,
+      draws: prev.managerDraws ?? 0,
+      losses: prev.managerLosses ?? 0,
       transferBalance: (prev.seasonTransferEarned ?? 0) - (prev.seasonTransferSpent ?? 0),
       fired,
     };
@@ -1029,6 +1031,17 @@ function App() {
     newLeague = simulateAiMarketSignings(newLeague);
     newLeague = simulateAiTrades(newLeague);
     newLeague = simulateAiFreeAgentSignings(newLeague);
+    const afterClausulazo = simulateAiClausulazos(newLeague);
+    const clausulazoNews = afterClausulazo.aiClausulazoNews ?? [];
+    newLeague = { ...afterClausulazo, aiClausulazoNews: [] };
+    if (clausulazoNews.length > 0) {
+      const n = clausulazoNews[0];
+      setTimeout(() => setMessage({
+        title: t('ai.clausulazoTitle'),
+        body: t('ai.clausulazoBody', { player: n.playerName, team: n.teamName, amount: formatEuros(n.amount) }),
+        tone: 'danger',
+      }), 100);
+    }
     newLeague = repickAiFormations(newLeague);
     newLeague = generateIncomingOffers(newLeague);
     const allMatchesPlayed = newLeague.schedule.every(j => j.matches.every(m => m.played));
@@ -1128,18 +1141,23 @@ function App() {
       finalMatch.awayStartingLineup,
     );
     newLeague = applyTvBonus(newLeague, league.userTeamId, tvBonus);
-    // Florentinometro: adjust based on user match result
+    // Florentinometro: adjust based on user match result + track per-manager record
     if (newLeague.gameMode === 'promanager' && !newLeague.boardFired) {
       const userIsHome = finalMatch.homeTeam.id === newLeague.userTeamId;
       const userGoals = userIsHome ? finalMatch.homeScore : finalMatch.awayScore;
       const oppGoals = userIsHome ? finalMatch.awayScore : finalMatch.homeScore;
-      const delta = userGoals > oppGoals ? METER_DELTAS.win : userGoals === oppGoals ? METER_DELTAS.draw : METER_DELTAS.loss;
+      const isWin = userGoals > oppGoals;
+      const isDraw = userGoals === oppGoals;
+      const delta = isWin ? METER_DELTAS.win : isDraw ? METER_DELTAS.draw : METER_DELTAS.loss;
       const newMeter = clampMeter((newLeague.florentinometro ?? 5) + delta);
       newLeague = {
         ...newLeague,
         florentinometro: newMeter,
         florentinometroPeak: Math.max(newLeague.florentinometroPeak ?? 5, newMeter),
         florentinometroMin: Math.min(newLeague.florentinometroMin ?? 5, newMeter),
+        managerWins: (newLeague.managerWins ?? 0) + (isWin ? 1 : 0),
+        managerDraws: (newLeague.managerDraws ?? 0) + (isDraw ? 1 : 0),
+        managerLosses: (newLeague.managerLosses ?? 0) + (!isWin && !isDraw ? 1 : 0),
       };
     }
     newLeague = simulateOtherMatches(newLeague, league.userTeamId);
@@ -1208,6 +1226,9 @@ function App() {
           seasonTransferSpent: 0,
           seasonTransferEarned: 0,
           managerStartJornada: 1,
+          managerWins: 0,
+          managerDraws: 0,
+          managerLosses: 0,
         };
       } else {
         // Mid-season fire — continue current season with new team
@@ -1225,6 +1246,9 @@ function App() {
           florentinometroMin: 5,
           managerCareer: updatedCareer,
           managerStartJornada: prev.currentJornada,
+          managerWins: 0,
+          managerDraws: 0,
+          managerLosses: 0,
         };
       }
     });

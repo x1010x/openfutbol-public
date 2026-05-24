@@ -533,5 +533,8 @@
   "career.noHistory":       "No seasons completed yet.",
   "career.fired":           "SACKED",
   "career.metObj":          "OBJ MET",
-  "career.missedObj":       "OBJ MISSED"
+  "career.missedObj":       "OBJ MISSED",
+
+  "ai.clausulazoTitle":     "BUYOUT TRIGGERED",
+  "ai.clausulazoBody":      "{team} has activated {player}'s release clause and paid {amount} directly. The player has already left."
 }

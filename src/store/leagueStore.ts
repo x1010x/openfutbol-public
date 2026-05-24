@@ -210,6 +210,10 @@ export interface LeagueState {
   managerCareer?: ManagerSeasonRecord[];
   boardRewardThreshold?: number; // 0 = none, 7 = praise given, 9 = marbella given
   managerStartJornada?: number;  // jornada when current manager took over (for grace period)
+  managerWins?: number;          // wins since current manager took over (not full team season)
+  managerDraws?: number;
+  managerLosses?: number;
+  aiClausulazoNews?: { playerName: string; teamName: string; amount: number }[];
 }
 
 export const emptyTeamRecords = (): TeamRecords => ({
@@ -1009,23 +1013,35 @@ export const generateIncomingOffers = (state: LeagueState): LeagueState => {
   const offers: IncomingOffer[] = (state.incomingOffers ?? []).filter(
     o => (o.expiresAt ?? Infinity) > state.currentJornada,
   );
+  // Cap: don't flood with more than 5 simultaneous offers
+  if (offers.length >= 5) return { ...state, incomingOffers: offers };
+
   for (const player of userTeam.players) {
+    if (offers.length >= 5) break;
     const price = computePrice(player, state.year);
     const listed = !!player.forSale;
     const group = groupFor(player.position);
     for (const rival of state.teams) {
+      if (offers.length >= 5) break;
       if (rival.id === userTeam.id) continue;
       if (offers.some(o => o.playerId === player.id && o.fromTeamId === rival.id)) continue;
 
       // Skip rivals already long in this position; allow some tolerance.
       const rivalNeeds = squadNeeds(rival);
       if (rivalNeeds[group] < -1) continue;
-      // Stronger appetite when rival is short of bodies.
-      const needBoost = clamp(rivalNeeds[group] * 0.06, -0.05, 0.18);
 
+      // Quality filter: rival only bids if player genuinely improves their squad
+      const rivalInGroup = rival.players.filter(p => groupFor(p.position) === group);
+      if (rivalInGroup.length > 0) {
+        const weakestMedia = Math.min(...rivalInGroup.map(p => p.media));
+        if (player.media <= weakestMedia + 3) continue; // must be a meaningful upgrade
+      }
+
+      // Stronger appetite when rival is short of bodies.
+      const needBoost = clamp(rivalNeeds[group] * 0.06, -0.05, 0.15);
       const surplus = Math.max(0, rival.budget - price * 1.2);
-      const interestBoost = Math.min(0.3, surplus / (price * 5 || 1));
-      const baseChance = listed ? 0.15 : 0.03;
+      const interestBoost = Math.min(0.2, surplus / (price * 5 || 1));
+      const baseChance = listed ? 0.07 : 0.012; // much lower than before
       const chance = baseChance + (listed ? interestBoost : interestBoost * 0.3) + needBoost;
       if (Math.random() > chance) continue;
 
@@ -1146,6 +1162,91 @@ export const simulateAiFreeAgentSignings = (state: LeagueState): LeagueState => 
   }
 
   return working;
+};
+
+// AI team triggers a clausulazo on a high-value user player (unlisted, pays 2× price immediately).
+// Max 1 clausulazo per jornada. Returns updated state with aiClausulazoNews populated.
+export const simulateAiClausulazos = (state: LeagueState): LeagueState => {
+  if (!state.userTeamId) return state;
+  const userTeam = state.teams.find(t => t.id === state.userTeamId);
+  if (!userTeam) return state;
+
+  // Only consider unlisted high-media players as clausulazo targets
+  const targets = userTeam.players.filter(p => !p.forSale && p.media >= 72);
+  if (targets.length === 0) return state;
+
+  const aiTeams = state.teams.filter(t => t.id !== state.userTeamId);
+  if (aiTeams.length === 0) return state;
+
+  // Shuffle both lists to avoid systematic bias
+  const shuffledTargets = [...targets].sort(() => Math.random() - 0.5);
+  const shuffledAi = [...aiTeams].sort(() => Math.random() - 0.5);
+
+  for (const player of shuffledTargets) {
+    const price = computePrice(player, state.year);
+    const clausulaPrice = price * 2;
+    const group = groupFor(player.position);
+
+    for (const rival of shuffledAi) {
+      // Rival must afford the clausulazo
+      if (rival.budget < clausulaPrice) continue;
+
+      // Rival must genuinely need an upgrade in this position group
+      const rivalInGroup = rival.players.filter(p => groupFor(p.position) === group);
+      const weakestMedia = rivalInGroup.length > 0
+        ? Math.min(...rivalInGroup.map(p => p.media))
+        : 0;
+      if (player.media <= weakestMedia + 5) continue; // must be a substantial upgrade
+
+      // Small chance per eligible rival (about 3%)
+      if (Math.random() > 0.03) continue;
+
+      // Execute the clausulazo
+      const newTeams = state.teams.map(t => {
+        if (t.id === userTeam.id) {
+          return {
+            ...t,
+            players: t.players.filter(p => p.id !== player.id),
+            lineup: t.lineup.filter(id => id !== player.id),
+            budget: t.budget + clausulaPrice,
+          };
+        }
+        if (t.id === rival.id) {
+          return {
+            ...t,
+            players: [...t.players, { ...player, forSale: false }],
+            budget: t.budget - clausulaPrice,
+          };
+        }
+        return t;
+      });
+
+      const record: TransferRecord = {
+        id: `clausulazo_${state.currentJornada}_${player.id}_${rival.id}`,
+        jornada: state.currentJornada,
+        year: state.year,
+        playerName: player.name,
+        playerPosition: player.position,
+        fromTeamName: userTeam.name,
+        toTeamName: rival.name,
+        amount: clausulaPrice,
+      };
+
+      const news = [...(state.aiClausulazoNews ?? []), {
+        playerName: player.name,
+        teamName: rival.name,
+        amount: clausulaPrice,
+      }];
+
+      return {
+        ...state,
+        teams: newTeams,
+        transferLog: appendTransfer(state.transferLog, record),
+        aiClausulazoNews: news,
+      };
+    }
+  }
+  return state;
 };
 
 // AI-vs-AI player swaps. One try per jornada. Players must share a position group
