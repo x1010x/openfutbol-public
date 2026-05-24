@@ -21,6 +21,9 @@ interface Props {
   onClausula: (playerId: string, fromTeamId: string) => OfferResult;
   onPlayerClick?: (playerId: string) => void;
   blockedSignings: string[];
+  windowOpen: boolean;
+  windowJornadasLeft: number;
+  jornadasUntilOpen: number;
   onBack: () => void;
 }
 
@@ -227,6 +230,7 @@ const MarketCard = ({
   onClausulaClick,
   onPlayerClick,
   blocked,
+  windowOpen,
 }: {
   entry: MarketEntry;
   seasonYear: number;
@@ -234,6 +238,7 @@ const MarketCard = ({
   onClausulaClick?: () => void;
   onPlayerClick?: () => void;
   blocked?: boolean;
+  windowOpen?: boolean;
 }) => {
   const t = useT();
   const price = computePrice(entry.player, seasonYear);
@@ -255,7 +260,11 @@ const MarketCard = ({
               {formatEuros(price)}
             </span>
           </div>
-          {blocked ? (
+          {!windowOpen ? (
+            <div className="w-full px-2 py-1 text-[7px] border border-vga-gray text-vga-gray text-center uppercase opacity-60">
+              {t('transfer.windowClosed')}
+            </div>
+          ) : blocked ? (
             <button disabled className="w-full px-2 py-1 text-[8px] border border-vga-black bg-vga-gray text-vga-black opacity-60 cursor-not-allowed">
               {t('misc.blocked')}
             </button>
@@ -353,6 +362,9 @@ export const TransfersView = ({
   onClausula,
   onPlayerClick,
   blockedSignings,
+  windowOpen,
+  windowJornadasLeft,
+  jornadasUntilOpen,
   onBack,
 }: Props) => {
   const t = useT();
@@ -421,6 +433,22 @@ export const TransfersView = ({
         </button>
       </div>
 
+      {windowOpen ? (
+        <div className="border-2 border-vga-light-green bg-vga-black p-2 text-[8px] flex items-center justify-between">
+          <span className="text-vga-light-green font-bold uppercase">{t('transfer.windowOpen')}</span>
+          <span className="text-vga-yellow">{t('transfer.windowOpenLeft', { n: String(windowJornadasLeft) })}</span>
+        </div>
+      ) : (
+        <div className="border-2 border-vga-light-red bg-vga-black p-2 text-[8px] flex items-center justify-between">
+          <span className="text-vga-light-red font-bold uppercase">{t('transfer.windowClosed')}</span>
+          <span className="text-vga-gray">
+            {jornadasUntilOpen < 900
+              ? t('transfer.windowClosedUntil', { n: String(jornadasUntilOpen) })
+              : t('transfer.windowClosedSeason')}
+          </span>
+        </div>
+      )}
+
       <div className="bg-vga-gray border-2 border-vga-blue p-3">
         <div className="text-[7px] text-vga-black uppercase font-bold mb-2">{t('misc.marketStatus', { j: String(currentJornada) })}</div>
         <div className="flex justify-between items-start">
@@ -482,6 +510,7 @@ export const TransfersView = ({
                   onClausulaClick={!entry.isFreeAgent && entry.teamId ? () => setClausulaEntry(entry) : undefined}
                   onPlayerClick={onPlayerClick ? () => onPlayerClick(entry.player.id) : undefined}
                   blocked={false}
+                  windowOpen={windowOpen}
                 />
               ))}
             </div>
@@ -527,6 +556,7 @@ export const TransfersView = ({
                             onClausulaClick={() => setClausulaEntry(entry)}
                             onPlayerClick={onPlayerClick ? () => onPlayerClick(p.id) : undefined}
                             blocked={false}
+                            windowOpen={windowOpen}
                           />
                         );
                       })}

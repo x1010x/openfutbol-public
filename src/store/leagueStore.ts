@@ -1,4 +1,5 @@
 import type { Team, Player, MatchEvent, Position } from '../types/game.d.ts';
+import type { BoardObjective } from '../engine/florentinometro';
 import { getTeamsForYearWithOverflow, getFreeAgents, getEligibleFreeAgents, advancePlayerToYear, extractDbId } from '../data/mockTeams';
 import { generateSchedule } from '../engine/calendar';
 import { pickBestFormation } from '../engine/formations';
@@ -8,6 +9,32 @@ import { computeAttendance, computePrice, teamWeeklySalary } from '../data/econo
 export type PosGroup = 'POR' | 'DEF' | 'MED' | 'DEL';
 
 export const SQUAD_TARGETS: Record<PosGroup, number> = { POR: 3, DEF: 6, MED: 6, DEL: 5 };
+
+// Transfer window: open for first SUMMER jornadas, then WINTER jornadas around mid-season
+export const SUMMER_WINDOW_SIZE = 10;
+export const WINTER_WINDOW_SIZE = 8;
+
+export const isTransferWindowOpen = (jornada: number, totalJornadas: number): boolean => {
+  const midStart = Math.floor(totalJornadas / 2);
+  return (jornada >= 1 && jornada <= SUMMER_WINDOW_SIZE) ||
+         (jornada >= midStart && jornada < midStart + WINTER_WINDOW_SIZE);
+};
+
+// How many jornadas remain in the current open window (0 if closed)
+export const windowJornadasLeft = (jornada: number, totalJornadas: number): number => {
+  const midStart = Math.floor(totalJornadas / 2);
+  if (jornada >= 1 && jornada <= SUMMER_WINDOW_SIZE) return SUMMER_WINDOW_SIZE - jornada + 1;
+  if (jornada >= midStart && jornada < midStart + WINTER_WINDOW_SIZE) return (midStart + WINTER_WINDOW_SIZE) - jornada;
+  return 0;
+};
+
+// Jornadas until the next window opens (0 if currently open)
+export const jornadasUntilWindowOpen = (jornada: number, totalJornadas: number): number => {
+  if (isTransferWindowOpen(jornada, totalJornadas)) return 0;
+  const midStart = Math.floor(totalJornadas / 2);
+  if (jornada < midStart) return midStart - jornada;
+  return 999; // after winter window — next is next season
+};
 
 export const groupFor = (pos: Position): PosGroup => {
   if (pos === 'POR') return 'POR';
@@ -155,6 +182,25 @@ export interface SeasonHistoryEntry {
   mejorPorEquipo: Record<string, { playerName: string; ratingSum: number }>;
 }
 
+export interface ManagerSeasonRecord {
+  year: number;
+  teamName: string;
+  teamId: string;
+  finalPosition: number;
+  totalTeams: number;
+  objective: BoardObjective;
+  objectiveMet: boolean;
+  florentinometroFinal: number;
+  florentinometroPeak: number;
+  florentinometroMin: number;
+  gamesManaged: number;
+  wins: number;
+  draws: number;
+  losses: number;
+  transferBalance: number;
+  fired: boolean;
+}
+
 // LeagueState is the save format (persisted to localStorage as 'openfutbol_league').
 // Any field added here that old saves won't have must also get a needsReset check in App.tsx.
 export interface LeagueState {
@@ -176,6 +222,27 @@ export interface LeagueState {
   leagueHistory: SeasonHistoryEntry[];
   // Keys "sellerTeamId:playerId" or "free:playerId" the user can't bid for this season.
   blockedSignings: string[];
+  // Florentinometro / PROMANAGER fields (optional so old saves load without reset).
+  gameMode?: 'classic' | 'promanager';
+  managerName?: string;
+  florentinometro?: number;
+  boardObjective?: BoardObjective;
+  boardWarnings?: number;
+  boardFired?: boolean;
+  florentinometroPeak?: number;
+  florentinometroMin?: number;
+  seasonTransferSpent?: number;
+  seasonTransferEarned?: number;
+  managerCareer?: ManagerSeasonRecord[];
+  boardRewardThreshold?: number; // 0 = none, 7 = praise given, 9 = marbella given
+  managerStartJornada?: number;  // jornada when current manager took over (for grace period)
+  managerWins?: number;          // wins since current manager took over (not full team season)
+  managerDraws?: number;
+  managerLosses?: number;
+  aiClausulazoNews?: { playerName: string; teamName: string; amount: number; playerMedia: number }[];
+  transferWindowEmergency?: boolean; // allow one extra signing after clausulazo on last window day
+  managerReputation?: number;        // 0-100, persistent career reputation
+  managerInitialSquadValue?: number; // budget + sum(playerPrices) when manager took over this stint
 }
 
 export const emptyTeamRecords = (): TeamRecords => ({
@@ -265,6 +332,17 @@ export const getInitialLeagueState = (
     teamRecords: initialRecords,
     leagueHistory: [],
     blockedSignings: [],
+    gameMode: 'classic',
+    managerName: '',
+    florentinometro: 5,
+    boardObjective: 'avoid_relegation' as BoardObjective,
+    boardWarnings: 0,
+    boardFired: false,
+    florentinometroPeak: 5,
+    florentinometroMin: 5,
+    seasonTransferSpent: 0,
+    seasonTransferEarned: 0,
+    managerCareer: [],
   };
 };
 
@@ -879,6 +957,14 @@ export const advanceSeason = (state: LeagueState): LeagueState => {
     leagueHistory: [...(state.leagueHistory ?? []), historyEntry],
     teamRecords: state.teamRecords ?? {},
     blockedSignings: [],
+    florentinometro: 5,
+    boardObjective: 'avoid_relegation' as BoardObjective,
+    boardWarnings: 0,
+    boardFired: false,
+    florentinometroPeak: 5,
+    florentinometroMin: 5,
+    seasonTransferSpent: 0,
+    seasonTransferEarned: 0,
   };
 };
 
@@ -949,6 +1035,10 @@ export const applyTvBonus = (
 
 export const generateIncomingOffers = (state: LeagueState): LeagueState => {
   if (!state.userTeamId) return state;
+  // Outside transfer windows, clear all pending offers — no new ones generated
+  if (!isTransferWindowOpen(state.currentJornada, state.schedule.length)) {
+    return { ...state, incomingOffers: [] };
+  }
   const userTeam = state.teams.find(t => t.id === state.userTeamId);
   if (!userTeam) return state;
 
@@ -956,23 +1046,38 @@ export const generateIncomingOffers = (state: LeagueState): LeagueState => {
   const offers: IncomingOffer[] = (state.incomingOffers ?? []).filter(
     o => (o.expiresAt ?? Infinity) > state.currentJornada,
   );
+  // Cap: don't flood with more than 5 simultaneous offers
+  if (offers.length >= 5) return { ...state, incomingOffers: offers };
+
   for (const player of userTeam.players) {
+    if (offers.length >= 5) break;
+    if (!player.forSale) continue; // only generate offers for players listed on the market
     const price = computePrice(player, state.year);
-    const listed = !!player.forSale;
+    const listed = true;
     const group = groupFor(player.position);
     for (const rival of state.teams) {
+      if (offers.length >= 5) break;
       if (rival.id === userTeam.id) continue;
       if (offers.some(o => o.playerId === player.id && o.fromTeamId === rival.id)) continue;
 
       // Skip rivals already long in this position; allow some tolerance.
       const rivalNeeds = squadNeeds(rival);
       if (rivalNeeds[group] < -1) continue;
-      // Stronger appetite when rival is short of bodies.
-      const needBoost = clamp(rivalNeeds[group] * 0.06, -0.05, 0.18);
 
+      // Quality filter: rival only bids if player genuinely improves their squad.
+      // Listed players get more lenient filter — rival just needs any improvement.
+      const rivalInGroup = rival.players.filter(p => groupFor(p.position) === group);
+      if (rivalInGroup.length > 0) {
+        const weakestMedia = Math.min(...rivalInGroup.map(p => p.media));
+        const minGain = listed ? 1 : 4; // listed = any gain, unlisted = must be clear upgrade
+        if (player.media <= weakestMedia + minGain) continue;
+      }
+
+      // Stronger appetite when rival is short of bodies.
+      const needBoost = clamp(rivalNeeds[group] * 0.06, -0.05, 0.15);
       const surplus = Math.max(0, rival.budget - price * 1.2);
-      const interestBoost = Math.min(0.3, surplus / (price * 5 || 1));
-      const baseChance = listed ? 0.15 : 0.03;
+      const interestBoost = Math.min(0.2, surplus / (price * 5 || 1));
+      const baseChance = listed ? 0.15 : 0.012; // listed players get much stronger interest
       const chance = baseChance + (listed ? interestBoost : interestBoost * 0.3) + needBoost;
       if (Math.random() > chance) continue;
 
@@ -1093,6 +1198,93 @@ export const simulateAiFreeAgentSignings = (state: LeagueState): LeagueState => 
   }
 
   return working;
+};
+
+// AI team triggers a clausulazo on a high-value user player (unlisted, pays 2× price immediately).
+// Only happens during open transfer windows. Max 1 clausulazo per jornada.
+export const simulateAiClausulazos = (state: LeagueState): LeagueState => {
+  if (!state.userTeamId) return state;
+  if (!isTransferWindowOpen(state.currentJornada, state.schedule.length)) return state;
+  const userTeam = state.teams.find(t => t.id === state.userTeamId);
+  if (!userTeam) return state;
+
+  // Only consider unlisted high-media players as clausulazo targets
+  const targets = userTeam.players.filter(p => !p.forSale && p.media >= 72);
+  if (targets.length === 0) return state;
+
+  const aiTeams = state.teams.filter(t => t.id !== state.userTeamId);
+  if (aiTeams.length === 0) return state;
+
+  // Shuffle both lists to avoid systematic bias
+  const shuffledTargets = [...targets].sort(() => Math.random() - 0.5);
+  const shuffledAi = [...aiTeams].sort(() => Math.random() - 0.5);
+
+  for (const player of shuffledTargets) {
+    const price = computePrice(player, state.year);
+    const clausulaPrice = price * 2;
+    const group = groupFor(player.position);
+
+    for (const rival of shuffledAi) {
+      // Rival must afford the clausulazo
+      if (rival.budget < clausulaPrice) continue;
+
+      // Rival must genuinely need an upgrade in this position group
+      const rivalInGroup = rival.players.filter(p => groupFor(p.position) === group);
+      const weakestMedia = rivalInGroup.length > 0
+        ? Math.min(...rivalInGroup.map(p => p.media))
+        : 0;
+      if (player.media <= weakestMedia + 5) continue; // must be a substantial upgrade
+
+      // ~5% chance per eligible rival → averages ~1 clausulazo per window
+      if (Math.random() > 0.05) continue;
+
+      // Execute the clausulazo
+      const newTeams = state.teams.map(t => {
+        if (t.id === userTeam.id) {
+          return {
+            ...t,
+            players: t.players.filter(p => p.id !== player.id),
+            lineup: t.lineup.filter(id => id !== player.id),
+            budget: t.budget + clausulaPrice,
+          };
+        }
+        if (t.id === rival.id) {
+          return {
+            ...t,
+            players: [...t.players, { ...player, forSale: false }],
+            budget: t.budget - clausulaPrice,
+          };
+        }
+        return t;
+      });
+
+      const record: TransferRecord = {
+        id: `clausulazo_${state.currentJornada}_${player.id}_${rival.id}`,
+        jornada: state.currentJornada,
+        year: state.year,
+        playerName: player.name,
+        playerPosition: player.position,
+        fromTeamName: userTeam.name,
+        toTeamName: rival.name,
+        amount: clausulaPrice,
+      };
+
+      const news = [...(state.aiClausulazoNews ?? []), {
+        playerName: player.name,
+        teamName: rival.name,
+        amount: clausulaPrice,
+        playerMedia: player.media,
+      }];
+
+      return {
+        ...state,
+        teams: newTeams,
+        transferLog: appendTransfer(state.transferLog, record),
+        aiClausulazoNews: news,
+      };
+    }
+  }
+  return state;
 };
 
 // AI-vs-AI player swaps. One try per jornada. Players must share a position group

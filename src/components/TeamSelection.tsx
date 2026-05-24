@@ -113,7 +113,7 @@ export const TeamSelection = ({ teams, selectedYear, yearStats, onSelectYear, on
                 </button>
                 {open && (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-1 pl-2">
-                    {countryTeams.map((team) => {
+                    {[...countryTeams].sort((a, b) => calculateTeamStrength(b) - calculateTeamStrength(a)).map((team) => {
                       const strength = Math.floor(calculateTeamStrength(team));
                       const star = team.players.reduce((best, p) => (p.media > best.media ? p : best), team.players[0]);
                       return (

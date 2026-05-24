@@ -329,7 +329,6 @@ export const AlignmentView = ({ team, onUpdate, onBack, onToggleDiscipline, inga
     border: '4px solid #aaaaaa',
     boxShadow: 'inset 2px 2px 0 #ffffff, inset -2px -2px 0 #000000, 5px 5px 0 #000000',
     background: '#000000',
-    maxWidth: 760,
     width: '100%',
   };
   const headerStyle: CSSProperties = {
@@ -448,7 +447,7 @@ export const AlignmentView = ({ team, onUpdate, onBack, onToggleDiscipline, inga
                 </button>
               )}
             </div>
-            <div style={{ overflowY: 'auto', maxHeight: 320 }}>
+            <div style={{ overflowY: 'auto', maxHeight: 'calc(100vh - 260px)', minHeight: 200 }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', tableLayout: 'fixed' }}>
                 <thead>
                   <tr style={tableHead}>

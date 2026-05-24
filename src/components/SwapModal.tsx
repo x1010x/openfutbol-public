@@ -65,7 +65,7 @@ export const SwapModal = ({ slotPos, currentPlayer, candidates, inLineup, onSele
         <td style={{ width: 26, textAlign: 'center', fontSize: 7, fontWeight: 'bold', color: POS_COLOR[p.position] ?? '#ffffff', borderRight: '1px solid #222244', padding: '2px 2px' }}>
           {p.position}
         </td>
-        <td style={{ fontSize: 7, color: '#ffffff', padding: '2px 4px', borderRight: '1px solid #222244', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis', maxWidth: 100 }}>
+        <td style={{ fontSize: 7, color: '#ffffff', padding: '2px 4px', borderRight: '1px solid #222244', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis', maxWidth: 200 }}>
           <PlayerName player={p} />
           {isCurrent && <span style={{ fontSize: 5, color: '#ffff55', marginLeft: 3 }}>(sale)</span>}
           {isTitular && !isCurrent && <span style={{ fontSize: 5, color: '#55ffff', marginLeft: 3 }}>(campo)</span>}
@@ -119,9 +119,9 @@ export const SwapModal = ({ slotPos, currentPlayer, candidates, inLineup, onSele
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50, padding: 8 }}>
       {/* ═══ MODAL FRAME ═══════════════════════════════════════════ */}
       <div style={{
-        maxWidth: 360,
+        maxWidth: 860,
         width: '100%',
-        maxHeight: '92vh',
+        maxHeight: '96vh',
         display: 'flex',
         flexDirection: 'column',
         border: '4px solid #aaaaaa',
