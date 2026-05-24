@@ -41,7 +41,7 @@ export interface TeamSeasonData {
   stadiumCapacity: number;
   ticketPrice: number;
   budget: number;
-  players: RosterEntry[] | RawPlayer[];
+  players: RosterEntry[] | RawPlayer[]; // RosterEntry in new DB format; RawPlayer in legacy packs — mockTeams.ts handles both
 }
 
 export interface RawTeamDB {
