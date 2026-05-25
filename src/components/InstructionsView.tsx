@@ -276,6 +276,16 @@ const ContentES = ({ onColaborar, changelogRef, engineRef }: {
       <Section title="CAMBIOS RECIENTES">
         <ul className="list-disc pl-5 space-y-1">
           <li>
+            <span className="text-vga-cyan">v1.5.1</span> — Reglas Tebas y carrera en tiempo real.
+            Límite Tebas de clausulazos recibidos por equipo (máx. 2 por temporada). En Pro Manager,
+            Florentino veta tus clausulazos con probabilidad creciente después del segundo — con
+            mensajes cada vez más agresivos sobre el gasto. Los jugadores ya traspasados no pueden
+            volver a ser clausulazados. La pantalla de carrera ahora muestra la temporada en curso
+            en tiempo real (posición, W/D/L y Florentinómetro actualizados cada jornada).
+            Las ofertas de trabajo filtran por reputación y objetivo del club: si no llegas a 70
+            no te llaman equipos que van a ganar la liga.
+          </li>
+          <li>
             <span className="text-vga-cyan">v1.3.0</span> — Modo Pro Manager.
             Nuevo modo de carrera completo: nombre de entrenador, reputación acumulada entre temporadas
             y ofertas de trabajo según tu historial. Florentinómetro (0–10) que mide la satisfacción
@@ -571,6 +581,15 @@ const ContentEN = ({ onColaborar, changelogRef, engineRef }: {
     <div ref={changelogRef} id="changelog">
       <Section title="RECENT CHANGES">
         <ul className="list-disc pl-5 space-y-1">
+          <li>
+            <span className="text-vga-cyan">v1.5.1</span> — Tebas rules and live career screen.
+            Tebas buyout limit: each team can only receive 2 buyout clauses per season. In Pro Manager
+            mode, Florentino vetoes your buyout attempts with increasing probability after the second —
+            his messages get progressively more insulting about your spending habits. Players already
+            transferred can't be bought out again. The career screen now shows the current season live
+            (position, W/D/L and Florentinometer updated every jornada). Job offers are now filtered
+            by reputation and club objective: below 70 rep, title-chasing clubs won't call you.
+          </li>
           <li>
             <span className="text-vga-cyan">v1.3.0</span> — Pro Manager mode.
             Full career mode: manager name, reputation that carries across seasons, and job offers

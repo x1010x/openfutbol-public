@@ -244,6 +244,9 @@ export interface LeagueState {
   transferWindowEmergency?: boolean; // allow one extra signing after clausulazo on last window day
   managerReputation?: number;        // 0-100, persistent career reputation
   managerInitialSquadValue?: number; // budget + sum(playerPrices) when manager took over this stint
+  // Tebas rules: max 2 clausulazos made by user per season, max 2 received per team per season
+  seasonClausulazosMade?: number;
+  seasonClausulazosReceived?: Record<string, number>;
 }
 
 export const emptyTeamRecords = (): TeamRecords => ({
@@ -347,6 +350,8 @@ export const getInitialLeagueState = (
     seasonTransferSpent: 0,
     seasonTransferEarned: 0,
     managerCareer: [],
+    seasonClausulazosMade: 0,
+    seasonClausulazosReceived: {},
   };
 };
 
@@ -1048,6 +1053,8 @@ export const advanceSeason = (state: LeagueState): LeagueState => {
     florentinometroMin: 5,
     seasonTransferSpent: 0,
     seasonTransferEarned: 0,
+    seasonClausulazosMade: 0,
+    seasonClausulazosReceived: {},
   };
 };
 
@@ -1291,6 +1298,10 @@ export const simulateAiClausulazos = (state: LeagueState): LeagueState => {
   const userTeam = state.teams.find(t => t.id === state.userTeamId);
   if (!userTeam) return state;
 
+  // Tebas rule: user team can only receive 2 clausulazos per season
+  const userReceived = (state.seasonClausulazosReceived ?? {})[state.userTeamId] ?? 0;
+  if (userReceived >= 2) return state;
+
   // Only consider unlisted high-media players as clausulazo targets
   const targets = userTeam.players.filter(p => !p.forSale && p.media >= 72);
   if (targets.length === 0) return state;
@@ -1361,12 +1372,17 @@ export const simulateAiClausulazos = (state: LeagueState): LeagueState => {
         playerMedia: player.media,
       }];
 
+      const prevReceived = state.seasonClausulazosReceived ?? {};
       return {
         ...state,
         teams: newTeams,
         transferLog: appendTransfer(state.transferLog, record),
         aiClausulazoNews: news,
         blockedSignings: [...(state.blockedSignings ?? []), transferredKey(player.id)],
+        seasonClausulazosReceived: {
+          ...prevReceived,
+          [state.userTeamId]: (prevReceived[state.userTeamId] ?? 0) + 1,
+        },
       };
     }
   }

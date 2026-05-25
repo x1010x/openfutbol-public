@@ -10,10 +10,24 @@ interface CareerExport {
   managerReputation: number;
 }
 
+export interface LiveSeasonSnap {
+  year: number;
+  teamName: string;
+  teamId: string;
+  finalPosition: number;
+  totalTeams: number;
+  objective: BoardObjective;
+  wins: number;
+  draws: number;
+  losses: number;
+  florentinometro: number;
+}
+
 interface Props {
   managerName: string;
   career: ManagerSeasonRecord[];
   managerReputation?: number;
+  liveSnap?: LiveSeasonSnap;
   onRename?: (name: string) => void;
   onBack: () => void;
 }
@@ -25,7 +39,7 @@ const OBJECTIVE_KEYS: Record<BoardObjective, string> = {
   avoid_relegation: 'florentino.obj.avoid_relegation',
 };
 
-export const ManagerCareerView = ({ managerName, career, managerReputation, onRename, onBack }: Props) => {
+export const ManagerCareerView = ({ managerName, career, managerReputation, liveSnap, onRename, onBack }: Props) => {
   const t = useT();
   const [editingName, setEditingName] = useState(false);
   const [nameInput, setNameInput] = useState(managerName);
@@ -163,10 +177,43 @@ export const ManagerCareerView = ({ managerName, career, managerReputation, onRe
         </div>
 
         {/* Season history */}
-        {career.length === 0 ? (
+        {career.length === 0 && !liveSnap ? (
           <p className="text-vga-gray text-[8px] text-center py-4">{t('career.noHistory')}</p>
         ) : (
           <div className="flex flex-col gap-2 max-h-[320px] overflow-y-auto pr-1">
+            {liveSnap && (() => {
+              const gamesLive = liveSnap.wins + liveSnap.draws + liveSnap.losses;
+              const wPctLive = gamesLive > 0 ? ((liveSnap.wins / gamesLive) * 100).toFixed(0) : '0';
+              const meterColorLive =
+                liveSnap.florentinometro >= 7 ? 'text-vga-light-green' :
+                liveSnap.florentinometro >= 5 ? 'text-vga-yellow' :
+                'text-vga-light-red';
+              return (
+                <div className="bg-vga-blue border-2 border-vga-cyan p-2 text-[8px]">
+                  <div className="flex justify-between items-start mb-1">
+                    <div>
+                      <span className="text-vga-cyan font-bold text-[6px] uppercase mr-2">{t('career.inProgress')}</span>
+                      <span className="text-vga-yellow font-bold">{liveSnap.year}/{(liveSnap.year + 1).toString().slice(-2)}</span>
+                      <span className="text-vga-bright-white ml-2">{liveSnap.teamName}</span>
+                    </div>
+                  </div>
+                  <div className="flex gap-4 flex-wrap">
+                    <span className="text-vga-gray">
+                      {ordinal(liveSnap.finalPosition)}/{liveSnap.totalTeams}
+                    </span>
+                    <span className="text-vga-cyan">
+                      {t(OBJECTIVE_KEYS[liveSnap.objective])}
+                    </span>
+                    <span className="text-vga-bright-white">
+                      {liveSnap.wins}W {liveSnap.draws}D {liveSnap.losses}L ({wPctLive}%)
+                    </span>
+                    <span className={meterColorLive}>
+                      ★ {liveSnap.florentinometro.toFixed(1)}
+                    </span>
+                  </div>
+                </div>
+              );
+            })()}
             {[...career].reverse().map((record, i) => {
               const yr = record.year;
               const wPct = record.gamesManaged > 0

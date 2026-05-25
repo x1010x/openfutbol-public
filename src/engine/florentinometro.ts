@@ -119,8 +119,17 @@ export const computeCareerRating = (
   return total / (managerCareer.length + 1);
 };
 
+// Minimum reputation required to be offered a job by a team with each objective.
+const MIN_REP_FOR_OBJECTIVE: Record<BoardObjective, number> = {
+  win_league:       70,
+  top_4:            45,
+  top_half:         20,
+  avoid_relegation: 0,
+};
+
 // Returns which teams are willing to offer a job based on manager reputation (0-100).
 // Always includes the weakest team. Higher reputation = more prestigious clubs available.
+// Teams whose objective exceeds the manager's reputation gate are filtered out.
 export const teamsOfferingJobs = (
   allTeams: Team[],
   excludeTeamId: string,
@@ -140,10 +149,18 @@ export const teamsOfferingJobs = (
   else cutoffPct = 1.0;
 
   const cutoff = Math.max(1, Math.ceil(N * cutoffPct));
-  const eligible = sorted.slice(0, cutoff);
+  const byStrength = sorted.slice(0, cutoff);
 
+  // Also filter by objective: don't offer jobs from teams whose ambition exceeds reputation
+  const eligible = byStrength.filter(team => {
+    const obj = computeBoardObjective(team, allTeams);
+    return reputation >= MIN_REP_FOR_OBJECTIVE[obj];
+  });
+
+  // Always guarantee at least the weakest available team
   if (eligible.length === 0 || eligible[0].id !== sorted[0].id) {
-    eligible.unshift(sorted[0]);
+    const weakest = sorted[0];
+    if (!eligible.some(t => t.id === weakest.id)) eligible.unshift(weakest);
   }
 
   return eligible.sort((a, b) => avgMedia(b) - avgMedia(a));
