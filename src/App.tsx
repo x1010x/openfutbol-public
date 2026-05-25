@@ -53,7 +53,7 @@ import type { OfferResult } from './data/economy';
 
 type View = 'LEAGUE' | 'SQUAD' | 'ALIGNMENT' | 'RESULTS' | 'STATS' | 'FINANCES' | 'TRANSFERS' | 'JORNADA_RESULTS' | 'END_OF_SEASON' | 'PLAYER_DETAIL' | 'BACKUP' | 'EDITOR' | 'EQUIPO' | 'MANAGER_CAREER';
 
-function App() {
+function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
   useT(); // subscribe to language changes so nav labels and messages re-render
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
   const [league, setLeague] = useState<LeagueState>(() => {
@@ -235,8 +235,13 @@ function App() {
   };
   const eventLogRef = useRef<HTMLDivElement>(null);
 
+  const didNotifyReady = useRef(false);
   useEffect(() => {
     localStorage.setItem('openfutbol_league', JSON.stringify(league));
+    if (league.isStarted && !didNotifyReady.current) {
+      didNotifyReady.current = true;
+      onLeagueReady?.();
+    }
   }, [league]);
 
   const [leagueSetupDone, setLeagueSetupDone] = useState(false);
@@ -578,6 +583,28 @@ function App() {
     if (!windowOpen) {
       return { accepted: false, message: t('transfer.windowClosedAction') };
     }
+    if (league.blockedSignings.includes(transferredKey(playerId))) {
+      return { accepted: false, message: t('msg.alreadyTransferred.body', { player: '' }).trim() };
+    }
+    // In Pro Manager mode: board veto increases exponentially after 2 clausulazos
+    if (league.gameMode === 'promanager') {
+      const made = league.seasonClausulazosMade ?? 0;
+      const vetoProb = made <= 1 ? 0 : made === 2 ? 0.5 : made === 3 ? 0.82 : 0.96;
+      if (vetoProb > 0 && Math.random() < vetoProb) {
+        const msgs = [
+          t('misc.tebas.floren0'),
+          t('misc.tebas.floren1'),
+          t('misc.tebas.floren2'),
+          t('misc.tebas.floren3'),
+        ];
+        const msg = msgs[Math.min(made - 2, msgs.length - 1)];
+        return { accepted: false, message: msg };
+      }
+    }
+    const prevReceived = league.seasonClausulazosReceived ?? {};
+    if ((prevReceived[fromTeamId] ?? 0) >= 2) {
+      return { accepted: false, message: t('misc.tebas.limitReceived') };
+    }
     const seller = league.teams.find(t => t.id === fromTeamId);
     const player = seller?.players.find(p => p.id === playerId);
     const buyer = league.teams.find(t => t.id === league.userTeamId);
@@ -599,6 +626,7 @@ function App() {
         ? computeTransferDelta(player, clausulaCost, marketValue, true, prev.year)
         : 0;
       const newMeter = florentinoDelta !== 0 ? applyMeterDelta(prev.florentinometro ?? 5, florentinoDelta) : (prev.florentinometro ?? 5);
+      const prevRec = prev.seasonClausulazosReceived ?? {};
       return {
         ...prev,
         teams: prev.teams.map(t => {
@@ -611,6 +639,9 @@ function App() {
         florentinometroPeak: Math.max(prev.florentinometroPeak ?? 5, newMeter),
         florentinometroMin: Math.min(prev.florentinometroMin ?? 5, newMeter),
         seasonTransferSpent: (prev.seasonTransferSpent ?? 0) + clausulaCost,
+        blockedSignings: [...prev.blockedSignings, transferredKey(playerId)],
+        seasonClausulazosMade: (prev.seasonClausulazosMade ?? 0) + 1,
+        seasonClausulazosReceived: { ...prevRec, [fromTeamId]: (prevRec[fromTeamId] ?? 0) + 1 },
       };
     });
     return { accepted: true, message: `Cláusula ejecutada. ${formatEuros(clausulaCost)} pagados a TEBAS.` };
@@ -1615,11 +1646,29 @@ function App() {
     }
 
     if (view === 'MANAGER_CAREER') {
+      const sortedForLive = Object.values(league.stats).sort((a, b) =>
+        b.points !== a.points ? b.points - a.points : (b.goalsFor - b.goalsAgainst) - (a.goalsFor - a.goalsAgainst)
+      );
+      const livePos = sortedForLive.findIndex(s => s.teamId === league.userTeamId) + 1;
+      const liveTeam = league.teams.find(t => t.id === league.userTeamId);
+      const liveSnap = league.isStarted && league.gameMode === 'promanager' && liveTeam ? {
+        year: league.year,
+        teamName: liveTeam.name,
+        teamId: liveTeam.id,
+        finalPosition: livePos || 1,
+        totalTeams: sortedForLive.length,
+        objective: league.boardObjective ?? 'avoid_relegation' as const,
+        wins: league.managerWins ?? 0,
+        draws: league.managerDraws ?? 0,
+        losses: league.managerLosses ?? 0,
+        florentinometro: league.florentinometro ?? 5,
+      } : undefined;
       return (
         <ManagerCareerView
           managerName={league.managerName ?? ''}
           career={league.managerCareer ?? []}
           managerReputation={league.managerReputation}
+          liveSnap={liveSnap}
           onRename={handleRenameManager}
           onBack={() => setView(league.isStarted ? 'LEAGUE' : 'LEAGUE')}
         />
