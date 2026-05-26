@@ -78,7 +78,7 @@ export function Match2D({ timeline, homeTeamName = 'Real Madrid', awayTeamName =
   }, [timeline]);
 
   return (
-    <div className="fixed inset-0 bg-black flex flex-col items-center z-50 overflow-hidden p-2 gap-2">
+    <div className="fixed inset-0 bg-black flex flex-col items-center z-50 overflow-auto p-2 gap-2">
       {/* Marcador */}
       <div className="bg-vga-blue border-2 border-vga-white px-6 py-1 flex items-center gap-6 shrink-0">
         <span className="text-vga-light-red text-[10px] w-28 text-right">{homeTeamName}</span>
@@ -89,11 +89,11 @@ export function Match2D({ timeline, homeTeamName = 'Real Madrid', awayTeamName =
 
       {/* Campo + controles compactos al lateral. El campo se escala al alto del
           viewport para que nunca se recorten los porteros en monitores bajos. */}
-      <div className="flex items-stretch justify-center gap-2 min-h-0">
+      <div className="flex items-start justify-center gap-2 shrink-0">
         <canvas
           ref={canvasRef}
           className="block"
-          style={{ height: '62vh', width: 'auto', maxWidth: '90vw', imageRendering: 'pixelated' }}
+          style={{ imageRendering: 'pixelated' }}
         />
 
         {/* Controles de velocidad — columna estrecha a la derecha */}
