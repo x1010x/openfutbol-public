@@ -1,10 +1,6 @@
-import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
-import App from './App.tsx'
+import { Root } from './Root.tsx'
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
-)
+// StrictMode removed: double-mount breaks WebGL context lifecycle (Pixi app.init vs destroy race).
+createRoot(document.getElementById('root')!).render(<Root />)

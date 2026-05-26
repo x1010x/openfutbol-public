@@ -12,6 +12,10 @@ import type { LeagueState } from './store/leagueStore';
 import { computeBoardObjective, computeTransferDelta, firingChance, applyMeterDelta, isObjectiveMet, computeMatchMeterDelta, computeMatchReputationDelta, computeSeasonReputationDelta, computeSeasonMeterDelta } from './engine/florentinometro';
 import { engineSettings, loadEngineSettings } from './engine/engineSettings';
 loadEngineSettings();
+import { Match2D } from './match2d/Match2D';
+import { generateTimeline } from './engine/zoneEngine';
+import { teamToEnginePlayers, timelineToMatchResult } from './engine/managerBridge';
+import type { MatchTimeline } from './types/match';
 import { LeagueTable } from './components/LeagueTable';
 import { StatusBar } from './components/StatusBar';
 import { SquadView } from './components/SquadView';
@@ -125,6 +129,9 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
   );
   const [match, setMatch] = useState<MatchState | null>(null);
   const [matchDuration, setMatchDuration] = useState<number>(30); // 30s por defecto
+  // Visionado 2D (motor de zonas): timeline2d != null => renderer Pixi montado.
+  const [timeline2d, setTimeline2d] = useState<MatchTimeline | null>(null);
+  const [watchDuration2d, setWatchDuration2d] = useState<number>(6); // minutos reales para los 90'
   const [showPreview, setShowPreview] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [showPlayFlow, setShowPlayFlow] = useState(false);
@@ -1004,6 +1011,34 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
     setIsPlaying(true);
   };
 
+  // Visionado 2D: run the user match through the zone engine and mount the Pixi
+  // renderer. Same eligibility checks as startNextMatch; mood-adjusted stats feed
+  // the engine so it matches the text sim. Result is committed on close.
+  const startWatch2D = () => {
+    if (!userMatch) return;
+    const homeTeam = league.teams.find(t => t.id === userMatch.homeId)!;
+    const awayTeam = league.teams.find(t => t.id === userMatch.awayId)!;
+    const userTeam = homeTeam.id === league.userTeamId ? homeTeam : awayTeam;
+    if (!userTeam.players.some(p => userTeam.lineup.includes(p.id) && p.position === 'POR')) {
+      alert(t('msg.noGK'));
+      return;
+    }
+    const injuredInLineup = userTeam.players.filter(p => userTeam.lineup.includes(p.id) && (p.injuryWeeksRemaining ?? 0) > 0);
+    if (injuredInLineup.length > 0) {
+      alert(t('msg.injuredInLineup', { players: injuredInLineup.map(p => p.name).join(', ') }));
+      return;
+    }
+    const tl = generateTimeline({
+      homeTeamId: homeTeam.id,
+      awayTeamId: awayTeam.id,
+      homePlayers: teamToEnginePlayers(applyMoodToTeam(homeTeam)),
+      awayPlayers: teamToEnginePlayers(applyMoodToTeam(awayTeam)),
+      seed: Math.floor(Math.random() * 0xffffffff),
+    });
+    setShowPreview(false);
+    setTimeline2d(tl);
+  };
+
   const samplePoisson = (lambda: number): number => {
     const L = Math.exp(-lambda);
     let k = 0;
@@ -1271,6 +1306,56 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
 
   const handleMatchEnd = () => {
     if (match) finalizeMatch(match);
+  };
+
+  // Closing the 2D viewer commits the (deterministic, already-computed) result.
+  // We synthesise a finished MatchState from the timeline and route it through
+  // the same finalizeMatch funnel so standings, player stats, TV bonus and
+  // florentinometro/reputation all update identically to the text modes.
+  // Note: the zone engine doesn't model stamina decay or in-match injuries yet,
+  // so those are carried over unchanged (starting stamina, no new injuries).
+  const handleClose2D = () => {
+    const tl = timeline2d;
+    setTimeline2d(null);
+    if (!tl) return;
+    const homeTeam = league.teams.find(tm => tm.id === tl.homeTeamId);
+    const awayTeam = league.teams.find(tm => tm.id === tl.awayTeamId);
+    if (!homeTeam || !awayTeam) return;
+    const r = timelineToMatchResult(tl, tl.homeTeamId, tl.awayTeamId);
+    const finalMatch: MatchState = {
+      homeTeam,
+      awayTeam,
+      homeScore: r.homeScore,
+      awayScore: r.awayScore,
+      minute: 90,
+      isFinished: true,
+      events: r.events,
+      matchSpeed: 0,
+      homeSentOff: [],
+      awaySentOff: [],
+      homeYellows: [],
+      awayYellows: [],
+      homePossession: 0,
+      awayPossession: 0,
+      homeShots: 0,
+      awayShots: 0,
+      homeShotsOnTarget: 0,
+      awayShotsOnTarget: 0,
+      homeFouls: 0,
+      awayFouls: 0,
+      homeBoost: 1,
+      homeStamina: Object.fromEntries(homeTeam.players.map(p => [p.id, p.stamina ?? 99])),
+      awayStamina: Object.fromEntries(awayTeam.players.map(p => [p.id, p.stamina ?? 99])),
+      homeSubsUsed: 0,
+      awaySubsUsed: 0,
+      homeInjuredInMatch: [],
+      awayInjuredInMatch: [],
+      homeStartingLineup: [...homeTeam.lineup],
+      awayStartingLineup: [...awayTeam.lineup],
+      stoppageTime1: 0,
+      stoppageTime2: 0,
+    };
+    finalizeMatch(finalMatch);
   };
 
   const handleByeRound = () => {
@@ -2188,6 +2273,26 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
                       ))}
                     </div>
                   </div>
+                  <div className="mb-3 pt-2 border-t border-vga-gray">
+                    <label className="text-[8px] block mb-1 font-bold text-vga-cyan">VISIONADO 2D — DURACIÓN REAL (MIN)</label>
+                    <div className="grid grid-cols-3 gap-1 mb-2">
+                      {[2, 6, 10].map((min) => (
+                        <button
+                          key={min}
+                          onClick={() => setWatchDuration2d(min)}
+                          className={`text-[7px] py-1 border font-bold ${watchDuration2d === min ? 'bg-vga-blue text-vga-bright-white border-vga-bright-white' : 'bg-vga-black text-vga-bright-white border-vga-gray hover:border-vga-light-cyan'}`}
+                        >
+                          {min}
+                        </button>
+                      ))}
+                    </div>
+                    <button
+                      onClick={startWatch2D}
+                      className="w-full bg-vga-cyan hover:bg-vga-light-cyan text-vga-black py-2 px-4 border-b-4 border-r-4 border-vga-black active:border-0 text-xs font-bold"
+                    >
+                      VISIONAR 2D
+                    </button>
+                  </div>
                   <div className="flex gap-2">
                     <button
                       onClick={() => setShowPreview(false)}
@@ -2228,6 +2333,15 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
   return (
     <PlayerTooltipProvider year={league?.year ?? selectedYear ?? new Date().getFullYear()}>
     <div className="min-h-screen bg-vga-black cool:bg-rc-bg overflow-x-hidden">
+      {timeline2d && (
+        <Match2D
+          timeline={timeline2d}
+          homeTeamName={league.teams.find(tm => tm.id === timeline2d.homeTeamId)?.name}
+          awayTeamName={league.teams.find(tm => tm.id === timeline2d.awayTeamId)?.name}
+          initialSpeed={90 / watchDuration2d}
+          onClose={handleClose2D}
+        />
+      )}
       {showDisclaimer && <DisclaimerView onDismiss={dismissDisclaimer} />}
 
       {updateAvailable && (

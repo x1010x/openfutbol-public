@@ -1,0 +1,65 @@
+export type Vec2 = { x: number; y: number };
+export type PlayerId = string;
+export type TeamSide = 'home' | 'away';
+export type Lane = 'T' | 'C' | 'B';
+export type Zone = 0 | 1 | 2 | 3 | 4 | 5;
+export interface Cell { zone: Zone; lane: Lane; }
+
+export type EventKind =
+  | 'kickoff'
+  | 'pass_short'
+  | 'pass_forward'
+  | 'pass_lateral'
+  | 'pass_back'
+  | 'interception'
+  | 'tackle_won'
+  | 'shot_on'
+  | 'shot_off'
+  | 'save'
+  | 'goal'
+  | 'foul'
+  | 'penalty'
+  | 'card'
+  | 'corner'
+  | 'throw_in'
+  | 'goal_kick'
+  | 'gk_distribute'
+  | 'reception'
+  | 'half_time'
+  | 'full_time';
+
+export interface TimelineEvent {
+  t: number;
+  kind: EventKind;
+  cell: Cell;
+  at: Vec2;
+  actor?: PlayerId;
+  target?: PlayerId;
+  side: TeamSide;
+  log?: string;
+  detail?: string;   // 'yellow' | 'red' | 'long_range' | 'wall' | ...
+}
+
+export interface Keyframe {
+  t: number;
+  positions: Record<PlayerId, Vec2>;
+  ball: Vec2;
+  ballOwner: PlayerId | null;
+  ballHeight?: number;
+  ballState?: 'free' | 'carried' | 'flying' | 'gk_holding' | 'throw_in_holding';
+  // Defensive wall member IDs during foul_* phases. Renderer uses this to
+  // force a "barrier" stance facing the ball.
+  wallIds?: PlayerId[];
+}
+
+export interface MatchTimeline {
+  seed: number;
+  homeTeamId: string;
+  awayTeamId: string;
+  homeLineup: PlayerId[];
+  awayLineup: PlayerId[];
+  durationMs: number;
+  events: TimelineEvent[];
+  keyframes: Keyframe[];
+  finalScore: { home: number; away: number };
+}

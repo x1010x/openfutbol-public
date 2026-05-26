@@ -1,0 +1,151 @@
+{
+  "frames": {
+    "frame_0": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 136,
+        "h": 32
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 136,
+        "h": 32
+      },
+      "sourceSize": {
+        "w": 136,
+        "h": 32
+      }
+    },
+    "frame_1": {
+      "frame": {
+        "x": 136,
+        "y": 0,
+        "w": 136,
+        "h": 32
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 136,
+        "h": 32
+      },
+      "sourceSize": {
+        "w": 136,
+        "h": 32
+      }
+    },
+    "frame_2": {
+      "frame": {
+        "x": 272,
+        "y": 0,
+        "w": 136,
+        "h": 32
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 136,
+        "h": 32
+      },
+      "sourceSize": {
+        "w": 136,
+        "h": 32
+      }
+    },
+    "frame_3": {
+      "frame": {
+        "x": 408,
+        "y": 0,
+        "w": 136,
+        "h": 32
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 136,
+        "h": 32
+      },
+      "sourceSize": {
+        "w": 136,
+        "h": 32
+      }
+    },
+    "frame_4": {
+      "frame": {
+        "x": 544,
+        "y": 0,
+        "w": 136,
+        "h": 32
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 136,
+        "h": 32
+      },
+      "sourceSize": {
+        "w": 136,
+        "h": 32
+      }
+    },
+    "frame_5": {
+      "frame": {
+        "x": 680,
+        "y": 0,
+        "w": 136,
+        "h": 32
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 136,
+        "h": 32
+      },
+      "sourceSize": {
+        "w": 136,
+        "h": 32
+      }
+    }
+  },
+  "animations": {
+    "event_time": [
+      0
+    ],
+    "event_out": [
+      1
+    ],
+    "event_goal": [
+      2
+    ],
+    "event_foul": [
+      3
+    ],
+    "event_penalty": [
+      4
+    ],
+    "event_corner_kick": [
+      5
+    ]
+  },
+  "meta": {
+    "app": "OpenFutbol AnimTool",
+    "format": "RGBA8888",
+    "scale": "1",
+    "baseWidth": 136,
+    "baseHeight": 32
+  }
+}
