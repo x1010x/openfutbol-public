@@ -1,7 +1,8 @@
 import type { FormationId, Player, PlayerStats, Position, Team } from '../types/game.d.ts';
+import { engineSettings } from './engineSettings';
 
 export const OOP_PENALTY = 0.825;
-export const GK_OOP_PENALTY = 0.45; // outfield player forced into goal
+export const GK_OOP_PENALTY = 0.45; // outfield player forced into goal — static fallback, runtime uses engineSettings
 
 export const FORMATIONS: Record<FormationId, Position[]> = {
   '4-4-2': ['POR', 'DEF', 'DEF', 'DEF', 'DEF', 'MED', 'MED', 'MED', 'MED', 'DEL', 'DEL'],
@@ -23,7 +24,7 @@ export const isOOP = (player: Player, slotPos: Position): boolean => {
 
 export const slotPenalty = (player: Player, slotPos: Position): number => {
   if (!isOOP(player, slotPos)) return 1;
-  return slotPos === 'POR' ? GK_OOP_PENALTY : OOP_PENALTY;
+  return slotPos === 'POR' ? engineSettings.gkOopPenalty : engineSettings.oopPenalty;
 };
 
 // Position-weighted stat importance. Specialists are rated fairly in their role.

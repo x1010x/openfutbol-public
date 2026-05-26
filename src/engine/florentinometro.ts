@@ -77,13 +77,18 @@ export const METER_DELTAS = {
 
 // Returns the per-jornada probability of a board warning/firing event.
 export const firingChance = (meter: number): number => {
+  const mult = engineSettings.firingRiskMult;
   if (meter >= 5) return 0;
-  if (meter >= 4) return 0.20;
-  if (meter >= 3) return 0.35;
-  if (meter >= 2) return 0.55;
-  if (meter >= 1) return 0.75;
-  return 0.90;
+  if (meter >= 4) return Math.min(1, 0.20 * mult);
+  if (meter >= 3) return Math.min(1, 0.35 * mult);
+  if (meter >= 2) return Math.min(1, 0.55 * mult);
+  if (meter >= 1) return Math.min(1, 0.75 * mult);
+  return Math.min(1, 0.90 * mult);
 };
+
+// Season-end board meter delta based on whether the board objective was met.
+export const computeSeasonMeterDelta = (objectiveMet: boolean): number =>
+  objectiveMet ? engineSettings.seasonObjectiveBonus : engineSettings.seasonObjectivePenalty;
 
 // Compute quality delta for a transfer made by the user.
 export const computeTransferDelta = (
@@ -99,12 +104,12 @@ export const computeTransferDelta = (
   const priceRatio = marketValue > 0 ? amount / marketValue : 1;
 
   if (isBuying) {
-    if (isYoung && priceRatio <= 1.1) return METER_DELTAS.goodTransfer;
-    if (isOld && priceRatio > 1.0) return METER_DELTAS.badTransfer;
+    if (isYoung && priceRatio <= 1.1) return engineSettings.transferGoodDelta;
+    if (isOld && priceRatio > 1.0) return engineSettings.transferBadDelta;
     return 0;
   } else {
-    if (isOld && priceRatio >= 0.8) return METER_DELTAS.goodTransfer;
-    if (isYoung && player.media >= 75 && priceRatio < 0.8) return METER_DELTAS.badTransfer;
+    if (isOld && priceRatio >= 0.8) return engineSettings.transferGoodDelta;
+    if (isYoung && player.media >= 75 && priceRatio < 0.8) return engineSettings.transferBadDelta;
     return 0;
   }
 };

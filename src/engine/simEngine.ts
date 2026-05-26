@@ -144,7 +144,7 @@ export const simulateMinute = (state: MatchState, userTeamId?: string): MatchSta
 
   const homeBoost = state.homeBoost;
 
-  const POSSESSION_EXP = 2.5;
+  const POSSESSION_EXP = engineSettings.possessionDiffExp;
   const homePow = Math.pow(homeStrength * homeBoost, POSSESSION_EXP);
   const awayPow = Math.pow(awayStrength || 1, POSSESSION_EXP);
   const homeProb = homePow / (homePow + awayPow);
@@ -152,7 +152,7 @@ export const simulateMinute = (state: MatchState, userTeamId?: string): MatchSta
   const homePossession = state.homePossession + (homeHasBall ? 1 : 0);
   const awayPossession = state.awayPossession + (homeHasBall ? 0 : 1);
 
-  if (Math.random() < 0.25) {
+  if (Math.random() < engineSettings.matchEventRate) {
     const isHomeEvent = homeHasBall;
     const attackingTeam = isHomeEvent ? homeTeam : awayTeam;
     const defendingTeam = isHomeEvent ? awayTeam : homeTeam;
@@ -212,7 +212,7 @@ export const simulateMinute = (state: MatchState, userTeamId?: string): MatchSta
         const scorer = (ownGk && Math.random() < 0.0008) ? ownGk : shooter;
 
         let assistant: Player | undefined;
-        if (Math.random() < 0.7) {
+        if (Math.random() < engineSettings.assistRate) {
           const possibleAssistants = attackLineup.filter(p => p.id !== scorer.id && slotOf(p.id, isHomeEvent) !== 'POR');
           if (possibleAssistants.length > 0) {
             assistant = possibleAssistants[Math.floor(Math.random() * possibleAssistants.length)];
