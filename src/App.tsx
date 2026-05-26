@@ -9,7 +9,7 @@ import { FORMATIONS } from './engine/formations';
 import { getInitialLeagueState, getFantasyLeagueState, updateLeagueStats, deductWeeklySalaries, generateIncomingOffers, autoListAiPlayers, simulateAiMarketSignings, advanceSeason, simulateAiTrades, simulateAiFreeAgentSignings, simulateAiClausulazos, appendTransfer, decrementSuspensions, signingBlockKey, transferredKey, squadNeeds, groupFor, repickAiFormations, writebackMatchStamina, decayTeamStaminaAfterMatch, decrementInjuries, applyStaminaRecovery, computeTvBonus, applyTvBonus, isTransferWindowOpen, windowJornadasLeft, jornadasUntilWindowOpen } from './store/leagueStore';
 import type { TransferRecord, ManagerSeasonRecord } from './store/leagueStore';
 import type { LeagueState } from './store/leagueStore';
-import { computeBoardObjective, computeTransferDelta, firingChance, applyMeterDelta, isObjectiveMet, computeMatchMeterDelta, computeMatchReputationDelta, computeSeasonReputationDelta } from './engine/florentinometro';
+import { computeBoardObjective, computeTransferDelta, firingChance, applyMeterDelta, isObjectiveMet, computeMatchMeterDelta, computeMatchReputationDelta, computeSeasonReputationDelta, computeSeasonMeterDelta } from './engine/florentinometro';
 import { engineSettings, loadEngineSettings } from './engine/engineSettings';
 loadEngineSettings();
 import { LeagueTable } from './components/LeagueTable';
@@ -1294,14 +1294,26 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
     return Math.max(0, Math.min(100, (prev.managerReputation ?? 50) + delta));
   };
 
+  const applySeasonMeterDelta = (prev: LeagueState): number => {
+    if (prev.boardFired) return prev.florentinometro ?? 5;
+    const sortedStats = Object.values(prev.stats).sort((a, b) => b.points - a.points || (b.goalsFor - b.goalsAgainst) - (a.goalsFor - a.goalsAgainst));
+    const userRank = sortedStats.findIndex(s => s.teamId === prev.userTeamId) + 1;
+    const totalTeams = sortedStats.length;
+    const objective = prev.boardObjective ?? 'avoid_relegation';
+    const objectiveMet = isObjectiveMet(objective, userRank, totalTeams);
+    return applyMeterDelta(prev.florentinometro ?? 5, computeSeasonMeterDelta(objectiveMet));
+  };
+
   const handleAdvanceSameTeam = () => {
     setLeague(prev => {
       if (prev.gameMode === 'promanager') {
         const fired = prev.boardFired ?? false;
-        const newRep = applySeasonReputationDelta(prev, fired);
-        const prevWithRep = { ...prev, managerReputation: newRep };
-        const record = buildSeasonCareerRecord(prevWithRep, fired);
-        const next = advanceSeason({ ...prevWithRep, managerCareer: [...(prev.managerCareer ?? []), record] });
+        const newMeter = applySeasonMeterDelta(prev);
+        const prevWithMeter = { ...prev, florentinometro: newMeter };
+        const newRep = applySeasonReputationDelta(prevWithMeter, fired);
+        const prevWithAll = { ...prevWithMeter, managerReputation: newRep };
+        const record = buildSeasonCareerRecord(prevWithAll, fired);
+        const next = advanceSeason({ ...prevWithAll, managerCareer: [...(prev.managerCareer ?? []), record] });
         const userTeam = next.teams.find(t => t.id === prev.userTeamId);
         const objective = userTeam ? computeBoardObjective(userTeam, next.teams) : 'avoid_relegation' as const;
         const initialSquadValue = userTeam
@@ -1318,10 +1330,12 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
     setLeague(prev => {
       if (prev.gameMode === 'promanager') {
         const fired = prev.boardFired ?? false;
-        const newRep = applySeasonReputationDelta(prev, fired);
-        const prevWithRep = { ...prev, managerReputation: newRep };
-        const record = buildSeasonCareerRecord(prevWithRep, fired);
-        const advanced = advanceSeason({ ...prevWithRep, managerCareer: [...(prev.managerCareer ?? []), record] });
+        const newMeter = applySeasonMeterDelta(prev);
+        const prevWithMeter = { ...prev, florentinometro: newMeter };
+        const newRep = applySeasonReputationDelta(prevWithMeter, fired);
+        const prevWithAll = { ...prevWithMeter, managerReputation: newRep };
+        const record = buildSeasonCareerRecord(prevWithAll, fired);
+        const advanced = advanceSeason({ ...prevWithAll, managerCareer: [...(prev.managerCareer ?? []), record] });
         setSelectedYear(advanced.year);
         return { ...advanced, userTeamId: '', isStarted: false, managerReputation: newRep };
       }

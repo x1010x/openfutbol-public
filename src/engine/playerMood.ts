@@ -1,4 +1,5 @@
 import type { Player, PlayerStats, Team } from '../types/game.d.ts';
+import { engineSettings } from './engineSettings';
 
 export type MoodState = 0 | 1 | 2 | 3 | 4;
 
@@ -15,9 +16,9 @@ export const computeMoodScore = (player: Player, isInLineup: boolean): number =>
   let score = 50;
 
   if (isInLineup) {
-    score += 20;
+    score += engineSettings.moodLineupBonus;
   } else if (apps > 0) {
-    score -= 15;
+    score -= engineSettings.moodBenchPenalty;
   }
 
   if (apps > 0) {

@@ -8,12 +8,25 @@ export interface EngineSettings {
   meterWeeklyPositive: number;
   meterWeeklyNegative: number;
   boardKeepThreshold: number;
+  firingRiskMult: number;
+  seasonObjectiveBonus: number;
+  seasonObjectivePenalty: number;
+  transferGoodDelta: number;
+  transferBadDelta: number;
   // Match Simulation
   goalChanceMult: number;
   injuryMult: number;
   staminaDecayMult: number;
   staminaRecoveryMult: number;
   cardStrictness: number;
+  possessionDiffExp: number;
+  matchEventRate: number;
+  assistRate: number;
+  // Player & Tactics
+  oopPenalty: number;
+  gkOopPenalty: number;
+  moodLineupBonus: number;
+  moodBenchPenalty: number;
   // Transfer Market
   aiClausulazoProb: number;
   aiTradeProb: number;
@@ -27,11 +40,23 @@ export const DEFAULT_ENGINE_SETTINGS: Readonly<EngineSettings> = {
   meterWeeklyPositive: 0.10,
   meterWeeklyNegative: -0.15,
   boardKeepThreshold: 6.0,
+  firingRiskMult: 1.0,
+  seasonObjectiveBonus: 1.5,
+  seasonObjectivePenalty: -1.5,
+  transferGoodDelta: 0.2,
+  transferBadDelta: -0.3,
   goalChanceMult: 1.0,
   injuryMult: 1.0,
   staminaDecayMult: 1.0,
   staminaRecoveryMult: 1.0,
   cardStrictness: 1.0,
+  possessionDiffExp: 2.5,
+  matchEventRate: 0.25,
+  assistRate: 0.7,
+  oopPenalty: 0.825,
+  gkOopPenalty: 0.45,
+  moodLineupBonus: 20,
+  moodBenchPenalty: 15,
   aiClausulazoProb: 0.05,
   aiTradeProb: 0.45,
   aiSigningProb: 0.28,
