@@ -1302,6 +1302,10 @@ export const simulateAiClausulazos = (state: LeagueState): LeagueState => {
   const userReceived = (state.seasonClausulazosReceived ?? {})[state.userTeamId] ?? 0;
   if (userReceived >= 2) return state;
 
+  // Single per-jornada probability roll — prevents the effective chance from
+  // multiplying across player×rival combinations (avoids near-certain firing each jornada).
+  if (Math.random() > engineSettings.aiClausulazoProb) return state;
+
   // Only consider unlisted high-media players as clausulazo targets
   const targets = userTeam.players.filter(p => !p.forSale && p.media >= 72);
   if (targets.length === 0) return state;
@@ -1331,8 +1335,6 @@ export const simulateAiClausulazos = (state: LeagueState): LeagueState => {
         ? Math.min(...rivalInGroup.map(p => p.media))
         : 0;
       if (player.media <= weakestMedia + 5) continue; // must be a substantial upgrade
-
-      if (Math.random() > engineSettings.aiClausulazoProb) continue;
 
       // Execute the clausulazo
       const newTeams = state.teams.map(t => {
