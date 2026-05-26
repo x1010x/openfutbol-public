@@ -14,7 +14,7 @@ import {
   dirFromDelta, MOVE_THRESHOLD,
   type Dir8,
 } from './states';
-import { lerp, toCanvasX, toCanvasY, ballHeightLevel, applyAnim } from './layout';
+import { lerp, toCanvasX, toCanvasY, ballHeightLevel, applyAnim, toDisplayMs } from './layout';
 import type { Scene } from './renderer';
 
 export interface AnimatorCtx {
@@ -90,8 +90,9 @@ export function updateScene(scene: Scene, ticker: Ticker, ctx: AnimatorCtx): voi
 
       if (logsRef.current && actionStr && actionStr !== 'shot_on') {
         const el = document.createElement('div');
-        const m = Math.floor(ev.t / 60000);
-        const s = Math.floor((ev.t % 60000) / 1000);
+        const dispT = toDisplayMs(ev.t, timeline.durationMs, timeline.nominalMatchMs);
+        const m = Math.floor(dispT / 60000);
+        const s = Math.floor((dispT % 60000) / 1000);
         el.className = 'text-[8px] text-vga-bright-white mb-1 font-mono uppercase leading-tight';
         const prefix = teamStr ? `${teamStr}: ` : '';
         el.innerText = `[${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}] ${prefix}${actionStr}`;
@@ -382,9 +383,11 @@ export function updateScene(scene: Scene, ticker: Ticker, ctx: AnimatorCtx): voi
     scoreRef.current.textContent = `${rt.homeScore} - ${rt.awayScore}`;
   }
 
-  // Minute display
+  // Minute display — remap the compressed timeline time to a 0–90' match minute.
   if (minuteRef.current) {
-    const min = Math.min(90, Math.floor(gt / 60000));
+    const dispT = toDisplayMs(gt, timeline.durationMs, timeline.nominalMatchMs);
+    const cap = timeline.nominalMatchMs ? timeline.nominalMatchMs / 60000 : Infinity;
+    const min = Math.min(cap, Math.floor(dispT / 60000));
     minuteRef.current.textContent = `${min}'`;
   }
 }

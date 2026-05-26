@@ -208,13 +208,22 @@ export function generateTimeline(cfg: {
   homePlayers: EnginePlayer[];
   awayPlayers: EnginePlayer[];
   seed?: number;
+  // Engine timeline length. The viewer passes a compressed value derived from
+  // the chosen watch duration (see the 2D speed/time model); omitted callers
+  // get a full 90' worth of simulated time.
+  durationMs?: number;
 }): MatchTimeline {
   const state = createInitialState(cfg);
   const seed  = cfg.seed ?? 0xdeadbeef;
+  const durationMs = cfg.durationMs ?? DURATION_MS;
 
   resetKickoff(state, 'away', true, { resetCarry: (p) => resetCarry(state, p) });
   stateEmit(state, 0, 'kickoff', 'home', state.kickerId!, undefined, '¡Saque inicial!');
   stateSnap(state, 0);
 
-  return simulateFromState(state, DURATION_MS, seed);
+  const tl = simulateFromState(state, durationMs, seed);
+  // A full match is always shown as 0–90' regardless of how compressed the
+  // timeline is; the log/stats remap each event's `t` accordingly.
+  tl.nominalMatchMs = DURATION_MS;
+  return tl;
 }

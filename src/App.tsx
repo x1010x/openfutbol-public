@@ -13,6 +13,7 @@ import { computeBoardObjective, computeTransferDelta, firingChance, applyMeterDe
 import { engineSettings, loadEngineSettings } from './engine/engineSettings';
 loadEngineSettings();
 import { Match2D } from './match2d/Match2D';
+import { BASE_SPEED_FACTOR, engineDurationMs } from './match2d/layout';
 import { generateTimeline } from './engine/zoneEngine';
 import { teamToEnginePlayers, timelineToMatchResult } from './engine/managerBridge';
 import type { MatchTimeline } from './types/match';
@@ -1034,6 +1035,9 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
       homePlayers: teamToEnginePlayers(applyMoodToTeam(homeTeam)),
       awayPlayers: teamToEnginePlayers(applyMoodToTeam(awayTeam)),
       seed: Math.floor(Math.random() * 0xffffffff),
+      // Compressed timeline so the match plays in `watchDuration2d` real minutes
+      // at 1x (fixed 0.75 pace); raising speed finishes it sooner.
+      durationMs: engineDurationMs(watchDuration2d),
     });
     setShowPreview(false);
     setTimeline2d(tl);
@@ -2338,7 +2342,7 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
           timeline={timeline2d}
           homeTeamName={league.teams.find(tm => tm.id === timeline2d.homeTeamId)?.name}
           awayTeamName={league.teams.find(tm => tm.id === timeline2d.awayTeamId)?.name}
-          initialSpeed={90 / watchDuration2d}
+          initialSpeed={BASE_SPEED_FACTOR}
           onClose={handleClose2D}
         />
       )}

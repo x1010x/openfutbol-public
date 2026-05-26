@@ -59,6 +59,12 @@ export interface MatchTimeline {
   homeLineup: PlayerId[];
   awayLineup: PlayerId[];
   durationMs: number;
+  // Nominal match length (ms) the timeline REPRESENTS for display purposes,
+  // i.e. 90' = 5 400 000. The viewer compresses a real match into a much
+  // shorter `durationMs` (see 2D speed/time model); the log + stats remap each
+  // event's `t` to a 0–90' minute via `nominalMatchMs / durationMs`. Left unset
+  // by sandbox clips, which then show raw time instead of a fake 0–90' minute.
+  nominalMatchMs?: number;
   events: TimelineEvent[];
   keyframes: Keyframe[];
   finalScore: { home: number; away: number };

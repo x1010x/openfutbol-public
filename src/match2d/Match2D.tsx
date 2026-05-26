@@ -78,63 +78,73 @@ export function Match2D({ timeline, homeTeamName = 'Real Madrid', awayTeamName =
   }, [timeline]);
 
   return (
-    <div className="fixed inset-0 bg-black flex flex-col items-center justify-center z-50">
-      <div className="bg-vga-blue border-2 border-vga-white px-6 py-1 mb-2 flex items-center gap-6">
+    <div className="fixed inset-0 bg-black flex flex-col items-center z-50 overflow-hidden p-2 gap-2">
+      {/* Marcador */}
+      <div className="bg-vga-blue border-2 border-vga-white px-6 py-1 flex items-center gap-6 shrink-0">
         <span className="text-vga-light-red text-[10px] w-28 text-right">{homeTeamName}</span>
         <span ref={scoreRef} className="text-vga-yellow text-[14px] font-bold w-12 text-center">0 - 0</span>
         <span className="text-vga-light-cyan text-[10px] w-28 text-left">{awayTeamName}</span>
         <span ref={minuteRef} className="text-vga-gray text-[8px] ml-4">0'</span>
       </div>
-      <canvas ref={canvasRef} className="block" style={{ imageRendering: 'pixelated' }} />
 
-      {/* Controles en el lateral izquierdo */}
-      <div className="fixed left-4 top-1/2 -translate-y-1/2 flex flex-col gap-4 z-[60] bg-vga-black/80 p-3 border border-vga-gray">
-        <button
-          onClick={() => {
-            if (isPaused) {
-              speedRef.current = playSpeedRef.current;
-              setIsPaused(false);
-            } else {
-              speedRef.current = 0;
-              setIsPaused(true);
-            }
-          }}
-          className={`text-[10px] px-4 py-2 border ${isPaused ? 'bg-vga-green text-vga-bright-white border-vga-white' : 'bg-vga-yellow text-vga-black border-vga-white'}`}
-        >
-          {isPaused ? 'REANUDAR' : 'PAUSA'}
-        </button>
+      {/* Campo + controles compactos al lateral. El campo se escala al alto del
+          viewport para que nunca se recorten los porteros en monitores bajos. */}
+      <div className="flex items-stretch justify-center gap-2 min-h-0">
+        <canvas
+          ref={canvasRef}
+          className="block"
+          style={{ height: '62vh', width: 'auto', maxWidth: '90vw', imageRendering: 'pixelated' }}
+        />
 
-        <div className="flex flex-col gap-1">
-          <span className="text-vga-gray text-[8px] mb-1 text-center">VEL:</span>
-          {SPEED_OPTIONS.map(s => (
-            <button
-              key={s}
-              onClick={() => {
-                setDisplaySpeed(s);
-                playSpeedRef.current = SPEED_FACTORS[s];
-                if (!isPaused) speedRef.current = SPEED_FACTORS[s];
-              }}
-              className={`text-[8px] px-3 py-1 border ${displaySpeed === s ? 'bg-vga-yellow text-vga-black border-vga-white' : 'bg-vga-blue text-vga-white border-vga-gray hover:border-vga-white'}`}
-            >
-              {s}x
-            </button>
-          ))}
+        {/* Controles de velocidad — columna estrecha a la derecha */}
+        <div className="flex flex-col gap-2 z-[60] bg-vga-black/80 p-1.5 border border-vga-gray self-center">
+          <button
+            onClick={() => {
+              if (isPaused) {
+                speedRef.current = playSpeedRef.current;
+                setIsPaused(false);
+              } else {
+                speedRef.current = 0;
+                setIsPaused(true);
+              }
+            }}
+            className={`text-[7px] px-2 py-1.5 border ${isPaused ? 'bg-vga-green text-vga-bright-white border-vga-white' : 'bg-vga-yellow text-vga-black border-vga-white'}`}
+          >
+            {isPaused ? '►' : 'II'}
+          </button>
+
+          <div className="flex flex-col gap-0.5">
+            <span className="text-vga-gray text-[6px] text-center">VEL</span>
+            {SPEED_OPTIONS.map(s => (
+              <button
+                key={s}
+                onClick={() => {
+                  setDisplaySpeed(s);
+                  playSpeedRef.current = SPEED_FACTORS[s];
+                  if (!isPaused) speedRef.current = SPEED_FACTORS[s];
+                }}
+                className={`text-[7px] w-7 py-0.5 border ${displaySpeed === s ? 'bg-vga-yellow text-vga-black border-vga-white' : 'bg-vga-blue text-vga-white border-vga-gray hover:border-vga-white'}`}
+              >
+                {s}x
+              </button>
+            ))}
+          </div>
+
+          <button
+            onClick={onClose}
+            className="text-[7px] px-2 py-1.5 bg-vga-red text-vga-bright-white border border-vga-bright-white hover:bg-vga-light-red"
+          >
+            ✕
+          </button>
         </div>
-
-        <button
-          onClick={onClose}
-          className="bg-vga-red text-vga-bright-white text-[10px] px-4 py-2 border border-vga-bright-white hover:bg-vga-light-red"
-        >
-          CERRAR
-        </button>
       </div>
 
-      {/* Log de Eventos en el lateral derecho */}
-      <div className="fixed right-4 top-1/2 -translate-y-1/2 w-48 h-64 flex flex-col z-[60] bg-vga-black/80 border border-vga-gray overflow-hidden">
-        <div className="bg-vga-blue border-b border-vga-gray p-1 text-center">
+      {/* Log de eventos — debajo del campo, a lo ancho */}
+      <div className="w-full max-w-[78vw] flex flex-col z-[60] bg-vga-black/80 border border-vga-gray overflow-hidden shrink-0" style={{ height: '16vh' }}>
+        <div className="bg-vga-blue border-b border-vga-gray px-2 py-0.5">
           <span className="text-vga-white text-[8px] uppercase">Eventos</span>
         </div>
-        <div ref={logsRef} className="flex-1 p-2 overflow-y-auto scrollbar-hide flex flex-col justify-start">
+        <div ref={logsRef} className="flex-1 px-2 py-1 overflow-y-auto scrollbar-hide flex flex-col justify-start">
         </div>
       </div>
     </div>

@@ -48,8 +48,15 @@ export function timelineToMatchResult(
   awayTeamId: string,
 ): MatchResult {
   const events: MatchEvent[] = [];
+  // The viewer compresses a full match into a short timeline; remap each event's
+  // timestamp back to a 0–90' minute so standings/player stats record the real
+  // match minute, not the compressed one. (See the 2D speed/time model.)
+  const scale = timeline.nominalMatchMs && timeline.durationMs > 0
+    ? timeline.nominalMatchMs / timeline.durationMs
+    : 1;
+  const minuteCap = timeline.nominalMatchMs ? timeline.nominalMatchMs / 60000 : 90;
   for (const ev of timeline.events) {
-    const minute = Math.max(1, Math.floor(ev.t / 60000));
+    const minute = Math.max(1, Math.min(minuteCap, Math.floor((ev.t * scale) / 60000)));
     const teamId = ev.side === 'home' ? homeTeamId : awayTeamId;
     if (ev.kind === 'goal' && ev.actor) {
       events.push({ minute, type: 'goal', playerId: ev.actor, teamId });

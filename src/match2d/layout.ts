@@ -5,14 +5,36 @@
 import type { AnimatedSprite } from 'pixi.js';
 import type { SpriteAtlas } from './sprites';
 
-export const SPEED_OPTIONS = [1, 2, 4, 8, 16] as const;
+// Playback speed model (see the "2D speed/time model" project memory).
+// 1x is a FIXED comfortable movement pace (0.75 game-ms per real-ms), NOT a
+// function of the chosen duration. The duration only sets how long the engine
+// timeline is, so at 1x the match plays in exactly the chosen real minutes;
+// higher presets multiply the pace and finish the same timeline sooner.
+export const SPEED_OPTIONS = [1, 2, 4, 8] as const;
+export const BASE_SPEED_FACTOR = 0.75; // the 1x factor
 export const SPEED_FACTORS: Record<number, number> = {
-  1: 0.5,
-  2: 1.0,
-  4: 2.0,
-  8: 4.0,
-  16: 8.0
+  1: BASE_SPEED_FACTOR,        // 0.75
+  2: BASE_SPEED_FACTOR * 2,    // 1.5
+  4: BASE_SPEED_FACTOR * 4,    // 3.0
+  8: BASE_SPEED_FACTOR * 8,    // 6.0
 };
+
+// Nominal full-match length the 0–90' minute display maps onto.
+export const NOMINAL_MATCH_MS = 90 * 60 * 1000;
+
+// Engine timeline length for a viewer that should last `watchMinutes` real
+// minutes at 1x: durationMs / BASE_SPEED_FACTOR === watchMinutes (in ms).
+export function engineDurationMs(watchMinutes: number): number {
+  return Math.round(watchMinutes * 60_000 * BASE_SPEED_FACTOR);
+}
+
+// Remap a timeline timestamp to the equivalent real-match milliseconds for the
+// minute display. Returns raw `t` when the timeline carries no nominal length
+// (sandbox clips), so those keep showing real elapsed time.
+export function toDisplayMs(t: number, durationMs: number, nominalMatchMs?: number): number {
+  if (!nominalMatchMs || durationMs <= 0) return t;
+  return t * (nominalMatchMs / durationMs);
+}
 
 export const FIELD_SCALE = 2;
 export const PLAYER_SCALE = 2;
