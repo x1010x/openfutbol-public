@@ -1,3 +1,4 @@
+import { useRef, useState } from 'react';
 import type { FormationId, Position, Team } from '../types/game.d.ts';
 import { FORMATIONS, isOOP, liveMed } from '../engine/formations';
 import { moodStateOf } from '../engine/playerMood';
@@ -8,7 +9,23 @@ interface Props {
   onSlotClick: (slotIdx: number) => void;
   onCircleClick?: (slotIdx: number) => void;
   onNameClick?: (playerId: string) => void;
+  // Drag-to-adjust (user team, pre-match only). When `draggable`, outfield
+  // tokens can be dragged to shift their off-ball anchor; the resulting offset
+  // (engine space: dx = forward toward opponent, dy = lateral) is reported via
+  // `onDragOffset` and persisted to team.lineupOffsets by the caller.
+  draggable?: boolean;
+  offsets?: Record<number, { dx: number; dy: number }>;
+  onDragOffset?: (slotIdx: number, off: { dx: number; dy: number }) => void;
 }
+
+// Inner pitch spans: x 3..97 (94 units wide ↔ engine lateral 0..1),
+// y 3..107 (104 units tall ↔ engine forward 0..1, attack = up = -y).
+const PITCH_W = 94;
+const PITCH_H = 104;
+// Clamp drag so a player can be nudged a line or two, not teleported.
+const OFF_DX_MIN = -0.18, OFF_DX_MAX = 0.30; // back / forward
+const OFF_DY_ABS = 0.16;                      // lateral
+const clamp = (v: number, lo: number, hi: number) => (v < lo ? lo : v > hi ? hi : v);
 
 const POS_FILL: Record<Position, string> = {
   POR: '#FFFF55',
@@ -65,13 +82,55 @@ const shortName = (name: string): string =>
 const MOOD_COLORS = ['#FF5555', '#AA5500', '#FFFF55', '#55FFFF', '#55FF55'];
 const MOOD_SYMBOLS = ['▼▼', '▼', '—', '▲', '▲▲'];
 
-export const PitchDiagram = ({ team, selectedSlot, onSlotClick, onCircleClick, onNameClick }: Props) => {
+export const PitchDiagram = ({ team, selectedSlot, onSlotClick, onCircleClick, onNameClick, draggable, offsets, onDragOffset }: Props) => {
   const slots = FORMATIONS[team.formation];
   const layout = FORMATION_LAYOUTS[team.formation];
 
+  const svgRef = useRef<SVGSVGElement>(null);
+  const [drag, setDrag] = useState<{ slot: number; dx: number; dy: number; moved: boolean } | null>(null);
+  const startRef = useRef<{ cx: number; cy: number; baseDx: number; baseDy: number } | null>(null);
+
+  // Screen-pixel delta → engine-space offset delta. Up on screen (−viewBox y)
+  // is "forward" (+dx toward the opponent goal); right is +dy lateral.
+  const toEngineDelta = (dCx: number, dCy: number) => {
+    const rect = svgRef.current?.getBoundingClientRect();
+    if (!rect || rect.width === 0 || rect.height === 0) return { ddx: 0, ddy: 0 };
+    const vbX = dCx * (100 / rect.width);
+    const vbY = dCy * (115 / rect.height);
+    return { ddx: -vbY / PITCH_H, ddy: vbX / PITCH_W };
+  };
+
+  const onTokenDown = (slotIdx: number, e: React.PointerEvent) => {
+    if (!draggable || slotIdx === 0 || !team.lineup[slotIdx]) return; // GK / empty not draggable
+    e.stopPropagation();
+    const cur = offsets?.[slotIdx] ?? { dx: 0, dy: 0 };
+    startRef.current = { cx: e.clientX, cy: e.clientY, baseDx: cur.dx, baseDy: cur.dy };
+    setDrag({ slot: slotIdx, dx: cur.dx, dy: cur.dy, moved: false });
+    (e.target as Element).setPointerCapture?.(e.pointerId);
+  };
+  const onMove = (e: React.PointerEvent) => {
+    const s = startRef.current;
+    if (!drag || !s) return;
+    const { ddx, ddy } = toEngineDelta(e.clientX - s.cx, e.clientY - s.cy);
+    const dx = clamp(s.baseDx + ddx, OFF_DX_MIN, OFF_DX_MAX);
+    const dy = clamp(s.baseDy + ddy, -OFF_DY_ABS, OFF_DY_ABS);
+    const moved = drag.moved || Math.abs(e.clientX - s.cx) > 2 || Math.abs(e.clientY - s.cy) > 2;
+    setDrag({ slot: drag.slot, dx, dy, moved });
+  };
+  const onUp = () => {
+    if (!drag) return;
+    if (drag.moved) onDragOffset?.(drag.slot, { dx: +drag.dx.toFixed(4), dy: +drag.dy.toFixed(4) });
+    else onSlotClick(drag.slot);
+    setDrag(null);
+    startRef.current = null;
+  };
+
   return (
     <div className="bg-vga-black border-4 border-vga-white p-2">
-      <svg viewBox="0 0 100 115" className="w-full max-w-md mx-auto block" shapeRendering="crispEdges">
+      <svg ref={svgRef} viewBox="0 0 100 115" className="w-full max-w-md mx-auto block" shapeRendering="crispEdges"
+        onPointerMove={draggable ? onMove : undefined}
+        onPointerUp={draggable ? onUp : undefined}
+        style={{ touchAction: draggable ? 'none' : undefined }}>
         {/* Pitch */}
         <rect x="0" y="0" width="100" height="115" fill="#006400" />
         <rect x="3" y="3" width="94" height="104" fill="none" stroke="#FFFFFF" strokeWidth="0.4" />
@@ -88,7 +147,15 @@ export const PitchDiagram = ({ team, selectedSlot, onSlotClick, onCircleClick, o
 
         {/* Slot tokens */}
         {slots.map((slotPos, idx) => {
-          const [x, y] = layout[idx];
+          const [baseX, baseY] = layout[idx];
+          // Apply the persisted offset (or the live drag offset for the token
+          // being dragged), converting engine space back to viewBox units.
+          const off = drag && drag.slot === idx
+            ? { dx: drag.dx, dy: drag.dy }
+            : (offsets?.[idx] ?? { dx: 0, dy: 0 });
+          const hasOff = off.dx !== 0 || off.dy !== 0;
+          const x = clamp(baseX + off.dy * PITCH_W, 3, 97);
+          const y = clamp(baseY - off.dx * PITCH_H, 3, 107);
           const playerId = team.lineup[idx];
           const player = playerId ? team.players.find(p => p.id === playerId) : null;
           const oop = player ? isOOP(player, slotPos) : false;
@@ -107,9 +174,20 @@ export const PitchDiagram = ({ team, selectedSlot, onSlotClick, onCircleClick, o
             ? (e: React.MouseEvent) => { e.stopPropagation(); onNameClick(player.id); }
             : undefined;
 
+          const canDrag = draggable && idx !== 0 && !!player;
           return (
-            <g key={idx} onClick={onCircleClick ? undefined : () => onSlotClick(idx)}
-              style={{ cursor: 'pointer', opacity: unavailable ? 0.45 : 1 }}>
+            <g key={idx}
+              onClick={(draggable || onCircleClick) ? undefined : () => onSlotClick(idx)}
+              onPointerDown={canDrag ? (e) => onTokenDown(idx, e) : undefined}
+              style={{ cursor: canDrag ? 'grab' : 'pointer', opacity: unavailable ? 0.45 : 1 }}>
+              {/* Drag indicator: faint marker at the formation base + line to the
+                  shifted position, so the adjustment relative to the slot reads. */}
+              {hasOff && canDrag && (
+                <>
+                  <circle cx={baseX} cy={baseY} r={1.1} fill="#ffff55" opacity={0.5} />
+                  <line x1={baseX} y1={baseY} x2={x} y2={y} stroke="#ffff55" strokeWidth={0.4} strokeDasharray="1,0.8" opacity={0.6} />
+                </>
+              )}
               {isSelected && (
                 <circle cx={x} cy={y} r={6.5} fill="none" stroke="#FFFF55" strokeWidth="0.7" />
               )}

@@ -1,5 +1,6 @@
 import type { EnginePlayer } from '../engine/zoneEngine';
 import type { MatchState } from '../engine/types';
+import { HOME_SLOTS, AWAY_SLOTS, HOME_ROLES, AWAY_ROLES, HOME_TAGS, AWAY_TAGS } from '../engine/zones';
 import { createInitialState, setCarrier, emit as stateEmit, snap as stateSnap } from '../engine/state';
 import { executeFoul } from '../engine/effectors';
 import type { PlayerId, Vec2 } from '../types/match';
@@ -10,23 +11,32 @@ type ForcedSeverity = 'normal' | 'cynical' | 'reckless' | 'dogso';
 // zones.ts: 0 = GK, 1–5 = back line, 6–8 = midfield, 9–10 = strikers.
 function statsForSlot(slotIndex: number) {
   if (slotIndex === 0) {
-    return { speed: 65, dribbling: 50, passing: 65, shooting: 30, defending: 82, physical: 78 };
+    return { speed: 65, dribbling: 50, passing: 65, shooting: 30, defending: 82, physical: 78, goalkeeping: 80 };
   }
   if (slotIndex <= 5) {
-    return { speed: 72, dribbling: 60, passing: 70, shooting: 50, defending: 78, physical: 78 };
+    return { speed: 72, dribbling: 60, passing: 70, shooting: 50, defending: 78, physical: 78, goalkeeping: 12 };
   }
   if (slotIndex <= 8) {
-    return { speed: 74, dribbling: 73, passing: 78, shooting: 65, defending: 68, physical: 72 };
+    return { speed: 74, dribbling: 73, passing: 78, shooting: 65, defending: 68, physical: 72, goalkeeping: 8 };
   }
-  return { speed: 80, dribbling: 78, passing: 70, shooting: 82, defending: 45, physical: 70 };
+  return { speed: 80, dribbling: 78, passing: 70, shooting: 82, defending: 45, physical: 70, goalkeeping: 5 };
 }
 
 function buildEleven(side: 'home' | 'away'): EnginePlayer[] {
+  // Sandbox keeps the original fixed layouts (home 5-3-2, away 4-4-2) so its
+  // scenarios stay byte-for-byte unchanged: read slot/role/tag straight from
+  // the zones.ts tables rather than deriving them from a formation.
+  const slots = side === 'home' ? HOME_SLOTS : AWAY_SLOTS;
+  const roles = side === 'home' ? HOME_ROLES : AWAY_ROLES;
+  const tags  = side === 'home' ? HOME_TAGS : AWAY_TAGS;
   const arr: EnginePlayer[] = [];
   for (let i = 0; i < 11; i++) {
     arr.push({
       id: `${side}_${i}` as PlayerId,
       slotIndex: i,
+      slot: { ...slots[i] },
+      role: roles[i],
+      tag: tags[i],
       ...statsForSlot(i),
       foulsCommitted: 0,
       yellowCount: 0,

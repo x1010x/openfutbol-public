@@ -20,6 +20,7 @@ export type EventKind =
   | 'foul'
   | 'penalty'
   | 'card'
+  | 'injury'
   | 'corner'
   | 'throw_in'
   | 'goal_kick'

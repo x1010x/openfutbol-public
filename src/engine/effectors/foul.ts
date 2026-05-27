@@ -145,6 +145,11 @@ export function executeFoul(
         state.injuredIds.add(victim.id);
       }
     }
+    // Surface a fresh injury as a timeline event so the log shows it and the
+    // manager can register it on close (see managerBridge.timelineToMatchResult).
+    if (victim.injured) {
+      stateEmit(state, t, 'injury', vSide, victim.id, tackler.id, '¡Lesión!');
+    }
   }
 
   const atkSide: TeamSide = vSide;

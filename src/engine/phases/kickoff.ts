@@ -5,7 +5,7 @@
 import type { Vec2, TeamSide } from '../../types/match';
 import type { EnginePlayer } from '../zoneEngine';
 import { spring, repel } from '../forces';
-import { HOME_SLOTS, AWAY_SLOTS } from '../zones';
+import { baseSlot } from '../lineup';
 import { KICKOFF_INITIAL_TICKS, KICKOFF_SETUP_TICKS } from './shared';
 import type { CarrierRole, PhaseForceCtx, PhaseCallbacks, MatchState } from './shared';
 
@@ -47,13 +47,13 @@ export function resetKickoff(
     // Match start. 22 players snap into formation; the brief intro lets the
     // user see the shape before the first pass.
     for (const p of state.homePlayers) {
-      const slot = { ...HOME_SLOTS[p.slotIndex] };
+      const slot = baseSlot(p);
       if (p.id !== kicker.id && p.id !== partner.id) slot.x = Math.min(slot.x, 0.48);
       state.pos[p.id] = slot;
       state.vel[p.id] = { x: 0, y: 0 };
     }
     for (const p of state.awayPlayers) {
-      const slot = { ...AWAY_SLOTS[p.slotIndex] };
+      const slot = baseSlot(p);
       if (p.id !== kicker.id && p.id !== partner.id) slot.x = Math.max(slot.x, 0.52);
       state.pos[p.id] = slot;
       state.vel[p.id] = { x: 0, y: 0 };

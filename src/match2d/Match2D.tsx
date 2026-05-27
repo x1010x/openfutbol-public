@@ -4,11 +4,18 @@ import type { MatchTimeline } from '../types/match';
 import { SPEED_OPTIONS, SPEED_FACTORS, CANVAS_W, CANVAS_H } from './layout';
 import { buildScene } from './renderer';
 import { updateScene } from './animator';
+import type { KitStyle } from '../types/game.d.ts';
 
 interface Match2DProps {
   timeline: MatchTimeline;
   homeTeamName?: string;
   awayTeamName?: string;
+  // Real kit colours (hex, [primary, secondary, ...]) and shirt pattern per
+  // side. When omitted the renderer falls back to the Madrid/Barca demo kits.
+  homeColors?: string[];
+  awayColors?: string[];
+  homeKitStyle?: KitStyle;
+  awayKitStyle?: KitStyle;
   // Game-time multiplier (game-ms per real-ms). When set, playback auto-starts
   // at this factor so the full 90' lands in the caller's chosen real duration
   // (factor = 90 / realMinutes). The Nx buttons still override it manually.
@@ -16,7 +23,7 @@ interface Match2DProps {
   onClose: () => void;
 }
 
-export function Match2D({ timeline, homeTeamName = 'Real Madrid', awayTeamName = 'Barcelona', initialSpeed, onClose }: Match2DProps) {
+export function Match2D({ timeline, homeTeamName = 'Real Madrid', awayTeamName = 'Barcelona', homeColors, awayColors, homeKitStyle, awayKitStyle, initialSpeed, onClose }: Match2DProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const scoreRef = useRef<HTMLSpanElement>(null);
   const minuteRef = useRef<HTMLSpanElement>(null);
@@ -50,7 +57,13 @@ export function Match2D({ timeline, homeTeamName = 'Real Madrid', awayTeamName =
         });
         if (!alive) { app.destroy(true, { children: true }); return; }
 
-        const scene = await buildScene(app, timeline, () => alive);
+        const kits = (homeColors || awayColors || homeKitStyle || awayKitStyle)
+          ? {
+              home: { colors: homeColors, style: homeKitStyle },
+              away: { colors: awayColors, style: awayKitStyle },
+            }
+          : undefined;
+        const scene = await buildScene(app, timeline, () => alive, kits);
         if (!scene || !alive) { if (app.renderer) app.destroy(true, { children: true }); return; }
 
         app.ticker.add((ticker) => {

@@ -26,7 +26,7 @@
 import type { PlayerId, Zone, Lane } from '../types/match';
 import type { MatchState, Intent } from './types';
 import { clampMagnitude } from './forces';
-import { HOME_SLOTS, AWAY_SLOTS, HOME_ROLES, AWAY_ROLES } from './zones';
+import { baseSlot } from './lineup';
 import { applyPhaseForces, type PhaseForceCtx } from './phases';
 import { applyGKForces } from './move/gk';
 import { applyIntentForce } from './move/intent';
@@ -113,9 +113,9 @@ export function moveAll(state: MatchState, intents: Map<PlayerId, Intent>, t: nu
     const pvel   = state.vel[p.id];
     const isHome = state.homeSet.has(p.id);
     const pSide  = isHome ? 'home' : 'away';
-    const base   = isHome ? { ...HOME_SLOTS[p.slotIndex] } : { ...AWAY_SLOTS[p.slotIndex] };
+    const base   = baseSlot(p);
     const isGK   = p.slotIndex === 0;
-    const role   = (isHome ? HOME_ROLES : AWAY_ROLES)[p.slotIndex] as 'gk' | 'def' | 'mid' | 'fwd';
+    const role   = p.role;
 
     // Wander timer / vector
     const w = state.wander.get(p.id)!;

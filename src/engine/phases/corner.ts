@@ -6,7 +6,6 @@ import type { Vec2, TeamSide } from '../../types/match';
 import type { EnginePlayer } from '../zoneEngine';
 import { spring } from '../forces';
 import { sideOf } from '../state';
-import { HOME_ROLES, AWAY_ROLES } from '../zones';
 import { clamp, CORNER_SETUP_TICKS, CORNER_HOLD_TICKS, KICK_FREEZE_MS } from './shared';
 import type { CarrierRole, PhaseForceCtx, PhaseCallbacks, MatchState } from './shared';
 
@@ -28,7 +27,6 @@ export function startCorner(state: MatchState, spot: Vec2, kSide: TeamSide): voi
   // Taker: nearest non-GK (by Y) to the corner — usually the winger on that
   // side. Partner: nearest remaining mid/fwd, used as the short-corner option.
   const team = kSide === 'home' ? state.homePlayers : state.awayPlayers;
-  const roles = kSide === 'home' ? HOME_ROLES : AWAY_ROLES;
   const onTop = spot.y < 0.5;
   const sameSide = (slotY: number) => onTop ? slotY < 0.5 : slotY > 0.5;
   const cand = team
@@ -43,7 +41,7 @@ export function startCorner(state: MatchState, spot: Vec2, kSide: TeamSide): voi
   // fall out of the same Y-sort that picked the taker.
   const partnerCand = team
     .filter(p => p.slotIndex !== 0 && p.id !== taker.id)
-    .filter(p => roles[p.slotIndex] === 'mid' || roles[p.slotIndex] === 'fwd')
+    .filter(p => p.role === 'mid' || p.role === 'fwd')
     .map(p => ({ p, dy: Math.abs((state.pos[p.id]?.y ?? 0.5) - spot.y) }))
     .sort((a, b) => a.dy - b.dy);
   state.partnerId = partnerCand[0]?.p.id ?? null;

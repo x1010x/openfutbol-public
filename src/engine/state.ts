@@ -1,7 +1,7 @@
 import type { MatchState, Wander, SlotRole } from './types';
 import type { TimelineEvent, PlayerId, TeamSide, Vec2 } from '../types/match';
 import type { EnginePlayer } from './zoneEngine';
-import { HOME_SLOTS, AWAY_SLOTS, HOME_ROLES, AWAY_ROLES } from './zones';
+import { baseSlot } from './lineup';
 import { mulberry32 } from './duels';
 
 export function createInitialState(cfg: {
@@ -21,12 +21,8 @@ export function createInitialState(cfg: {
 
   const pos: Record<PlayerId, Vec2> = {};
   const vel: Record<PlayerId, Vec2> = {};
-  for (const p of cfg.homePlayers) {
-    pos[p.id] = { ...HOME_SLOTS[p.slotIndex] };
-    vel[p.id] = { x: 0, y: 0 };
-  }
-  for (const p of cfg.awayPlayers) {
-    pos[p.id] = { ...AWAY_SLOTS[p.slotIndex] };
+  for (const p of allPlayers) {
+    pos[p.id] = baseSlot(p);
     vel[p.id] = { x: 0, y: 0 };
   }
 
@@ -113,9 +109,8 @@ export function sideOf(state: MatchState, id: PlayerId): TeamSide {
   return state.homeSet.has(id) ? 'home' : 'away';
 }
 
-export function roleOf(state: MatchState, p: EnginePlayer): SlotRole {
-  const roles = state.homeSet.has(p.id) ? HOME_ROLES : AWAY_ROLES;
-  return roles[p.slotIndex] as SlotRole;
+export function roleOf(_state: MatchState, p: EnginePlayer): SlotRole {
+  return p.role;
 }
 
 export function emit(

@@ -21,7 +21,7 @@
 
 import type { MatchState, Intent } from '../types';
 import type { EnginePlayer } from '../zoneEngine';
-import { HOME_SLOTS, AWAY_SLOTS, HOME_TAGS, AWAY_TAGS } from '../zones';
+import { baseSlot } from '../lineup';
 import { roleOf } from '../state';
 
 export function decide(p: EnginePlayer, state: MatchState): Intent {
@@ -77,11 +77,11 @@ export function decide(p: EnginePlayer, state: MatchState): Intent {
 
   // Slot-tagged winger advance once the attack crosses midfield. Same target
   // as the prior slice (0.10 ahead of slot, same touchline Y).
-  const tag = pSide === 'home' ? HOME_TAGS[p.slotIndex] : AWAY_TAGS[p.slotIndex];
+  const tag = p.tag;
   if (tag === 'wing' && state.phase === 'live') {
     const ballPastMidfield = pSide === 'home' ? state.ball.x > 0.50 : state.ball.x < 0.50;
     if (ballPastMidfield) {
-      const slot = pSide === 'home' ? HOME_SLOTS[p.slotIndex] : AWAY_SLOTS[p.slotIndex];
+      const slot = baseSlot(p);
       const targetX = pSide === 'home'
         ? Math.min(0.95, slot.x + 0.10)
         : Math.max(0.05, slot.x - 0.10);
@@ -93,7 +93,7 @@ export function decide(p: EnginePlayer, state: MatchState): Intent {
   // pushes up toward the attacking third / byline. The opposite FB stays put
   // as cover. Y stays on the touchline so we keep width.
   if (tag === 'fb' && state.phase === 'live') {
-    const slot = pSide === 'home' ? HOME_SLOTS[p.slotIndex] : AWAY_SLOTS[p.slotIndex];
+    const slot = baseSlot(p);
     const ballInOppHalf  = pSide === 'home' ? state.ball.x > 0.50 : state.ball.x < 0.50;
     const ballInOppThird = pSide === 'home' ? state.ball.x > 0.66 : state.ball.x < 0.34;
     const sameSide = (slot.y < 0.5) ? state.ball.y < 0.55 : state.ball.y > 0.45;

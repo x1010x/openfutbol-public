@@ -8,7 +8,6 @@ import type { Vec2 } from '../../types/match';
 import type { MatchState, Intent } from '../types';
 import type { EnginePlayer } from '../zoneEngine';
 import { spring, attract } from '../forces';
-import { HOME_ROLES, AWAY_ROLES } from '../zones';
 
 export interface IntentResult { dominance: number; }
 
@@ -20,7 +19,7 @@ export function applyIntentForce(
   force: Vec2,
 ): IntentResult {
   const pSide = state.homeSet.has(p.id) ? 'home' : 'away';
-  const role = (pSide === 'home' ? HOME_ROLES : AWAY_ROLES)[p.slotIndex];
+  const role = p.role;
   const roleGain = role === 'fwd' ? 0.05 : role === 'mid' ? 0.06 : 0.02;
 
   switch (intent.kind) {

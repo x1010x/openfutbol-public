@@ -7,6 +7,8 @@
 import { Application, Container, Sprite, AnimatedSprite, Texture, Rectangle } from 'pixi.js';
 import { remapWithPalette, loadAtlasWithPalette, type SpriteAtlas } from './sprites';
 import { BASE_PAL, KIT_MADRID, KIT_BARCA, KIT_GK, KIT_GK_AWAY } from './palette';
+import { buildKitPalette, spriteForStyle } from './kit';
+import type { KitStyle } from '../types/game.d.ts';
 import type { MatchTimeline, PlayerId, TimelineEvent } from '../types/match';
 import {
   makePlayerAnim, makeGKAnim, dirFromDelta,
@@ -41,10 +43,18 @@ export interface Scene {
   gkAnimMap: Map<PlayerId, GKAnim>;
   playerSideMap: Map<PlayerId, 'home' | 'away'>;
   ballAtlas: SpriteAtlas;
+  // Both GK atlases so the animator can swap a keeper's sprite set at the
+  // change of ends (second half): the home GK, drawn at the left goal in the
+  // first half, must use the right-goal sprite set after the teams switch.
+  gkLeftAtlas: SpriteAtlas;
+  gkRightAtlas: SpriteAtlas;
   ballSp: AnimatedSprite;
   shadowSp: AnimatedSprite;
   homeGK: PlayerId;
   awayGK: PlayerId;
+  // Engine time (ms) of the half-time whistle, or null if none. Past this the
+  // animator mirrors the pitch (x → 1-x) so the teams visibly change ends.
+  halfTimeMs: number | null;
   goalEvents: TimelineEvent[];
   // Event overlays
   fueraOverlay: Container;
@@ -63,10 +73,18 @@ export interface Scene {
 // `isAlive` lets the caller cancel an in-flight build (React 19 double-mount /
 // unmount during async asset loading). Returns null when cancelled; the caller
 // owns the Application lifecycle and destroys it.
+// Per-team kit (real colours + shirt pattern) for the two outfield sides. When
+// omitted, the viewer falls back to the original Madrid/Barca demo kits.
+export interface SceneKits {
+  home: { colors?: string[]; style?: KitStyle };
+  away: { colors?: string[]; style?: KitStyle };
+}
+
 export async function buildScene(
   app: Application,
   timeline: MatchTimeline,
   isAlive: () => boolean,
+  kits?: SceneKits,
 ): Promise<Scene | null> {
   const spriteMap = new Map<PlayerId, SpriteEntry>();
   const animMap = new Map<PlayerId, PlayerAnim>();
@@ -75,6 +93,8 @@ export async function buildScene(
 
   // Precompute goal events for score tracking
   const goalEvents = timeline.events.filter(e => e.kind === 'goal');
+  // Half-time whistle time (drives the second-half side switch). null = none.
+  const halfTimeMs = timeline.events.find(e => e.kind === 'half_time')?.t ?? null;
 
   const homeSet = new Set(timeline.homeLineup);
   const homeGK = timeline.homeLineup[0];
@@ -125,9 +145,17 @@ export async function buildScene(
   rightGoalSp.zIndex = 1;
   app.stage.addChild(rightGoalSp);
 
-  const [madridAtlas, barcaAtlas, gkLeftAtlas, gkRightAtlas, ballAtlas, faltasAtlas] = await Promise.all([
-    loadAtlasWithPalette(`${BASE}assets/match2d/base_sprites/JUGALISO_indexed.png`, `${BASE}assets/match2d/atlas/spritesheet_atlas_player.json`, KIT_MADRID),
-    loadAtlasWithPalette(`${BASE}assets/match2d/base_sprites/JUGARAYA_indexed.png`, `${BASE}assets/match2d/atlas/spritesheet_atlas_player.json`, KIT_BARCA),
+  // Resolve each side's kit: real colours + chosen shirt pattern, or the
+  // Madrid/Barca demo kits when no kit info was supplied.
+  const playerAtlasJson = `${BASE}assets/match2d/atlas/spritesheet_atlas_player.json`;
+  const homeSprite = kits ? `${BASE}assets/match2d/base_sprites/${spriteForStyle(kits.home.style)}` : `${BASE}assets/match2d/base_sprites/JUGALISO_indexed.png`;
+  const awaySprite = kits ? `${BASE}assets/match2d/base_sprites/${spriteForStyle(kits.away.style)}` : `${BASE}assets/match2d/base_sprites/JUGARAYA_indexed.png`;
+  const homePal = kits ? buildKitPalette(kits.home.colors) : KIT_MADRID;
+  const awayPal = kits ? buildKitPalette(kits.away.colors) : KIT_BARCA;
+
+  const [homeAtlas, awayAtlas, gkLeftAtlas, gkRightAtlas, ballAtlas, faltasAtlas] = await Promise.all([
+    loadAtlasWithPalette(homeSprite, playerAtlasJson, homePal),
+    loadAtlasWithPalette(awaySprite, playerAtlasJson, awayPal),
     loadAtlasWithPalette(`${BASE}assets/match2d/base_sprites/PORTEROI_indexed.png`, `${BASE}assets/match2d/atlas/spritesheet_atlas_gk_left.json`, KIT_GK),
     loadAtlasWithPalette(`${BASE}assets/match2d/base_sprites/PORTEROD_indexed.png`, `${BASE}assets/match2d/atlas/spritesheet_atlas_gk_right.json`, KIT_GK_AWAY),
     loadAtlasWithPalette(`${BASE}assets/match2d/base_sprites/BALON_indexed.png`, `${BASE}assets/match2d/atlas/spritesheet_atlas_ball.json`, BASE_PAL),
@@ -142,7 +170,7 @@ export async function buildScene(
     const isHomeGK = id === homeGK;
     const isAwayGK = id === awayGK;
     const isGK = isHomeGK || isAwayGK;
-    const atlas = isHomeGK ? gkLeftAtlas : isAwayGK ? gkRightAtlas : homeSet.has(id) ? madridAtlas : barcaAtlas;
+    const atlas = isHomeGK ? gkLeftAtlas : isAwayGK ? gkRightAtlas : homeSet.has(id) ? homeAtlas : awayAtlas;
     const initKey = isHomeGK ? 'gk_left_idle_E' : isAwayGK ? 'gk_right_idle_W' : 'player_idle_E';
     const frames = atlas.animations[initKey] ?? atlas.frames.slice(0, 4);
     const sp = new AnimatedSprite(frames);
@@ -326,10 +354,13 @@ export async function buildScene(
     gkAnimMap,
     playerSideMap,
     ballAtlas,
+    gkLeftAtlas,
+    gkRightAtlas,
     ballSp,
     shadowSp,
     homeGK,
     awayGK,
+    halfTimeMs,
     goalEvents,
     fueraOverlay,
     goalOverlay,

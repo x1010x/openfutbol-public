@@ -20,7 +20,7 @@ interface IngameProps {
 
 interface Props {
   team: Team;
-  onUpdate: (patch: { lineup: string[]; formation: FormationId }) => void;
+  onUpdate: (patch: { lineup: string[]; formation: FormationId; lineupOffsets?: Record<number, { dx: number; dy: number }> }) => void;
   onBack: () => void;
   onToggleDiscipline: () => void;
   ingame?: IngameProps;
@@ -251,8 +251,25 @@ export const AlignmentView = ({ team, onUpdate, onBack, onToggleDiscipline, inga
   const handleFormationChange = (f: FormationId) => {
     if (f === team.formation) return;
     const newLineup = reslotLineup(team, currentTitulars, f);
-    onUpdate({ lineup: newLineup, formation: f });
+    // Slot layout changes meaning across formations — drop any drag offsets so
+    // they don't carry over onto unrelated slots.
+    onUpdate({ lineup: newLineup, formation: f, lineupOffsets: {} });
   };
+
+  // Persist a single slot's drag adjustment (engine-space offset). User team,
+  // pre-match only — the 2D engine reads team.lineupOffsets as the off-ball
+  // anchor for that slot.
+  const handleDragOffset = (slotIdx: number, off: { dx: number; dy: number }) => {
+    const next = { ...(team.lineupOffsets ?? {}) };
+    if (Math.abs(off.dx) < 0.005 && Math.abs(off.dy) < 0.005) delete next[slotIdx];
+    else next[slotIdx] = off;
+    onUpdate({ lineup: team.lineup, formation: team.formation, lineupOffsets: next });
+  };
+
+  const resetOffsets = () => {
+    onUpdate({ lineup: team.lineup, formation: team.formation, lineupOffsets: {} });
+  };
+  const hasOffsets = !!team.lineupOffsets && Object.keys(team.lineupOffsets).length > 0;
 
   const handleAutoFix = () => {
     const excl = ingame ? new Set([...ingame.sentOff, ...ingame.injuredIds]) : new Set<string>();
@@ -416,6 +433,9 @@ export const AlignmentView = ({ team, onUpdate, onBack, onToggleDiscipline, inga
                 if (ingame && ingame.subsUsed >= ingame.maxSubs) return;
                 setSelectedSlot(idx === selectedSlot ? null : idx);
               }}
+              draggable={!ingame}
+              offsets={team.lineupOffsets}
+              onDragOffset={handleDragOffset}
             />
             {inPickMode && currentSlotPlayerId && !ingame && (
               <button
@@ -520,6 +540,11 @@ export const AlignmentView = ({ team, onUpdate, onBack, onToggleDiscipline, inga
           {!ingame && (
             <CmdButton onClick={handleAutoFix} color="#55ff55" hoverBg="#00aa00">
               {t('misc.auto11')}
+            </CmdButton>
+          )}
+          {!ingame && hasOffsets && (
+            <CmdButton onClick={resetOffsets} color="#ffaa55" hoverBg="#aa5500">
+              ■ {t('misc.resetPositions')}
             </CmdButton>
           )}
           <CmdButton

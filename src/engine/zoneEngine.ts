@@ -1,5 +1,6 @@
-import type { MatchTimeline, PlayerId } from '../types/match';
+import type { MatchTimeline, PlayerId, Vec2 } from '../types/match';
 import type { MatchState } from './types';
+import type { SlotRole, SlotTag } from './zones';
 import {
   createInitialState,
   emit as stateEmit,
@@ -19,12 +20,21 @@ import { tickKickoffRoutine } from './loop/kickoffRoutine';
 export interface EnginePlayer {
   id: PlayerId;
   slotIndex: number;
+  // Formation-derived layout for this slot (see engine/lineup.ts). `slot` is the
+  // base home position the player springs back to off the ball; `slotOffset`
+  // (user team only) shifts that anchor forward/back/sideways per the dragged
+  // line adjustment. `role`/`tag` drive the off-ball decision layer.
+  slot: Vec2;
+  slotOffset?: Vec2;
+  role: SlotRole;
+  tag: SlotTag;
   speed: number;
   dribbling: number;
   passing: number;
   shooting: number;
   defending: number;
   physical: number;
+  goalkeeping: number;
   // Disciplinary / fitness state — mutated as the match runs.
   // foulsCommitted counts only fouls *committed* (the tackler in a
   // foulCommitted roll), not received. yellowCount is 0 or 1; second yellow
@@ -49,11 +59,14 @@ export function simulateFromState(
   state: MatchState,
   durationMs: number,
   seed: number,
+  opts?: { emitHalfTime?: boolean },
 ): MatchTimeline {
   const TOTAL_TICKS = Math.floor(durationMs / TICK_MS);
-  // Only emit half-time for matches of at least 5 minutes — short sandbox
-  // clips would otherwise misfire a "Descanso" event in the middle.
-  const EMIT_HALF_TIME = durationMs >= 5 * 60 * 1000;
+  // Full matches always get a half-time at the true midpoint regardless of how
+  // compressed the engine timeline is (the viewer plays a 90' game in a couple
+  // of real minutes). Sandbox clips fall back to the old length gate so a short
+  // scenario doesn't misfire a "Descanso" in the middle.
+  const EMIT_HALF_TIME = opts?.emitHalfTime ?? (durationMs >= 5 * 60 * 1000);
   const HALF_TIME_TICK = Math.floor(TOTAL_TICKS / 2);
 
   const effectorDeps: EffectorDeps = {
@@ -145,6 +158,14 @@ export function simulateFromState(
 
     if (EMIT_HALF_TIME && tick === HALF_TIME_TICK) {
       stateEmit(state, t, 'half_time', state.possession, undefined, undefined, 'Descanso');
+      // Half-time is a hard break, not a continuation: stop the current play and
+      // restage a centre kickoff with the 22 teleported back into formation.
+      // The match always kicks off with HOME (see generateTimeline), so the
+      // second half is taken by AWAY → pass lastScorer='home' (kicker = the
+      // non-scorer side). The render mirrors the pitch from this point (see
+      // animator `flipped`), so the teams visibly change ends for the restart.
+      resetKickoff(state, 'home', true, { resetCarry: (p) => resetCarry(state, p) });
+      stateEmit(state, t, 'kickoff', state.possession, state.kickerId!, undefined, '¡Segunda parte!');
       stateSnap(state, t);
     }
 
@@ -221,7 +242,7 @@ export function generateTimeline(cfg: {
   stateEmit(state, 0, 'kickoff', 'home', state.kickerId!, undefined, '¡Saque inicial!');
   stateSnap(state, 0);
 
-  const tl = simulateFromState(state, durationMs, seed);
+  const tl = simulateFromState(state, durationMs, seed, { emitHalfTime: true });
   // A full match is always shown as 0–90' regardless of how compressed the
   // timeline is; the log/stats remap each event's `t` accordingly.
   tl.nominalMatchMs = DURATION_MS;

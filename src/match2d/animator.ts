@@ -34,6 +34,16 @@ export function updateScene(scene: Scene, ticker: Ticker, ctx: AnimatorCtx): voi
   rt.gameTime = Math.min(rt.gameTime + ticker.deltaMS * speedRef.current, timeline.durationMs);
   const gt = rt.gameTime;
 
+  // Second-half side switch: once the half-time whistle has passed we mirror
+  // the pitch horizontally (x → 1-x) so the teams visibly change ends. The
+  // engine timeline is unchanged (home still attacks x=1 internally); only the
+  // rendering flips. `mir` maps an absolute x; `mdx` flips a horizontal delta
+  // (for facing); GK sprite sets are swapped below since their atlas is
+  // left/right-goal specific.
+  const flipped = scene.halfTimeMs !== null && gt >= scene.halfTimeMs;
+  const mir = (x: number) => (flipped ? 1 - x : x);
+  const mdx = (dx: number) => (flipped ? -dx : dx);
+
   // Advance keyframe pointer
   while (rt.kfPointer < kfs.length - 2 && kfs[rt.kfPointer + 1].t <= gt) rt.kfPointer++;
 
@@ -59,22 +69,22 @@ export function updateScene(scene: Scene, ticker: Ticker, ctx: AnimatorCtx): voi
         // dirFromDelta returns one of the 8 cardinals; the throw
         // atlas has N/S/NE/NW/SE/SW and playerAnimKey falls back
         // E→SE, W→SW, so all 8 deltas resolve to a valid frame.
-        if (tpos) kickDir = dirFromDelta(tpos.x - ev.at.x, tpos.y - ev.at.y);
+        if (tpos) kickDir = dirFromDelta(mdx(tpos.x - ev.at.x), tpos.y - ev.at.y);
       }
     } else if (ev.kind === 'shot_on' || ev.kind === 'shot_off') {
       const goalX = ev.side === 'home' ? 1.0 : 0.0;
-      kickDir = dirFromDelta(goalX - ev.at.x, 0.5 - ev.at.y);
+      kickDir = dirFromDelta(mdx(goalX - ev.at.x), 0.5 - ev.at.y);
     } else if (ev.kind === 'reception' && ev.log === 'Fuera de banda') {
       // Throw-in pickup: face the intended receiver if provided.
       if (ev.target) {
         const tpos = kfA.positions[ev.target];
-        if (tpos) kickDir = dirFromDelta(tpos.x - ev.at.x, tpos.y - ev.at.y);
+        if (tpos) kickDir = dirFromDelta(mdx(tpos.x - ev.at.x), tpos.y - ev.at.y);
       }
 
       if (!kickDir) {
         // Fallback: face back into the field if no target.
         const onTop = ev.at.y < 0.5;
-        const homeAttacksRight = ev.side === 'home';
+        const homeAttacksRight = (ev.side === 'home') !== flipped;
         const lateral: 'E' | 'W' = homeAttacksRight ? 'E' : 'W';
         if (onTop) {
           kickDir = (lateral === 'E' ? 'SE' : 'SW') as Dir8;
@@ -122,7 +132,9 @@ export function updateScene(scene: Scene, ticker: Ticker, ctx: AnimatorCtx): voi
         if (gkAnim) {
           const gkPos = kfA.positions[gkId] ?? { x: ev.side === 'home' ? 0.015 : 0.985, y: 0.5 };
           const targetPos = ev.target ? kfA.positions[ev.target] : undefined;
-          fireGKEvent(gkAnim, ev, gt, ev.at, gkPos, ev.side === 'home', targetPos);
+          // Dive directions are vertical (x-mirror-agnostic); pass the effective
+          // home/away so the swapped sprite set picks the right diagonal frames.
+          fireGKEvent(gkAnim, ev, gt, ev.at, gkPos, (ev.side === 'home') !== flipped, targetPos);
         }
       }
     }
@@ -253,7 +265,12 @@ export function updateScene(scene: Scene, ticker: Ticker, ctx: AnimatorCtx): voi
       const ballFlying = kfA.ballState === 'flying';
       const gkHolding = kfA.ballState === 'gk_holding';
       tickGKAnim(gkAnim, gt, ballFlying, gkHolding, moving);
-      key = gkAnimKey(entry.isHomeGK, gkAnim.state, kfA.ball.y, posA.y, kfA.ball.x, posA.x, gkAnim.throwDir);
+      // After the change of ends the keeper stands at the opposite goal, so it
+      // needs the other side's sprite set (left↔right). Swap the atlas and the
+      // home/away flag the key generator uses.
+      const effHomeGK = entry.isHomeGK !== flipped;
+      entry.atlas = effHomeGK ? scene.gkLeftAtlas : scene.gkRightAtlas;
+      key = gkAnimKey(effHomeGK, gkAnim.state, kfA.ball.y, posA.y, kfA.ball.x, posA.x, gkAnim.throwDir);
 
       if (gkAnim.state === 'throw') {
         animSpeedBase = 0.16;
@@ -264,13 +281,13 @@ export function updateScene(scene: Scene, ticker: Ticker, ctx: AnimatorCtx): voi
       const anim = scene.animMap.get(id)!;
       // Only update facing direction when not locked in a one-shot anim
       if (moving && anim.holdUntil === null) {
-        anim.dir = dirFromDelta(dx, dy);
+        anim.dir = dirFromDelta(mdx(dx), dy);
       } else if (gt === 0 || (anim.state === 'idle' && anim.holdUntil === null)) {
         // If idle or at start, face the ball to stay focused on the play
         const bdx = kfA.ball.x - nx;
         const bdy = kfA.ball.y - ny;
         if (Math.hypot(bdx, bdy) > 0.01) {
-          anim.dir = dirFromDelta(bdx, bdy);
+          anim.dir = dirFromDelta(mdx(bdx), bdy);
         }
       }
       tickPlayerAnim(anim, gt, moving);
@@ -282,7 +299,7 @@ export function updateScene(scene: Scene, ticker: Ticker, ctx: AnimatorCtx): voi
       // the choice so the result is always one of E/W/NE/NW/SE/SW.
       const wallIds = kfA.wallIds;
       if (!moving && wallIds && wallIds.includes(id) && anim.holdUntil === null) {
-        const bdx = kfA.ball.x - nx;
+        const bdx = mdx(kfA.ball.x - nx);
         const bdy = kfA.ball.y - ny;
         const ax = Math.abs(bdx), ay = Math.abs(bdy);
         let bdir: Dir8;
@@ -301,7 +318,7 @@ export function updateScene(scene: Scene, ticker: Ticker, ctx: AnimatorCtx): voi
         animSpeedBase = 0.16;
       }
     }
-    entry.sp.x = toCanvasX(nx);
+    entry.sp.x = toCanvasX(mir(nx));
     entry.sp.y = toCanvasY(ny);
     applyAnim(entry, key);
     // Sync animation playback with speed linearly so frames fit the phase duration exactly
@@ -328,7 +345,7 @@ export function updateScene(scene: Scene, ticker: Ticker, ctx: AnimatorCtx): voi
     scene.ballSp.visible = true;
     scene.shadowSp.visible = bHeight > 0.005;
 
-    const screenX = toCanvasX(bx);
+    const screenX = toCanvasX(mir(bx));
     const screenY = toCanvasY(by);
 
     scene.shadowSp.x = screenX;

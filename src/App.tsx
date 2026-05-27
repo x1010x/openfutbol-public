@@ -370,11 +370,20 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
     };
   };
 
-  const handleUpdateAlignment = (patch: { lineup: string[]; formation: FormationId }) => {
+  const handleUpdateAlignment = (patch: { lineup: string[]; formation: FormationId; lineupOffsets?: Record<number, { dx: number; dy: number }> }) => {
     setLeague(prev => ({
       ...prev,
       teams: prev.teams.map(t =>
-        t.id === prev.userTeamId ? { ...t, lineup: patch.lineup, formation: patch.formation } : t
+        t.id === prev.userTeamId
+          ? {
+              ...t,
+              lineup: patch.lineup,
+              formation: patch.formation,
+              // Only touch offsets when the patch carries them (drag / reset /
+              // formation change); other edits keep the existing adjustments.
+              ...(patch.lineupOffsets !== undefined ? { lineupOffsets: patch.lineupOffsets } : {}),
+            }
+          : t
       )
     }));
   };
@@ -1032,8 +1041,8 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
     const tl = generateTimeline({
       homeTeamId: homeTeam.id,
       awayTeamId: awayTeam.id,
-      homePlayers: teamToEnginePlayers(applyMoodToTeam(homeTeam)),
-      awayPlayers: teamToEnginePlayers(applyMoodToTeam(awayTeam)),
+      homePlayers: teamToEnginePlayers(applyMoodToTeam(homeTeam), 'home'),
+      awayPlayers: teamToEnginePlayers(applyMoodToTeam(awayTeam), 'away'),
       seed: Math.floor(Math.random() * 0xffffffff),
       // Compressed timeline so the match plays in `watchDuration2d` real minutes
       // at 1x (fixed 0.75 pace); raising speed finishes it sooner.
@@ -1335,29 +1344,29 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
       isFinished: true,
       events: r.events,
       matchSpeed: 0,
-      homeSentOff: [],
-      awaySentOff: [],
-      homeYellows: [],
-      awayYellows: [],
-      homePossession: 0,
-      awayPossession: 0,
-      homeShots: 0,
-      awayShots: 0,
-      homeShotsOnTarget: 0,
-      awayShotsOnTarget: 0,
-      homeFouls: 0,
-      awayFouls: 0,
+      homeSentOff: r.homeSentOff,
+      awaySentOff: r.awaySentOff,
+      homeYellows: r.homeYellows,
+      awayYellows: r.awayYellows,
+      homePossession: r.homePossession,
+      awayPossession: r.awayPossession,
+      homeShots: r.homeShots,
+      awayShots: r.awayShots,
+      homeShotsOnTarget: r.homeShotsOnTarget,
+      awayShotsOnTarget: r.awayShotsOnTarget,
+      homeFouls: r.homeFouls,
+      awayFouls: r.awayFouls,
       homeBoost: 1,
       homeStamina: Object.fromEntries(homeTeam.players.map(p => [p.id, p.stamina ?? 99])),
       awayStamina: Object.fromEntries(awayTeam.players.map(p => [p.id, p.stamina ?? 99])),
       homeSubsUsed: 0,
       awaySubsUsed: 0,
-      homeInjuredInMatch: [],
-      awayInjuredInMatch: [],
+      homeInjuredInMatch: r.homeInjured,
+      awayInjuredInMatch: r.awayInjured,
       homeStartingLineup: [...homeTeam.lineup],
       awayStartingLineup: [...awayTeam.lineup],
-      stoppageTime1: 0,
-      stoppageTime2: 0,
+      stoppageTime1: r.stoppageTime1,
+      stoppageTime2: r.stoppageTime2,
     };
     finalizeMatch(finalMatch);
   };
@@ -2342,6 +2351,10 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
           timeline={timeline2d}
           homeTeamName={league.teams.find(tm => tm.id === timeline2d.homeTeamId)?.name}
           awayTeamName={league.teams.find(tm => tm.id === timeline2d.awayTeamId)?.name}
+          homeColors={league.teams.find(tm => tm.id === timeline2d.homeTeamId)?.colors}
+          awayColors={league.teams.find(tm => tm.id === timeline2d.awayTeamId)?.colors}
+          homeKitStyle={league.teams.find(tm => tm.id === timeline2d.homeTeamId)?.kitStyle}
+          awayKitStyle={league.teams.find(tm => tm.id === timeline2d.awayTeamId)?.kitStyle}
           initialSpeed={BASE_SPEED_FACTOR}
           onClose={handleClose2D}
         />
