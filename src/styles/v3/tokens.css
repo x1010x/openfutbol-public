@@ -1,0 +1,51 @@
+:root {
+  /* Surfaces */
+  --bg: #0e1e36;
+  --panel: #1a3a5c;
+  --panel-raised: #244a73;
+  --panel-sunken: #122a47;
+
+  /* Borders (beveled feel — light top/left, dark bottom/right) */
+  --border-light: #3d6ea0;
+  --border-dark: #081628;
+
+  /* Text */
+  --text: #e8eef5;
+  --text-muted: #a0b4cc;
+  --text-dim: #6b819b;
+
+  /* Category accents */
+  --cat-league: #4caf50;
+  --cat-squad: #2196f3;
+  --cat-club: #e53935;
+  --cat-finance: #fb8c00;
+
+  /* Interactive */
+  --button-bg: #2c5582;
+  --button-hover: #3a6a9e;
+  --button-active: #1f3f64;
+  --focus-ring: #ffd54f;
+
+  /* Spacing — 4px base unit */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+
+  /* Typography */
+  --font-pixel: 'm6x11', 'Courier New', monospace;
+  --fs-xs: 12px;
+  --fs-sm: 14px;
+  --fs-base: 16px;
+  --fs-lg: 20px;
+  --fs-xl: 28px;
+  --fs-2xl: 40px;
+
+  /* Layout */
+  --screen-max: 1280px;
+  --radius: 0;
+  --border-width: 2px;
+}
