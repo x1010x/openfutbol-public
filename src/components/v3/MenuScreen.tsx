@@ -1,60 +1,82 @@
+import '../../styles/v3/menu.css';
 import { Button } from './Button';
 
 const MENU_ITEMS = [
-  { label: 'Jugar',         action: () => console.log('start standard') },
-  { label: 'Pro-Manager',   action: () => console.log('start career') },
-  { label: 'Play Fantasy',  action: () => console.log('start fantasy') },
-  { label: 'Cargar Partida',action: () => console.log('load game') },
-  { label: 'Seguimiento',   action: () => console.log('database') },
-  { label: 'Opciones',      action: () => console.log('settings') },
+  { label: 'Jugar',          action: () => console.log('start standard'), accent: 'var(--cat-league)'  },
+  { label: 'Pro-Manager',    action: () => console.log('start career'),   accent: 'var(--cat-squad)'   },
+  { label: 'Play Fantasy',   action: () => console.log('start fantasy'),  accent: 'var(--cat-finance)' },
+  { label: 'Cargar Partida', action: () => console.log('load game'),      accent: 'var(--border-light)'},
+  { label: 'Seguimiento',    action: () => console.log('database'),       accent: 'var(--cat-league)'  },
+  { label: 'Opciones',       action: () => console.log('settings'),       accent: 'var(--text-dim)'    },
 ];
 
 export function MenuScreen() {
   return (
-    <div
-      style={{
-        height: '100%',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: 'var(--space-4)',
-      }}
-    >
-      <div
-        style={{
-          width: '100%',
-          maxWidth: '360px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 'var(--space-3)',
-        }}
-      >
-        <div style={{ textAlign: 'center', marginBottom: 'var(--space-6)' }}>
+    <div className="v3-menu-shell">
+      {/* Outer raised-bevel panel */}
+      <div className="v3-menu-panel">
+
+        {/* Left: branding — sunken panel */}
+        <div className="v3-menu-brand">
           <div
-            style={{
+            className="v3-menu-brand-title"
+            style={{ display: 'flex', flexDirection: 'column', lineHeight: 1 }}
+          >
+            <span style={{
               fontFamily: 'var(--font-pixel)',
-              fontSize: 'var(--fs-2xl)',
+              fontSize: 'var(--fs-xl)',
+              fontWeight: 700,
+              color: 'var(--text-dim)',
+              letterSpacing: '0.02em',
+            }}>
+              OPEN
+            </span>
+            <span style={{
+              fontFamily: 'var(--font-pixel)',
+              fontSize: 'var(--fs-xl)',
               fontWeight: 700,
               color: 'var(--text)',
-            }}
-          >
-            OPENFÚTBOL
+              letterSpacing: '0.02em',
+            }}>
+              FÚTBOL
+            </span>
           </div>
+
           <div
-            style={{
+            className="v3-menu-brand-meta"
+            style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}
+          >
+            <span style={{
               fontFamily: 'var(--font-pixel)',
               fontSize: 'var(--fs-xs)',
               color: 'var(--text-muted)',
-              marginTop: 'var(--space-1)',
-            }}
-          >
-            v1.5.0 — UI Refresh
+              textTransform: 'uppercase',
+              letterSpacing: '0.08em',
+            }}>
+              Fútbol de gestión
+            </span>
+            <span style={{
+              fontFamily: 'var(--font-pixel)',
+              fontSize: 'var(--fs-xs)',
+              color: 'var(--text-dim)',
+            }}>
+              v1.5.0 — UI Refresh
+            </span>
           </div>
         </div>
 
-        {MENU_ITEMS.map(item => (
-          <Button key={item.label} label={item.label} onClick={item.action} />
-        ))}
+        {/* Right: menu items */}
+        <div className="v3-menu-items">
+          {MENU_ITEMS.map(item => (
+            <Button
+              key={item.label}
+              label={item.label}
+              onClick={item.action}
+              accentColor={item.accent}
+            />
+          ))}
+        </div>
+
       </div>
     </div>
   );

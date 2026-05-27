@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 interface ButtonProps {
   label: string;
   onClick: () => void;
@@ -6,47 +8,84 @@ interface ButtonProps {
 }
 
 export function Button({ label, onClick, accentColor, disabled = false }: ButtonProps) {
+  const [hovered, setHovered] = useState(false);
+  const [pressed, setPressed] = useState(false);
+  const [focused, setFocused] = useState(false);
+
   return (
     <button
       onClick={onClick}
       disabled={disabled}
+      onMouseEnter={() => !disabled && setHovered(true)}
+      onMouseLeave={() => { setHovered(false); setPressed(false); }}
+      onMouseDown={() => !disabled && setPressed(true)}
+      onMouseUp={() => setPressed(false)}
+      onFocus={() => setFocused(true)}
+      onBlur={() => setFocused(false)}
       style={{
+        display: 'flex',
+        alignItems: 'stretch',
         width: '100%',
-        padding: 'var(--space-3) var(--space-4)',
-        background: accentColor ?? 'var(--button-bg)',
-        color: 'var(--text)',
-        font: 'inherit',
-        fontSize: 'var(--fs-base)',
-        border: 'var(--border-width) solid',
-        borderColor: 'var(--border-light) var(--border-dark) var(--border-dark) var(--border-light)',
-        borderRadius: 'var(--radius)',
+        padding: 0,
+        background: 'none',
+        border: 'none',
         cursor: disabled ? 'not-allowed' : 'pointer',
         opacity: disabled ? 0.5 : 1,
-        textAlign: 'left',
-        letterSpacing: '0.02em',
-        outline: 'none',
-      }}
-      onMouseEnter={e => {
-        if (!disabled) (e.currentTarget as HTMLButtonElement).style.background = accentColor ?? 'var(--button-hover)';
-      }}
-      onMouseLeave={e => {
-        if (!disabled) (e.currentTarget as HTMLButtonElement).style.background = accentColor ?? 'var(--button-bg)';
-      }}
-      onMouseDown={e => {
-        if (!disabled) (e.currentTarget as HTMLButtonElement).style.background = 'var(--button-active)';
-      }}
-      onMouseUp={e => {
-        if (!disabled) (e.currentTarget as HTMLButtonElement).style.background = accentColor ?? 'var(--button-hover)';
-      }}
-      onFocus={e => {
-        e.currentTarget.style.outline = 'var(--border-width) solid var(--focus-ring)';
-        e.currentTarget.style.outlineOffset = '2px';
-      }}
-      onBlur={e => {
-        e.currentTarget.style.outline = 'none';
+        outline: focused ? `var(--border-width) solid var(--focus-ring)` : 'none',
+        outlineOffset: '2px',
       }}
     >
-      {label}
+      {/* Left category accent bar */}
+      <div style={{
+        width: 'var(--space-1)',
+        background: accentColor ?? 'var(--border-light)',
+        flexShrink: 0,
+      }} />
+
+      {/* Row content with beveled border */}
+      <div style={{
+        flex: 1,
+        display: 'flex',
+        alignItems: 'center',
+        gap: 'var(--space-2)',
+        padding: `var(--space-2) var(--space-3)`,
+        background: pressed
+          ? 'var(--button-active)'
+          : hovered
+          ? 'var(--button-hover)'
+          : 'var(--button-bg)',
+        borderStyle: 'solid',
+        borderWidth: '1px',
+        borderColor: pressed
+          ? 'var(--border-dark) var(--border-light) var(--border-light) var(--border-dark)'
+          : 'var(--border-light) var(--border-dark) var(--border-dark) var(--border-light)',
+      }}>
+        {/* > arrow — space always reserved to prevent layout shift */}
+        <span style={{
+          width: 'var(--space-3)',
+          flexShrink: 0,
+          fontFamily: 'var(--font-pixel)',
+          fontSize: 'var(--fs-xs)',
+          color: 'var(--text-muted)',
+          textAlign: 'center',
+          visibility: hovered && !pressed ? 'visible' : 'hidden',
+        }}>
+          &gt;
+        </span>
+
+        <span style={{
+          flex: 1,
+          fontFamily: 'var(--font-pixel)',
+          fontSize: 'var(--fs-sm)',
+          fontWeight: 700,
+          textTransform: 'uppercase',
+          letterSpacing: '0.06em',
+          color: hovered ? 'var(--text)' : 'var(--text-muted)',
+          textAlign: 'left',
+        }}>
+          {label}
+        </span>
+      </div>
     </button>
   );
 }
