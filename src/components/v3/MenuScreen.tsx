@@ -8,12 +8,12 @@ interface MenuScreenProps {
 
 export function MenuScreen({ onNavigate }: MenuScreenProps) {
   const MENU_ITEMS = [
-    { label: 'Jugar',          action: () => onNavigate('liga'),     accent: 'var(--cat-league)'   },
-    { label: 'Pro-Manager',    action: () => onNavigate('liga'),     accent: 'var(--cat-squad)'    },
-    { label: 'Play Fantasy',   action: () => onNavigate('liga'),     accent: 'var(--cat-finance)'  },
-    { label: 'Cargar Partida', action: () => onNavigate('liga'),     accent: 'var(--border-light)' },
-    { label: 'Seguimiento',    action: () => onNavigate('liga'),     accent: 'var(--cat-league)'   },
-    { label: 'Opciones',       action: () => onNavigate('opciones'), accent: 'var(--text-dim)'     },
+    { label: 'Jugar',          action: () => onNavigate('liga'),     accent: 'var(--cat-league)',   icon: '/assets/icons/v3/jugar.svg'      },
+    { label: 'Pro-Manager',    action: () => onNavigate('liga'),     accent: 'var(--cat-squad)',    icon: '/assets/icons/v3/promanager.svg' },
+    { label: 'Play Fantasy',   action: () => onNavigate('liga'),     accent: 'var(--cat-finance)',  icon: '/assets/icons/v3/fantasy.svg'    },
+    { label: 'Cargar Partida', action: () => onNavigate('liga'),     accent: 'var(--border-light)', icon: '/assets/icons/v3/cargar.svg'     },
+    { label: 'Seguimiento',    action: () => onNavigate('liga'),     accent: 'var(--cat-league)',   icon: '/assets/icons/v3/seguimiento.svg'},
+    { label: 'Opciones',       action: () => onNavigate('opciones'), accent: 'var(--text-dim)',     icon: '/assets/icons/v3/opciones.svg'   },
   ];
 
   return (
@@ -75,6 +75,7 @@ export function MenuScreen({ onNavigate }: MenuScreenProps) {
               label={item.label}
               onClick={item.action}
               accentColor={item.accent}
+              icon={item.icon}
             />
           ))}
         </div>

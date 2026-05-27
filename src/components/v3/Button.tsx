@@ -5,12 +5,14 @@ interface ButtonProps {
   onClick: () => void;
   accentColor?: string;
   disabled?: boolean;
+  icon?: string;
 }
 
-export function Button({ label, onClick, accentColor, disabled = false }: ButtonProps) {
+export function Button({ label, onClick, accentColor, disabled = false, icon }: ButtonProps) {
   const [hovered, setHovered] = useState(false);
   const [pressed, setPressed] = useState(false);
   const [focused, setFocused] = useState(false);
+  const [iconFailed, setIconFailed] = useState(false);
 
   return (
     <button
@@ -72,6 +74,23 @@ export function Button({ label, onClick, accentColor, disabled = false }: Button
         }}>
           &gt;
         </span>
+
+        {/* Optional icon */}
+        {icon && !iconFailed && (
+          <img
+            src={icon}
+            alt=""
+            aria-hidden="true"
+            onError={() => setIconFailed(true)}
+            style={{
+              width: 16,
+              height: 16,
+              flexShrink: 0,
+              imageRendering: 'pixelated',
+              opacity: hovered ? 1 : 0.7,
+            }}
+          />
+        )}
 
         <span style={{
           flex: 1,

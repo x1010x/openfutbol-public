@@ -2,6 +2,7 @@ export interface MockGameState {
   teamName: string;
   teamShort: string;
   teamCrestColors: { primary: string; secondary: string };
+  teamLogoUrl?: string;        // /assets/teams/{id}.png — optional, falls back to color blocks
   managerName: string;
   position: number;
   totalTeams: number;
@@ -20,6 +21,7 @@ export const MOCK_GAME_STATE: MockGameState = {
   teamName: 'CD Vallecas',
   teamShort: 'VAL',
   teamCrestColors: { primary: '#c8362e', secondary: '#ffd23f' },
+  // teamLogoUrl: '/assets/teams/{teamId}.png',  — set this to a real team ID when available
   managerName: 'L. Sánchez',
   position: 4,
   totalTeams: 20,

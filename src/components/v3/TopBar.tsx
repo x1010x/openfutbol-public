@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { V3Screen } from '../../AppV3';
 import { MOCK_GAME_STATE } from '../../data/v3/mockGameState';
 import { TeamCrest } from './TeamCrest';
@@ -9,15 +9,15 @@ interface TopBarProps {
   onNavigate: (screen: V3Screen) => void;
 }
 
-const TABS: Array<{ id: Exclude<V3Screen, 'menu'>; label: string; accent: string }> = [
-  { id: 'liga',       label: 'Liga',       accent: 'var(--cat-league)'  },
-  { id: 'plantilla',  label: 'Plantilla',  accent: 'var(--cat-squad)'   },
-  { id: 'alineacion', label: 'Alineación', accent: 'var(--cat-squad)'   },
-  { id: 'resultados', label: 'Resultados', accent: 'var(--cat-league)'  },
-  { id: 'finanzas',   label: 'Finanzas',   accent: 'var(--cat-finance)' },
-  { id: 'mercado',    label: 'Mercado',    accent: 'var(--cat-finance)' },
-  { id: 'club',       label: 'Club',       accent: 'var(--cat-club)'    },
-  { id: 'opciones',   label: 'Opciones',   accent: 'var(--text-dim)'    },
+const TABS: Array<{ id: Exclude<V3Screen, 'menu'>; label: string; accent: string; icon: string }> = [
+  { id: 'liga',       label: 'Liga',       accent: 'var(--cat-league)',  icon: '/assets/icons/v3/liga.svg'       },
+  { id: 'plantilla',  label: 'Plantilla',  accent: 'var(--cat-squad)',   icon: '/assets/icons/v3/plantilla.svg'  },
+  { id: 'alineacion', label: 'Alineación', accent: 'var(--cat-squad)',   icon: '/assets/icons/v3/alineacion.svg' },
+  { id: 'resultados', label: 'Resultados', accent: 'var(--cat-league)',  icon: '/assets/icons/v3/resultados.svg' },
+  { id: 'finanzas',   label: 'Finanzas',   accent: 'var(--cat-finance)', icon: '/assets/icons/v3/finanzas.svg'   },
+  { id: 'mercado',    label: 'Mercado',    accent: 'var(--cat-finance)', icon: '/assets/icons/v3/mercado.svg'    },
+  { id: 'club',       label: 'Club',       accent: 'var(--cat-club)',    icon: '/assets/icons/v3/club.svg'       },
+  { id: 'opciones',   label: 'Opciones',   accent: 'var(--text-dim)',    icon: '/assets/icons/v3/opciones.svg'   },
 ];
 
 function positionColor(pos: number, total: number): string {
@@ -41,6 +41,26 @@ function florentinoColor(val: number): string {
   if (val >= 7) return 'var(--cat-league)';
   if (val >= 5) return 'var(--cat-finance)';
   return 'var(--cat-club)';
+}
+
+function TabIcon({ src, active }: { src: string; active: boolean }) {
+  const [failed, setFailed] = useState(false);
+  if (failed) return null;
+  return (
+    <img
+      src={src}
+      alt=""
+      aria-hidden="true"
+      onError={() => setFailed(true)}
+      style={{
+        width: 14,
+        height: 14,
+        flexShrink: 0,
+        imageRendering: 'pixelated',
+        opacity: active ? 1 : 0.6,
+      }}
+    />
+  );
 }
 
 export function TopBar({ current, onNavigate }: TopBarProps) {
@@ -71,7 +91,12 @@ export function TopBar({ current, onNavigate }: TopBarProps) {
             fontSize: 'var(--fs-xs)',
             color: 'var(--text-dim)',
           }}>·</span>
-          <TeamCrest colors={g.teamCrestColors} size="sm" title={g.teamName} />
+          <TeamCrest
+            colors={g.teamCrestColors}
+            logoUrl={g.teamLogoUrl}
+            size="sm"
+            title={g.teamName}
+          />
           <span
             className="is-essential"
             style={{
@@ -201,6 +226,7 @@ export function TopBar({ current, onNavigate }: TopBarProps) {
                 style={{ background: tab.accent }}
               />
               <div className="v3-topbar-tab-inner">
+                <TabIcon src={tab.icon} active={isActive} />
                 {tab.label}
               </div>
             </button>
