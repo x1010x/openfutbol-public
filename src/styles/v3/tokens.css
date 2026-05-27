@@ -36,9 +36,9 @@
   --space-12: 48px;
 
   /* Typography */
-  --font-pixel: 'm6x11', 'Courier New', monospace;
-  --fs-xs: 12px;
-  --fs-sm: 14px;
+  --font-pixel: 'VT323', 'Courier New', monospace;
+  --fs-xs: 14px;
+  --fs-sm: 16px;
   --fs-base: 16px;
   --fs-lg: 20px;
   --fs-xl: 28px;

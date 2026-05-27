@@ -9,9 +9,8 @@ body {
   font-family: var(--font-pixel);
   font-size: var(--fs-base);
   line-height: 1.4;
-  -webkit-font-smoothing: none;
+  -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  font-smooth: never;
   image-rendering: pixelated;
   text-rendering: geometricPrecision;
 }
