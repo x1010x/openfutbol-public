@@ -1,22 +1,25 @@
 import '../../styles/v3/menu.css';
+import type { V3Screen } from '../../AppV3';
 import { Button } from './Button';
 
-const MENU_ITEMS = [
-  { label: 'Jugar',          action: () => console.log('start standard'), accent: 'var(--cat-league)'  },
-  { label: 'Pro-Manager',    action: () => console.log('start career'),   accent: 'var(--cat-squad)'   },
-  { label: 'Play Fantasy',   action: () => console.log('start fantasy'),  accent: 'var(--cat-finance)' },
-  { label: 'Cargar Partida', action: () => console.log('load game'),      accent: 'var(--border-light)'},
-  { label: 'Seguimiento',    action: () => console.log('database'),       accent: 'var(--cat-league)'  },
-  { label: 'Opciones',       action: () => console.log('settings'),       accent: 'var(--text-dim)'    },
-];
+interface MenuScreenProps {
+  onNavigate: (screen: V3Screen) => void;
+}
 
-export function MenuScreen() {
+export function MenuScreen({ onNavigate }: MenuScreenProps) {
+  const MENU_ITEMS = [
+    { label: 'Jugar',          action: () => onNavigate('liga'),     accent: 'var(--cat-league)'   },
+    { label: 'Pro-Manager',    action: () => onNavigate('liga'),     accent: 'var(--cat-squad)'    },
+    { label: 'Play Fantasy',   action: () => onNavigate('liga'),     accent: 'var(--cat-finance)'  },
+    { label: 'Cargar Partida', action: () => onNavigate('liga'),     accent: 'var(--border-light)' },
+    { label: 'Seguimiento',    action: () => onNavigate('liga'),     accent: 'var(--cat-league)'   },
+    { label: 'Opciones',       action: () => onNavigate('opciones'), accent: 'var(--text-dim)'     },
+  ];
+
   return (
     <div className="v3-menu-shell">
-      {/* Outer raised-bevel panel */}
       <div className="v3-menu-panel">
 
-        {/* Left: branding — sunken panel */}
         <div className="v3-menu-brand">
           <div
             className="v3-menu-brand-title"
@@ -65,7 +68,6 @@ export function MenuScreen() {
           </div>
         </div>
 
-        {/* Right: menu items */}
         <div className="v3-menu-items">
           {MENU_ITEMS.map(item => (
             <Button

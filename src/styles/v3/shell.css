@@ -1,0 +1,14 @@
+.v3-shell {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.v3-shell-main {
+  flex: 1;
+  min-width: 0;
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
