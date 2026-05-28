@@ -52,6 +52,8 @@ import { formatJornadaDate } from './engine/calendar';
 import type { OfferResult } from './data/economy';
 import { PackLoaderView } from './components/PackLoaderView';
 import { usePack } from './state/PackContext';
+import { buildTeamFromPackClub } from './data/packTeamBuilder';
+import { runtimePlayerFromPack } from './data/playerBuilder';
 
 type View = 'LEAGUE' | 'SQUAD' | 'ALIGNMENT' | 'RESULTS' | 'STATS' | 'FINANCES' | 'TRANSFERS' | 'JORNADA_RESULTS' | 'END_OF_SEASON' | 'PLAYER_DETAIL' | 'BACKUP' | 'EDITOR' | 'EQUIPO' | 'MANAGER_CAREER';
 
@@ -262,20 +264,37 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
 
   const handleLeagueSetupConfirm = (selectedTeamIds: string[], extraRawPlayers: import('./types/game.d.ts').RawPlayerDB[], importedRawTeams: import('./types/game.d.ts').RawTeamDB[]) => {
     const selectedSet = new Set(selectedTeamIds);
-    const importedTeams = importedRawTeams
-      .filter(rt => selectedSet.has(rt.id))
-      .flatMap(rt => {
-        const season = rt.seasons.find(s => s.year === selectedYear!) ?? rt.seasons[0];
-        if (!season) return [];
-        return [buildTeamFromSeason({ id: rt.id, name: rt.name, ...season })];
-      });
-    const dbTeamIds = new Set(getTeamTemplatesForYear(selectedYear!).map(t => t.id));
-    const importedRawIds = new Set(importedRawTeams.map(rt => rt.id));
-    const editorTeams = league.teams.filter(t => !dbTeamIds.has(t.id) && !importedRawIds.has(t.id));
-    const extraTeams = [...importedTeams, ...editorTeams];
-    const extraFreeAgents = extraRawPlayers
-      .map(p => buildFreeAgentFromDB(p, selectedYear!))
-      .filter((p): p is import('./types/game.d.ts').Player => p !== null);
+    let extraTeams: import('./types/game.d.ts').Team[] = [];
+    let extraFreeAgents: import('./types/game.d.ts').Player[] = [];
+
+    if (pack) {
+      // Build teams from pack clubs
+      const packClubIds = new Set(pack.clubs.map(c => c.id));
+      const selectedPackClubs = pack.clubs.filter(c => selectedSet.has(c.id));
+      extraTeams = selectedPackClubs.map(club => buildTeamFromPackClub(club, pack, selectedYear!));
+      // Free agents: players not assigned to any selected club
+      extraFreeAgents = pack.players
+        .filter(p => !p.club_id || !packClubIds.has(p.club_id) || !selectedSet.has(p.club_id))
+        .slice(0, 500) // cap to avoid bloat
+        .map(p => runtimePlayerFromPack(p, 0));
+    } else {
+      // Legacy: build from imported raw teams + editor teams
+      const importedTeams = importedRawTeams
+        .filter(rt => selectedSet.has(rt.id))
+        .flatMap(rt => {
+          const season = rt.seasons.find(s => s.year === selectedYear!) ?? rt.seasons[0];
+          if (!season) return [];
+          return [buildTeamFromSeason({ id: rt.id, name: rt.name, ...season })];
+        });
+      const dbTeamIds = new Set(getTeamTemplatesForYear(selectedYear!).map(t => t.id));
+      const importedRawIds = new Set(importedRawTeams.map(rt => rt.id));
+      const editorTeams = league.teams.filter(t => !dbTeamIds.has(t.id) && !importedRawIds.has(t.id));
+      extraTeams = [...importedTeams, ...editorTeams];
+      extraFreeAgents = extraRawPlayers
+        .map(p => buildFreeAgentFromDB(p, selectedYear!))
+        .filter((p): p is import('./types/game.d.ts').Player => p !== null);
+    }
+
     setLeague(getInitialLeagueState(selectedYear!, selectedTeamIds, extraFreeAgents, extraTeams));
     setLeagueSetupDone(true);
   };
@@ -1723,7 +1742,9 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
     }
 
     if (!league.isStarted) {
-      const availableYears = getAvailableYears();
+      const PACK_YEAR = new Date().getFullYear();
+      const packYearStats = pack ? [{ year: PACK_YEAR, teams: pack.clubs.length, leagues: pack.leagues.length, players: pack.players.length }] : [];
+      const availableYears = pack ? [PACK_YEAR] : getAvailableYears();
 
       if (!showPlayFlow) {
         return (
@@ -1802,7 +1823,7 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
           teams={league.teams}
           selectedYear={selectedYear}
           availableYears={availableYears}
-          yearStats={getAvailableYearsWithStats()}
+          yearStats={packYearStats.length > 0 ? packYearStats : getAvailableYearsWithStats()}
           onSelectYear={handleSelectYear}
           onSelect={handleSelectTeam}
           onBack={() => setShowPlayFlow(false)}

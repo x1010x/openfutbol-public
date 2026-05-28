@@ -1,8 +1,10 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useMemo } from 'react';
 import type { RawPlayerDB, RawTeamDB } from '../types/game.d.ts';
 import type { Team } from '../types/game.d.ts';
 import { getTeamTemplatesForYear, getTeamCountry, type TeamTemplate } from '../data/mockTeams';
 import { loadLegacyPackFromFile as loadPackFromFile } from '../data/packLoader';
+import { getPackTemplates } from '../data/packTeamBuilder';
+import { usePack } from '../state/PackContext';
 import { TeamCrest } from './TeamCrest';
 import { CountryBadge } from './CountryBadge';
 import { useT as useTranslation } from '../i18n';
@@ -19,7 +21,21 @@ const MAX_TEAMS = 24;
 
 export const LeagueSetupView = ({ year, existingTeams, onConfirm, onBack }: Props) => {
   const tr = useTranslation();
-  const templates = getTeamTemplatesForYear(year);
+  const { pack } = usePack();
+
+  const packTemplates = useMemo((): TeamTemplate[] => {
+    if (!pack) return [];
+    return getPackTemplates(pack).map(pt => ({
+      id: pt.clubId,
+      name: pt.name,
+      colors: pt.colors ? [pt.colors.background, pt.colors.foreground] : undefined,
+      playerCount: pt.playerCount,
+      country: pt.countryName || pt.leagueName || 'unknown',
+    }));
+  }, [pack]);
+
+  const legacyTemplates = getTeamTemplatesForYear(year);
+  const templates = packTemplates.length > 0 ? packTemplates : legacyTemplates;
   const dbIds = new Set(templates.map(t => t.id));
 
   const editorTemplates: TeamTemplate[] = (existingTeams ?? [])
