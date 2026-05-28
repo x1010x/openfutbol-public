@@ -1,8 +1,8 @@
-import type { FormationId, Player, PlayerStats, Position, Team } from '../types/game.d.ts';
+import type { FormationId, Player, PlayerStats, Position, PositionCode, Team } from '../types/game.d.ts';
 import { engineSettings } from './engineSettings';
 
 export const OOP_PENALTY = 0.825;
-export const GK_OOP_PENALTY = 0.45; // outfield player forced into goal — static fallback, runtime uses engineSettings
+export const GK_OOP_PENALTY = 0.45;
 
 export const FORMATIONS: Record<FormationId, Position[]> = {
   '4-4-2': ['POR', 'DEF', 'DEF', 'DEF', 'DEF', 'MED', 'MED', 'MED', 'MED', 'DEL', 'DEL'],
@@ -15,19 +15,36 @@ export const FORMATIONS: Record<FormationId, Position[]> = {
 
 export const ALL_FORMATIONS: FormationId[] = ['4-4-2', '5-3-2', '4-3-3', '4-2-4', '5-4-1', '3-4-3'];
 
-const FORWARD_FAMILY: Position[] = ['DEL', 'AML', 'AMR'];
-
-export const isOOP = (player: Player, slotPos: Position): boolean => {
-  if (FORWARD_FAMILY.includes(slotPos) && player.allowedPositions.some(p => FORWARD_FAMILY.includes(p))) return false;
-  return !player.allowedPositions.includes(slotPos);
+// Map: legacy formation slot → new PositionCodes that count as natural.
+const LEGACY_SLOT_TO_CODES: Record<Position, PositionCode[]> = {
+  POR: ['GK'],
+  DEF: ['DC', 'DL', 'DR', 'WBL', 'WBR'],
+  MED: ['DMC', 'MC', 'ML', 'MR'],
+  DEL: ['FC'],
+  AML: ['AML', 'WBL', 'ML'],
+  AMR: ['AMR', 'WBR', 'MR'],
 };
 
-export const slotPenalty = (player: Player, slotPos: Position): number => {
-  if (!isOOP(player, slotPos)) return 1;
-  return slotPos === 'POR' ? engineSettings.gkOopPenalty : engineSettings.oopPenalty;
+export const positionLevelFactor = (player: Player, slotPos: Position): number => {
+  const codes = LEGACY_SLOT_TO_CODES[slotPos];
+  let bestLevel = 0;
+  for (const entry of player.positions ?? []) {
+    if (codes.includes(entry.code) && entry.level > bestLevel) {
+      bestLevel = entry.level;
+    }
+  }
+  if (bestLevel === 0) return 0.1;
+  return Math.max(0.1, (bestLevel / 20) ** 1.5);
 };
 
-// Position-weighted stat importance. Specialists are rated fairly in their role.
+export const effectiveAbility = (player: Player, slotPos: Position): number => {
+  const stam = player.stamina ?? 99;
+  const stamFactor = 0.8 + 0.2 * (stam / 99);
+  const ca = player.current_ability ?? (player.media ?? 50) * 2;
+  return ca * positionLevelFactor(player, slotPos) * stamFactor;
+};
+
+// Position-weighted stat importance — used by legacy code paths only.
 const STAT_WEIGHTS: Record<Position, Record<keyof PlayerStats, number>> = {
   POR: { goalkeeping: 0.70, defending: 0.15, physical: 0.05, speed: 0.05, passing: 0.03, dribbling: 0.01, shooting: 0.01 },
   DEF: { defending: 0.35, physical: 0.25, speed: 0.20, passing: 0.10, dribbling: 0.06, shooting: 0.03, goalkeeping: 0.01 },
@@ -41,29 +58,32 @@ export const computePositionWeightedMedia = (stats: PlayerStats, pos: Position):
   const w = STAT_WEIGHTS[pos];
   return (w.speed ?? 0) * stats.speed + (w.dribbling ?? 0) * stats.dribbling + (w.passing ?? 0) * stats.passing
        + (w.shooting ?? 0) * stats.shooting + (w.defending ?? 0) * stats.defending + (w.physical ?? 0) * stats.physical
-       + (w.goalkeeping ?? 0) * stats.goalkeeping;
+       + (w.goalkeeping ?? 0) * (stats.goalkeeping ?? 0);
 };
 
-export const rawMedia = (player: Player): number =>
-  computePositionWeightedMedia(player.stats, player.position);
+// Legacy shim — components still import this. Tests OOP via the legacy positions list.
+export const isOOP = (player: Player, slotPos: Position): boolean =>
+  !player.allowedPositions.includes(slotPos);
 
-// Formation picking uses stamina so AI naturally rotates tired players out.
-export const effectiveMedia = (player: Player, slotPos: Position): number => {
-  const stam = player.stamina ?? 99;
-  return rawMedia(player) * slotPenalty(player, slotPos) * (0.7 + 0.3 * (stam / 99));
+export const slotPenalty = (player: Player, slotPos: Position): number => {
+  if (!isOOP(player, slotPos)) return 1;
+  return slotPos === 'POR' ? engineSettings.gkOopPenalty : engineSettings.oopPenalty;
 };
 
-// Effective MED as used by the simulation: OOP penalty + stamina factor.
-export const liveMed = (player: Player, stam: number, slotPos?: Position): number => {
-  const raw = rawMedia(player);
-  const pen = slotPos ? slotPenalty(player, slotPos) : 1;
-  return Math.floor(raw * pen * (0.7 + 0.3 * (stam / 99)));
-};
+export const rawMedia = (player: Player): number => player.media ?? 50;
 
-export const effectiveStat = (player: Player, stat: keyof Player['stats'], slotPos: Position): number =>
-  player.stats[stat] * slotPenalty(player, slotPos);
+// Thin aliases so existing imports compile.
+export const effectiveMedia = effectiveAbility;
 
-// Mapa playerId -> position del slot que ocupa en la alineación, según la formación del equipo.
+export const liveMed = (player: Player, _stam: number, slotPos?: Position): number =>
+  effectiveAbility(player, slotPos ?? player.position);
+
+export const effectiveStat = (
+  player: Player,
+  _stat: keyof PlayerStats,
+  slotPos: Position,
+): number => effectiveAbility(player, slotPos);
+
 export const buildSlotMap = (team: Team): Map<string, Position> => {
   const slots = FORMATIONS[team.formation];
   const map = new Map<string, Position>();
@@ -82,9 +102,6 @@ export const slotPositionFor = (team: Team, playerId: string): Position | null =
   return slots[idx] ?? null;
 };
 
-// Asigna greedy los mejores 11 jugadores disponibles a los 11 slots de una formación.
-// disciplined=true: cada slot se llena primero con jugadores en posición natural; sólo
-// recurre a jugadores fuera de posición si no queda ningún nativo disponible.
 export const pickBestXI = (
   players: Player[],
   formationId: FormationId,
@@ -92,8 +109,8 @@ export const pickBestXI = (
   disciplined: boolean = false,
 ): { lineup: string[]; strength: number } => {
   const slots = FORMATIONS[formationId];
-  const eligible = players.filter(p => 
-    !excludeIds.has(p.id) && 
+  const eligible = players.filter(p =>
+    !excludeIds.has(p.id) &&
     (p.suspensionMatches ?? 0) === 0 &&
     (p.injuryWeeksRemaining ?? 0) === 0
   );
@@ -104,26 +121,23 @@ export const pickBestXI = (
   for (const slotPos of slots) {
     let best: Player | null = null;
     let bestScore = -Infinity;
-    // POR siempre busca nativos primero. Con disciplina ON, todos los slots hacen lo mismo.
     const natives = eligible.filter(p => !used.has(p.id) && p.allowedPositions.includes(slotPos));
     const useNativesFirst = slotPos === 'POR' || (disciplined && natives.length > 0);
     const pool = useNativesFirst && natives.length > 0 ? natives : eligible;
-    
-    // Find best in current pool
+
     for (const p of pool) {
       if (used.has(p.id)) continue;
-      const score = effectiveMedia(p, slotPos);
+      const score = effectiveAbility(p, slotPos);
       if (score > bestScore) {
         bestScore = score;
         best = p;
       }
     }
-    
-    // If no best found in current pool and disciplined, fallback to global eligible pool
+
     if (!best && disciplined) {
       for (const p of eligible) {
         if (used.has(p.id)) continue;
-        const score = effectiveMedia(p, slotPos);
+        const score = effectiveAbility(p, slotPos);
         if (score > bestScore) {
           bestScore = score;
           best = p;
@@ -136,13 +150,12 @@ export const pickBestXI = (
       used.add(best.id);
       strength += bestScore;
     } else {
-      lineup.push(''); // Fill with empty if truly no one left
+      lineup.push('');
     }
   }
   return { lineup, strength };
 };
 
-// Elige la formación que maximiza la fuerza agregada del mejor XI.
 export const pickBestFormation = (
   players: Player[],
   excludeIds: Set<string> = new Set(),
@@ -166,9 +179,6 @@ export const pickBestFormation = (
   return { formation: bestFormation, lineup: bestLineup };
 };
 
-// Reordena un conjunto fijo de titulares en los slots de una formación dada.
-// El resultado es disperso (longitud 11, '' para slots vacantes) para que los índices
-// de slot se correspondan siempre con la formación.
 export const reslotLineup = (
   team: Team,
   titularIds: string[],
@@ -187,7 +197,7 @@ export const reslotLineup = (
     const pool = natives && natives.length > 0 ? natives : candidates;
     for (const p of pool) {
       if (used.has(p.id)) continue;
-      const score = effectiveMedia(p, slotPos);
+      const score = effectiveAbility(p, slotPos);
       if (score > bestScore) {
         bestScore = score;
         best = p;
@@ -200,7 +210,6 @@ export const reslotLineup = (
       lineup.push('');
     }
   }
-  // Trim trailing empties so length reflects highest used slot (keeps storage compact).
   while (lineup.length > 0 && lineup[lineup.length - 1] === '') lineup.pop();
   return lineup;
 };

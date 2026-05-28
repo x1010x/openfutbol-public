@@ -3,15 +3,15 @@ import { engineSettings } from './engineSettings';
 
 export type BoardObjective = 'avoid_relegation' | 'top_half' | 'top_4' | 'win_league';
 
-const avgMedia = (team: Team): number =>
+const avgCA = (team: Team): number =>
   team.players.length > 0
-    ? team.players.reduce((sum, p) => sum + p.media, 0) / team.players.length
+    ? team.players.reduce((sum, p) => sum + (p.current_ability ?? p.media * 2), 0) / team.players.length
     : 0;
 
 export const computeBoardObjective = (team: Team, allTeams: Team[]): BoardObjective => {
   if (allTeams.length === 0) return 'avoid_relegation';
-  const teamAvg = avgMedia(team);
-  const bestAvg = Math.max(...allTeams.map(avgMedia));
+  const teamAvg = avgCA(team);
+  const bestAvg = Math.max(...allTeams.map(avgCA));
   const gap = bestAvg - teamAvg;
   // Gap in average media rating from the best team drives the objective.
   // Teams are usually very close, so most should chase the title.
@@ -98,10 +98,15 @@ export const computeTransferDelta = (
   isBuying: boolean,
   year: number,
 ): number => {
-  const age = year - player.birthYear;
-  const isYoung = age < player.peakAge;
-  const isOld = age > player.peakAge + 2;
+  const birthYear = player.birth_date
+    ? parseInt(player.birth_date.slice(0, 4), 10)
+    : player.birthYear;
+  const age = year - birthYear;
+  const peakAge = player.peakAge ?? 28;
+  const isYoung = age < peakAge;
+  const isOld = age > peakAge + 2;
   const priceRatio = marketValue > 0 ? amount / marketValue : 1;
+  const ca = player.current_ability ?? player.media * 2;
 
   if (isBuying) {
     if (isYoung && priceRatio <= 1.1) return engineSettings.transferGoodDelta;
@@ -109,7 +114,7 @@ export const computeTransferDelta = (
     return 0;
   } else {
     if (isOld && priceRatio >= 0.8) return engineSettings.transferGoodDelta;
-    if (isYoung && player.media >= 75 && priceRatio < 0.8) return engineSettings.transferBadDelta;
+    if (isYoung && ca >= 150 && priceRatio < 0.8) return engineSettings.transferBadDelta;
     return 0;
   }
 };
@@ -143,7 +148,7 @@ export const teamsOfferingJobs = (
   const candidates = allTeams.filter(t => t.id !== excludeTeamId);
   if (candidates.length === 0) return [];
 
-  const sorted = [...candidates].sort((a, b) => avgMedia(a) - avgMedia(b)); // weakest first
+  const sorted = [...candidates].sort((a, b) => avgCA(a) - avgCA(b)); // weakest first
   const N = sorted.length;
 
   let cutoffPct: number;
@@ -168,7 +173,7 @@ export const teamsOfferingJobs = (
     if (!eligible.some(t => t.id === weakest.id)) eligible.unshift(weakest);
   }
 
-  return eligible.sort((a, b) => avgMedia(b) - avgMedia(a));
+  return eligible.sort((a, b) => avgCA(b) - avgCA(a));
 };
 
 // Context-aware match delta for florentinometro. Replaces the simple win/draw/loss lookup.
