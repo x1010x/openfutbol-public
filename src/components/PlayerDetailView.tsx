@@ -83,8 +83,8 @@ export const PlayerDetailView = ({ player, teamName, history, seasonYear, onBack
 
   const primaryPosCode = topPositions[0]?.code ?? 'MC';
   const attrs = useMemo(
-    () => synthesizeAttributes(ca, primaryPosCode, player.id),
-    [ca, primaryPosCode, player.id],
+    () => player.attributes ?? synthesizeAttributes(ca, primaryPosCode, player.id),
+    [player.attributes, ca, primaryPosCode, player.id],
   );
 
   return (

@@ -1,5 +1,32 @@
 // TODO(phase-4): delete shim fields from Player; use current_ability/positions directly.
 import type { PackPlayer, Player, PlayerStats, PositionCode, Position, PlayerPositionEntry } from '../types/game.d.ts';
+import { synthesizeAttributes, type PlayerAttributes } from './playerAttributes';
+
+const avg = (...vals: number[]) => vals.reduce((s, v) => s + v, 0) / vals.length;
+
+// Map FM 1-20 attribute groups into the legacy 0-100 PlayerStats. Five-times the
+// attribute average lands the result on the same 0-100 scale the engine expects.
+const statsFromAttributes = (a: PlayerAttributes, isGK: boolean): PlayerStats => {
+  const t = a.technical, m = a.mental, p = a.physical;
+  const speed       = avg(p.pace, p.acceleration) * 5;
+  const dribbling   = avg(t.dribbling, t.technique, p.agility, t.firstTouch) * 5;
+  const passing     = avg(t.passing, m.vision, m.decisions, t.firstTouch) * 5;
+  const shooting    = avg(t.finishing, t.longShots, m.composure, t.technique) * 5;
+  const defending   = avg(t.tackling, t.marking, m.positioning, m.anticipation) * 5;
+  const physical    = avg(p.strength, p.stamina, p.jumping, p.naturalFitness) * 5;
+  const goalkeeping = isGK
+    ? avg(m.anticipation, m.positioning, m.concentration, p.agility, p.jumping, m.composure) * 5
+    : avg(p.agility, m.anticipation) * 3;
+  return {
+    speed: Math.round(speed),
+    dribbling: Math.round(dribbling),
+    passing: Math.round(passing),
+    shooting: Math.round(shooting),
+    defending: Math.round(defending),
+    physical: Math.round(physical),
+    goalkeeping: Math.round(goalkeeping),
+  };
+};
 
 const NEW_CODE_TO_LEGACY: Record<PositionCode, Position> = {
   GK: 'POR',
@@ -25,10 +52,8 @@ export const runtimePlayerFromPack = (
   const allowedPositions: Position[] = [...allowedSet];
 
   const halfCa = Math.round(packPlayer.current_ability / 2);
-  const stats: PlayerStats = {
-    speed: halfCa, dribbling: halfCa, passing: halfCa,
-    shooting: halfCa, defending: halfCa, physical: halfCa, goalkeeping: halfCa,
-  };
+  const attributes = synthesizeAttributes(packPlayer.current_ability, primaryCode, packPlayer.id);
+  const stats: PlayerStats = statsFromAttributes(attributes, primaryCode === 'GK');
 
   return {
     id: packPlayer.id,
@@ -41,6 +66,7 @@ export const runtimePlayerFromPack = (
     positions: packPlayer.positions,
     current_ability: packPlayer.current_ability,
     potential_ability: packPlayer.potential_ability,
+    attributes,
     value: packPlayer.value,
     contract: packPlayer.contract,
     number,

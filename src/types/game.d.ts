@@ -152,6 +152,7 @@ export interface Player {
   potential_ability?: number;     // 1-200
   value?: number;
   contract?: { salary: number; expiration: string } | null;
+  attributes?: import('../data/playerAttributes').PlayerAttributes;
 
   // Runtime/game state
   number: number;

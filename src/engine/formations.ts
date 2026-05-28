@@ -80,9 +80,15 @@ export const liveMed = (player: Player, _stam: number, slotPos?: Position): numb
 
 export const effectiveStat = (
   player: Player,
-  _stat: keyof PlayerStats,
+  stat: keyof PlayerStats,
   slotPos: Position,
-): number => effectiveAbility(player, slotPos);
+): number => {
+  const raw = player.stats?.[stat] ?? 50; // 0-100
+  const stam = player.stamina ?? 99;
+  const stamFactor = 0.8 + 0.2 * (stam / 99);
+  // Scale to ~CA range (1-200) so duels stay magnitude-compatible with effectiveAbility.
+  return raw * 2 * positionLevelFactor(player, slotPos) * stamFactor;
+};
 
 export const buildSlotMap = (team: Team): Map<string, Position> => {
   const slots = FORMATIONS[team.formation];
