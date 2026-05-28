@@ -312,13 +312,16 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
   };
 
   const handleProManagerSelectYear = (year: number) => {
-    if (year === 0) {
-      setSelectedYear(null);
-      return;
-    }
+    if (year === 0) { setSelectedYear(null); return; }
     setSelectedYear(year);
-    const allTeamIds = getTeamTemplatesForYear(year).map(t => t.id);
-    setLeague(getInitialLeagueState(year, allTeamIds, [], []));
+    if (pack) {
+      const extraTeams = pack.clubs.map(club => buildTeamFromPackClub(club, pack, year));
+      const allTeamIds = pack.clubs.map(c => c.id);
+      setLeague(getInitialLeagueState(year, allTeamIds, [], extraTeams));
+    } else {
+      const allTeamIds = getTeamTemplatesForYear(year).map(t => t.id);
+      setLeague(getInitialLeagueState(year, allTeamIds, [], []));
+    }
   };
 
   const handleSelectTeamProManager = (teamId: string, managerName: string) => {
@@ -1725,13 +1728,17 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
     }
 
     if (showProManagerFlow) {
+      const PACK_YEAR = new Date().getFullYear();
+      const proYearStats = pack
+        ? [{ year: PACK_YEAR, teams: pack.clubs.length, leagues: pack.leagues.length, players: pack.players.length }]
+        : getAvailableYearsWithStats();
       return (
         <ProManagerSetupView
           teams={league.teams}
           managerName={league.managerName ?? ''}
           managerCareer={league.managerCareer ?? []}
           managerReputation={league.managerReputation ?? 50}
-          yearStats={getAvailableYearsWithStats()}
+          yearStats={proYearStats}
           selectedYear={selectedYear}
           onSelectYear={handleProManagerSelectYear}
           onSelectTeam={handleSelectTeamProManager}
