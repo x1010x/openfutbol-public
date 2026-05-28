@@ -11,7 +11,7 @@ const formatDate = (iso: string): string => {
 };
 
 export const PackLoaderView = () => {
-  const { pack, setPack, clearPack, persistent } = usePack();
+  const { pack, setPack, clearPack, persistent, isDefault } = usePack();
   const fileRef = useRef<HTMLInputElement>(null);
   const [url, setUrl] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -29,6 +29,7 @@ export const PackLoaderView = () => {
     if (!file) return;
     setError(null);
     if (!confirmReplace()) { if (fileRef.current) fileRef.current.value = ''; return; }
+    localStorage.removeItem('openfutbol_pack_dismissed_default');
     setBusy(true);
     const result = await loadPackFromFile(file);
     setBusy(false);
@@ -43,6 +44,7 @@ export const PackLoaderView = () => {
     if (!trimmed) { setError('Introduce una URL.'); return; }
     setError(null);
     if (!confirmReplace()) return;
+    localStorage.removeItem('openfutbol_pack_dismissed_default');
     setBusy(true);
     const result = await loadPackFromUrl(trimmed);
     setBusy(false);
@@ -125,6 +127,11 @@ export const PackLoaderView = () => {
 
       {pack && (
         <div className="bg-vga-gray border-4 border-vga-blue p-4 flex flex-col gap-3 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+          {isDefault && (
+            <div className="bg-vga-yellow text-vga-black text-[8px] p-2 border-2 border-vga-black">
+              Estás usando el pack incluido. Importa un archivo para sustituirlo.
+            </div>
+          )}
           <div className="flex flex-col gap-1">
             <span className="text-vga-blue text-[10px] font-bold uppercase">{pack.meta.name}</span>
             <span className="text-vga-black text-[8px]">v{pack.meta.version}</span>
