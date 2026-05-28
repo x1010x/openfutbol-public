@@ -168,7 +168,8 @@ function main() {
     meta: {
       name: 'OpenFutbol Default Pack',
       version: '1.0.0',
-      source_url: null,
+      source_url: 'https://github.com/x1010x/openfutbol-public',
+      source_commit: null,
       imported_at: new Date().toISOString(),
       schema_version: 1,
     },

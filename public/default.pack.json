@@ -2,8 +2,9 @@
   "meta": {
     "name": "OpenFutbol Default Pack",
     "version": "1.0.0",
-    "source_url": null,
-    "imported_at": "2026-05-28T19:15:29.234Z",
+    "source_url": "https://github.com/x1010x/openfutbol-public",
+    "source_commit": null,
+    "imported_at": "2026-05-28T19:28:23.601Z",
     "schema_version": 1
   },
   "continents": [
