@@ -1,0 +1,5691 @@
+{
+  "meta": {
+    "name": "OpenFutbol Default Pack",
+    "version": "1.0.0",
+    "source_url": "https://github.com/x1010x/pcfurbo",
+    "source_commit": null,
+    "imported_at": "2026-05-28T17:07:26.969Z",
+    "schema_version": 1
+  },
+  "continents": [
+    {
+      "id": "fae147f8-2790-4a7d-9e79-3822bd3d2aa0",
+      "source_id": 1,
+      "name": "World"
+    }
+  ],
+  "countries": [
+    {
+      "id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "source_id": 1,
+      "code": "esp",
+      "slug": "esp",
+      "name": "España",
+      "continent_id": "fae147f8-2790-4a7d-9e79-3822bd3d2aa0",
+      "reputation": 80
+    }
+  ],
+  "leagues": [
+    {
+      "id": "cd86a07e-6df9-40e8-8926-6747b0a30ce9",
+      "source_id": 1,
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "slug": "esp-liga",
+      "name": "España Liga",
+      "reputation": 90,
+      "tier": 1,
+      "promotion_spots": 0,
+      "relegation_spots": 0
+    }
+  ],
+  "clubs": [
+    {
+      "id": "925bb99d-8480-43a9-9e37-8d1bf8c7efb0",
+      "source_id": 1,
+      "league_id": "cd86a07e-6df9-40e8-8926-6747b0a30ce9",
+      "name": "Real Madrid CF",
+      "colors": {
+        "background": "#ffffff",
+        "foreground": "#ffffff"
+      },
+      "rivals_source_ids": []
+    },
+    {
+      "id": "b57f96e8-eeee-4c15-87bc-c55b9f6cdc94",
+      "source_id": 2,
+      "league_id": "cd86a07e-6df9-40e8-8926-6747b0a30ce9",
+      "name": "Athletic Club",
+      "colors": {
+        "background": "#ee2523",
+        "foreground": "#ffffff"
+      },
+      "rivals_source_ids": []
+    },
+    {
+      "id": "04d08c83-beaf-4a5b-91c0-7fe1bd685653",
+      "source_id": 3,
+      "league_id": "cd86a07e-6df9-40e8-8926-6747b0a30ce9",
+      "name": "FC Barcelona",
+      "colors": {
+        "background": "#004d98",
+        "foreground": "#a50044"
+      },
+      "rivals_source_ids": []
+    },
+    {
+      "id": "d2a135d8-ce0d-4e00-9b03-c71efbbd95e8",
+      "source_id": 4,
+      "league_id": "cd86a07e-6df9-40e8-8926-6747b0a30ce9",
+      "name": "Atlético de Madrid",
+      "colors": {
+        "background": "#d50000",
+        "foreground": "#ffffff"
+      },
+      "rivals_source_ids": []
+    },
+    {
+      "id": "c1a77a05-5f03-4e55-84c7-96f12b3ef1a5",
+      "source_id": 5,
+      "league_id": "cd86a07e-6df9-40e8-8926-6747b0a30ce9",
+      "name": "Valencia CF",
+      "colors": {
+        "background": "#ffffff",
+        "foreground": "#ee7800"
+      },
+      "rivals_source_ids": []
+    },
+    {
+      "id": "71a9d897-c219-4901-9b17-ed79ed635157",
+      "source_id": 6,
+      "league_id": "cd86a07e-6df9-40e8-8926-6747b0a30ce9",
+      "name": "RCD Espanyol",
+      "colors": {
+        "background": "#0044aa",
+        "foreground": "#ffffff"
+      },
+      "rivals_source_ids": []
+    },
+    {
+      "id": "8a635691-a263-4e8c-9ab1-1d4b0a899bc4",
+      "source_id": 7,
+      "league_id": "cd86a07e-6df9-40e8-8926-6747b0a30ce9",
+      "name": "Deportivo Coruña",
+      "colors": {
+        "background": "#2a83d3",
+        "foreground": "#ffffff"
+      },
+      "rivals_source_ids": []
+    },
+    {
+      "id": "13323286-3948-44b6-aae6-fba0e413e98c",
+      "source_id": 8,
+      "league_id": "cd86a07e-6df9-40e8-8926-6747b0a30ce9",
+      "name": "UD Salamanca",
+      "colors": {
+        "background": "#ffffff",
+        "foreground": "#ffffff"
+      },
+      "rivals_source_ids": []
+    },
+    {
+      "id": "c976b397-3fae-4ce3-bf83-f9654aa6afd8",
+      "source_id": 9,
+      "league_id": "cd86a07e-6df9-40e8-8926-6747b0a30ce9",
+      "name": "Real Betis",
+      "colors": {
+        "background": "#0bb04a",
+        "foreground": "#ffffff"
+      },
+      "rivals_source_ids": []
+    },
+    {
+      "id": "f1b102bc-7dce-445b-b8aa-e4108bbdc557",
+      "source_id": 10,
+      "league_id": "cd86a07e-6df9-40e8-8926-6747b0a30ce9",
+      "name": "Real Sociedad",
+      "colors": {
+        "background": "#143dad",
+        "foreground": "#ffffff"
+      },
+      "rivals_source_ids": []
+    }
+  ],
+  "players": [
+    {
+      "id": "1e436071-14db-4190-8256-c79894cf0f1a",
+      "source_id": 1,
+      "club_id": "d2a135d8-ce0d-4e00-9b03-c71efbbd95e8",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "José Luis Pérez",
+      "last_name": "Caminero",
+      "birth_date": "1967-01-01",
+      "positions": [
+        {
+          "code": "MC",
+          "level": 17
+        },
+        {
+          "code": "DMC",
+          "level": 12
+        },
+        {
+          "code": "AMC",
+          "level": 10
+        }
+      ],
+      "current_ability": 162,
+      "potential_ability": 177,
+      "value": 21257640,
+      "contract": {
+        "salary": 162000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "932a8404-2a07-4800-9454-355d56934cc4",
+      "source_id": 2,
+      "club_id": "04d08c83-beaf-4a5b-91c0-7fe1bd685653",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Mehmed",
+      "last_name": "Kodro",
+      "birth_date": "1967-01-01",
+      "positions": [
+        {
+          "code": "FC",
+          "level": 18
+        },
+        {
+          "code": "AMC",
+          "level": 9
+        }
+      ],
+      "current_ability": 146,
+      "potential_ability": 148,
+      "value": 15560680,
+      "contract": {
+        "salary": 146000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "35435e1c-c5c1-44dc-84f3-3dd9ad74824b",
+      "source_id": 3,
+      "club_id": "8a635691-a263-4e8c-9ab1-1d4b0a899bc4",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Dmitri",
+      "last_name": "Radchenko",
+      "birth_date": "1970-01-01",
+      "positions": [
+        {
+          "code": "FC",
+          "level": 18
+        },
+        {
+          "code": "AMC",
+          "level": 9
+        }
+      ],
+      "current_ability": 141,
+      "potential_ability": 148,
+      "value": 14016105,
+      "contract": {
+        "salary": 141000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "24405b09-471c-4cae-a7ff-e1c817221f9b",
+      "source_id": 4,
+      "club_id": "04d08c83-beaf-4a5b-91c0-7fe1bd685653",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Guillermo Amor",
+      "last_name": "Amor",
+      "birth_date": "1967-01-01",
+      "positions": [
+        {
+          "code": "MC",
+          "level": 17
+        },
+        {
+          "code": "DMC",
+          "level": 12
+        },
+        {
+          "code": "AMC",
+          "level": 10
+        }
+      ],
+      "current_ability": 160,
+      "potential_ability": 163,
+      "value": 20480000,
+      "contract": {
+        "salary": 160000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "14897e16-8e9b-4db8-9cd5-97cfa7fa3905",
+      "source_id": 5,
+      "club_id": "71a9d897-c219-4901-9b17-ed79ed635157",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Miguel Ángel Lardín",
+      "last_name": "Lardín",
+      "birth_date": "1971-01-01",
+      "positions": [
+        {
+          "code": "FC",
+          "level": 18
+        },
+        {
+          "code": "AMC",
+          "level": 9
+        }
+      ],
+      "current_ability": 143,
+      "potential_ability": 157,
+      "value": 14621035,
+      "contract": {
+        "salary": 143000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "4524276d-da9c-4da3-96a6-1882cf164b76",
+      "source_id": 6,
+      "club_id": "f1b102bc-7dce-445b-b8aa-e4108bbdc557",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Francisco Javier de Pedro",
+      "last_name": "De Pedro",
+      "birth_date": "1973-01-01",
+      "positions": [
+        {
+          "code": "MC",
+          "level": 17
+        },
+        {
+          "code": "DMC",
+          "level": 12
+        },
+        {
+          "code": "AMC",
+          "level": 10
+        }
+      ],
+      "current_ability": 147,
+      "potential_ability": 149,
+      "value": 15882615,
+      "contract": {
+        "salary": 147000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "c4918de0-ca12-42dd-ba16-9aa5e2c81ae5",
+      "source_id": 7,
+      "club_id": "c1a77a05-5f03-4e55-84c7-96f12b3ef1a5",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Iñaki Goikoetxea",
+      "last_name": "Iñaki",
+      "birth_date": "1968-01-01",
+      "positions": [
+        {
+          "code": "MC",
+          "level": 17
+        },
+        {
+          "code": "DMC",
+          "level": 12
+        },
+        {
+          "code": "AMC",
+          "level": 10
+        }
+      ],
+      "current_ability": 134,
+      "potential_ability": 147,
+      "value": 12030520,
+      "contract": {
+        "salary": 134000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "f47974cf-d9e4-42b3-b608-0b36858aa3f2",
+      "source_id": 8,
+      "club_id": null,
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Jürgen",
+      "last_name": "Klinsmann",
+      "birth_date": "1964-01-01",
+      "positions": [
+        {
+          "code": "FC",
+          "level": 18
+        },
+        {
+          "code": "AMC",
+          "level": 9
+        }
+      ],
+      "current_ability": 149,
+      "potential_ability": 163,
+      "value": 16539745,
+      "contract": {
+        "salary": 149000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "1f8534fe-4cc7-4f5c-a34a-afba431dd8cf",
+      "source_id": 9,
+      "club_id": "f1b102bc-7dce-445b-b8aa-e4108bbdc557",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Aitor López",
+      "last_name": "Rekarte",
+      "birth_date": "1965-01-01",
+      "positions": [
+        {
+          "code": "DC",
+          "level": 17
+        },
+        {
+          "code": "DL",
+          "level": 11
+        },
+        {
+          "code": "DR",
+          "level": 11
+        }
+      ],
+      "current_ability": 136,
+      "potential_ability": 150,
+      "value": 12577280,
+      "contract": {
+        "salary": 136000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "6dc0ced7-8d49-49dd-aa6c-b8f322b0d36d",
+      "source_id": 10,
+      "club_id": null,
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Roberto",
+      "last_name": "R. Baggio",
+      "birth_date": "1967-01-01",
+      "positions": [
+        {
+          "code": "MC",
+          "level": 17
+        },
+        {
+          "code": "DMC",
+          "level": 12
+        },
+        {
+          "code": "AMC",
+          "level": 10
+        }
+      ],
+      "current_ability": 159,
+      "potential_ability": 171,
+      "value": 20098395,
+      "contract": {
+        "salary": 159000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "bca191d2-5f12-4d8c-b64f-56ec598c9ffe",
+      "source_id": 11,
+      "club_id": "71a9d897-c219-4901-9b17-ed79ed635157",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Miguel Albesa",
+      "last_name": "Albesa",
+      "birth_date": "1971-01-01",
+      "positions": [
+        {
+          "code": "DC",
+          "level": 17
+        },
+        {
+          "code": "DL",
+          "level": 11
+        },
+        {
+          "code": "DR",
+          "level": 11
+        }
+      ],
+      "current_ability": 114,
+      "potential_ability": 126,
+      "value": 7407720,
+      "contract": {
+        "salary": 114000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "730248c1-21a0-4e16-9f65-a57e16c5ab4d",
+      "source_id": 12,
+      "club_id": "b57f96e8-eeee-4c15-87bc-c55b9f6cdc94",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Aitor Garitano",
+      "last_name": "Garitano",
+      "birth_date": "1969-01-01",
+      "positions": [
+        {
+          "code": "MC",
+          "level": 17
+        },
+        {
+          "code": "DMC",
+          "level": 12
+        },
+        {
+          "code": "AMC",
+          "level": 10
+        }
+      ],
+      "current_ability": 139,
+      "potential_ability": 143,
+      "value": 13428095,
+      "contract": {
+        "salary": 139000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "e67487b7-4b78-4aae-ba64-5ad1cb7ef756",
+      "source_id": 13,
+      "club_id": "8a635691-a263-4e8c-9ab1-1d4b0a899bc4",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Fernando Enrique Voro",
+      "last_name": "Voro",
+      "birth_date": "1963-01-01",
+      "positions": [
+        {
+          "code": "DC",
+          "level": 17
+        },
+        {
+          "code": "DL",
+          "level": 11
+        },
+        {
+          "code": "DR",
+          "level": 11
+        }
+      ],
+      "current_ability": 127,
+      "potential_ability": 133,
+      "value": 10241915,
+      "contract": {
+        "salary": 127000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "09155e7c-ca07-4685-9916-219df423ec57",
+      "source_id": 14,
+      "club_id": "d2a135d8-ce0d-4e00-9b03-c71efbbd95e8",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Alberto Correa",
+      "last_name": "Correa",
+      "birth_date": "1972-01-01",
+      "positions": [
+        {
+          "code": "FC",
+          "level": 18
+        },
+        {
+          "code": "AMC",
+          "level": 9
+        }
+      ],
+      "current_ability": 136,
+      "potential_ability": 149,
+      "value": 12577280,
+      "contract": {
+        "salary": 136000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "7705666a-2f9f-46b5-a6e2-637bb6fe37cd",
+      "source_id": 15,
+      "club_id": "c976b397-3fae-4ce3-bf83-f9654aa6afd8",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Roberto Ríos",
+      "last_name": "Roberto Ríos",
+      "birth_date": "1971-01-01",
+      "positions": [
+        {
+          "code": "DC",
+          "level": 17
+        },
+        {
+          "code": "DL",
+          "level": 11
+        },
+        {
+          "code": "DR",
+          "level": 11
+        }
+      ],
+      "current_ability": 148,
+      "potential_ability": 156,
+      "value": 16208960,
+      "contract": {
+        "salary": 148000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "48798614-7a46-4a64-9193-846e10846c7f",
+      "source_id": 16,
+      "club_id": "b57f96e8-eeee-4c15-87bc-c55b9f6cdc94",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Imanol Etxeberria",
+      "last_name": "Etxeberria I.",
+      "birth_date": "1971-01-01",
+      "positions": [
+        {
+          "code": "GK",
+          "level": 18
+        }
+      ],
+      "current_ability": 112,
+      "potential_ability": 117,
+      "value": 7024640,
+      "contract": {
+        "salary": 112000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "24aa8966-68d3-42b6-bafa-8dbfedb4e0bc",
+      "source_id": 17,
+      "club_id": "d2a135d8-ce0d-4e00-9b03-c71efbbd95e8",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Antonio Muñoz",
+      "last_name": "Toni Muñoz",
+      "birth_date": "1965-01-01",
+      "positions": [
+        {
+          "code": "DC",
+          "level": 17
+        },
+        {
+          "code": "DL",
+          "level": 11
+        },
+        {
+          "code": "DR",
+          "level": 11
+        }
+      ],
+      "current_ability": 138,
+      "potential_ability": 147,
+      "value": 13140360,
+      "contract": {
+        "salary": 138000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "62d40c8d-953c-4eb9-bae6-517088d04085",
+      "source_id": 18,
+      "club_id": "925bb99d-8480-43a9-9e37-8d1bf8c7efb0",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "José Francisco Pérez",
+      "last_name": "Amavisca",
+      "birth_date": "1971-01-01",
+      "positions": [
+        {
+          "code": "AML",
+          "level": 17
+        },
+        {
+          "code": "ML",
+          "level": 14
+        },
+        {
+          "code": "AMC",
+          "level": 9
+        }
+      ],
+      "current_ability": 160,
+      "potential_ability": 173,
+      "value": 20480000,
+      "contract": {
+        "salary": 160000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "42446398-2aff-425c-9dd9-fd71ef43b15a",
+      "source_id": 19,
+      "club_id": "71a9d897-c219-4901-9b17-ed79ed635157",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Francisco Pérez",
+      "last_name": "Francisco",
+      "birth_date": "1970-01-01",
+      "positions": [
+        {
+          "code": "MC",
+          "level": 17
+        },
+        {
+          "code": "DMC",
+          "level": 12
+        },
+        {
+          "code": "AMC",
+          "level": 10
+        }
+      ],
+      "current_ability": 131,
+      "potential_ability": 137,
+      "value": 11240455,
+      "contract": {
+        "salary": 131000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "3ffefb15-e207-47bc-a2b4-08addb415269",
+      "source_id": 20,
+      "club_id": "04d08c83-beaf-4a5b-91c0-7fe1bd685653",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Miguel Ángel Nadal",
+      "last_name": "Nadal",
+      "birth_date": "1966-01-01",
+      "positions": [
+        {
+          "code": "DC",
+          "level": 17
+        },
+        {
+          "code": "DL",
+          "level": 11
+        },
+        {
+          "code": "DR",
+          "level": 11
+        }
+      ],
+      "current_ability": 150,
+      "potential_ability": 150,
+      "value": 16875000,
+      "contract": {
+        "salary": 150000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "c9e06ed7-9003-4b78-8c3a-fedb2d1a696f",
+      "source_id": 21,
+      "club_id": "925bb99d-8480-43a9-9e37-8d1bf8c7efb0",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Iván Luis Zamorano",
+      "last_name": "Zamorano",
+      "birth_date": "1967-01-01",
+      "positions": [
+        {
+          "code": "FC",
+          "level": 18
+        },
+        {
+          "code": "AMC",
+          "level": 9
+        }
+      ],
+      "current_ability": 157,
+      "potential_ability": 168,
+      "value": 19349465,
+      "contract": {
+        "salary": 157000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "3ea12c69-6be5-4551-98da-4825b62f27db",
+      "source_id": 22,
+      "club_id": "04d08c83-beaf-4a5b-91c0-7fe1bd685653",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Gheorghe",
+      "last_name": "Hagi",
+      "birth_date": "1965-01-01",
+      "positions": [
+        {
+          "code": "AML",
+          "level": 17
+        },
+        {
+          "code": "ML",
+          "level": 14
+        },
+        {
+          "code": "AMC",
+          "level": 9
+        }
+      ],
+      "current_ability": 162,
+      "potential_ability": 166,
+      "value": 21257640,
+      "contract": {
+        "salary": 162000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "0b408be7-adb5-40d8-92f4-a074d6179143",
+      "source_id": 23,
+      "club_id": "f1b102bc-7dce-445b-b8aa-e4108bbdc557",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Agustín Aranzabal",
+      "last_name": "Aranzabal",
+      "birth_date": "1973-01-01",
+      "positions": [
+        {
+          "code": "DC",
+          "level": 17
+        },
+        {
+          "code": "DL",
+          "level": 11
+        },
+        {
+          "code": "DR",
+          "level": 11
+        }
+      ],
+      "current_ability": 136,
+      "potential_ability": 139,
+      "value": 12577280,
+      "contract": {
+        "salary": 136000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "0e14186d-c956-4ae6-b19f-7b33d45d91b0",
+      "source_id": 24,
+      "club_id": null,
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Dennis",
+      "last_name": "Bergkamp",
+      "birth_date": "1969-01-01",
+      "positions": [
+        {
+          "code": "FC",
+          "level": 18
+        },
+        {
+          "code": "AMC",
+          "level": 9
+        }
+      ],
+      "current_ability": 154,
+      "potential_ability": 166,
+      "value": 18261320,
+      "contract": {
+        "salary": 154000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "e217d37a-b4e2-47ce-915f-ec9a46984b02",
+      "source_id": 25,
+      "club_id": "c1a77a05-5f03-4e55-84c7-96f12b3ef1a5",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Antonio Romero",
+      "last_name": "Romero",
+      "birth_date": "1969-01-01",
+      "positions": [
+        {
+          "code": "DC",
+          "level": 17
+        },
+        {
+          "code": "DL",
+          "level": 11
+        },
+        {
+          "code": "DR",
+          "level": 11
+        }
+      ],
+      "current_ability": 126,
+      "potential_ability": 129,
+      "value": 10001880,
+      "contract": {
+        "salary": 126000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "3f338627-247b-4833-a2b4-73ca4a64c9bd",
+      "source_id": 26,
+      "club_id": "b57f96e8-eeee-4c15-87bc-c55b9f6cdc94",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Aitor Larrazábal",
+      "last_name": "Larrazábal",
+      "birth_date": "1971-01-01",
+      "positions": [
+        {
+          "code": "DC",
+          "level": 17
+        },
+        {
+          "code": "DL",
+          "level": 11
+        },
+        {
+          "code": "DR",
+          "level": 11
+        }
+      ],
+      "current_ability": 140,
+      "potential_ability": 148,
+      "value": 13720000,
+      "contract": {
+        "salary": 140000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "50c8b43a-62e4-4733-9efb-0e03f10704eb",
+      "source_id": 27,
+      "club_id": "d2a135d8-ce0d-4e00-9b03-c71efbbd95e8",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Juan Vizcaíno",
+      "last_name": "Vizcaíno",
+      "birth_date": "1966-01-01",
+      "positions": [
+        {
+          "code": "MC",
+          "level": 17
+        },
+        {
+          "code": "DMC",
+          "level": 12
+        },
+        {
+          "code": "AMC",
+          "level": 10
+        }
+      ],
+      "current_ability": 154,
+      "potential_ability": 154,
+      "value": 18261320,
+      "contract": {
+        "salary": 154000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "5348315f-6fa6-478e-acc1-092b5d47156c",
+      "source_id": 28,
+      "club_id": "925bb99d-8480-43a9-9e37-8d1bf8c7efb0",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Fernando Ruiz",
+      "last_name": "Hierro",
+      "birth_date": "1968-01-01",
+      "positions": [
+        {
+          "code": "DC",
+          "level": 17
+        },
+        {
+          "code": "DL",
+          "level": 11
+        },
+        {
+          "code": "DR",
+          "level": 11
+        }
+      ],
+      "current_ability": 170,
+      "potential_ability": 174,
+      "value": 24565000,
+      "contract": {
+        "salary": 170000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "7bb1f77c-a05f-453e-9ddc-2c7fd4ae41f6",
+      "source_id": 29,
+      "club_id": "c1a77a05-5f03-4e55-84c7-96f12b3ef1a5",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Ionar de Oliveira",
+      "last_name": "Mazinho",
+      "birth_date": "1966-01-01",
+      "positions": [
+        {
+          "code": "MC",
+          "level": 17
+        },
+        {
+          "code": "DMC",
+          "level": 12
+        },
+        {
+          "code": "AMC",
+          "level": 10
+        }
+      ],
+      "current_ability": 159,
+      "potential_ability": 174,
+      "value": 20098395,
+      "contract": {
+        "salary": 159000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "815a2a11-dbaf-4007-bb20-a7cc6b3a7860",
+      "source_id": 30,
+      "club_id": "925bb99d-8480-43a9-9e37-8d1bf8c7efb0",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Fernando Carlos Redondo",
+      "last_name": "Redondo",
+      "birth_date": "1969-01-01",
+      "positions": [
+        {
+          "code": "MC",
+          "level": 17
+        },
+        {
+          "code": "DMC",
+          "level": 12
+        },
+        {
+          "code": "AMC",
+          "level": 10
+        }
+      ],
+      "current_ability": 178,
+      "potential_ability": 188,
+      "value": 28198760,
+      "contract": {
+        "salary": 178000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "cf8ac876-7a4a-47c0-a1ae-5018c6f6ce06",
+      "source_id": 31,
+      "club_id": "d2a135d8-ce0d-4e00-9b03-c71efbbd95e8",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Lyuboslav",
+      "last_name": "Penev",
+      "birth_date": "1966-01-01",
+      "positions": [
+        {
+          "code": "FC",
+          "level": 18
+        },
+        {
+          "code": "AMC",
+          "level": 9
+        }
+      ],
+      "current_ability": 148,
+      "potential_ability": 158,
+      "value": 16208960,
+      "contract": {
+        "salary": 148000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "32a79721-32ef-428c-a11b-eddccfd29e8d",
+      "source_id": 32,
+      "club_id": "8a635691-a263-4e8c-9ab1-1d4b0a899bc4",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "José Ribera",
+      "last_name": "Ribera",
+      "birth_date": "1969-01-01",
+      "positions": [
+        {
+          "code": "DC",
+          "level": 17
+        },
+        {
+          "code": "DL",
+          "level": 11
+        },
+        {
+          "code": "DR",
+          "level": 11
+        }
+      ],
+      "current_ability": 129,
+      "potential_ability": 134,
+      "value": 10733445,
+      "contract": {
+        "salary": 129000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "d97faa23-8c48-4ceb-af7d-7865c977dd5c",
+      "source_id": 33,
+      "club_id": "c976b397-3fae-4ce3-bf83-f9654aa6afd8",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Antonio Olías",
+      "last_name": "Olías",
+      "birth_date": "1968-01-01",
+      "positions": [
+        {
+          "code": "DC",
+          "level": 17
+        },
+        {
+          "code": "DL",
+          "level": 11
+        },
+        {
+          "code": "DR",
+          "level": 11
+        }
+      ],
+      "current_ability": 140,
+      "potential_ability": 142,
+      "value": 13720000,
+      "contract": {
+        "salary": 140000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "395c6541-af3d-4bbc-884a-4be336739e74",
+      "source_id": 34,
+      "club_id": "13323286-3948-44b6-aae6-fba0e413e98c",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Alejandro Arenales",
+      "last_name": "Jandri",
+      "birth_date": "1968-01-01",
+      "positions": [
+        {
+          "code": "DC",
+          "level": 17
+        },
+        {
+          "code": "DL",
+          "level": 11
+        },
+        {
+          "code": "DR",
+          "level": 11
+        }
+      ],
+      "current_ability": 119,
+      "potential_ability": 125,
+      "value": 8425795,
+      "contract": {
+        "salary": 119000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "190452a7-4a89-4779-a811-f3fce4b2a41d",
+      "source_id": 35,
+      "club_id": "71a9d897-c219-4901-9b17-ed79ed635157",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Miljan",
+      "last_name": "Bogdanović",
+      "birth_date": "1968-01-01",
+      "positions": [
+        {
+          "code": "MC",
+          "level": 17
+        },
+        {
+          "code": "DMC",
+          "level": 12
+        },
+        {
+          "code": "AMC",
+          "level": 10
+        }
+      ],
+      "current_ability": 132,
+      "potential_ability": 139,
+      "value": 11499840,
+      "contract": {
+        "salary": 132000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "4a32f8b0-020a-465b-bbdf-1ef0422556db",
+      "source_id": 36,
+      "club_id": "925bb99d-8480-43a9-9e37-8d1bf8c7efb0",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Dejan",
+      "last_name": "Petković",
+      "birth_date": "1972-01-01",
+      "positions": [
+        {
+          "code": "FC",
+          "level": 18
+        },
+        {
+          "code": "AMC",
+          "level": 9
+        }
+      ],
+      "current_ability": 150,
+      "potential_ability": 160,
+      "value": 16875000,
+      "contract": {
+        "salary": 150000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "46aac128-046e-43ae-8ba7-80e5947e4359",
+      "source_id": 37,
+      "club_id": "b57f96e8-eeee-4c15-87bc-c55b9f6cdc94",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Andoni Lakabeg",
+      "last_name": "Lakabeg",
+      "birth_date": "1968-01-01",
+      "positions": [
+        {
+          "code": "DC",
+          "level": 17
+        },
+        {
+          "code": "DL",
+          "level": 11
+        },
+        {
+          "code": "DR",
+          "level": 11
+        }
+      ],
+      "current_ability": 124,
+      "potential_ability": 135,
+      "value": 9533120,
+      "contract": {
+        "salary": 124000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "40938755-36f6-4d8e-82bc-f5ffa30d24c0",
+      "source_id": 38,
+      "club_id": "71a9d897-c219-4901-9b17-ed79ed635157",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Ismael Urzaiz",
+      "last_name": "Urzaiz",
+      "birth_date": "1971-01-01",
+      "positions": [
+        {
+          "code": "FC",
+          "level": 18
+        },
+        {
+          "code": "AMC",
+          "level": 9
+        }
+      ],
+      "current_ability": 134,
+      "potential_ability": 146,
+      "value": 12030520,
+      "contract": {
+        "salary": 134000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "87e08aef-66ba-4a8a-a73c-2f429ca460bd",
+      "source_id": 39,
+      "club_id": "71a9d897-c219-4901-9b17-ed79ed635157",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Mauricio Roberto",
+      "last_name": "Pochettino",
+      "birth_date": "1972-01-01",
+      "positions": [
+        {
+          "code": "DC",
+          "level": 17
+        },
+        {
+          "code": "DL",
+          "level": 11
+        },
+        {
+          "code": "DR",
+          "level": 11
+        }
+      ],
+      "current_ability": 135,
+      "potential_ability": 139,
+      "value": 12301875,
+      "contract": {
+        "salary": 135000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "3a307fd8-5d39-459d-b063-e68856d524e1",
+      "source_id": 40,
+      "club_id": "04d08c83-beaf-4a5b-91c0-7fe1bd685653",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Carles Busquets",
+      "last_name": "Busquets",
+      "birth_date": "1967-01-01",
+      "positions": [
+        {
+          "code": "GK",
+          "level": 18
+        }
+      ],
+      "current_ability": 109,
+      "potential_ability": 120,
+      "value": 6475145,
+      "contract": {
+        "salary": 109000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "7001d35f-d27c-49c8-bec3-9f71407187b7",
+      "source_id": 41,
+      "club_id": "925bb99d-8480-43a9-9e37-8d1bf8c7efb0",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Vicente Soler",
+      "last_name": "Soler",
+      "birth_date": "1967-01-01",
+      "positions": [
+        {
+          "code": "DC",
+          "level": 17
+        },
+        {
+          "code": "DL",
+          "level": 11
+        },
+        {
+          "code": "DR",
+          "level": 11
+        }
+      ],
+      "current_ability": 139,
+      "potential_ability": 144,
+      "value": 13428095,
+      "contract": {
+        "salary": 139000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "f3bd5721-0c9f-4a8c-8c13-2fadc76e9a3d",
+      "source_id": 42,
+      "club_id": "71a9d897-c219-4901-9b17-ed79ed635157",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Roque Benítez",
+      "last_name": "Benítez",
+      "birth_date": "1972-01-01",
+      "positions": [
+        {
+          "code": "FC",
+          "level": 18
+        },
+        {
+          "code": "AMC",
+          "level": 9
+        }
+      ],
+      "current_ability": 130,
+      "potential_ability": 134,
+      "value": 10985000,
+      "contract": {
+        "salary": 130000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "a2711f5a-abb1-4373-8f4d-965a861edef3",
+      "source_id": 43,
+      "club_id": "b57f96e8-eeee-4c15-87bc-c55b9f6cdc94",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Sergio Sánchez",
+      "last_name": "Sergio",
+      "birth_date": "1968-01-01",
+      "positions": [
+        {
+          "code": "DC",
+          "level": 17
+        },
+        {
+          "code": "DL",
+          "level": 11
+        },
+        {
+          "code": "DR",
+          "level": 11
+        }
+      ],
+      "current_ability": 126,
+      "potential_ability": 137,
+      "value": 10001880,
+      "contract": {
+        "salary": 126000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "b7b19c4f-4511-4124-b78e-5460ae1ded9d",
+      "source_id": 44,
+      "club_id": "925bb99d-8480-43a9-9e37-8d1bf8c7efb0",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Raúl González",
+      "last_name": "Raúl",
+      "birth_date": "1977-01-01",
+      "positions": [
+        {
+          "code": "FC",
+          "level": 18
+        },
+        {
+          "code": "AMC",
+          "level": 9
+        }
+      ],
+      "current_ability": 169,
+      "potential_ability": 171,
+      "value": 24134045,
+      "contract": {
+        "salary": 169000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "e1dd8175-e280-4cf0-ac22-5d45870f5b9a",
+      "source_id": 45,
+      "club_id": "925bb99d-8480-43a9-9e37-8d1bf8c7efb0",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Francisco Lloréns",
+      "last_name": "Buyo",
+      "birth_date": "1958-01-01",
+      "positions": [
+        {
+          "code": "GK",
+          "level": 18
+        }
+      ],
+      "current_ability": 116,
+      "potential_ability": 119,
+      "value": 7804480,
+      "contract": {
+        "salary": 116000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "ae853f59-f85b-4892-b6ab-4298d1f49ced",
+      "source_id": 46,
+      "club_id": "c976b397-3fae-4ce3-bf83-f9654aa6afd8",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Iván Iglesias",
+      "last_name": "Iglesias",
+      "birth_date": "1969-01-01",
+      "positions": [
+        {
+          "code": "AMR",
+          "level": 17
+        },
+        {
+          "code": "MR",
+          "level": 14
+        },
+        {
+          "code": "AMC",
+          "level": 9
+        }
+      ],
+      "current_ability": 142,
+      "potential_ability": 151,
+      "value": 14316440,
+      "contract": {
+        "salary": 142000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "f6fb4fc3-5cb3-43ef-af1d-c2359004d480",
+      "source_id": 47,
+      "club_id": "04d08c83-beaf-4a5b-91c0-7fe1bd685653",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Robert",
+      "last_name": "Prosinečki",
+      "birth_date": "1969-01-01",
+      "positions": [
+        {
+          "code": "MC",
+          "level": 17
+        },
+        {
+          "code": "DMC",
+          "level": 12
+        },
+        {
+          "code": "AMC",
+          "level": 10
+        }
+      ],
+      "current_ability": 157,
+      "potential_ability": 159,
+      "value": 19349465,
+      "contract": {
+        "salary": 157000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "2078d036-0bdc-4e48-b81a-c8303e61ad1a",
+      "source_id": 48,
+      "club_id": "8a635691-a263-4e8c-9ab1-1d4b0a899bc4",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Francisco Javier González",
+      "last_name": "Fran",
+      "birth_date": "1969-01-01",
+      "positions": [
+        {
+          "code": "MC",
+          "level": 17
+        },
+        {
+          "code": "DMC",
+          "level": 12
+        },
+        {
+          "code": "AMC",
+          "level": 10
+        }
+      ],
+      "current_ability": 157,
+      "potential_ability": 167,
+      "value": 19349465,
+      "contract": {
+        "salary": 157000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "85f02a66-5bfa-41d0-98da-8d9d97825e18",
+      "source_id": 49,
+      "club_id": "b57f96e8-eeee-4c15-87bc-c55b9f6cdc94",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Patxi Salinas",
+      "last_name": "Salinas",
+      "birth_date": "1971-01-01",
+      "positions": [
+        {
+          "code": "DC",
+          "level": 17
+        },
+        {
+          "code": "DL",
+          "level": 11
+        },
+        {
+          "code": "DR",
+          "level": 11
+        }
+      ],
+      "current_ability": 129,
+      "potential_ability": 137,
+      "value": 10733445,
+      "contract": {
+        "salary": 129000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "8e94984b-fc8c-4806-930d-d9dde4891f81",
+      "source_id": 50,
+      "club_id": "f1b102bc-7dce-445b-b8aa-e4108bbdc557",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Meho",
+      "last_name": "Kodro",
+      "birth_date": "1967-01-01",
+      "positions": [
+        {
+          "code": "FC",
+          "level": 18
+        },
+        {
+          "code": "AMC",
+          "level": 9
+        }
+      ],
+      "current_ability": 146,
+      "potential_ability": 153,
+      "value": 15560680,
+      "contract": {
+        "salary": 146000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "13e7f8bb-f856-4844-87d5-f8eb672af330",
+      "source_id": 51,
+      "club_id": "925bb99d-8480-43a9-9e37-8d1bf8c7efb0",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Michael",
+      "last_name": "Laudrup",
+      "birth_date": "1964-01-01",
+      "positions": [
+        {
+          "code": "MC",
+          "level": 17
+        },
+        {
+          "code": "DMC",
+          "level": 12
+        },
+        {
+          "code": "AMC",
+          "level": 10
+        }
+      ],
+      "current_ability": 163,
+      "potential_ability": 176,
+      "value": 21653735,
+      "contract": {
+        "salary": 163000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "462fd01c-1272-4abf-b44c-c3ef7bf5f12d",
+      "source_id": 52,
+      "club_id": "c1a77a05-5f03-4e55-84c7-96f12b3ef1a5",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Andoni Zubizarreta",
+      "last_name": "Zubizarreta",
+      "birth_date": "1961-01-01",
+      "positions": [
+        {
+          "code": "GK",
+          "level": 18
+        }
+      ],
+      "current_ability": 112,
+      "potential_ability": 116,
+      "value": 7024640,
+      "contract": {
+        "salary": 112000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "c0d69bd9-b4d5-464b-931d-34cfed2f4c1d",
+      "source_id": 53,
+      "club_id": "c1a77a05-5f03-4e55-84c7-96f12b3ef1a5",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Santiago Viola",
+      "last_name": "Viola",
+      "birth_date": "1969-01-01",
+      "positions": [
+        {
+          "code": "FC",
+          "level": 18
+        },
+        {
+          "code": "AMC",
+          "level": 9
+        }
+      ],
+      "current_ability": 144,
+      "potential_ability": 159,
+      "value": 14929920,
+      "contract": {
+        "salary": 144000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "e2c1f9bf-598c-4bb9-912a-0a2c460b9089",
+      "source_id": 54,
+      "club_id": "13323286-3948-44b6-aae6-fba0e413e98c",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Diego Fernando",
+      "last_name": "Latorre",
+      "birth_date": "1969-01-01",
+      "positions": [
+        {
+          "code": "FC",
+          "level": 18
+        },
+        {
+          "code": "AMC",
+          "level": 9
+        }
+      ],
+      "current_ability": 134,
+      "potential_ability": 139,
+      "value": 12030520,
+      "contract": {
+        "salary": 134000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "285fce0b-8c83-4227-9d35-ffdef63ac562",
+      "source_id": 55,
+      "club_id": null,
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Edgar",
+      "last_name": "Davids",
+      "birth_date": "1973-01-01",
+      "positions": [
+        {
+          "code": "MC",
+          "level": 17
+        },
+        {
+          "code": "DMC",
+          "level": 12
+        },
+        {
+          "code": "AMC",
+          "level": 10
+        }
+      ],
+      "current_ability": 160,
+      "potential_ability": 172,
+      "value": 20480000,
+      "contract": {
+        "salary": 160000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "ef5d3f82-1404-416c-a1ec-1ba38ba6d73a",
+      "source_id": 56,
+      "club_id": "04d08c83-beaf-4a5b-91c0-7fe1bd685653",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Santiago Lopetegui",
+      "last_name": "Lopetegui",
+      "birth_date": "1966-01-01",
+      "positions": [
+        {
+          "code": "GK",
+          "level": 18
+        }
+      ],
+      "current_ability": 109,
+      "potential_ability": 119,
+      "value": 6475145,
+      "contract": {
+        "salary": 109000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "18d924a0-8641-4fb5-a481-d021ca0ad2a9",
+      "source_id": 57,
+      "club_id": "13323286-3948-44b6-aae6-fba0e413e98c",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Martín Vellisca",
+      "last_name": "Vellisca",
+      "birth_date": "1971-01-01",
+      "positions": [
+        {
+          "code": "MC",
+          "level": 17
+        },
+        {
+          "code": "DMC",
+          "level": 12
+        },
+        {
+          "code": "AMC",
+          "level": 10
+        }
+      ],
+      "current_ability": 130,
+      "potential_ability": 142,
+      "value": 10985000,
+      "contract": {
+        "salary": 130000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "5f345199-f50e-43f3-9bd1-ba198c34d5f0",
+      "source_id": 58,
+      "club_id": null,
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Christian",
+      "last_name": "Vieri",
+      "birth_date": "1973-01-01",
+      "positions": [
+        {
+          "code": "FC",
+          "level": 18
+        },
+        {
+          "code": "AMC",
+          "level": 9
+        }
+      ],
+      "current_ability": 147,
+      "potential_ability": 156,
+      "value": 15882615,
+      "contract": {
+        "salary": 147000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "7417b918-4259-4ff7-8b6f-1f9e199cc821",
+      "source_id": 59,
+      "club_id": "925bb99d-8480-43a9-9e37-8d1bf8c7efb0",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Rafael Alkorta",
+      "last_name": "Alkorta",
+      "birth_date": "1968-01-01",
+      "positions": [
+        {
+          "code": "DC",
+          "level": 17
+        },
+        {
+          "code": "DL",
+          "level": 11
+        },
+        {
+          "code": "DR",
+          "level": 11
+        }
+      ],
+      "current_ability": 145,
+      "potential_ability": 145,
+      "value": 15243125,
+      "contract": {
+        "salary": 145000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "2c824156-e907-4d14-8ec0-bca8c79482b2",
+      "source_id": 60,
+      "club_id": "f1b102bc-7dce-445b-b8aa-e4108bbdc557",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Jokin Aramburu",
+      "last_name": "Aramburu J.",
+      "birth_date": "1976-01-01",
+      "positions": [
+        {
+          "code": "AMR",
+          "level": 17
+        },
+        {
+          "code": "MR",
+          "level": 14
+        },
+        {
+          "code": "AMC",
+          "level": 9
+        }
+      ],
+      "current_ability": 133,
+      "potential_ability": 136,
+      "value": 11763185,
+      "contract": {
+        "salary": 133000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "22bcb191-b768-4904-ac35-4c9010d37400",
+      "source_id": 61,
+      "club_id": "8a635691-a263-4e8c-9ab1-1d4b0a899bc4",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Fernando Menéndez",
+      "last_name": "Nando",
+      "birth_date": "1967-01-01",
+      "positions": [
+        {
+          "code": "DC",
+          "level": 17
+        },
+        {
+          "code": "DL",
+          "level": 11
+        },
+        {
+          "code": "DR",
+          "level": 11
+        }
+      ],
+      "current_ability": 128,
+      "potential_ability": 134,
+      "value": 10485760,
+      "contract": {
+        "salary": 128000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "37044cb2-460c-42db-ae35-14ba1f09a698",
+      "source_id": 62,
+      "club_id": "c976b397-3fae-4ce3-bf83-f9654aa6afd8",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Pedro Jaro",
+      "last_name": "Jaro",
+      "birth_date": "1965-01-01",
+      "positions": [
+        {
+          "code": "GK",
+          "level": 18
+        }
+      ],
+      "current_ability": 117,
+      "potential_ability": 120,
+      "value": 8008065,
+      "contract": {
+        "salary": 117000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "1d17b2d4-f960-466b-b3f9-d44ed4fe25d4",
+      "source_id": 63,
+      "club_id": "b57f96e8-eeee-4c15-87bc-c55b9f6cdc94",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Patxi Cuco Ziganda",
+      "last_name": "Ziganda",
+      "birth_date": "1966-01-01",
+      "positions": [
+        {
+          "code": "FC",
+          "level": 18
+        },
+        {
+          "code": "AMC",
+          "level": 9
+        }
+      ],
+      "current_ability": 139,
+      "potential_ability": 144,
+      "value": 13428095,
+      "contract": {
+        "salary": 139000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "f8c3b649-c0ec-44dc-8bcc-7e4adbbd57c8",
+      "source_id": 64,
+      "club_id": "b57f96e8-eeee-4c15-87bc-c55b9f6cdc94",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "José Antonio Mendiguren",
+      "last_name": "Mendiguren",
+      "birth_date": "1968-01-01",
+      "positions": [
+        {
+          "code": "MC",
+          "level": 17
+        },
+        {
+          "code": "DMC",
+          "level": 12
+        },
+        {
+          "code": "AMC",
+          "level": 10
+        }
+      ],
+      "current_ability": 137,
+      "potential_ability": 137,
+      "value": 12856765,
+      "contract": {
+        "salary": 137000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "f1f4ffe4-9262-4465-8af0-1fdc29e05167",
+      "source_id": 65,
+      "club_id": "925bb99d-8480-43a9-9e37-8d1bf8c7efb0",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Juan Eduardo",
+      "last_name": "Esnaider",
+      "birth_date": "1973-01-01",
+      "positions": [
+        {
+          "code": "FC",
+          "level": 18
+        },
+        {
+          "code": "AMC",
+          "level": 9
+        }
+      ],
+      "current_ability": 153,
+      "potential_ability": 162,
+      "value": 17907885,
+      "contract": {
+        "salary": 153000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "0f8eabfa-b841-4594-a0cc-3b576ccefb88",
+      "source_id": 66,
+      "club_id": "b57f96e8-eeee-4c15-87bc-c55b9f6cdc94",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Roberto Ituiño",
+      "last_name": "Tiko",
+      "birth_date": "1976-01-01",
+      "positions": [
+        {
+          "code": "MC",
+          "level": 17
+        },
+        {
+          "code": "DMC",
+          "level": 12
+        },
+        {
+          "code": "AMC",
+          "level": 10
+        }
+      ],
+      "current_ability": 129,
+      "potential_ability": 130,
+      "value": 10733445,
+      "contract": {
+        "salary": 129000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "e460ce62-9766-4433-b736-2e32668c098f",
+      "source_id": 67,
+      "club_id": "04d08c83-beaf-4a5b-91c0-7fe1bd685653",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Jesús Angoy",
+      "last_name": "Angoy",
+      "birth_date": "1972-01-01",
+      "positions": [
+        {
+          "code": "GK",
+          "level": 18
+        }
+      ],
+      "current_ability": 99,
+      "potential_ability": 107,
+      "value": 4851495,
+      "contract": {
+        "salary": 99000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "50c5fa41-2410-437f-b12a-f39cc115d75e",
+      "source_id": 68,
+      "club_id": "c1a77a05-5f03-4e55-84c7-96f12b3ef1a5",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "José Manuel Otero",
+      "last_name": "Otero",
+      "birth_date": "1970-01-01",
+      "positions": [
+        {
+          "code": "FC",
+          "level": 18
+        },
+        {
+          "code": "AMC",
+          "level": 9
+        }
+      ],
+      "current_ability": 132,
+      "potential_ability": 139,
+      "value": 11499840,
+      "contract": {
+        "salary": 132000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "5aa4cd2d-cfed-455d-a592-6149e1748323",
+      "source_id": 69,
+      "club_id": "04d08c83-beaf-4a5b-91c0-7fe1bd685653",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Iván de la Peña",
+      "last_name": "De la Peña",
+      "birth_date": "1976-01-01",
+      "positions": [
+        {
+          "code": "MC",
+          "level": 17
+        },
+        {
+          "code": "DMC",
+          "level": 12
+        },
+        {
+          "code": "AMC",
+          "level": 10
+        }
+      ],
+      "current_ability": 152,
+      "potential_ability": 158,
+      "value": 17559040,
+      "contract": {
+        "salary": 152000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "ae0dd863-a0ed-4f9d-9f6c-b95f148ba0a9",
+      "source_id": 70,
+      "club_id": "8a635691-a263-4e8c-9ab1-1d4b0a899bc4",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Francisco Liaño",
+      "last_name": "Liaño",
+      "birth_date": "1966-01-01",
+      "positions": [
+        {
+          "code": "GK",
+          "level": 18
+        }
+      ],
+      "current_ability": 112,
+      "potential_ability": 120,
+      "value": 7024640,
+      "contract": {
+        "salary": 112000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "af94e5f5-0079-4372-8975-5d337b60ec70",
+      "source_id": 71,
+      "club_id": null,
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Gabriel Omar",
+      "last_name": "Batistuta",
+      "birth_date": "1969-01-01",
+      "positions": [
+        {
+          "code": "FC",
+          "level": 18
+        },
+        {
+          "code": "AMC",
+          "level": 9
+        }
+      ],
+      "current_ability": 151,
+      "potential_ability": 154,
+      "value": 17214755,
+      "contract": {
+        "salary": 151000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "f3863337-f755-4580-a1b1-0a441217ae1b",
+      "source_id": 72,
+      "club_id": "d2a135d8-ce0d-4e00-9b03-c71efbbd95e8",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Juan Antonio López",
+      "last_name": "López",
+      "birth_date": "1968-01-01",
+      "positions": [
+        {
+          "code": "DC",
+          "level": 17
+        },
+        {
+          "code": "DL",
+          "level": 11
+        },
+        {
+          "code": "DR",
+          "level": 11
+        }
+      ],
+      "current_ability": 132,
+      "potential_ability": 136,
+      "value": 11499840,
+      "contract": {
+        "salary": 132000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "4178b44d-b7c9-4c04-bb49-72fb0bbcedf9",
+      "source_id": 73,
+      "club_id": "c1a77a05-5f03-4e55-84c7-96f12b3ef1a5",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Francisco Camarasa",
+      "last_name": "Camarasa",
+      "birth_date": "1966-01-01",
+      "positions": [
+        {
+          "code": "DC",
+          "level": 17
+        },
+        {
+          "code": "DL",
+          "level": 11
+        },
+        {
+          "code": "DR",
+          "level": 11
+        }
+      ],
+      "current_ability": 131,
+      "potential_ability": 134,
+      "value": 11240455,
+      "contract": {
+        "salary": 131000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "56a4ebec-72af-493d-bc1a-1246463f6c39",
+      "source_id": 74,
+      "club_id": "c976b397-3fae-4ce3-bf83-f9654aa6afd8",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Jaime Quesada",
+      "last_name": "Quesada",
+      "birth_date": "1966-01-01",
+      "positions": [
+        {
+          "code": "DC",
+          "level": 17
+        },
+        {
+          "code": "DL",
+          "level": 11
+        },
+        {
+          "code": "DR",
+          "level": 11
+        }
+      ],
+      "current_ability": 135,
+      "potential_ability": 147,
+      "value": 12301875,
+      "contract": {
+        "salary": 135000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "8abf92d1-36b3-40b6-bae1-9d9d66ece4ea",
+      "source_id": 75,
+      "club_id": "c976b397-3fae-4ce3-bf83-f9654aa6afd8",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Alexis Trujillo",
+      "last_name": "Alexis",
+      "birth_date": "1965-01-01",
+      "positions": [
+        {
+          "code": "MC",
+          "level": 17
+        },
+        {
+          "code": "DMC",
+          "level": 12
+        },
+        {
+          "code": "AMC",
+          "level": 10
+        }
+      ],
+      "current_ability": 153,
+      "potential_ability": 167,
+      "value": 17907885,
+      "contract": {
+        "salary": 153000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "6818f478-48de-4464-bcd2-e4a284de8bda",
+      "source_id": 76,
+      "club_id": "c976b397-3fae-4ce3-bf83-f9654aa6afd8",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Juan Ureña",
+      "last_name": "Juanito",
+      "birth_date": "1965-01-01",
+      "positions": [
+        {
+          "code": "DC",
+          "level": 17
+        },
+        {
+          "code": "DL",
+          "level": 11
+        },
+        {
+          "code": "DR",
+          "level": 11
+        }
+      ],
+      "current_ability": 145,
+      "potential_ability": 145,
+      "value": 15243125,
+      "contract": {
+        "salary": 145000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "710fd7b9-fe3d-4bde-8b1b-e1e7ea2f08ef",
+      "source_id": 77,
+      "club_id": "c1a77a05-5f03-4e55-84c7-96f12b3ef1a5",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Fernando Giner",
+      "last_name": "Giner",
+      "birth_date": "1964-01-01",
+      "positions": [
+        {
+          "code": "DC",
+          "level": 17
+        },
+        {
+          "code": "DL",
+          "level": 11
+        },
+        {
+          "code": "DR",
+          "level": 11
+        }
+      ],
+      "current_ability": 127,
+      "potential_ability": 142,
+      "value": 10241915,
+      "contract": {
+        "salary": 127000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "fc256d8f-bea4-4878-b68d-d73ba9248419",
+      "source_id": 78,
+      "club_id": "c976b397-3fae-4ce3-bf83-f9654aa6afd8",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Marcos Vales",
+      "last_name": "Vales",
+      "birth_date": "1971-01-01",
+      "positions": [
+        {
+          "code": "FC",
+          "level": 18
+        },
+        {
+          "code": "AMC",
+          "level": 9
+        }
+      ],
+      "current_ability": 134,
+      "potential_ability": 136,
+      "value": 12030520,
+      "contract": {
+        "salary": 134000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "43458b50-44c5-4772-8bdb-eb18dde00ad3",
+      "source_id": 79,
+      "club_id": "13323286-3948-44b6-aae6-fba0e413e98c",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "José Antonio Quiroga",
+      "last_name": "Quiroga",
+      "birth_date": "1969-01-01",
+      "positions": [
+        {
+          "code": "MC",
+          "level": 17
+        },
+        {
+          "code": "DMC",
+          "level": 12
+        },
+        {
+          "code": "AMC",
+          "level": 10
+        }
+      ],
+      "current_ability": 131,
+      "potential_ability": 132,
+      "value": 11240455,
+      "contract": {
+        "salary": 131000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "a0d438e2-b901-4850-b44e-fc6bd6a1bef6",
+      "source_id": 80,
+      "club_id": "d2a135d8-ce0d-4e00-9b03-c71efbbd95e8",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Ricardo Álvarez",
+      "last_name": "Ricardo",
+      "birth_date": "1971-01-01",
+      "positions": [
+        {
+          "code": "GK",
+          "level": 18
+        }
+      ],
+      "current_ability": 99,
+      "potential_ability": 103,
+      "value": 4851495,
+      "contract": {
+        "salary": 99000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "ba89c6cb-8f7a-47e0-8c6f-c6f25da22624",
+      "source_id": 81,
+      "club_id": "71a9d897-c219-4901-9b17-ed79ed635157",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Joaquín Pakín",
+      "last_name": "Pakín",
+      "birth_date": "1971-01-01",
+      "positions": [
+        {
+          "code": "MC",
+          "level": 17
+        },
+        {
+          "code": "DMC",
+          "level": 12
+        },
+        {
+          "code": "AMC",
+          "level": 10
+        }
+      ],
+      "current_ability": 126,
+      "potential_ability": 132,
+      "value": 10001880,
+      "contract": {
+        "salary": 126000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "efca819b-4783-4960-9530-73484f5bec3e",
+      "source_id": 82,
+      "club_id": "f1b102bc-7dce-445b-b8aa-e4108bbdc557",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Francisco Ferreira",
+      "last_name": "Ferreira",
+      "birth_date": "1973-01-01",
+      "positions": [
+        {
+          "code": "GK",
+          "level": 18
+        }
+      ],
+      "current_ability": 100,
+      "potential_ability": 108,
+      "value": 5000000,
+      "contract": {
+        "salary": 100000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "49bc86c0-3d7c-4250-ad7a-30c2dc6ca000",
+      "source_id": 83,
+      "club_id": "c1a77a05-5f03-4e55-84c7-96f12b3ef1a5",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Antonio Gálvez",
+      "last_name": "Gálvez",
+      "birth_date": "1971-01-01",
+      "positions": [
+        {
+          "code": "FC",
+          "level": 18
+        },
+        {
+          "code": "AMC",
+          "level": 9
+        }
+      ],
+      "current_ability": 131,
+      "potential_ability": 141,
+      "value": 11240455,
+      "contract": {
+        "salary": 131000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "89932264-070f-40f8-b134-9fa844e84e5d",
+      "source_id": 84,
+      "club_id": "c1a77a05-5f03-4e55-84c7-96f12b3ef1a5",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "José Emilio Bartual",
+      "last_name": "Bartual",
+      "birth_date": "1972-01-01",
+      "positions": [
+        {
+          "code": "GK",
+          "level": 18
+        }
+      ],
+      "current_ability": 90,
+      "potential_ability": 95,
+      "value": 3645000,
+      "contract": {
+        "salary": 90000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "786af83d-190e-4fdb-a2e3-a2a6d6d211d0",
+      "source_id": 85,
+      "club_id": "13323286-3948-44b6-aae6-fba0e413e98c",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "José María López",
+      "last_name": "Josema",
+      "birth_date": "1969-01-01",
+      "positions": [
+        {
+          "code": "DC",
+          "level": 17
+        },
+        {
+          "code": "DL",
+          "level": 11
+        },
+        {
+          "code": "DR",
+          "level": 11
+        }
+      ],
+      "current_ability": 117,
+      "potential_ability": 118,
+      "value": 8008065,
+      "contract": {
+        "salary": 117000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "ad1eb6ca-27e2-4638-b170-cea2f2424037",
+      "source_id": 86,
+      "club_id": "13323286-3948-44b6-aae6-fba0e413e98c",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Francisco Javier Rey",
+      "last_name": "Quico",
+      "birth_date": "1967-01-01",
+      "positions": [
+        {
+          "code": "FC",
+          "level": 18
+        },
+        {
+          "code": "AMC",
+          "level": 9
+        }
+      ],
+      "current_ability": 132,
+      "potential_ability": 132,
+      "value": 11499840,
+      "contract": {
+        "salary": 132000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "0d10f912-783f-43b8-931e-eee36bb911a7",
+      "source_id": 87,
+      "club_id": "13323286-3948-44b6-aae6-fba0e413e98c",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Ángel Pedro Medina",
+      "last_name": "Medina",
+      "birth_date": "1967-01-01",
+      "positions": [
+        {
+          "code": "MC",
+          "level": 17
+        },
+        {
+          "code": "DMC",
+          "level": 12
+        },
+        {
+          "code": "AMC",
+          "level": 10
+        }
+      ],
+      "current_ability": 128,
+      "potential_ability": 141,
+      "value": 10485760,
+      "contract": {
+        "salary": 128000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "ea545d84-a5a3-4702-98e8-0752c341932b",
+      "source_id": 88,
+      "club_id": "8a635691-a263-4e8c-9ab1-1d4b0a899bc4",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Mauro Silva Gomes de",
+      "last_name": "Mauro Silva",
+      "birth_date": "1968-01-01",
+      "positions": [
+        {
+          "code": "MC",
+          "level": 17
+        },
+        {
+          "code": "DMC",
+          "level": 12
+        },
+        {
+          "code": "AMC",
+          "level": 10
+        }
+      ],
+      "current_ability": 163,
+      "potential_ability": 171,
+      "value": 21653735,
+      "contract": {
+        "salary": 163000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "c8825dd0-6c27-4a57-aff3-9b273dea7305",
+      "source_id": 89,
+      "club_id": "b57f96e8-eeee-4c15-87bc-c55b9f6cdc94",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Andoni Imaz",
+      "last_name": "Imaz",
+      "birth_date": "1968-01-01",
+      "positions": [
+        {
+          "code": "FC",
+          "level": 18
+        },
+        {
+          "code": "AMC",
+          "level": 9
+        }
+      ],
+      "current_ability": 126,
+      "potential_ability": 128,
+      "value": 10001880,
+      "contract": {
+        "salary": 126000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "c47c7603-c98d-4b78-b6c4-97f5880a4db8",
+      "source_id": 90,
+      "club_id": "c1a77a05-5f03-4e55-84c7-96f12b3ef1a5",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Gaizka Mendieta",
+      "last_name": "Mendieta",
+      "birth_date": "1974-01-01",
+      "positions": [
+        {
+          "code": "AMR",
+          "level": 17
+        },
+        {
+          "code": "MR",
+          "level": 14
+        },
+        {
+          "code": "AMC",
+          "level": 9
+        }
+      ],
+      "current_ability": 157,
+      "potential_ability": 158,
+      "value": 19349465,
+      "contract": {
+        "salary": 157000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "1477df50-309f-44d9-a55e-4c3d3ada377c",
+      "source_id": 91,
+      "club_id": "13323286-3948-44b6-aae6-fba0e413e98c",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Juan Luis Sukunza",
+      "last_name": "Sukunza",
+      "birth_date": "1967-01-01",
+      "positions": [
+        {
+          "code": "MC",
+          "level": 17
+        },
+        {
+          "code": "DMC",
+          "level": 12
+        },
+        {
+          "code": "AMC",
+          "level": 10
+        }
+      ],
+      "current_ability": 126,
+      "potential_ability": 129,
+      "value": 10001880,
+      "contract": {
+        "salary": 126000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "38ebe571-3a4d-4a94-bb64-9398dce4db0c",
+      "source_id": 92,
+      "club_id": "f1b102bc-7dce-445b-b8aa-e4108bbdc557",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Alberto López",
+      "last_name": "Alberto",
+      "birth_date": "1966-01-01",
+      "positions": [
+        {
+          "code": "GK",
+          "level": 18
+        }
+      ],
+      "current_ability": 106,
+      "potential_ability": 116,
+      "value": 5955080,
+      "contract": {
+        "salary": 106000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "fc9a9280-1505-4596-bf48-7d237752c9d3",
+      "source_id": 93,
+      "club_id": null,
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Patrick",
+      "last_name": "Kluivert",
+      "birth_date": "1976-01-01",
+      "positions": [
+        {
+          "code": "FC",
+          "level": 18
+        },
+        {
+          "code": "AMC",
+          "level": 9
+        }
+      ],
+      "current_ability": 149,
+      "potential_ability": 164,
+      "value": 16539745,
+      "contract": {
+        "salary": 149000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "21d817a5-1b71-4e5f-b1d9-ce30291c0361",
+      "source_id": 94,
+      "club_id": "c1a77a05-5f03-4e55-84c7-96f12b3ef1a5",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "José Poyatos",
+      "last_name": "Poyatos",
+      "birth_date": "1969-01-01",
+      "positions": [
+        {
+          "code": "MC",
+          "level": 17
+        },
+        {
+          "code": "DMC",
+          "level": 12
+        },
+        {
+          "code": "AMC",
+          "level": 10
+        }
+      ],
+      "current_ability": 139,
+      "potential_ability": 145,
+      "value": 13428095,
+      "contract": {
+        "salary": 139000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "a980d830-4bea-4b8d-882b-b7f5e1d08ce0",
+      "source_id": 95,
+      "club_id": null,
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Zinedine Yazid",
+      "last_name": "Zidane",
+      "birth_date": "1972-01-01",
+      "positions": [
+        {
+          "code": "MC",
+          "level": 17
+        },
+        {
+          "code": "DMC",
+          "level": 12
+        },
+        {
+          "code": "AMC",
+          "level": 10
+        }
+      ],
+      "current_ability": 165,
+      "potential_ability": 175,
+      "value": 22460625,
+      "contract": {
+        "salary": 165000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "0531855b-ccf7-4e5a-961a-69bbf9c3189c",
+      "source_id": 96,
+      "club_id": "f1b102bc-7dce-445b-b8aa-e4108bbdc557",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Mikel Aramburu",
+      "last_name": "Aramburu M.",
+      "birth_date": "1973-01-01",
+      "positions": [
+        {
+          "code": "AML",
+          "level": 17
+        },
+        {
+          "code": "ML",
+          "level": 14
+        },
+        {
+          "code": "AMC",
+          "level": 9
+        }
+      ],
+      "current_ability": 136,
+      "potential_ability": 143,
+      "value": 12577280,
+      "contract": {
+        "salary": 136000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "b11ff25f-6271-4d37-9144-79e8cb1f3af0",
+      "source_id": 97,
+      "club_id": "f1b102bc-7dce-445b-b8aa-e4108bbdc557",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Lorenzo Juarros",
+      "last_name": "Loren",
+      "birth_date": "1968-01-01",
+      "positions": [
+        {
+          "code": "DC",
+          "level": 17
+        },
+        {
+          "code": "DL",
+          "level": 11
+        },
+        {
+          "code": "DR",
+          "level": 11
+        }
+      ],
+      "current_ability": 127,
+      "potential_ability": 133,
+      "value": 10241915,
+      "contract": {
+        "salary": 127000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "6d44cf08-372b-4a06-9de3-dc011e97cdf0",
+      "source_id": 98,
+      "club_id": "c976b397-3fae-4ce3-bf83-f9654aa6afd8",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Roberto Cuéllar",
+      "last_name": "Cuéllar",
+      "birth_date": "1968-01-01",
+      "positions": [
+        {
+          "code": "FC",
+          "level": 18
+        },
+        {
+          "code": "AMC",
+          "level": 9
+        }
+      ],
+      "current_ability": 137,
+      "potential_ability": 146,
+      "value": 12856765,
+      "contract": {
+        "salary": 137000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "73b8f5d4-678c-43e0-ace2-586f8c462b53",
+      "source_id": 99,
+      "club_id": "8a635691-a263-4e8c-9ab1-1d4b0a899bc4",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Miroslav",
+      "last_name": "Đukić",
+      "birth_date": "1966-01-01",
+      "positions": [
+        {
+          "code": "DC",
+          "level": 17
+        },
+        {
+          "code": "DL",
+          "level": 11
+        },
+        {
+          "code": "DR",
+          "level": 11
+        }
+      ],
+      "current_ability": 141,
+      "potential_ability": 141,
+      "value": 14016105,
+      "contract": {
+        "salary": 141000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "e21e80c8-7c5d-47f7-b83e-a37748196c7a",
+      "source_id": 100,
+      "club_id": "c976b397-3fae-4ce3-bf83-f9654aa6afd8",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Aitor Aldeondo",
+      "last_name": "Aldeondo",
+      "birth_date": "1967-01-01",
+      "positions": [
+        {
+          "code": "DC",
+          "level": 17
+        },
+        {
+          "code": "DL",
+          "level": 11
+        },
+        {
+          "code": "DR",
+          "level": 11
+        }
+      ],
+      "current_ability": 135,
+      "potential_ability": 140,
+      "value": 12301875,
+      "contract": {
+        "salary": 135000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "b54eec0f-ce5d-4937-ad70-d80902d56d66",
+      "source_id": 101,
+      "club_id": "13323286-3948-44b6-aae6-fba0e413e98c",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Josu Anuzita",
+      "last_name": "Yosu",
+      "birth_date": "1964-01-01",
+      "positions": [
+        {
+          "code": "GK",
+          "level": 18
+        }
+      ],
+      "current_ability": 106,
+      "potential_ability": 119,
+      "value": 5955080,
+      "contract": {
+        "salary": 106000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "a9025129-e482-4fd6-8433-54e7e58f6569",
+      "source_id": 102,
+      "club_id": "b57f96e8-eeee-4c15-87bc-c55b9f6cdc94",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "José María",
+      "last_name": "Valencia",
+      "birth_date": "1970-01-01",
+      "positions": [
+        {
+          "code": "GK",
+          "level": 18
+        }
+      ],
+      "current_ability": 103,
+      "potential_ability": 111,
+      "value": 5463635,
+      "contract": {
+        "salary": 103000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "f6b8d823-f562-4495-a019-4b916438dfd7",
+      "source_id": 103,
+      "club_id": "b57f96e8-eeee-4c15-87bc-c55b9f6cdc94",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Bittor Alkiza",
+      "last_name": "Alkiza",
+      "birth_date": "1971-01-01",
+      "positions": [
+        {
+          "code": "MC",
+          "level": 17
+        },
+        {
+          "code": "DMC",
+          "level": 12
+        },
+        {
+          "code": "AMC",
+          "level": 10
+        }
+      ],
+      "current_ability": 139,
+      "potential_ability": 139,
+      "value": 13428095,
+      "contract": {
+        "salary": 139000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "97c6685c-0457-4672-a968-7be9c8db976e",
+      "source_id": 104,
+      "club_id": "d2a135d8-ce0d-4e00-9b03-c71efbbd95e8",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Diego Pablo",
+      "last_name": "Simeone",
+      "birth_date": "1970-01-01",
+      "positions": [
+        {
+          "code": "MC",
+          "level": 17
+        },
+        {
+          "code": "DMC",
+          "level": 12
+        },
+        {
+          "code": "AMC",
+          "level": 10
+        }
+      ],
+      "current_ability": 166,
+      "potential_ability": 180,
+      "value": 22871480,
+      "contract": {
+        "salary": 166000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "6f8a3790-7ddf-413e-8ca4-84b346acd548",
+      "source_id": 105,
+      "club_id": "13323286-3948-44b6-aae6-fba0e413e98c",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Claudio Barragán",
+      "last_name": "Claudio",
+      "birth_date": "1964-01-01",
+      "positions": [
+        {
+          "code": "FC",
+          "level": 18
+        },
+        {
+          "code": "AMC",
+          "level": 9
+        }
+      ],
+      "current_ability": 133,
+      "potential_ability": 146,
+      "value": 11763185,
+      "contract": {
+        "salary": 133000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "b45098ec-a227-40b5-a149-9527b5c9c64f",
+      "source_id": 106,
+      "club_id": "71a9d897-c219-4901-9b17-ed79ed635157",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Juan Cristóbal",
+      "last_name": "Cristóbal",
+      "birth_date": "1970-01-01",
+      "positions": [
+        {
+          "code": "DC",
+          "level": 17
+        },
+        {
+          "code": "DL",
+          "level": 11
+        },
+        {
+          "code": "DR",
+          "level": 11
+        }
+      ],
+      "current_ability": 126,
+      "potential_ability": 130,
+      "value": 10001880,
+      "contract": {
+        "salary": 126000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "a0146e63-5bd9-43a0-9fb7-02116f2e4550",
+      "source_id": 107,
+      "club_id": "04d08c83-beaf-4a5b-91c0-7fe1bd685653",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Óscar García",
+      "last_name": "Óscar",
+      "birth_date": "1973-01-01",
+      "positions": [
+        {
+          "code": "FC",
+          "level": 18
+        },
+        {
+          "code": "AMC",
+          "level": 9
+        }
+      ],
+      "current_ability": 148,
+      "potential_ability": 162,
+      "value": 16208960,
+      "contract": {
+        "salary": 148000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "5380590e-a4b8-44b4-8118-1b5c62deeefb",
+      "source_id": 108,
+      "club_id": "d2a135d8-ce0d-4e00-9b03-c71efbbd95e8",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "José Francisco Molina",
+      "last_name": "Molina",
+      "birth_date": "1970-01-01",
+      "positions": [
+        {
+          "code": "GK",
+          "level": 18
+        }
+      ],
+      "current_ability": 113,
+      "potential_ability": 127,
+      "value": 7214485,
+      "contract": {
+        "salary": 113000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "3a19106b-fe2e-43db-908a-28baec2d1902",
+      "source_id": 109,
+      "club_id": "b57f96e8-eeee-4c15-87bc-c55b9f6cdc94",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Carlos Aurkenetxea",
+      "last_name": "Aurkenetxea",
+      "birth_date": "1969-01-01",
+      "positions": [
+        {
+          "code": "DC",
+          "level": 17
+        },
+        {
+          "code": "DL",
+          "level": 11
+        },
+        {
+          "code": "DR",
+          "level": 11
+        }
+      ],
+      "current_ability": 120,
+      "potential_ability": 121,
+      "value": 8640000,
+      "contract": {
+        "salary": 120000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "0bea16bf-27f1-41d9-b143-8f830e2d0442",
+      "source_id": 110,
+      "club_id": "c1a77a05-5f03-4e55-84c7-96f12b3ef1a5",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Fernando Sietes",
+      "last_name": "Sietes",
+      "birth_date": "1970-01-01",
+      "positions": [
+        {
+          "code": "DC",
+          "level": 17
+        },
+        {
+          "code": "DL",
+          "level": 11
+        },
+        {
+          "code": "DR",
+          "level": 11
+        }
+      ],
+      "current_ability": 122,
+      "potential_ability": 127,
+      "value": 9079240,
+      "contract": {
+        "salary": 122000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "77adc1cb-3d03-4503-84e2-8b00aec27274",
+      "source_id": 111,
+      "club_id": "925bb99d-8480-43a9-9e37-8d1bf8c7efb0",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Enrique Flores",
+      "last_name": "Quique Flores",
+      "birth_date": "1965-01-01",
+      "positions": [
+        {
+          "code": "DC",
+          "level": 17
+        },
+        {
+          "code": "DL",
+          "level": 11
+        },
+        {
+          "code": "DR",
+          "level": 11
+        }
+      ],
+      "current_ability": 143,
+      "potential_ability": 143,
+      "value": 14621035,
+      "contract": {
+        "salary": 143000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "3166e66d-27e1-4049-a105-475b7589d490",
+      "source_id": 112,
+      "club_id": "8a635691-a263-4e8c-9ab1-1d4b0a899bc4",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Enrique López",
+      "last_name": "López Rekarte",
+      "birth_date": "1968-01-01",
+      "positions": [
+        {
+          "code": "DC",
+          "level": 17
+        },
+        {
+          "code": "DL",
+          "level": 11
+        },
+        {
+          "code": "DR",
+          "level": 11
+        }
+      ],
+      "current_ability": 134,
+      "potential_ability": 142,
+      "value": 12030520,
+      "contract": {
+        "salary": 134000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "3f52e5b3-4791-4db5-8ee3-a921458eee7b",
+      "source_id": 113,
+      "club_id": "71a9d897-c219-4901-9b17-ed79ed635157",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Antoni Jiménez",
+      "last_name": "Toni Jiménez",
+      "birth_date": "1970-01-01",
+      "positions": [
+        {
+          "code": "GK",
+          "level": 18
+        }
+      ],
+      "current_ability": 101,
+      "potential_ability": 112,
+      "value": 5151505,
+      "contract": {
+        "salary": 101000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "d8320fff-699b-4d6a-9c6a-2b39554da1c9",
+      "source_id": 114,
+      "club_id": "d2a135d8-ce0d-4e00-9b03-c71efbbd95e8",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Juan Antonio Denia",
+      "last_name": "Denia",
+      "birth_date": "1969-01-01",
+      "positions": [
+        {
+          "code": "DC",
+          "level": 17
+        },
+        {
+          "code": "DL",
+          "level": 11
+        },
+        {
+          "code": "DR",
+          "level": 11
+        }
+      ],
+      "current_ability": 139,
+      "potential_ability": 154,
+      "value": 13428095,
+      "contract": {
+        "salary": 139000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "4c29de81-4a54-4883-ae96-f15ca9aaebae",
+      "source_id": 115,
+      "club_id": "8a635691-a263-4e8c-9ab1-1d4b0a899bc4",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Donato Gama da",
+      "last_name": "Donato",
+      "birth_date": "1962-01-01",
+      "positions": [
+        {
+          "code": "MC",
+          "level": 17
+        },
+        {
+          "code": "DMC",
+          "level": 12
+        },
+        {
+          "code": "AMC",
+          "level": 10
+        }
+      ],
+      "current_ability": 156,
+      "potential_ability": 167,
+      "value": 18982080,
+      "contract": {
+        "salary": 156000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "e60bfc01-87fb-402b-83cf-8e9ab60867ef",
+      "source_id": 116,
+      "club_id": "04d08c83-beaf-4a5b-91c0-7fe1bd685653",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "José Mari Bakero",
+      "last_name": "Bakero",
+      "birth_date": "1963-01-01",
+      "positions": [
+        {
+          "code": "MC",
+          "level": 17
+        },
+        {
+          "code": "DMC",
+          "level": 12
+        },
+        {
+          "code": "AMC",
+          "level": 10
+        }
+      ],
+      "current_ability": 156,
+      "potential_ability": 170,
+      "value": 18982080,
+      "contract": {
+        "salary": 156000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "41ce57cb-ce96-441a-8023-52c8ad4d38b1",
+      "source_id": 117,
+      "club_id": "04d08c83-beaf-4a5b-91c0-7fe1bd685653",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Roger García",
+      "last_name": "Roger",
+      "birth_date": "1976-01-01",
+      "positions": [
+        {
+          "code": "FC",
+          "level": 18
+        },
+        {
+          "code": "AMC",
+          "level": 9
+        }
+      ],
+      "current_ability": 146,
+      "potential_ability": 154,
+      "value": 15560680,
+      "contract": {
+        "salary": 146000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "b3638eba-b896-494c-aceb-fee83732cb7b",
+      "source_id": 118,
+      "club_id": "8a635691-a263-4e8c-9ab1-1d4b0a899bc4",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Aitor Beguiristain",
+      "last_name": "Beguiristain",
+      "birth_date": "1964-01-01",
+      "positions": [
+        {
+          "code": "FC",
+          "level": 18
+        },
+        {
+          "code": "AMC",
+          "level": 9
+        }
+      ],
+      "current_ability": 144,
+      "potential_ability": 157,
+      "value": 14929920,
+      "contract": {
+        "salary": 144000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "51601f67-e282-48b7-af80-87aba0ba37c1",
+      "source_id": 119,
+      "club_id": null,
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Paulo Manuel",
+      "last_name": "P. Sousa",
+      "birth_date": "1970-01-01",
+      "positions": [
+        {
+          "code": "MC",
+          "level": 17
+        },
+        {
+          "code": "DMC",
+          "level": 12
+        },
+        {
+          "code": "AMC",
+          "level": 10
+        }
+      ],
+      "current_ability": 153,
+      "potential_ability": 160,
+      "value": 17907885,
+      "contract": {
+        "salary": 153000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "cbc022fa-333d-4ad1-a23e-837654cfa1cb",
+      "source_id": 120,
+      "club_id": "04d08c83-beaf-4a5b-91c0-7fe1bd685653",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Sergi Barjuán",
+      "last_name": "Sergi Barjuán",
+      "birth_date": "1971-01-01",
+      "positions": [
+        {
+          "code": "DC",
+          "level": 17
+        },
+        {
+          "code": "DL",
+          "level": 11
+        },
+        {
+          "code": "DR",
+          "level": 11
+        }
+      ],
+      "current_ability": 160,
+      "potential_ability": 171,
+      "value": 20480000,
+      "contract": {
+        "salary": 160000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "b0980038-cf38-45e5-b8c3-ffa75bcdfbd7",
+      "source_id": 121,
+      "club_id": "13323286-3948-44b6-aae6-fba0e413e98c",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "José Guillermo del Solar",
+      "last_name": "Del Solar",
+      "birth_date": "1967-01-01",
+      "positions": [
+        {
+          "code": "MC",
+          "level": 17
+        },
+        {
+          "code": "DMC",
+          "level": 12
+        },
+        {
+          "code": "AMC",
+          "level": 10
+        }
+      ],
+      "current_ability": 131,
+      "potential_ability": 131,
+      "value": 11240455,
+      "contract": {
+        "salary": 131000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "affaefc9-094e-434b-9c61-0dc793857a27",
+      "source_id": 122,
+      "club_id": "04d08c83-beaf-4a5b-91c0-7fe1bd685653",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Luís Filipe Madeira Caeiro",
+      "last_name": "Figo",
+      "birth_date": "1972-01-01",
+      "positions": [
+        {
+          "code": "AMR",
+          "level": 17
+        },
+        {
+          "code": "MR",
+          "level": 14
+        },
+        {
+          "code": "AMC",
+          "level": 9
+        }
+      ],
+      "current_ability": 174,
+      "potential_ability": 174,
+      "value": 26340120,
+      "contract": {
+        "salary": 174000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "daad9f28-5d79-45f0-8789-8873a7b22405",
+      "source_id": 123,
+      "club_id": "f1b102bc-7dce-445b-b8aa-e4108bbdc557",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Imanol Idiakez",
+      "last_name": "Idiakez",
+      "birth_date": "1973-01-01",
+      "positions": [
+        {
+          "code": "DC",
+          "level": 17
+        },
+        {
+          "code": "DL",
+          "level": 11
+        },
+        {
+          "code": "DR",
+          "level": 11
+        }
+      ],
+      "current_ability": 129,
+      "potential_ability": 142,
+      "value": 10733445,
+      "contract": {
+        "salary": 129000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "7cc69717-a301-4fed-8712-00f2de1760bb",
+      "source_id": 124,
+      "club_id": "925bb99d-8480-43a9-9e37-8d1bf8c7efb0",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Luis Milla",
+      "last_name": "Milla",
+      "birth_date": "1966-01-01",
+      "positions": [
+        {
+          "code": "MC",
+          "level": 17
+        },
+        {
+          "code": "DMC",
+          "level": 12
+        },
+        {
+          "code": "AMC",
+          "level": 10
+        }
+      ],
+      "current_ability": 164,
+      "potential_ability": 164,
+      "value": 22054720,
+      "contract": {
+        "salary": 164000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "316c753d-3617-4694-969d-847e29cf99e6",
+      "source_id": 125,
+      "club_id": "71a9d897-c219-4901-9b17-ed79ed635157",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Raúl Arribas",
+      "last_name": "Raúl Arribas",
+      "birth_date": "1973-01-01",
+      "positions": [
+        {
+          "code": "GK",
+          "level": 18
+        }
+      ],
+      "current_ability": 86,
+      "potential_ability": 93,
+      "value": 3180280,
+      "contract": {
+        "salary": 86000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "c65acb93-1278-42fa-85ab-6f833b53dddc",
+      "source_id": 126,
+      "club_id": "8a635691-a263-4e8c-9ab1-1d4b0a899bc4",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Alfredo Santaelena",
+      "last_name": "Alfredo",
+      "birth_date": "1968-01-01",
+      "positions": [
+        {
+          "code": "MC",
+          "level": 17
+        },
+        {
+          "code": "DMC",
+          "level": 12
+        },
+        {
+          "code": "AMC",
+          "level": 10
+        }
+      ],
+      "current_ability": 140,
+      "potential_ability": 155,
+      "value": 13720000,
+      "contract": {
+        "salary": 140000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "ace1716e-d91b-4980-9b62-b8fb6d130e19",
+      "source_id": 127,
+      "club_id": "f1b102bc-7dce-445b-b8aa-e4108bbdc557",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Joseba Pikabea",
+      "last_name": "Pikabea",
+      "birth_date": "1969-01-01",
+      "positions": [
+        {
+          "code": "MC",
+          "level": 17
+        },
+        {
+          "code": "DMC",
+          "level": 12
+        },
+        {
+          "code": "AMC",
+          "level": 10
+        }
+      ],
+      "current_ability": 134,
+      "potential_ability": 141,
+      "value": 12030520,
+      "contract": {
+        "salary": 134000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "b419c6ac-4e37-4c1b-87ca-3a406f28be76",
+      "source_id": 128,
+      "club_id": "04d08c83-beaf-4a5b-91c0-7fe1bd685653",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Albert Ferrer",
+      "last_name": "Ferrer",
+      "birth_date": "1970-01-01",
+      "positions": [
+        {
+          "code": "DC",
+          "level": 17
+        },
+        {
+          "code": "DL",
+          "level": 11
+        },
+        {
+          "code": "DR",
+          "level": 11
+        }
+      ],
+      "current_ability": 152,
+      "potential_ability": 163,
+      "value": 17559040,
+      "contract": {
+        "salary": 152000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "4ccc9898-8229-42ce-8db2-e214607fde67",
+      "source_id": 129,
+      "club_id": "c1a77a05-5f03-4e55-84c7-96f12b3ef1a5",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Javier Arroyo",
+      "last_name": "Arroyo",
+      "birth_date": "1968-01-01",
+      "positions": [
+        {
+          "code": "MC",
+          "level": 17
+        },
+        {
+          "code": "DMC",
+          "level": 12
+        },
+        {
+          "code": "AMC",
+          "level": 10
+        }
+      ],
+      "current_ability": 142,
+      "potential_ability": 151,
+      "value": 14316440,
+      "contract": {
+        "salary": 142000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "aa63cd9d-c2a9-40a3-ba74-452a44e8b097",
+      "source_id": 130,
+      "club_id": "13323286-3948-44b6-aae6-fba0e413e98c",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Ovidiu",
+      "last_name": "Stîngă",
+      "birth_date": "1972-01-01",
+      "positions": [
+        {
+          "code": "MC",
+          "level": 17
+        },
+        {
+          "code": "DMC",
+          "level": 12
+        },
+        {
+          "code": "AMC",
+          "level": 10
+        }
+      ],
+      "current_ability": 133,
+      "potential_ability": 147,
+      "value": 11763185,
+      "contract": {
+        "salary": 133000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "a3047e84-d262-4e8c-b574-1fafea471b9f",
+      "source_id": 131,
+      "club_id": "d2a135d8-ce0d-4e00-9b03-c71efbbd95e8",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Francisco Narváez",
+      "last_name": "Kiko",
+      "birth_date": "1972-01-01",
+      "positions": [
+        {
+          "code": "FC",
+          "level": 18
+        },
+        {
+          "code": "AMC",
+          "level": 9
+        }
+      ],
+      "current_ability": 155,
+      "potential_ability": 164,
+      "value": 18619375,
+      "contract": {
+        "salary": 155000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "041fa404-deea-4e5e-80d8-37720841a6a8",
+      "source_id": 132,
+      "club_id": "d2a135d8-ce0d-4e00-9b03-c71efbbd95e8",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Milinko",
+      "last_name": "Pantić",
+      "birth_date": "1966-01-01",
+      "positions": [
+        {
+          "code": "MC",
+          "level": 17
+        },
+        {
+          "code": "DMC",
+          "level": 12
+        },
+        {
+          "code": "AMC",
+          "level": 10
+        }
+      ],
+      "current_ability": 160,
+      "potential_ability": 160,
+      "value": 20480000,
+      "contract": {
+        "salary": 160000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "4857e54a-c7e3-4150-8da3-40b1c55261c5",
+      "source_id": 133,
+      "club_id": "c976b397-3fae-4ce3-bf83-f9654aa6afd8",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Antonio Prats",
+      "last_name": "Toni Prats",
+      "birth_date": "1962-01-01",
+      "positions": [
+        {
+          "code": "GK",
+          "level": 18
+        }
+      ],
+      "current_ability": 115,
+      "potential_ability": 129,
+      "value": 7604375,
+      "contract": {
+        "salary": 115000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "be85c8a2-8557-4f8c-acf8-e1e6b88fa80d",
+      "source_id": 134,
+      "club_id": "925bb99d-8480-43a9-9e37-8d1bf8c7efb0",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Freddy Alejandro Rincón",
+      "last_name": "Rincón",
+      "birth_date": "1966-01-01",
+      "positions": [
+        {
+          "code": "MC",
+          "level": 17
+        },
+        {
+          "code": "DMC",
+          "level": 12
+        },
+        {
+          "code": "AMC",
+          "level": 10
+        }
+      ],
+      "current_ability": 169,
+      "potential_ability": 178,
+      "value": 24134045,
+      "contract": {
+        "salary": 169000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "18ad1f27-5f04-4a36-9935-e33e2aa0aaef",
+      "source_id": 135,
+      "club_id": "925bb99d-8480-43a9-9e37-8d1bf8c7efb0",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Manuel Sanchís",
+      "last_name": "Sanchís",
+      "birth_date": "1965-01-01",
+      "positions": [
+        {
+          "code": "DC",
+          "level": 17
+        },
+        {
+          "code": "DL",
+          "level": 11
+        },
+        {
+          "code": "DR",
+          "level": 11
+        }
+      ],
+      "current_ability": 147,
+      "potential_ability": 154,
+      "value": 15882615,
+      "contract": {
+        "salary": 147000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "a196ebe4-31a4-491e-a88e-af1058fc1f02",
+      "source_id": 136,
+      "club_id": "c976b397-3fae-4ce3-bf83-f9654aa6afd8",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Borislav",
+      "last_name": "Stosic",
+      "birth_date": "1968-01-01",
+      "positions": [
+        {
+          "code": "FC",
+          "level": 18
+        },
+        {
+          "code": "AMC",
+          "level": 9
+        }
+      ],
+      "current_ability": 135,
+      "potential_ability": 149,
+      "value": 12301875,
+      "contract": {
+        "salary": 135000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "6f590d39-94eb-43d2-81bf-cf39a2b06cf9",
+      "source_id": 137,
+      "club_id": null,
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Paolo",
+      "last_name": "Maldini",
+      "birth_date": "1968-01-01",
+      "positions": [
+        {
+          "code": "DC",
+          "level": 17
+        },
+        {
+          "code": "DL",
+          "level": 11
+        },
+        {
+          "code": "DR",
+          "level": 11
+        }
+      ],
+      "current_ability": 165,
+      "potential_ability": 170,
+      "value": 22460625,
+      "contract": {
+        "salary": 165000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "51b0afc6-15b1-4c22-b22c-a4fef3b65646",
+      "source_id": 138,
+      "club_id": "925bb99d-8480-43a9-9e37-8d1bf8c7efb0",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "José Ignacio García",
+      "last_name": "García Calvo",
+      "birth_date": "1975-01-01",
+      "positions": [
+        {
+          "code": "DC",
+          "level": 17
+        },
+        {
+          "code": "DL",
+          "level": 11
+        },
+        {
+          "code": "DR",
+          "level": 11
+        }
+      ],
+      "current_ability": 133,
+      "potential_ability": 144,
+      "value": 11763185,
+      "contract": {
+        "salary": 133000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "0a9d1159-680a-42cb-8f83-649bf9d1462b",
+      "source_id": 139,
+      "club_id": "71a9d897-c219-4901-9b17-ed79ed635157",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Branko",
+      "last_name": "Brnović",
+      "birth_date": "1967-01-01",
+      "positions": [
+        {
+          "code": "MC",
+          "level": 17
+        },
+        {
+          "code": "DMC",
+          "level": 12
+        },
+        {
+          "code": "AMC",
+          "level": 10
+        }
+      ],
+      "current_ability": 137,
+      "potential_ability": 150,
+      "value": 12856765,
+      "contract": {
+        "salary": 137000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "40e49b0d-8789-4f77-b585-26a3c765cd1c",
+      "source_id": 140,
+      "club_id": "13323286-3948-44b6-aae6-fba0e413e98c",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Rodolfo Condado",
+      "last_name": "Rodolfo",
+      "birth_date": "1965-01-01",
+      "positions": [
+        {
+          "code": "DC",
+          "level": 17
+        },
+        {
+          "code": "DL",
+          "level": 11
+        },
+        {
+          "code": "DR",
+          "level": 11
+        }
+      ],
+      "current_ability": 126,
+      "potential_ability": 140,
+      "value": 10001880,
+      "contract": {
+        "salary": 126000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "cde1c654-df07-41b1-a881-7cf3a108b34b",
+      "source_id": 141,
+      "club_id": null,
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Hristo",
+      "last_name": "Stoichkov",
+      "birth_date": "1966-01-01",
+      "positions": [
+        {
+          "code": "AML",
+          "level": 17
+        },
+        {
+          "code": "ML",
+          "level": 14
+        },
+        {
+          "code": "AMC",
+          "level": 9
+        }
+      ],
+      "current_ability": 156,
+      "potential_ability": 158,
+      "value": 18982080,
+      "contract": {
+        "salary": 156000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "b82d1238-5017-4445-af2d-5a8cc2449fcc",
+      "source_id": 142,
+      "club_id": "b57f96e8-eeee-4c15-87bc-c55b9f6cdc94",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Julen Guerrero",
+      "last_name": "Guerrero",
+      "birth_date": "1974-01-01",
+      "positions": [
+        {
+          "code": "AMR",
+          "level": 17
+        },
+        {
+          "code": "MR",
+          "level": 14
+        },
+        {
+          "code": "AMC",
+          "level": 9
+        }
+      ],
+      "current_ability": 158,
+      "potential_ability": 173,
+      "value": 19721560,
+      "contract": {
+        "salary": 158000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "f0337fdb-0d5b-44e5-b1df-ba0ed76b2208",
+      "source_id": 143,
+      "club_id": null,
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Lothar",
+      "last_name": "Matthäus",
+      "birth_date": "1961-01-01",
+      "positions": [
+        {
+          "code": "MC",
+          "level": 17
+        },
+        {
+          "code": "DMC",
+          "level": 12
+        },
+        {
+          "code": "AMC",
+          "level": 10
+        }
+      ],
+      "current_ability": 161,
+      "potential_ability": 172,
+      "value": 20866405,
+      "contract": {
+        "salary": 161000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "5fcb6c6a-be3a-42c8-ade9-4c95f912d2cc",
+      "source_id": 144,
+      "club_id": "c976b397-3fae-4ce3-bf83-f9654aa6afd8",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Jesús Merino",
+      "last_name": "Merino",
+      "birth_date": "1970-01-01",
+      "positions": [
+        {
+          "code": "AML",
+          "level": 17
+        },
+        {
+          "code": "ML",
+          "level": 14
+        },
+        {
+          "code": "AMC",
+          "level": 9
+        }
+      ],
+      "current_ability": 140,
+      "potential_ability": 153,
+      "value": 13720000,
+      "contract": {
+        "salary": 140000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "1e6af394-76bc-419d-81f3-d33a63546187",
+      "source_id": 145,
+      "club_id": null,
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Roberto",
+      "last_name": "Mancini",
+      "birth_date": "1964-01-01",
+      "positions": [
+        {
+          "code": "FC",
+          "level": 18
+        },
+        {
+          "code": "AMC",
+          "level": 9
+        }
+      ],
+      "current_ability": 149,
+      "potential_ability": 152,
+      "value": 16539745,
+      "contract": {
+        "salary": 149000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "02d2779c-30b1-49e6-92de-709876c0ab9e",
+      "source_id": 146,
+      "club_id": "d2a135d8-ce0d-4e00-9b03-c71efbbd95e8",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "José Antonio Biagini",
+      "last_name": "Biagini",
+      "birth_date": "1970-01-01",
+      "positions": [
+        {
+          "code": "FC",
+          "level": 18
+        },
+        {
+          "code": "AMC",
+          "level": 9
+        }
+      ],
+      "current_ability": 142,
+      "potential_ability": 148,
+      "value": 14316440,
+      "contract": {
+        "salary": 142000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "e66faaf7-a400-45a9-bcbd-7bb4e9d7ce40",
+      "source_id": 147,
+      "club_id": "13323286-3948-44b6-aae6-fba0e413e98c",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "César Villafañe",
+      "last_name": "Villafañe",
+      "birth_date": "1974-01-01",
+      "positions": [
+        {
+          "code": "MC",
+          "level": 17
+        },
+        {
+          "code": "DMC",
+          "level": 12
+        },
+        {
+          "code": "AMC",
+          "level": 10
+        }
+      ],
+      "current_ability": 132,
+      "potential_ability": 139,
+      "value": 11499840,
+      "contract": {
+        "salary": 132000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "97ab90ec-23ad-43ba-8b92-abcd0332331e",
+      "source_id": 148,
+      "club_id": "c976b397-3fae-4ce3-bf83-f9654aa6afd8",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Pedro Riesco",
+      "last_name": "Pier",
+      "birth_date": "1970-01-01",
+      "positions": [
+        {
+          "code": "MC",
+          "level": 17
+        },
+        {
+          "code": "DMC",
+          "level": 12
+        },
+        {
+          "code": "AMC",
+          "level": 10
+        }
+      ],
+      "current_ability": 144,
+      "potential_ability": 157,
+      "value": 14929920,
+      "contract": {
+        "salary": 144000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "72ef112b-9eeb-4846-aecd-04d41e1e72d4",
+      "source_id": 149,
+      "club_id": "8a635691-a263-4e8c-9ab1-1d4b0a899bc4",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "José Roberto Gama de",
+      "last_name": "Bebeto",
+      "birth_date": "1964-01-01",
+      "positions": [
+        {
+          "code": "FC",
+          "level": 18
+        },
+        {
+          "code": "AMC",
+          "level": 9
+        }
+      ],
+      "current_ability": 155,
+      "potential_ability": 157,
+      "value": 18619375,
+      "contract": {
+        "salary": 155000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "2322fc4c-19ec-444a-b098-111d98fa0fbf",
+      "source_id": 150,
+      "club_id": "c1a77a05-5f03-4e55-84c7-96f12b3ef1a5",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Benjamín Zarandona Esono",
+      "last_name": "Engonga",
+      "birth_date": "1965-01-01",
+      "positions": [
+        {
+          "code": "DC",
+          "level": 17
+        },
+        {
+          "code": "DL",
+          "level": 11
+        },
+        {
+          "code": "DR",
+          "level": 11
+        }
+      ],
+      "current_ability": 142,
+      "potential_ability": 146,
+      "value": 14316440,
+      "contract": {
+        "salary": 142000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "9d113dd5-57a1-4aa6-8ed7-d9c2d9a193a1",
+      "source_id": 151,
+      "club_id": null,
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Ronaldo Luís Nazário de",
+      "last_name": "Ronaldo",
+      "birth_date": "1976-01-01",
+      "positions": [
+        {
+          "code": "FC",
+          "level": 18
+        },
+        {
+          "code": "AMC",
+          "level": 9
+        }
+      ],
+      "current_ability": 162,
+      "potential_ability": 171,
+      "value": 21257640,
+      "contract": {
+        "salary": 162000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "d1428700-b4b0-4592-b36b-f6aae66c07ba",
+      "source_id": 152,
+      "club_id": "13323286-3948-44b6-aae6-fba0e413e98c",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "José Ignacio Aizpurúa",
+      "last_name": "Aizpurúa",
+      "birth_date": "1970-01-01",
+      "positions": [
+        {
+          "code": "GK",
+          "level": 18
+        }
+      ],
+      "current_ability": 106,
+      "potential_ability": 119,
+      "value": 5955080,
+      "contract": {
+        "salary": 106000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "5b39b32c-ed89-4a63-9081-1c1b42647625",
+      "source_id": 153,
+      "club_id": "71a9d897-c219-4901-9b17-ed79ed635157",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Pedro Herrera",
+      "last_name": "Herrera",
+      "birth_date": "1969-01-01",
+      "positions": [
+        {
+          "code": "DC",
+          "level": 17
+        },
+        {
+          "code": "DL",
+          "level": 11
+        },
+        {
+          "code": "DR",
+          "level": 11
+        }
+      ],
+      "current_ability": 123,
+      "potential_ability": 132,
+      "value": 9304335,
+      "contract": {
+        "salary": 123000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "8a9b8f2d-1a4e-4272-be92-f294ce103f79",
+      "source_id": 154,
+      "club_id": "13323286-3948-44b6-aae6-fba0e413e98c",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Luciano Iturrino",
+      "last_name": "Iturrino",
+      "birth_date": "1963-01-01",
+      "positions": [
+        {
+          "code": "MC",
+          "level": 17
+        },
+        {
+          "code": "DMC",
+          "level": 12
+        },
+        {
+          "code": "AMC",
+          "level": 10
+        }
+      ],
+      "current_ability": 131,
+      "potential_ability": 141,
+      "value": 11240455,
+      "contract": {
+        "salary": 131000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "4d9435b0-5759-4ba0-8225-91d5754edf8f",
+      "source_id": 155,
+      "club_id": "d2a135d8-ce0d-4e00-9b03-c71efbbd95e8",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Radek",
+      "last_name": "Bejbl",
+      "birth_date": "1972-01-01",
+      "positions": [
+        {
+          "code": "MC",
+          "level": 17
+        },
+        {
+          "code": "DMC",
+          "level": 12
+        },
+        {
+          "code": "AMC",
+          "level": 10
+        }
+      ],
+      "current_ability": 153,
+      "potential_ability": 162,
+      "value": 17907885,
+      "contract": {
+        "salary": 153000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "b240badf-d9d6-449d-a511-6607b006b5da",
+      "source_id": 156,
+      "club_id": "13323286-3948-44b6-aae6-fba0e413e98c",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Luis Manuel Arias",
+      "last_name": "Luis Manuel",
+      "birth_date": "1967-01-01",
+      "positions": [
+        {
+          "code": "DC",
+          "level": 17
+        },
+        {
+          "code": "DL",
+          "level": 11
+        },
+        {
+          "code": "DR",
+          "level": 11
+        }
+      ],
+      "current_ability": 123,
+      "potential_ability": 135,
+      "value": 9304335,
+      "contract": {
+        "salary": 123000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "e36ebc63-5a07-435e-8507-785676292866",
+      "source_id": 157,
+      "club_id": "925bb99d-8480-43a9-9e37-8d1bf8c7efb0",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Santiago Cañizares",
+      "last_name": "Cañizares",
+      "birth_date": "1969-01-01",
+      "positions": [
+        {
+          "code": "GK",
+          "level": 18
+        }
+      ],
+      "current_ability": 118,
+      "potential_ability": 118,
+      "value": 8215160,
+      "contract": {
+        "salary": 118000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "5818d34c-bc07-4d73-84fe-76f90898f601",
+      "source_id": 158,
+      "club_id": null,
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "George",
+      "last_name": "Weah",
+      "birth_date": "1966-01-01",
+      "positions": [
+        {
+          "code": "FC",
+          "level": 18
+        },
+        {
+          "code": "AMC",
+          "level": 9
+        }
+      ],
+      "current_ability": 160,
+      "potential_ability": 175,
+      "value": 20480000,
+      "contract": {
+        "salary": 160000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "f173287e-f629-4053-a98b-fe5a8f1a7473",
+      "source_id": 159,
+      "club_id": "04d08c83-beaf-4a5b-91c0-7fe1bd685653",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Josep Guardiola i",
+      "last_name": "Guardiola",
+      "birth_date": "1971-01-01",
+      "positions": [
+        {
+          "code": "MC",
+          "level": 17
+        },
+        {
+          "code": "DMC",
+          "level": 12
+        },
+        {
+          "code": "AMC",
+          "level": 10
+        }
+      ],
+      "current_ability": 162,
+      "potential_ability": 172,
+      "value": 21257640,
+      "contract": {
+        "salary": 162000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "44a7be75-eeda-4c68-9a42-2b98d5566005",
+      "source_id": 160,
+      "club_id": "f1b102bc-7dce-445b-b8aa-e4108bbdc557",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Aitor Garmendia",
+      "last_name": "Garmendia",
+      "birth_date": "1971-01-01",
+      "positions": [
+        {
+          "code": "DC",
+          "level": 17
+        },
+        {
+          "code": "DL",
+          "level": 11
+        },
+        {
+          "code": "DR",
+          "level": 11
+        }
+      ],
+      "current_ability": 123,
+      "potential_ability": 125,
+      "value": 9304335,
+      "contract": {
+        "salary": 123000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "affa792c-648f-454b-8061-13527dab9c5b",
+      "source_id": 161,
+      "club_id": "8a635691-a263-4e8c-9ab1-1d4b0a899bc4",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "José Villarreal",
+      "last_name": "Villarreal",
+      "birth_date": "1971-01-01",
+      "positions": [
+        {
+          "code": "MC",
+          "level": 17
+        },
+        {
+          "code": "DMC",
+          "level": 12
+        },
+        {
+          "code": "AMC",
+          "level": 10
+        }
+      ],
+      "current_ability": 131,
+      "potential_ability": 131,
+      "value": 11240455,
+      "contract": {
+        "salary": 131000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "a3294c40-6a22-496d-a1e2-ca15035bda77",
+      "source_id": 162,
+      "club_id": "c976b397-3fae-4ce3-bf83-f9654aa6afd8",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Carlos Movilla",
+      "last_name": "Movilla",
+      "birth_date": "1968-01-01",
+      "positions": [
+        {
+          "code": "MC",
+          "level": 17
+        },
+        {
+          "code": "DMC",
+          "level": 12
+        },
+        {
+          "code": "AMC",
+          "level": 10
+        }
+      ],
+      "current_ability": 144,
+      "potential_ability": 149,
+      "value": 14929920,
+      "contract": {
+        "salary": 144000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "c3f7d690-585e-40b8-ae67-c50cc38a9429",
+      "source_id": 163,
+      "club_id": "f1b102bc-7dce-445b-b8aa-e4108bbdc557",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Aitor Lapeña",
+      "last_name": "Lapeña",
+      "birth_date": "1971-01-01",
+      "positions": [
+        {
+          "code": "DC",
+          "level": 17
+        },
+        {
+          "code": "DL",
+          "level": 11
+        },
+        {
+          "code": "DR",
+          "level": 11
+        }
+      ],
+      "current_ability": 118,
+      "potential_ability": 127,
+      "value": 8215160,
+      "contract": {
+        "salary": 118000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "3aa37a36-ce29-427b-a017-6eae2d1e34a9",
+      "source_id": 164,
+      "club_id": "f1b102bc-7dce-445b-b8aa-e4108bbdc557",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Aitor Aldeondo",
+      "last_name": "Aldeondo",
+      "birth_date": "1969-01-01",
+      "positions": [
+        {
+          "code": "MC",
+          "level": 17
+        },
+        {
+          "code": "DMC",
+          "level": 12
+        },
+        {
+          "code": "AMC",
+          "level": 10
+        }
+      ],
+      "current_ability": 129,
+      "potential_ability": 129,
+      "value": 10733445,
+      "contract": {
+        "salary": 129000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "feca4731-6f63-4f0f-ba27-216d9d719feb",
+      "source_id": 165,
+      "club_id": "71a9d897-c219-4901-9b17-ed79ed635157",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Fernando Muñoz",
+      "last_name": "Nando",
+      "birth_date": "1967-01-01",
+      "positions": [
+        {
+          "code": "DC",
+          "level": 17
+        },
+        {
+          "code": "DL",
+          "level": 11
+        },
+        {
+          "code": "DR",
+          "level": 11
+        }
+      ],
+      "current_ability": 123,
+      "potential_ability": 125,
+      "value": 9304335,
+      "contract": {
+        "salary": 123000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "ab2675f1-9acc-4cad-ab15-8d30910ce9cd",
+      "source_id": 166,
+      "club_id": "f1b102bc-7dce-445b-b8aa-e4108bbdc557",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Igor Gabilondo",
+      "last_name": "Gabilondo",
+      "birth_date": "1973-01-01",
+      "positions": [
+        {
+          "code": "FC",
+          "level": 18
+        },
+        {
+          "code": "AMC",
+          "level": 9
+        }
+      ],
+      "current_ability": 126,
+      "potential_ability": 136,
+      "value": 10001880,
+      "contract": {
+        "salary": 126000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "b04523a4-f3a4-429a-bc12-070c87d52071",
+      "source_id": 167,
+      "club_id": "8a635691-a263-4e8c-9ab1-1d4b0a899bc4",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Carlos Manjarín",
+      "last_name": "Manjarín",
+      "birth_date": "1969-01-01",
+      "positions": [
+        {
+          "code": "FC",
+          "level": 18
+        },
+        {
+          "code": "AMC",
+          "level": 9
+        }
+      ],
+      "current_ability": 146,
+      "potential_ability": 158,
+      "value": 15560680,
+      "contract": {
+        "salary": 146000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "a50b2b63-c1db-4cd7-b50d-2e32475bcb92",
+      "source_id": 168,
+      "club_id": "04d08c83-beaf-4a5b-91c0-7fe1bd685653",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Gheorghe",
+      "last_name": "Popescu",
+      "birth_date": "1967-01-01",
+      "positions": [
+        {
+          "code": "DC",
+          "level": 17
+        },
+        {
+          "code": "DL",
+          "level": 11
+        },
+        {
+          "code": "DR",
+          "level": 11
+        }
+      ],
+      "current_ability": 160,
+      "potential_ability": 163,
+      "value": 20480000,
+      "contract": {
+        "salary": 160000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "ee4f57ed-b055-42da-8528-cb5f18eb6ae0",
+      "source_id": 169,
+      "club_id": "13323286-3948-44b6-aae6-fba0e413e98c",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Joan Barbarà",
+      "last_name": "Barbarà",
+      "birth_date": "1966-01-01",
+      "positions": [
+        {
+          "code": "FC",
+          "level": 18
+        },
+        {
+          "code": "AMC",
+          "level": 9
+        }
+      ],
+      "current_ability": 128,
+      "potential_ability": 131,
+      "value": 10485760,
+      "contract": {
+        "salary": 128000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "219ca050-d868-47dc-9dba-ae9218ede3bf",
+      "source_id": 170,
+      "club_id": "f1b102bc-7dce-445b-b8aa-e4108bbdc557",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Iván Oceano",
+      "last_name": "Oceano",
+      "birth_date": "1971-01-01",
+      "positions": [
+        {
+          "code": "FC",
+          "level": 18
+        },
+        {
+          "code": "AMC",
+          "level": 9
+        }
+      ],
+      "current_ability": 131,
+      "potential_ability": 146,
+      "value": 11240455,
+      "contract": {
+        "salary": 131000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "818b6705-cb4f-46e9-8f38-4a8107ea8022",
+      "source_id": 171,
+      "club_id": "c1a77a05-5f03-4e55-84c7-96f12b3ef1a5",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Fernando Gómez",
+      "last_name": "Fernando Gómez",
+      "birth_date": "1965-01-01",
+      "positions": [
+        {
+          "code": "MC",
+          "level": 17
+        },
+        {
+          "code": "DMC",
+          "level": 12
+        },
+        {
+          "code": "AMC",
+          "level": 10
+        }
+      ],
+      "current_ability": 149,
+      "potential_ability": 160,
+      "value": 16539745,
+      "contract": {
+        "salary": 149000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "2f582a40-7204-4bbe-a3df-c44a8c903533",
+      "source_id": 172,
+      "club_id": "71a9d897-c219-4901-9b17-ed79ed635157",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Enrique Torres",
+      "last_name": "Torres Mestre",
+      "birth_date": "1968-01-01",
+      "positions": [
+        {
+          "code": "DC",
+          "level": 17
+        },
+        {
+          "code": "DL",
+          "level": 11
+        },
+        {
+          "code": "DR",
+          "level": 11
+        }
+      ],
+      "current_ability": 118,
+      "potential_ability": 129,
+      "value": 8215160,
+      "contract": {
+        "salary": 118000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "0489947d-fc12-4663-bbb0-b07e7d4c07cf",
+      "source_id": 173,
+      "club_id": "d2a135d8-ce0d-4e00-9b03-c71efbbd95e8",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Juan Manuel Geli",
+      "last_name": "Geli",
+      "birth_date": "1970-01-01",
+      "positions": [
+        {
+          "code": "DC",
+          "level": 17
+        },
+        {
+          "code": "DL",
+          "level": 11
+        },
+        {
+          "code": "DR",
+          "level": 11
+        }
+      ],
+      "current_ability": 133,
+      "potential_ability": 144,
+      "value": 11763185,
+      "contract": {
+        "salary": 133000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "5093c51d-958c-4962-8980-734617703c3a",
+      "source_id": 174,
+      "club_id": "71a9d897-c219-4901-9b17-ed79ed635157",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Javier García",
+      "last_name": "Javi García",
+      "birth_date": "1970-01-01",
+      "positions": [
+        {
+          "code": "MC",
+          "level": 17
+        },
+        {
+          "code": "DMC",
+          "level": 12
+        },
+        {
+          "code": "AMC",
+          "level": 10
+        }
+      ],
+      "current_ability": 126,
+      "potential_ability": 139,
+      "value": 10001880,
+      "contract": {
+        "salary": 126000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "cb06b890-9015-45c6-a347-c94efa5e31f4",
+      "source_id": 175,
+      "club_id": "d2a135d8-ce0d-4e00-9b03-c71efbbd95e8",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Roberto Fresnedoso",
+      "last_name": "Roberto",
+      "birth_date": "1968-01-01",
+      "positions": [
+        {
+          "code": "MC",
+          "level": 17
+        },
+        {
+          "code": "DMC",
+          "level": 12
+        },
+        {
+          "code": "AMC",
+          "level": 10
+        }
+      ],
+      "current_ability": 145,
+      "potential_ability": 158,
+      "value": 15243125,
+      "contract": {
+        "salary": 145000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "225f9808-5a29-4799-881f-91df3c7f0698",
+      "source_id": 176,
+      "club_id": "71a9d897-c219-4901-9b17-ed79ed635157",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Jesús Arteaga",
+      "last_name": "Arteaga",
+      "birth_date": "1970-01-01",
+      "positions": [
+        {
+          "code": "MC",
+          "level": 17
+        },
+        {
+          "code": "DMC",
+          "level": 12
+        },
+        {
+          "code": "AMC",
+          "level": 10
+        }
+      ],
+      "current_ability": 139,
+      "potential_ability": 151,
+      "value": 13428095,
+      "contract": {
+        "salary": 139000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "3d438e21-fb73-473e-ab6d-6537b3ffca47",
+      "source_id": 177,
+      "club_id": "8a635691-a263-4e8c-9ab1-1d4b0a899bc4",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Francisco Jémez",
+      "last_name": "Paco Jémez",
+      "birth_date": "1970-01-01",
+      "positions": [
+        {
+          "code": "DC",
+          "level": 17
+        },
+        {
+          "code": "DL",
+          "level": 11
+        },
+        {
+          "code": "DR",
+          "level": 11
+        }
+      ],
+      "current_ability": 132,
+      "potential_ability": 137,
+      "value": 11499840,
+      "contract": {
+        "salary": 132000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "c989fc0b-aca4-49f8-be40-675dbcfc7433",
+      "source_id": 178,
+      "club_id": "71a9d897-c219-4901-9b17-ed79ed635157",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Stéphane",
+      "last_name": "Ouédec",
+      "birth_date": "1971-01-01",
+      "positions": [
+        {
+          "code": "FC",
+          "level": 18
+        },
+        {
+          "code": "AMC",
+          "level": 9
+        }
+      ],
+      "current_ability": 130,
+      "potential_ability": 144,
+      "value": 10985000,
+      "contract": {
+        "salary": 130000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "1ed27772-a96e-4b51-83a1-097b0cc2eea5",
+      "source_id": 179,
+      "club_id": "d2a135d8-ce0d-4e00-9b03-c71efbbd95e8",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Juan Carlos Solozábal",
+      "last_name": "Solozábal",
+      "birth_date": "1963-01-01",
+      "positions": [
+        {
+          "code": "DC",
+          "level": 17
+        },
+        {
+          "code": "DL",
+          "level": 11
+        },
+        {
+          "code": "DR",
+          "level": 11
+        }
+      ],
+      "current_ability": 135,
+      "potential_ability": 141,
+      "value": 12301875,
+      "contract": {
+        "salary": 135000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "13b4718d-db9f-4ace-b62f-9328c94ca3b1",
+      "source_id": 180,
+      "club_id": null,
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Eric",
+      "last_name": "Cantona",
+      "birth_date": "1966-01-01",
+      "positions": [
+        {
+          "code": "FC",
+          "level": 18
+        },
+        {
+          "code": "AMC",
+          "level": 9
+        }
+      ],
+      "current_ability": 156,
+      "potential_ability": 167,
+      "value": 18982080,
+      "contract": {
+        "salary": 156000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "1d713cd6-3ca3-4cb5-a578-a366cc153720",
+      "source_id": 181,
+      "club_id": "c1a77a05-5f03-4e55-84c7-96f12b3ef1a5",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Predrag",
+      "last_name": "Mijatović",
+      "birth_date": "1969-01-01",
+      "positions": [
+        {
+          "code": "FC",
+          "level": 18
+        },
+        {
+          "code": "AMC",
+          "level": 9
+        }
+      ],
+      "current_ability": 152,
+      "potential_ability": 162,
+      "value": 17559040,
+      "contract": {
+        "salary": 152000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "bed8f4b7-9453-4dc3-a39b-238f1ebe4720",
+      "source_id": 182,
+      "club_id": "b57f96e8-eeee-4c15-87bc-c55b9f6cdc94",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Manu Sarabia",
+      "last_name": "Manu",
+      "birth_date": "1972-01-01",
+      "positions": [
+        {
+          "code": "DC",
+          "level": 17
+        },
+        {
+          "code": "DL",
+          "level": 11
+        },
+        {
+          "code": "DR",
+          "level": 11
+        }
+      ],
+      "current_ability": 121,
+      "potential_ability": 134,
+      "value": 8857805,
+      "contract": {
+        "salary": 121000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "ee6c49f0-b594-461e-b533-4b78fc325b14",
+      "source_id": 183,
+      "club_id": "925bb99d-8480-43a9-9e37-8d1bf8c7efb0",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Luis Enrique Martínez",
+      "last_name": "Luis Enrique",
+      "birth_date": "1970-01-01",
+      "positions": [
+        {
+          "code": "MC",
+          "level": 17
+        },
+        {
+          "code": "DMC",
+          "level": 12
+        },
+        {
+          "code": "AMC",
+          "level": 10
+        }
+      ],
+      "current_ability": 176,
+      "potential_ability": 182,
+      "value": 27258880,
+      "contract": {
+        "salary": 176000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "b9d1dcde-c148-45f3-af0e-546fdd863260",
+      "source_id": 184,
+      "club_id": "c976b397-3fae-4ce3-bf83-f9654aa6afd8",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "José Cañas",
+      "last_name": "Cañas",
+      "birth_date": "1969-01-01",
+      "positions": [
+        {
+          "code": "MC",
+          "level": 17
+        },
+        {
+          "code": "DMC",
+          "level": 12
+        },
+        {
+          "code": "AMC",
+          "level": 10
+        }
+      ],
+      "current_ability": 149,
+      "potential_ability": 151,
+      "value": 16539745,
+      "contract": {
+        "salary": 149000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "4de9c448-c211-435d-882d-80e0e3f098d8",
+      "source_id": 185,
+      "club_id": "04d08c83-beaf-4a5b-91c0-7fe1bd685653",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Abelardo Fernández",
+      "last_name": "Abelardo",
+      "birth_date": "1970-01-01",
+      "positions": [
+        {
+          "code": "DC",
+          "level": 17
+        },
+        {
+          "code": "DL",
+          "level": 11
+        },
+        {
+          "code": "DR",
+          "level": 11
+        }
+      ],
+      "current_ability": 151,
+      "potential_ability": 158,
+      "value": 17214755,
+      "contract": {
+        "salary": 151000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "66df9e9e-ab11-4263-a634-fa6dfc3926ed",
+      "source_id": 186,
+      "club_id": "13323286-3948-44b6-aae6-fba0e413e98c",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Enrique Ayúcar",
+      "last_name": "Ayúcar",
+      "birth_date": "1966-01-01",
+      "positions": [
+        {
+          "code": "MC",
+          "level": 17
+        },
+        {
+          "code": "DMC",
+          "level": 12
+        },
+        {
+          "code": "AMC",
+          "level": 10
+        }
+      ],
+      "current_ability": 135,
+      "potential_ability": 147,
+      "value": 12301875,
+      "contract": {
+        "salary": 135000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "111e2125-5475-4e47-bcc7-e47051b6e5c3",
+      "source_id": 187,
+      "club_id": "c976b397-3fae-4ce3-bf83-f9654aa6afd8",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Diego Calderón",
+      "last_name": "Calderón",
+      "birth_date": "1972-01-01",
+      "positions": [
+        {
+          "code": "MC",
+          "level": 17
+        },
+        {
+          "code": "DMC",
+          "level": 12
+        },
+        {
+          "code": "AMC",
+          "level": 10
+        }
+      ],
+      "current_ability": 141,
+      "potential_ability": 142,
+      "value": 14016105,
+      "contract": {
+        "salary": 141000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "98dd216d-6f39-4331-9724-6d0d8fd98495",
+      "source_id": 188,
+      "club_id": "8a635691-a263-4e8c-9ab1-1d4b0a899bc4",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Francisco Canales",
+      "last_name": "Canales",
+      "birth_date": "1970-01-01",
+      "positions": [
+        {
+          "code": "GK",
+          "level": 18
+        }
+      ],
+      "current_ability": 89,
+      "potential_ability": 104,
+      "value": 3524845,
+      "contract": {
+        "salary": 89000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "284983f3-1e21-4d17-82bb-21aca2d5c79e",
+      "source_id": 189,
+      "club_id": "c976b397-3fae-4ce3-bf83-f9654aa6afd8",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Goran",
+      "last_name": "Vidakovic",
+      "birth_date": "1965-01-01",
+      "positions": [
+        {
+          "code": "DC",
+          "level": 17
+        },
+        {
+          "code": "DL",
+          "level": 11
+        },
+        {
+          "code": "DR",
+          "level": 11
+        }
+      ],
+      "current_ability": 138,
+      "potential_ability": 150,
+      "value": 13140360,
+      "contract": {
+        "salary": 138000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "1c223ab0-707b-4b0b-9ed1-2a8ab510c13c",
+      "source_id": 190,
+      "club_id": "13323286-3948-44b6-aae6-fba0e413e98c",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "José Agustín Cenzual",
+      "last_name": "Sito",
+      "birth_date": "1965-01-01",
+      "positions": [
+        {
+          "code": "DC",
+          "level": 17
+        },
+        {
+          "code": "DL",
+          "level": 11
+        },
+        {
+          "code": "DR",
+          "level": 11
+        }
+      ],
+      "current_ability": 123,
+      "potential_ability": 132,
+      "value": 9304335,
+      "contract": {
+        "salary": 123000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "d97ea47b-a5cb-43ea-8132-8bf7a26671eb",
+      "source_id": 191,
+      "club_id": "d2a135d8-ce0d-4e00-9b03-c71efbbd95e8",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Santiago Denia",
+      "last_name": "Santi",
+      "birth_date": "1974-01-01",
+      "positions": [
+        {
+          "code": "DC",
+          "level": 17
+        },
+        {
+          "code": "DL",
+          "level": 11
+        },
+        {
+          "code": "DR",
+          "level": 11
+        }
+      ],
+      "current_ability": 134,
+      "potential_ability": 136,
+      "value": 12030520,
+      "contract": {
+        "salary": 134000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "e3d06ac7-2759-4099-9e0f-08e0aae1c1c4",
+      "source_id": 192,
+      "club_id": "b57f96e8-eeee-4c15-87bc-c55b9f6cdc94",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Joseba Etxeberria",
+      "last_name": "Etxeberria J.",
+      "birth_date": "1977-01-01",
+      "positions": [
+        {
+          "code": "AMR",
+          "level": 17
+        },
+        {
+          "code": "MR",
+          "level": 14
+        },
+        {
+          "code": "AMC",
+          "level": 9
+        }
+      ],
+      "current_ability": 144,
+      "potential_ability": 146,
+      "value": 14929920,
+      "contract": {
+        "salary": 144000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "46bfc2fa-ec75-4231-94e0-3b01099ca440",
+      "source_id": 193,
+      "club_id": "8a635691-a263-4e8c-9ab1-1d4b0a899bc4",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Francisco Aldana",
+      "last_name": "Aldana",
+      "birth_date": "1970-01-01",
+      "positions": [
+        {
+          "code": "MC",
+          "level": 17
+        },
+        {
+          "code": "DMC",
+          "level": 12
+        },
+        {
+          "code": "AMC",
+          "level": 10
+        }
+      ],
+      "current_ability": 146,
+      "potential_ability": 152,
+      "value": 15560680,
+      "contract": {
+        "salary": 146000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "26381735-f669-4b4d-ac64-040a20c4b2ca",
+      "source_id": 194,
+      "club_id": "c1a77a05-5f03-4e55-84c7-96f12b3ef1a5",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Javier Navarro",
+      "last_name": "Javi Navarro",
+      "birth_date": "1974-01-01",
+      "positions": [
+        {
+          "code": "DC",
+          "level": 17
+        },
+        {
+          "code": "DL",
+          "level": 11
+        },
+        {
+          "code": "DR",
+          "level": 11
+        }
+      ],
+      "current_ability": 130,
+      "potential_ability": 137,
+      "value": 10985000,
+      "contract": {
+        "salary": 130000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "bb95d549-1a8f-4262-b5f4-f50c38d53b1b",
+      "source_id": 195,
+      "club_id": "13323286-3948-44b6-aae6-fba0e413e98c",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Miguel Montes",
+      "last_name": "Torrecilla",
+      "birth_date": "1969-01-01",
+      "positions": [
+        {
+          "code": "DC",
+          "level": 17
+        },
+        {
+          "code": "DL",
+          "level": 11
+        },
+        {
+          "code": "DR",
+          "level": 11
+        }
+      ],
+      "current_ability": 119,
+      "potential_ability": 121,
+      "value": 8425795,
+      "contract": {
+        "salary": 119000,
+        "expiration": "2029-06-30"
+      }
+    },
+    {
+      "id": "31d75fe8-7a0f-45b9-b88f-9645a572b548",
+      "source_id": 196,
+      "club_id": "f1b102bc-7dce-445b-b8aa-e4108bbdc557",
+      "country_id": "8a4ff327-c113-48dd-b264-0d4d4c85ddf9",
+      "first_name": "Aitor Karanka de la",
+      "last_name": "Karanka",
+      "birth_date": "1973-01-01",
+      "positions": [
+        {
+          "code": "MC",
+          "level": 17
+        },
+        {
+          "code": "DMC",
+          "level": 12
+        },
+        {
+          "code": "AMC",
+          "level": 10
+        }
+      ],
+      "current_ability": 142,
+      "potential_ability": 154,
+      "value": 14316440,
+      "contract": {
+        "salary": 142000,
+        "expiration": "2029-06-30"
+      }
+    }
+  ]
+}
