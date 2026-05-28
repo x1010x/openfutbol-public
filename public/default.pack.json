@@ -4,7 +4,7 @@
     "version": "1.0.0",
     "source_url": "https://github.com/x1010x/openfutbol-public",
     "source_commit": null,
-    "imported_at": "2026-05-28T19:28:23.601Z",
+    "imported_at": "2026-05-28T19:52:50.061Z",
     "schema_version": 1
   },
   "continents": [
@@ -580,15 +580,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 154,
@@ -610,15 +602,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 140,
@@ -640,15 +624,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 140,
@@ -670,15 +646,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 150,
@@ -700,15 +668,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 141,
@@ -730,11 +690,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 140,
@@ -756,15 +712,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 125,
@@ -786,15 +734,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 128,
@@ -816,7 +756,7 @@
       "positions": [
         {
           "code": "GK",
-          "level": 18
+          "level": 20
         }
       ],
       "current_ability": 123,
@@ -838,7 +778,7 @@
       "positions": [
         {
           "code": "GK",
-          "level": 18
+          "level": 20
         }
       ],
       "current_ability": 131,
@@ -860,15 +800,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 151,
@@ -890,11 +822,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 155,
@@ -916,15 +844,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 126,
@@ -946,15 +866,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 138,
@@ -976,15 +888,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 159,
@@ -1006,15 +910,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 152,
@@ -1036,7 +932,7 @@
       "positions": [
         {
           "code": "GK",
-          "level": 18
+          "level": 20
         }
       ],
       "current_ability": 107,
@@ -1058,7 +954,7 @@
       "positions": [
         {
           "code": "GK",
-          "level": 18
+          "level": 20
         }
       ],
       "current_ability": 129,
@@ -1080,7 +976,7 @@
       "positions": [
         {
           "code": "GK",
-          "level": 18
+          "level": 20
         }
       ],
       "current_ability": 111,
@@ -1102,15 +998,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 153,
@@ -1132,15 +1020,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 140,
@@ -1162,7 +1042,7 @@
       "positions": [
         {
           "code": "GK",
-          "level": 18
+          "level": 20
         }
       ],
       "current_ability": 106,
@@ -1184,15 +1064,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 139,
@@ -1214,15 +1086,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 159,
@@ -1244,15 +1108,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 150,
@@ -1274,11 +1130,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 136,
@@ -1300,15 +1152,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 135,
@@ -1330,15 +1174,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 148,
@@ -1360,15 +1196,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 141,
@@ -1390,11 +1218,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 153,
@@ -1416,15 +1240,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 148,
@@ -1446,7 +1262,7 @@
       "positions": [
         {
           "code": "GK",
-          "level": 18
+          "level": 20
         }
       ],
       "current_ability": 165,
@@ -1468,11 +1284,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 145,
@@ -1494,15 +1306,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 155,
@@ -1524,15 +1328,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 128,
@@ -1554,15 +1350,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 149,
@@ -1584,11 +1372,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 149,
@@ -1610,15 +1394,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 135,
@@ -1640,15 +1416,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 154,
@@ -1670,15 +1438,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 146,
@@ -1700,11 +1460,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 153,
@@ -1726,7 +1482,7 @@
       "positions": [
         {
           "code": "GK",
-          "level": 18
+          "level": 20
         }
       ],
       "current_ability": 122,
@@ -1748,11 +1504,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 152,
@@ -1774,11 +1526,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 145,
@@ -1800,15 +1548,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 135,
@@ -1830,15 +1570,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 141,
@@ -1860,11 +1592,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 163,
@@ -1886,15 +1614,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 152,
@@ -1916,11 +1636,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 148,
@@ -1942,7 +1658,7 @@
       "positions": [
         {
           "code": "GK",
-          "level": 18
+          "level": 20
         }
       ],
       "current_ability": 128,
@@ -1964,11 +1680,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 149,
@@ -1990,11 +1702,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 146,
@@ -2016,7 +1724,7 @@
       "positions": [
         {
           "code": "GK",
-          "level": 18
+          "level": 20
         }
       ],
       "current_ability": 122,
@@ -2038,15 +1746,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 154,
@@ -2068,11 +1768,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 125,
@@ -2094,15 +1790,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 138,
@@ -2124,11 +1812,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 153,
@@ -2150,15 +1834,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 143,
@@ -2180,15 +1856,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 142,
@@ -2210,15 +1878,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 162,
@@ -2240,15 +1900,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 162,
@@ -2270,15 +1922,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 133,
@@ -2300,15 +1944,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 152,
@@ -2330,11 +1966,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 136,
@@ -2356,15 +1988,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 150,
@@ -2386,11 +2010,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 149,
@@ -2412,11 +2032,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 168,
@@ -2438,15 +2054,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 147,
@@ -2468,15 +2076,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 126,
@@ -2498,15 +2098,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 134,
@@ -2528,15 +2120,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 153,
@@ -2558,11 +2142,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 126,
@@ -2584,7 +2164,7 @@
       "positions": [
         {
           "code": "GK",
-          "level": 18
+          "level": 20
         }
       ],
       "current_ability": 127,
@@ -2606,11 +2186,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 130,
@@ -2632,15 +2208,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 164,
@@ -2662,15 +2230,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 136,
@@ -2692,15 +2252,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 139,
@@ -2722,15 +2274,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 149,
@@ -2752,15 +2296,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 140,
@@ -2782,15 +2318,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 141,
@@ -2812,7 +2340,7 @@
       "positions": [
         {
           "code": "GK",
-          "level": 18
+          "level": 20
         }
       ],
       "current_ability": 129,
@@ -2834,15 +2362,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 160,
@@ -2864,15 +2384,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 135,
@@ -2894,15 +2406,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 160,
@@ -2924,15 +2428,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 141,
@@ -2954,15 +2450,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 137,
@@ -2984,7 +2472,7 @@
       "positions": [
         {
           "code": "GK",
-          "level": 18
+          "level": 20
         }
       ],
       "current_ability": 108,
@@ -3006,7 +2494,7 @@
       "positions": [
         {
           "code": "GK",
-          "level": 18
+          "level": 20
         }
       ],
       "current_ability": 162,
@@ -3028,15 +2516,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 135,
@@ -3058,7 +2538,7 @@
       "positions": [
         {
           "code": "GK",
-          "level": 18
+          "level": 20
         }
       ],
       "current_ability": 114,
@@ -3080,15 +2560,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 152,
@@ -3110,11 +2582,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 142,
@@ -3136,7 +2604,7 @@
       "positions": [
         {
           "code": "GK",
-          "level": 18
+          "level": 20
         }
       ],
       "current_ability": 115,
@@ -3158,11 +2626,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 147,
@@ -3184,15 +2648,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 150,
@@ -3214,7 +2670,7 @@
       "positions": [
         {
           "code": "GK",
-          "level": 18
+          "level": 20
         }
       ],
       "current_ability": 96,
@@ -3236,7 +2692,7 @@
       "positions": [
         {
           "code": "GK",
-          "level": 18
+          "level": 20
         }
       ],
       "current_ability": 109,
@@ -3258,15 +2714,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 138,
@@ -3288,15 +2736,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 150,
@@ -3318,15 +2758,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 141,
@@ -3348,11 +2780,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 129,
@@ -3374,7 +2802,7 @@
       "positions": [
         {
           "code": "GK",
-          "level": 18
+          "level": 20
         }
       ],
       "current_ability": 129,
@@ -3396,7 +2824,7 @@
       "positions": [
         {
           "code": "GK",
-          "level": 18
+          "level": 20
         }
       ],
       "current_ability": 116,
@@ -3418,15 +2846,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 146,
@@ -3448,15 +2868,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 154,
@@ -3478,15 +2890,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 145,
@@ -3508,7 +2912,7 @@
       "positions": [
         {
           "code": "GK",
-          "level": 18
+          "level": 20
         }
       ],
       "current_ability": 137,
@@ -3530,11 +2934,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 154,
@@ -3556,7 +2956,7 @@
       "positions": [
         {
           "code": "GK",
-          "level": 18
+          "level": 20
         }
       ],
       "current_ability": 124,
@@ -3578,15 +2978,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 150,
@@ -3608,15 +3000,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 141,
@@ -3638,15 +3022,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 168,
@@ -3668,11 +3044,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 141,
@@ -3694,15 +3066,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 144,
@@ -3724,11 +3088,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 141,
@@ -3750,15 +3110,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 153,
@@ -3780,15 +3132,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 132,
@@ -3810,11 +3154,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 142,
@@ -3836,11 +3176,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 152,
@@ -3862,15 +3198,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 139,
@@ -3892,15 +3220,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 149,
@@ -3922,15 +3242,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 142,
@@ -3952,15 +3264,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 147,
@@ -3982,7 +3286,7 @@
       "positions": [
         {
           "code": "GK",
-          "level": 18
+          "level": 20
         }
       ],
       "current_ability": 130,
@@ -4004,7 +3308,7 @@
       "positions": [
         {
           "code": "GK",
-          "level": 18
+          "level": 20
         }
       ],
       "current_ability": 164,
@@ -4026,7 +3330,7 @@
       "positions": [
         {
           "code": "GK",
-          "level": 18
+          "level": 20
         }
       ],
       "current_ability": 117,
@@ -4048,11 +3352,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 133,
@@ -4074,11 +3374,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 143,
@@ -4100,7 +3396,7 @@
       "positions": [
         {
           "code": "GK",
-          "level": 18
+          "level": 20
         }
       ],
       "current_ability": 111,
@@ -4122,15 +3418,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 141,
@@ -4152,7 +3440,7 @@
       "positions": [
         {
           "code": "GK",
-          "level": 18
+          "level": 20
         }
       ],
       "current_ability": 118,
@@ -4174,11 +3462,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 155,
@@ -4200,15 +3484,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 137,
@@ -4230,11 +3506,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 149,
@@ -4256,11 +3528,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 135,
@@ -4282,15 +3550,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 158,
@@ -4312,11 +3572,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 153,
@@ -4338,11 +3594,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 144,
@@ -4364,11 +3616,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 157,
@@ -4390,15 +3638,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 152,
@@ -4420,7 +3660,7 @@
       "positions": [
         {
           "code": "GK",
-          "level": 18
+          "level": 20
         }
       ],
       "current_ability": 116,
@@ -4442,15 +3682,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 163,
@@ -4472,15 +3704,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 136,
@@ -4502,11 +3726,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 142,
@@ -4528,15 +3748,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 147,
@@ -4558,15 +3770,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 138,
@@ -4588,15 +3792,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 143,
@@ -4618,15 +3814,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 145,
@@ -4648,11 +3836,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 131,
@@ -4674,11 +3858,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 164,
@@ -4700,15 +3880,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 134,
@@ -4730,11 +3902,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 142,
@@ -4756,15 +3924,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 145,
@@ -4786,11 +3946,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 147,
@@ -4812,15 +3968,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 145,
@@ -4842,11 +3990,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 147,
@@ -4868,15 +4012,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 148,
@@ -4898,15 +4034,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 150,
@@ -4928,11 +4056,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 160,
@@ -4954,15 +4078,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 150,
@@ -4984,7 +4100,7 @@
       "positions": [
         {
           "code": "GK",
-          "level": 18
+          "level": 20
         }
       ],
       "current_ability": 157,
@@ -5006,11 +4122,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 143,
@@ -5032,11 +4144,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 157,
@@ -5058,7 +4166,7 @@
       "positions": [
         {
           "code": "GK",
-          "level": 18
+          "level": 20
         }
       ],
       "current_ability": 106,
@@ -5080,7 +4188,7 @@
       "positions": [
         {
           "code": "GK",
-          "level": 18
+          "level": 20
         }
       ],
       "current_ability": 151,
@@ -5102,15 +4210,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 146,
@@ -5132,11 +4232,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 128,
@@ -5158,15 +4254,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 145,
@@ -5188,15 +4276,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 134,
@@ -5218,15 +4298,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 130,
@@ -5248,15 +4320,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 158,
@@ -5278,11 +4342,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 129,
@@ -5304,15 +4364,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 153,
@@ -5334,15 +4386,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 130,
@@ -5364,15 +4408,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 156,
@@ -5394,15 +4430,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 162,
@@ -5424,15 +4452,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 137,
@@ -5454,15 +4474,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 161,
@@ -5484,15 +4496,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 135,
@@ -5514,11 +4518,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 150,
@@ -5540,11 +4540,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 134,
@@ -5566,11 +4562,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 135,
@@ -5592,15 +4584,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 145,
@@ -5622,7 +4606,7 @@
       "positions": [
         {
           "code": "GK",
-          "level": 18
+          "level": 20
         }
       ],
       "current_ability": 147,
@@ -5644,15 +4628,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 151,
@@ -5674,15 +4650,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 130,
@@ -5704,11 +4672,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 146,
@@ -5730,11 +4694,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 159,
@@ -5756,7 +4716,7 @@
       "positions": [
         {
           "code": "GK",
-          "level": 18
+          "level": 20
         }
       ],
       "current_ability": 124,
@@ -5778,7 +4738,7 @@
       "positions": [
         {
           "code": "GK",
-          "level": 18
+          "level": 20
         }
       ],
       "current_ability": 116,
@@ -5800,11 +4760,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 140,
@@ -5826,11 +4782,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 126,
@@ -5852,15 +4804,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 145,
@@ -5882,15 +4826,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 128,
@@ -5912,11 +4848,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 143,
@@ -5938,15 +4870,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 159,
@@ -5968,11 +4892,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 134,
@@ -5994,11 +4914,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 137,
@@ -6020,15 +4936,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 141,
@@ -6050,11 +4958,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 127,
@@ -6076,15 +4980,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 132,
@@ -6106,11 +5002,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 169,
@@ -6132,15 +5024,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 153,
@@ -6162,11 +5046,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 143,
@@ -6188,7 +5068,7 @@
       "positions": [
         {
           "code": "GK",
-          "level": 18
+          "level": 20
         }
       ],
       "current_ability": 118,
@@ -6210,15 +5090,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 164,
@@ -6240,15 +5112,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 140,
@@ -6270,15 +5134,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 147,
@@ -6300,11 +5156,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 144,
@@ -6326,7 +5178,7 @@
       "positions": [
         {
           "code": "GK",
-          "level": 18
+          "level": 20
         }
       ],
       "current_ability": 108,
@@ -6348,15 +5200,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 160,
@@ -6378,11 +5222,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 152,
@@ -6404,15 +5244,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 130,
@@ -6434,15 +5266,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 153,
@@ -6464,15 +5288,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 166,
@@ -6494,11 +5310,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 155,
@@ -6520,15 +5332,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 137,
@@ -6550,15 +5354,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 168,
@@ -6580,15 +5376,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 146,
@@ -6610,15 +5398,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 141,
@@ -6640,15 +5420,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 149,
@@ -6670,11 +5442,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 136,
@@ -6696,7 +5464,7 @@
       "positions": [
         {
           "code": "GK",
-          "level": 18
+          "level": 20
         }
       ],
       "current_ability": 121,
@@ -6718,11 +5486,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 139,
@@ -6744,15 +5508,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 146,
@@ -6774,11 +5530,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 128,
@@ -6800,15 +5552,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 149,
@@ -6830,11 +5574,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 144,
@@ -6856,15 +5596,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 153,
@@ -6886,15 +5618,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 146,
@@ -6916,11 +5640,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 152,
@@ -6942,11 +5662,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 139,
@@ -6968,15 +5684,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 146,
@@ -6998,15 +5706,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 137,
@@ -7028,15 +5728,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 137,
@@ -7058,15 +5750,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 145,
@@ -7088,15 +5772,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 134,
@@ -7118,15 +5794,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 146,
@@ -7148,15 +5816,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 150,
@@ -7178,11 +5838,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 139,
@@ -7204,11 +5860,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 151,
@@ -7230,11 +5882,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 159,
@@ -7256,11 +5904,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 140,
@@ -7282,15 +5926,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 144,
@@ -7312,11 +5948,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 161,
@@ -7338,11 +5970,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 140,
@@ -7364,11 +5992,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 141,
@@ -7390,15 +6014,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 148,
@@ -7420,11 +6036,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 169,
@@ -7446,15 +6058,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 153,
@@ -7476,15 +6080,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 138,
@@ -7506,15 +6102,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 141,
@@ -7536,11 +6124,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 160,
@@ -7562,11 +6146,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 125,
@@ -7588,15 +6168,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 139,
@@ -7618,15 +6190,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 135,
@@ -7648,15 +6212,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 163,
@@ -7678,7 +6234,7 @@
       "positions": [
         {
           "code": "GK",
-          "level": 18
+          "level": 20
         }
       ],
       "current_ability": 108,
@@ -7700,15 +6256,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 146,
@@ -7730,7 +6278,7 @@
       "positions": [
         {
           "code": "GK",
-          "level": 18
+          "level": 20
         }
       ],
       "current_ability": 112,
@@ -7752,11 +6300,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 129,
@@ -7778,11 +6322,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 138,
@@ -7804,11 +6344,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 154,
@@ -7830,7 +6366,7 @@
       "positions": [
         {
           "code": "GK",
-          "level": 18
+          "level": 20
         }
       ],
       "current_ability": 137,
@@ -7852,15 +6388,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 146,
@@ -7882,15 +6410,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 149,
@@ -7912,15 +6432,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 140,
@@ -7942,11 +6454,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 133,
@@ -7968,7 +6476,7 @@
       "positions": [
         {
           "code": "GK",
-          "level": 18
+          "level": 20
         }
       ],
       "current_ability": 119,
@@ -7990,11 +6498,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 141,
@@ -8016,15 +6520,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 146,
@@ -8046,15 +6542,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 143,
@@ -8076,11 +6564,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 154,
@@ -8102,15 +6586,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 160,
@@ -8132,11 +6608,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 139,
@@ -8158,15 +6630,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 160,
@@ -8188,11 +6652,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 156,
@@ -8214,11 +6674,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 151,
@@ -8240,15 +6696,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 155,
@@ -8270,15 +6718,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 141,
@@ -8300,11 +6740,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 146,
@@ -8326,7 +6762,7 @@
       "positions": [
         {
           "code": "GK",
-          "level": 18
+          "level": 20
         }
       ],
       "current_ability": 120,
@@ -8348,11 +6784,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 147,
@@ -8374,15 +6806,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 145,
@@ -8404,7 +6828,7 @@
       "positions": [
         {
           "code": "GK",
-          "level": 18
+          "level": 20
         }
       ],
       "current_ability": 148,
@@ -8426,11 +6850,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 142,
@@ -8452,15 +6872,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 161,
@@ -8482,15 +6894,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 150,
@@ -8512,15 +6916,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 136,
@@ -8542,15 +6938,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 138,
@@ -8572,15 +6960,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 164,
@@ -8602,15 +6982,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 123,
@@ -8632,11 +7004,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 123,
@@ -8658,11 +7026,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 125,
@@ -8684,15 +7048,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 154,
@@ -8714,15 +7070,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 133,
@@ -8744,7 +7092,7 @@
       "positions": [
         {
           "code": "GK",
-          "level": 18
+          "level": 20
         }
       ],
       "current_ability": 111,
@@ -8766,7 +7114,7 @@
       "positions": [
         {
           "code": "GK",
-          "level": 18
+          "level": 20
         }
       ],
       "current_ability": 107,
@@ -8788,11 +7136,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 140,
@@ -8814,15 +7158,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 145,
@@ -8844,15 +7180,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 137,
@@ -8874,15 +7202,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 152,
@@ -8904,15 +7224,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 146,
@@ -8934,7 +7246,7 @@
       "positions": [
         {
           "code": "GK",
-          "level": 18
+          "level": 20
         }
       ],
       "current_ability": 128,
@@ -8956,15 +7268,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 153,
@@ -8986,15 +7290,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 155,
@@ -9016,11 +7312,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 145,
@@ -9042,15 +7334,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 147,
@@ -9072,11 +7356,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 160,
@@ -9098,15 +7378,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 152,
@@ -9128,11 +7400,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 134,
@@ -9154,7 +7422,7 @@
       "positions": [
         {
           "code": "GK",
-          "level": 18
+          "level": 20
         }
       ],
       "current_ability": 111,
@@ -9176,15 +7444,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 165,
@@ -9206,11 +7466,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 162,
@@ -9232,7 +7488,7 @@
       "positions": [
         {
           "code": "GK",
-          "level": 18
+          "level": 20
         }
       ],
       "current_ability": 123,
@@ -9254,15 +7510,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 140,
@@ -9284,15 +7532,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 135,
@@ -9314,15 +7554,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 158,
@@ -9344,11 +7576,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 134,
@@ -9370,15 +7598,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 131,
@@ -9400,15 +7620,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 137,
@@ -9430,7 +7642,7 @@
       "positions": [
         {
           "code": "GK",
-          "level": 18
+          "level": 20
         }
       ],
       "current_ability": 157,
@@ -9452,15 +7664,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 137,
@@ -9482,15 +7686,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 161,
@@ -9512,15 +7708,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 146,
@@ -9542,15 +7730,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 149,
@@ -9572,15 +7752,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 143,
@@ -9602,15 +7774,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 134,
@@ -9632,15 +7796,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 147,
@@ -9662,11 +7818,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 158,
@@ -9688,11 +7840,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 133,
@@ -9714,15 +7862,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 155,
@@ -9744,11 +7884,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 144,
@@ -9770,15 +7906,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 129,
@@ -9800,15 +7928,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 136,
@@ -9830,15 +7950,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 144,
@@ -9860,15 +7972,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 165,
@@ -9890,15 +7994,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 155,
@@ -9920,11 +8016,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 138,
@@ -9946,15 +8038,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 143,
@@ -9976,15 +8060,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 145,
@@ -10006,15 +8082,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 139,
@@ -10036,11 +8104,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 140,
@@ -10062,11 +8126,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 156,
@@ -10088,15 +8148,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 151,
@@ -10118,7 +8170,7 @@
       "positions": [
         {
           "code": "GK",
-          "level": 18
+          "level": 20
         }
       ],
       "current_ability": 150,
@@ -10140,15 +8192,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 148,
@@ -10170,15 +8214,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 161,
@@ -10200,11 +8236,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 150,
@@ -10226,15 +8258,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 148,
@@ -10256,15 +8280,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 165,
@@ -10286,7 +8302,7 @@
       "positions": [
         {
           "code": "GK",
-          "level": 18
+          "level": 20
         }
       ],
       "current_ability": 117,
@@ -10308,15 +8324,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 141,
@@ -10338,15 +8346,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 167,
@@ -10368,15 +8368,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 141,
@@ -10398,15 +8390,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 135,
@@ -10428,11 +8412,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 137,
@@ -10454,11 +8434,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 138,
@@ -10480,11 +8456,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 140,
@@ -10506,11 +8478,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 156,
@@ -10532,15 +8500,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 165,
@@ -10562,15 +8522,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 132,
@@ -10592,7 +8544,7 @@
       "positions": [
         {
           "code": "GK",
-          "level": 18
+          "level": 20
         }
       ],
       "current_ability": 123,
@@ -10614,15 +8566,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 157,
@@ -10644,11 +8588,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 130,
@@ -10670,15 +8610,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 154,
@@ -10700,15 +8632,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 155,
@@ -10730,11 +8654,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 145,
@@ -10756,7 +8676,7 @@
       "positions": [
         {
           "code": "GK",
-          "level": 18
+          "level": 20
         }
       ],
       "current_ability": 129,
@@ -10778,15 +8698,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 152,
@@ -10808,15 +8720,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 134,
@@ -10838,15 +8742,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 124,
@@ -10868,7 +8764,7 @@
       "positions": [
         {
           "code": "GK",
-          "level": 18
+          "level": 20
         }
       ],
       "current_ability": 119,
@@ -10890,11 +8786,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 161,
@@ -10916,7 +8808,7 @@
       "positions": [
         {
           "code": "GK",
-          "level": 18
+          "level": 20
         }
       ],
       "current_ability": 111,
@@ -10938,11 +8830,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 158,
@@ -10964,11 +8852,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 158,
@@ -10990,7 +8874,7 @@
       "positions": [
         {
           "code": "GK",
-          "level": 18
+          "level": 20
         }
       ],
       "current_ability": 121,
@@ -11012,11 +8896,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 144,
@@ -11038,15 +8918,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 164,
@@ -11068,15 +8940,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 128,
@@ -11098,7 +8962,7 @@
       "positions": [
         {
           "code": "GK",
-          "level": 18
+          "level": 20
         }
       ],
       "current_ability": 113,
@@ -11120,11 +8984,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 144,
@@ -11146,11 +9006,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 127,
@@ -11172,15 +9028,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 143,
@@ -11202,11 +9050,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 148,
@@ -11228,15 +9072,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 145,
@@ -11258,15 +9094,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 139,
@@ -11288,11 +9116,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 133,
@@ -11314,15 +9138,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 154,
@@ -11344,15 +9160,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 139,
@@ -11374,15 +9182,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 154,
@@ -11404,15 +9204,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 140,
@@ -11434,11 +9226,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 153,
@@ -11460,15 +9248,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 147,
@@ -11490,11 +9270,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 161,
@@ -11516,11 +9292,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 137,
@@ -11542,15 +9314,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 161,
@@ -11572,15 +9336,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 165,
@@ -11602,7 +9358,7 @@
       "positions": [
         {
           "code": "GK",
-          "level": 18
+          "level": 20
         }
       ],
       "current_ability": 145,
@@ -11624,15 +9380,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 134,
@@ -11654,15 +9402,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 135,
@@ -11684,15 +9424,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 153,
@@ -11714,11 +9446,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 138,
@@ -11740,15 +9468,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 149,
@@ -11770,15 +9490,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 150,
@@ -11800,7 +9512,7 @@
       "positions": [
         {
           "code": "GK",
-          "level": 18
+          "level": 20
         }
       ],
       "current_ability": 108,
@@ -11822,11 +9534,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 145,
@@ -11848,11 +9556,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 155,
@@ -11874,15 +9578,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 138,
@@ -11904,15 +9600,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 164,
@@ -11934,15 +9622,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 143,
@@ -11964,11 +9644,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 129,
@@ -11990,15 +9666,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 140,
@@ -12020,15 +9688,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 156,
@@ -12050,15 +9710,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 144,
@@ -12080,15 +9732,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 152,
@@ -12110,7 +9754,7 @@
       "positions": [
         {
           "code": "GK",
-          "level": 18
+          "level": 20
         }
       ],
       "current_ability": 111,
@@ -12132,11 +9776,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 141,
@@ -12158,15 +9798,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 150,
@@ -12188,15 +9820,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 145,
@@ -12218,15 +9842,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 139,
@@ -12248,11 +9864,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 135,
@@ -12274,15 +9886,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 158,
@@ -12304,15 +9908,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 157,
@@ -12334,15 +9930,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 148,
@@ -12364,15 +9952,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 135,
@@ -12394,15 +9974,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 153,
@@ -12424,15 +9996,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 155,
@@ -12454,7 +10018,7 @@
       "positions": [
         {
           "code": "GK",
-          "level": 18
+          "level": 20
         }
       ],
       "current_ability": 116,
@@ -12476,15 +10040,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 142,
@@ -12506,15 +10062,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 141,
@@ -12536,11 +10084,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 160,
@@ -12562,15 +10106,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 158,
@@ -12592,11 +10128,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 150,
@@ -12618,11 +10150,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 167,
@@ -12644,11 +10172,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 139,
@@ -12670,11 +10194,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 150,
@@ -12696,15 +10216,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 145,
@@ -12726,15 +10238,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 159,
@@ -12756,11 +10260,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 149,
@@ -12782,15 +10282,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 139,
@@ -12812,15 +10304,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 149,
@@ -12842,11 +10326,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 157,
@@ -12868,15 +10348,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 153,
@@ -12898,15 +10370,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 137,
@@ -12928,15 +10392,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 149,
@@ -12958,15 +10414,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 135,
@@ -12988,11 +10436,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 150,
@@ -13014,15 +10458,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 138,
@@ -13044,11 +10480,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 165,
@@ -13070,11 +10502,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 138,
@@ -13096,15 +10524,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 150,
@@ -13126,15 +10546,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 144,
@@ -13156,7 +10568,7 @@
       "positions": [
         {
           "code": "GK",
-          "level": 18
+          "level": 20
         }
       ],
       "current_ability": 117,
@@ -13178,15 +10590,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 153,
@@ -13208,7 +10612,7 @@
       "positions": [
         {
           "code": "GK",
-          "level": 18
+          "level": 20
         }
       ],
       "current_ability": 123,
@@ -13230,11 +10634,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 135,
@@ -13256,15 +10656,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 131,
@@ -13286,15 +10678,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 166,
@@ -13316,15 +10700,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 137,
@@ -13346,11 +10722,7 @@
       "positions": [
         {
           "code": "FC",
-          "level": 18
-        },
-        {
-          "code": "AMC",
-          "level": 9
+          "level": 20
         }
       ],
       "current_ability": 141,
@@ -13372,15 +10744,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 148,
@@ -13402,15 +10766,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 152,
@@ -13432,15 +10788,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 155,
@@ -13462,15 +10810,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 128,
@@ -13492,15 +10832,7 @@
       "positions": [
         {
           "code": "MC",
-          "level": 17
-        },
-        {
-          "code": "DMC",
-          "level": 12
-        },
-        {
-          "code": "AMC",
-          "level": 10
+          "level": 20
         }
       ],
       "current_ability": 141,
@@ -13522,15 +10854,7 @@
       "positions": [
         {
           "code": "DC",
-          "level": 17
-        },
-        {
-          "code": "DL",
-          "level": 11
-        },
-        {
-          "code": "DR",
-          "level": 11
+          "level": 20
         }
       ],
       "current_ability": 160,

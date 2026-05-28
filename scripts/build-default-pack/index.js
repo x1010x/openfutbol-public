@@ -16,12 +16,12 @@ function deterministicExtra(uuid) {
 }
 
 const POS_MAP = {
-  POR: [{ code: 'GK', level: 18 }],
-  DEF: [{ code: 'DC', level: 17 }, { code: 'DL', level: 11 }, { code: 'DR', level: 11 }],
-  MED: [{ code: 'MC', level: 17 }, { code: 'DMC', level: 12 }, { code: 'AMC', level: 10 }],
-  AML: [{ code: 'AML', level: 17 }, { code: 'ML', level: 14 }, { code: 'AMC', level: 9 }],
-  AMR: [{ code: 'AMR', level: 17 }, { code: 'MR', level: 14 }, { code: 'AMC', level: 9 }],
-  DEL: [{ code: 'FC', level: 18 }, { code: 'AMC', level: 9 }],
+  POR: [{ code: 'GK',  level: 20 }],
+  DEF: [{ code: 'DC',  level: 20 }],
+  MED: [{ code: 'MC',  level: 20 }],
+  AML: [{ code: 'AML', level: 20 }],
+  AMR: [{ code: 'AMR', level: 20 }],
+  DEL: [{ code: 'FC',  level: 20 }],
 };
 
 const COUNTRY_NAMES = {
