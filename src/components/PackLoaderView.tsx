@@ -10,7 +10,7 @@ const formatDate = (iso: string): string => {
   } catch { return iso; }
 };
 
-export const PackLoaderView = () => {
+export const PackLoaderView = ({ onBack }: { onBack?: () => void }) => {
   const { pack, setPack, clearPack, persistent, isDefault } = usePack();
   const fileRef = useRef<HTMLInputElement>(null);
   const [url, setUrl] = useState('');
@@ -64,9 +64,14 @@ export const PackLoaderView = () => {
 
   return (
     <div className="w-full max-w-md flex flex-col gap-3 animate-in fade-in duration-300">
-      <div className="bg-vga-blue border-4 border-vga-white p-5 text-center shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] mb-1">
+      <div className="bg-vga-blue border-4 border-vga-white p-5 text-center shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] mb-1 relative">
+        {onBack && (
+          <button onClick={onBack} className="absolute left-3 top-1/2 -translate-y-1/2 bg-vga-red text-vga-bright-white px-3 py-1 text-[8px] border border-vga-black hover:bg-vga-light-red">
+            VOLVER
+          </button>
+        )}
         <div className="text-vga-yellow text-lg font-bold tracking-widest mb-1 cool:text-rc-primary">DATOS DEL JUEGO</div>
-        <div className="text-vga-cyan text-[8px] tracking-widest cool:text-rc-accent">CARGA UN PACK PARA EMPEZAR</div>
+        <div className="text-vga-cyan text-[8px] tracking-widest cool:text-rc-accent">GESTIÓN DE PACK</div>
       </div>
 
       {!pack && (

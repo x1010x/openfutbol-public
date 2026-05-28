@@ -55,7 +55,7 @@ import { usePack } from './state/PackContext';
 import { buildTeamFromPackClub } from './data/packTeamBuilder';
 import { runtimePlayerFromPack } from './data/playerBuilder';
 
-type View = 'LEAGUE' | 'SQUAD' | 'ALIGNMENT' | 'RESULTS' | 'STATS' | 'FINANCES' | 'TRANSFERS' | 'JORNADA_RESULTS' | 'END_OF_SEASON' | 'PLAYER_DETAIL' | 'BACKUP' | 'EDITOR' | 'EQUIPO' | 'MANAGER_CAREER';
+type View = 'LEAGUE' | 'SQUAD' | 'ALIGNMENT' | 'RESULTS' | 'STATS' | 'FINANCES' | 'TRANSFERS' | 'JORNADA_RESULTS' | 'END_OF_SEASON' | 'PLAYER_DETAIL' | 'BACKUP' | 'EDITOR' | 'EQUIPO' | 'MANAGER_CAREER' | 'PACK_LOADER';
 
 function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
   useT(); // subscribe to language changes so nav labels and messages re-render
@@ -1621,8 +1621,8 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
       );
     }
 
-    if (!pack) {
-      return <PackLoaderView />;
+    if (view === 'PACK_LOADER') {
+      return <PackLoaderView onBack={() => setView('BACKUP')} />;
     }
 
     if (showInstructions) {
@@ -1653,6 +1653,7 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
           onRestore={(newState) => { setLeague(newState); setView('LEAGUE'); }}
           onReset={() => { setLeague(getInitialLeagueState()); setView('LEAGUE'); }}
           onBack={() => setView('LEAGUE')}
+          onOpenPack={() => setView('PACK_LOADER')}
         />
       );
     }
@@ -2023,6 +2024,7 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
             setView('LEAGUE');
           }}
           onBack={() => setView('LEAGUE')}
+          onOpenPack={() => setView('PACK_LOADER')}
         />
       );
     }

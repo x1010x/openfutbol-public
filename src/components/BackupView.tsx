@@ -9,11 +9,12 @@ interface Props {
   onRestore: (newState: LeagueState) => void;
   onReset: () => void;
   onBack: () => void;
+  onOpenPack?: () => void;
 }
 
-export const BackupView = ({ league, onRestore, onReset, onBack }: Props) => {
+export const BackupView = ({ league, onRestore, onReset, onBack, onOpenPack }: Props) => {
   const t = useT();
-  const [tab, setTab] = useState<'backup' | 'engine'>('backup');
+  const [tab, setTab] = useState<'backup' | 'engine' | 'pack'>('backup');
 
   const handleReset = () => {
     if (confirm(t('misc.confirmReset'))) {
@@ -80,6 +81,14 @@ export const BackupView = ({ league, onRestore, onReset, onBack }: Props) => {
             >
               ENGINE
             </button>
+            {onOpenPack && (
+              <button
+                onClick={() => setTab('pack')}
+                className={`text-[7px] px-2 py-0.5 border font-bold uppercase ${tab === 'pack' ? 'bg-vga-green text-vga-black border-vga-green' : 'text-vga-gray border-vga-gray hover:text-vga-bright-white hover:border-vga-bright-white'}`}
+              >
+                PACK
+              </button>
+            )}
           </div>
         </div>
         <button onClick={onBack} className="bg-vga-red text-vga-bright-white px-3 py-1 text-[8px] border border-vga-black hover:bg-vga-light-red">
@@ -90,6 +99,19 @@ export const BackupView = ({ league, onRestore, onReset, onBack }: Props) => {
       {tab === 'engine' && (
         <div className="bg-vga-gray border-4 border-vga-blue p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
           <EngineSettingsView />
+        </div>
+      )}
+
+      {tab === 'pack' && onOpenPack && (
+        <div className="bg-vga-gray border-4 border-vga-blue p-6 flex flex-col gap-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+          <h3 className="text-vga-blue text-[10px] font-bold border-b border-vga-blue pb-1 uppercase">Pack de datos</h3>
+          <p className="text-vga-black text-[8px] leading-relaxed">Importa un pack externo o gestiona el pack activo.</p>
+          <button
+            onClick={onOpenPack}
+            className="bg-vga-green hover:opacity-90 text-vga-bright-white py-2 px-4 border-b-4 border-r-4 border-vga-black text-[10px] font-bold uppercase tracking-wider"
+          >
+            GESTIONAR PACK
+          </button>
         </div>
       )}
 
