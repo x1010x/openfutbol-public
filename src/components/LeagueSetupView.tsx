@@ -2,7 +2,7 @@ import { useState, useRef } from 'react';
 import type { RawPlayerDB, RawTeamDB } from '../types/game.d.ts';
 import type { Team } from '../types/game.d.ts';
 import { getTeamTemplatesForYear, getTeamCountry, type TeamTemplate } from '../data/mockTeams';
-import { loadPackFromFile } from '../data/packLoader';
+import { loadLegacyPackFromFile as loadPackFromFile } from '../data/packLoader';
 import { TeamCrest } from './TeamCrest';
 import { CountryBadge } from './CountryBadge';
 import { useT as useTranslation } from '../i18n';

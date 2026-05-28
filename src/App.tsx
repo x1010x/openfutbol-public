@@ -50,11 +50,14 @@ import { PlayerTooltipProvider } from './contexts/PlayerTooltipContext';
 import { PlayerName } from './components/PlayerName';
 import { formatJornadaDate } from './engine/calendar';
 import type { OfferResult } from './data/economy';
+import { PackLoaderView } from './components/PackLoaderView';
+import { usePack } from './state/PackContext';
 
 type View = 'LEAGUE' | 'SQUAD' | 'ALIGNMENT' | 'RESULTS' | 'STATS' | 'FINANCES' | 'TRANSFERS' | 'JORNADA_RESULTS' | 'END_OF_SEASON' | 'PLAYER_DETAIL' | 'BACKUP' | 'EDITOR' | 'EQUIPO' | 'MANAGER_CAREER';
 
 function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
   useT(); // subscribe to language changes so nav labels and messages re-render
+  const { pack, loading: packLoading } = usePack();
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
   const [league, setLeague] = useState<LeagueState>(() => {
     const saved = localStorage.getItem('openfutbol_league');
@@ -67,6 +70,7 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
       // trying to patch a broken state. Add a check here whenever LeagueState
       // gains a required field that old saves won't have.
       const needsReset =
+        (parsed.schema_version ?? 1) !== 2 ||       // schema_version mismatch — wipe
         parsed.isStarted === undefined ||           // pre-isStarted saves
         !parsed.schedule ||                         // pre-schedule saves
         !parsed.year ||                             // pre-multi-year saves
@@ -1587,6 +1591,18 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
   };
 
   const renderMainContent = () => {
+    if (packLoading) {
+      return (
+        <div className="w-full max-w-sm flex flex-col items-center gap-3 animate-in fade-in duration-300">
+          <div className="text-vga-cyan text-[10px] uppercase tracking-widest cool:text-rc-accent">CARGANDO...</div>
+        </div>
+      );
+    }
+
+    if (!pack) {
+      return <PackLoaderView />;
+    }
+
     if (showInstructions) {
       return <InstructionsView onBack={() => { setShowInstructions(false); setInstructionsScroll(undefined); }} onColaborar={() => { setShowInstructions(false); setShowColaborar(true); }} scrollTo={instructionsScroll} />;
     }
