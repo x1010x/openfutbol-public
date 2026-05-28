@@ -247,6 +247,7 @@ export interface LeagueState {
   // Tebas rules: max 2 clausulazos made by user per season, max 2 received per team per season
   seasonClausulazosMade?: number;
   seasonClausulazosReceived?: Record<string, number>;
+  schema_version?: number;
 }
 
 export const emptyTeamRecords = (): TeamRecords => ({
@@ -352,6 +353,7 @@ export const getInitialLeagueState = (
     managerCareer: [],
     seasonClausulazosMade: 0,
     seasonClausulazosReceived: {},
+    schema_version: 2,
   };
 };
 
@@ -654,7 +656,7 @@ export const decayTeamStaminaAfterMatch = (state: LeagueState, teamId: string): 
       ...team,
       players: team.players.map(p => {
         if (!team.lineup.includes(p.id)) return p;
-        const rate = 0.25 + (1 - p.stats.physical / 99) * 0.15;
+        const rate = 0.25 + (1 - (p.current_ability ?? 100) / 200) * 0.15;
         return { ...p, stamina: Math.max(1, Math.round((p.stamina ?? 99) - rate * 90)) };
       }),
     };
@@ -677,7 +679,7 @@ export const applyStaminaRecovery = (state: LeagueState): LeagueState => {
     ...team,
     players: team.players.map(p => ({
       ...p,
-      stamina: Math.min(99, (p.stamina ?? 99) + Math.round((12 + (p.stats.physical / 99) * 13) * engineSettings.staminaRecoveryMult)),
+      stamina: Math.min(99, (p.stamina ?? 99) + Math.round((12 + ((p.current_ability ?? 100) / 200) * 13) * engineSettings.staminaRecoveryMult)),
     })),
   }));
   return { ...state, teams: newTeams };
