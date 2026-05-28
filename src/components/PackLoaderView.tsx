@@ -1,6 +1,8 @@
 import { useRef, useState } from 'react';
 import { usePack } from '../state/PackContext';
+import { useStatsPack } from '../state/StatsPackContext';
 import { loadPackFromFile, loadPackFromUrl } from '../data/packLoader';
+import { loadStatsPackFromFile, loadStatsPackFromUrl } from '../data/statsPackLoader';
 
 const formatDate = (iso: string): string => {
   try {
@@ -130,6 +132,8 @@ export const PackLoaderView = ({ onBack }: { onBack?: () => void }) => {
         </div>
       )}
 
+      <StatsPackSection />
+
       {pack && (
         <div className="bg-vga-gray border-4 border-vga-blue p-4 flex flex-col gap-3 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
           {isDefault && (
@@ -181,6 +185,98 @@ export const PackLoaderView = ({ onBack }: { onBack?: () => void }) => {
             REEMPLAZAR PACK
           </button>
         </div>
+      )}
+    </div>
+  );
+};
+
+const StatsPackSection = () => {
+  const { pack, setPack, clearPack, persistent } = useStatsPack();
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [url, setUrl] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+
+  const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setError(null); setBusy(true);
+    const result = await loadStatsPackFromFile(file);
+    setBusy(false);
+    if (!result.ok) { setError(result.message); if (fileRef.current) fileRef.current.value = ''; return; }
+    await setPack(result.pack);
+    if (fileRef.current) fileRef.current.value = '';
+  };
+
+  const handleUrl = async () => {
+    const trimmed = url.trim();
+    if (!trimmed) { setError('Introduce una URL.'); return; }
+    setError(null); setBusy(true);
+    const result = await loadStatsPackFromUrl(trimmed);
+    setBusy(false);
+    if (!result.ok) { setError(`No se pudo cargar la URL. (${result.message})`); return; }
+    await setPack(result.pack);
+    setUrl('');
+  };
+
+  return (
+    <div className="bg-vga-gray border-4 border-vga-magenta p-4 flex flex-col gap-3 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+      <div className="flex justify-between items-center border-b-2 border-vga-magenta pb-1">
+        <span className="text-vga-magenta text-[10px] font-bold uppercase">Stats Pack</span>
+        {pack && <span className="text-vga-light-green text-[7px]">{pack.meta.count} entradas</span>}
+      </div>
+
+      {pack ? (
+        <>
+          <div className="flex flex-col gap-1">
+            <span className="text-vga-black text-[9px] font-bold">{pack.meta.name}</span>
+            <span className="text-vga-black text-[7px] opacity-70">v{pack.meta.version} · {pack.meta.source}</span>
+          </div>
+          <button
+            onClick={() => clearPack()}
+            className="w-full bg-vga-red text-vga-bright-white py-2 text-[8px] border-b-4 border-r-4 border-vga-black font-bold uppercase tracking-widest hover:opacity-90"
+          >
+            Quitar stats pack
+          </button>
+        </>
+      ) : (
+        <>
+          <div className="text-vga-black text-[8px]">
+            Opcional. Sobrescribe stats por <code>source_id</code>. Sin nombres, solo números.
+          </div>
+          <button
+            onClick={() => fileRef.current?.click()}
+            disabled={busy}
+            className="w-full bg-vga-magenta text-vga-bright-white py-2 text-[9px] border-b-4 border-r-4 border-vga-black font-bold uppercase tracking-widest hover:opacity-90 disabled:opacity-50"
+          >
+            Cargar .stats.json
+          </button>
+          <input ref={fileRef} type="file" accept=".json,application/json" onChange={handleFile} className="hidden" />
+          <div className="flex flex-col gap-2">
+            <input
+              value={url}
+              onChange={e => setUrl(e.target.value)}
+              placeholder="https://...stats.json"
+              disabled={busy}
+              className="bg-vga-bright-white text-vga-black text-[9px] px-2 py-1.5 border-2 border-vga-black font-mono disabled:opacity-50"
+            />
+            <button
+              onClick={handleUrl}
+              disabled={busy}
+              className="w-full bg-vga-blue text-vga-bright-white py-2 text-[9px] border-b-4 border-r-4 border-vga-black font-bold uppercase tracking-widest hover:opacity-90 disabled:opacity-50"
+            >
+              Cargar desde URL
+            </button>
+          </div>
+          {error && (
+            <div className="bg-vga-red text-vga-bright-white text-[8px] p-2 border-2 border-vga-black break-words">{error}</div>
+          )}
+          {!persistent && (
+            <div className="bg-vga-yellow text-vga-black text-[8px] p-2 border-2 border-vga-black">
+              Aviso: el stats pack no se guardará entre sesiones.
+            </div>
+          )}
+        </>
       )}
     </div>
   );

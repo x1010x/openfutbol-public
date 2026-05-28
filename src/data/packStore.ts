@@ -1,22 +1,28 @@
 import type { Pack } from '../types/game.d.ts';
 
 const DB_NAME = 'pcfurbo';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 const STORE = 'pack';
+const STATS_STORE = 'stats';
 const KEY = 'active';
 
 export const hasIndexedDB = (): boolean =>
   typeof indexedDB !== 'undefined' && indexedDB !== null;
 
-const open = (): Promise<IDBDatabase> => new Promise((resolve, reject) => {
+export const openDB = (): Promise<IDBDatabase> => new Promise((resolve, reject) => {
   const req = indexedDB.open(DB_NAME, DB_VERSION);
   req.onupgradeneeded = () => {
     const db = req.result;
     if (!db.objectStoreNames.contains(STORE)) db.createObjectStore(STORE);
+    if (!db.objectStoreNames.contains(STATS_STORE)) db.createObjectStore(STATS_STORE);
   };
   req.onsuccess = () => resolve(req.result);
   req.onerror = () => reject(req.error);
 });
+
+const open = openDB;
+export const STATS_STORE_NAME = STATS_STORE;
+export const ACTIVE_KEY = KEY;
 
 export const savePack = async (pack: Pack): Promise<void> => {
   const db = await open();

@@ -1,6 +1,7 @@
-// Singleton index of FIFA-derived stats, keyed by ZOXEXIVO source_id.
-// Loaded once from /fifa-stats.json; consulted by playerBuilder when packs are
-// instantiated. Missing entries fall back to the deterministic synthesizer.
+// In-memory index of stat-pack entries, keyed by data-pack source_id.
+// StatsPackProvider calls setStatsIndex() when a pack loads; playerBuilder
+// consults getFifaStats() during PackPlayer instantiation. Missing entries
+// fall back to the deterministic synthesizer.
 import type { PlayerAttributes } from './playerAttributes';
 
 interface FifaMacro { pa: number; sh: number; ps: number; dr: number; de: number; ph: number; gk?: number; }
@@ -15,28 +16,17 @@ interface FifaMicro {
 }
 export interface FifaEntry { fy: number; ov: number; macro: FifaMacro; micro: FifaMicro; gk: number; }
 
-let index: Map<number, FifaEntry> | null = null;
-let loadPromise: Promise<void> | null = null;
+let index: Map<number, FifaEntry> = new Map();
 
-export const loadFifaStats = async (): Promise<void> => {
-  if (index || loadPromise) return loadPromise ?? undefined;
-  loadPromise = (async () => {
-    try {
-      const res = await fetch('/fifa-stats.json');
-      if (!res.ok) { index = new Map(); return; }
-      const payload = await res.json() as { stats: Record<string, FifaEntry> };
-      const m = new Map<number, FifaEntry>();
-      for (const [k, v] of Object.entries(payload.stats)) m.set(Number(k), v);
-      index = m;
-    } catch {
-      index = new Map();
-    }
-  })();
-  return loadPromise;
+export const setStatsIndex = (entries: Record<string, FifaEntry> | null): void => {
+  if (!entries) { index = new Map(); return; }
+  const m = new Map<number, FifaEntry>();
+  for (const [k, v] of Object.entries(entries)) m.set(Number(k), v);
+  index = m;
 };
 
 export const getFifaStats = (sourceId: number | undefined): FifaEntry | undefined => {
-  if (sourceId == null || !index) return undefined;
+  if (sourceId == null) return undefined;
   return index.get(sourceId);
 };
 

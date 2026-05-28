@@ -134,6 +134,21 @@ export interface Pack {
   leagues: League[]; clubs: Club[]; players: PackPlayer[];
 }
 
+// Stats packs are a parallel importable: they carry per-player ratings keyed
+// by the data pack's `source_id`. No names or PII — pure stat data.
+export interface StatsPackMeta {
+  name: string;
+  version: string;
+  source: string;
+  generated_at: string;
+  schema_version: 1;
+  count: number;
+}
+export interface StatsPack {
+  meta: StatsPackMeta;
+  entries: Record<string, unknown>; // shape validated by the consumer (e.g. FifaEntry)
+}
+
 // ── Runtime Player (canonical + legacy shim) ─────────────────────────────
 // Canonical fields are optional only because legacy code paths (EditorView's
 // inline createPlayer, etc.) still build players in the old shape. Pack-built
