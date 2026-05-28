@@ -28,7 +28,9 @@ interface Props {
 }
 
 const BAND_SIZE = 5;
-const BAND_THRESHOLDS = [85, 80, 75, 70, 65, 0]; // top edge of each band (last = catch-all)
+const BAND_THRESHOLDS = [170, 160, 150, 140, 130, 0]; // CA bands (last = catch-all)
+
+const playerCa = (p: Player): number => p.current_ability ?? Math.round((p.media ?? 50) * 2);
 
 // Deterministic shuffle so the same jornada always shows the same rotation.
 const seededShuffle = <T,>(arr: T[], seed: number): T[] => {
@@ -59,7 +61,7 @@ const sortPlayers = (players: Player[]) =>
     const pa = POSITION_ORDER[a.position] ?? 99;
     const pb = POSITION_ORDER[b.position] ?? 99;
     if (pa !== pb) return pa - pb;
-    return b.media - a.media;
+    return playerCa(b) - playerCa(a);
   });
 
 const TransferRankRow = ({ rank, record }: { rank: number; record: TransferRecord }) => (
@@ -110,7 +112,7 @@ const OfferModal = ({
       const pa = POSITION_ORDER[a.position] ?? 99;
       const pb = POSITION_ORDER[b.position] ?? 99;
       if (pa !== pb) return pa - pb;
-      return b.media - a.media;
+      return playerCa(b) - playerCa(a);
     }),
     [userPlayers]
   );
@@ -175,7 +177,7 @@ const OfferModal = ({
                           <span className="min-w-0 truncate">
                             <span className="text-vga-yellow font-bold mr-1">{p.position}</span>
                             <PlayerName player={p} />
-                            <span className="text-vga-cyan ml-2 text-[7px]">M{p.media} · {playerAge(p, seasonYear)}a</span>
+                            <span className="text-vga-cyan ml-2 text-[7px]">CA {playerCa(p)} · {playerAge(p, seasonYear)}a</span>
                           </span>
                           <span className="text-vga-light-green text-[8px] shrink-0">{formatEuros(pPrice)}</span>
                         </div>
@@ -410,7 +412,7 @@ export const TransfersView = ({
   for (let b = 0; b < BAND_THRESHOLDS.length; b++) {
     const min = BAND_THRESHOLDS[b];
     const max = b === 0 ? 99 : BAND_THRESHOLDS[b - 1] - 1;
-    const band = freeAgentEntries.filter(e => e.player.media >= min && e.player.media <= max);
+    const band = freeAgentEntries.filter(e => playerCa(e.player) >= min && playerCa(e.player) <= max);
     rotatedFreeAgents.push(...seededShuffle(band, seed + b).slice(0, BAND_SIZE));
   }
   const marketEntries = [...listedEntries, ...rotatedFreeAgents]
