@@ -1753,6 +1753,7 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
       const packYearStats = pack ? [{ year: PACK_YEAR, teams: pack.clubs.length, leagues: pack.leagues.length, players: pack.players.length }] : [];
       const availableYears = pack ? [PACK_YEAR] : getAvailableYears();
 
+      const fantasyAvailable = getAvailableYears().length > 0;
       if (!showPlayFlow) {
         return (
           <div className="w-full max-w-sm flex flex-col gap-3 animate-in fade-in duration-300 rc-menu">
@@ -1766,12 +1767,14 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
             >
               {t('btn.play')}
             </button>
+            {fantasyAvailable && (
             <button
               onClick={() => setShowFantasyFlow(true)}
               className="w-full bg-vga-yellow text-vga-black py-4 text-sm border-b-4 border-r-4 border-vga-black font-bold uppercase tracking-widest hover:opacity-90 rc-btn-fantasy"
             >
               {t('btn.fantasy')}
             </button>
+            )}
             <button
               onClick={() => setShowProManagerFlow(true)}
               className="w-full bg-vga-magenta text-vga-bright-white py-4 text-sm border-b-4 border-r-4 border-vga-black font-bold uppercase tracking-widest hover:opacity-90"

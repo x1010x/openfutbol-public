@@ -21,6 +21,27 @@ const CAP_LIMIT = 1350;
 export const FantasySetupView = ({ availableYears, existingTeams, onConfirm, onBack, onOpenEditor }: Props) => {
   const tr = useTranslation();
   const [year, setYear] = useState<number | null>(null);
+
+  if (availableYears.length === 0) {
+    return (
+      <div className="w-full max-w-2xl flex flex-col gap-6 animate-in fade-in duration-500">
+        <div className="bg-vga-blue p-4 border-4 border-vga-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+          <h2 className="text-vga-yellow text-center mb-4 text-sm underline decoration-double">
+            {tr('setup.fantasyTitle')}
+          </h2>
+          <div className="bg-vga-black border border-vga-red p-3 text-[8px] text-vga-light-red leading-relaxed text-center">
+            Modo Fantasy no disponible — requiere base de datos clásica.
+          </div>
+        </div>
+        <button
+          onClick={onBack}
+          className="bg-vga-black border-2 border-vga-gray hover:border-vga-light-green p-2 text-[8px] text-vga-gray hover:text-vga-bright-white text-center transition-colors"
+        >
+          {tr('btn.back')}
+        </button>
+      </div>
+    );
+  }
   const [mode, setMode] = useState<'libre' | 'cap'>('libre');
   const [selected, setSelected] = useState<string[]>([]);
   const [userTeamId, setUserTeamId] = useState<string>('');
