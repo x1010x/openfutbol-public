@@ -155,6 +155,26 @@ The in-app loader validates `schema_version`, then writes everything into the st
 - Player cards, squad screens, league tables — read from the new entity types.
 - Acceptance: load a pack, start a season, play a match through to end. No crashes.
 
+## Phase 4 status (2026-05-28)
+
+### What works
+- `npm run import-pack` produces a valid 39.5 MB `world.pack.json` from ZOXEXIVO source (54,568 players, 1,355 clubs, 92 leagues, 218 countries, 6 continents)
+- `npm run build` passes with no TypeScript errors
+- `npm run dev` shows `PackLoaderView` when no pack is loaded
+- Loading `temp/world.pack.json` via file picker persists to IndexedDB and transitions to the main menu
+- `LeagueSetupView` populates with all 1,355 clubs from the pack, grouped by country
+- Selecting 4+ clubs and confirming builds `Team` objects from pack players using CA × positionLevelFactor engine
+- `PlayerCard` shows CA, PA, and per-position competence bars
+- Match engine runs (CA-based strength calculation)
+
+### What still needs migration (Phase 4 remainder)
+- `PlayerDetailView`, `StatRadar`, `TransfersView`: still read old 7-stat `PlayerStats` shape (values are uniform stubs — not wrong but not meaningful)
+- `EndOfSeasonView`: uses `isPlayerActive` + `getRetireAge` stubs — retirement logic is disabled
+- `EditorView` / `PlayerPickerPanel`: legacy pack import flow is disabled (returns null)
+- Transfer value display: `formatEuros(computePrice(...))` uses `media` shim — works but not CA-calibrated
+- ProManager mode: `getTeamTemplatesForYear` returns empty — ProManager setup broken
+- Fantasy mode: same issue — disabled until pack-aware setup is implemented
+
 ### Phase 5 — Polish
 - Pack management: show currently loaded pack in settings. "Unload" option.
 - Multiple packs: out of scope for v1. Single active pack only.
