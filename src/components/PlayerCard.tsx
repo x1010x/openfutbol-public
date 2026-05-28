@@ -74,13 +74,25 @@ export const PlayerCard = ({ player, seasonYear, highlight, onNameClick, footer,
           <span className="text-[7px] text-vga-yellow mt-1">{age}a</span>
         </div>
         <div className="flex-1 flex flex-col gap-0.5">
-          <StatBar label="VEL" value={player.stats.speed} segments={6} size="sm" />
-          <StatBar label="REG" value={player.stats.dribbling} segments={6} size="sm" />
-          <StatBar label="PAS" value={player.stats.passing} segments={6} size="sm" />
-          <StatBar label="TIR" value={player.stats.shooting} segments={6} size="sm" />
-          <StatBar label="DEF" value={player.stats.defending} segments={6} size="sm" />
-          <StatBar label="FIS" value={player.stats.physical} segments={6} size="sm" />
-          <StatBar label="POR" value={player.stats.goalkeeping} segments={6} size="sm" />
+          {player.current_ability != null ? (
+            <>
+              <StatBar label="CA" value={player.current_ability} max={200} segments={8} size="sm" />
+              <StatBar label="PA" value={player.potential_ability ?? player.current_ability} max={200} segments={8} size="sm" />
+              {(player.positions ?? []).slice(0, 5).map(pos => (
+                <StatBar key={pos.code} label={pos.code} value={pos.level} max={20} segments={4} size="sm" />
+              ))}
+            </>
+          ) : (
+            <>
+              <StatBar label="VEL" value={player.stats.speed} segments={6} size="sm" />
+              <StatBar label="REG" value={player.stats.dribbling} segments={6} size="sm" />
+              <StatBar label="PAS" value={player.stats.passing} segments={6} size="sm" />
+              <StatBar label="TIR" value={player.stats.shooting} segments={6} size="sm" />
+              <StatBar label="DEF" value={player.stats.defending} segments={6} size="sm" />
+              <StatBar label="FIS" value={player.stats.physical} segments={6} size="sm" />
+              <StatBar label="POR" value={player.stats.goalkeeping} segments={6} size="sm" />
+            </>
+          )}
         </div>
       </div>
 
