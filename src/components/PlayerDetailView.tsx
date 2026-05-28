@@ -1,8 +1,6 @@
 import type { Player } from '../types/game.d.ts';
 import type { PlayerSeasonRecord } from '../store/leagueStore';
 import { formatEuros, computePrice, playerAge } from '../data/economy';
-import { StatBar } from './StatBar';
-import { StatRadar } from './StatRadar';
 import { PlayerPhoto } from './PlayerPhoto';
 import { PlayerName } from './PlayerName';
 import { useT } from '../i18n';
@@ -24,26 +22,15 @@ const POS_COLOR: Record<string, string> = {
   DEL: 'text-vga-light-red',
 };
 
-const STAT_LABELS: { key: keyof Player['stats']; label: string }[] = [
-  { key: 'speed', label: 'VEL' },
-  { key: 'dribbling', label: 'REG' },
-  { key: 'passing', label: 'PAS' },
-  { key: 'shooting', label: 'TIR' },
-  { key: 'defending', label: 'DEF' },
-  { key: 'physical', label: 'FIS' },
-  { key: 'goalkeeping', label: 'POR' },
-];
+const PEAK_AGE = 28;
 
-const ageFactor = (a: number, peakAge: number): number => {
-  const f = 1 - Math.abs(a - peakAge) * 0.02;
-  return Math.max(0.7, Math.min(1.0, f));
-};
+const ageFactor = (a: number): number => Math.max(0.7, Math.min(1.0, 1 - Math.abs(a - PEAK_AGE) * 0.02));
 
-const mediaAtAge = (currentMedia: number, currentAge: number, peakAge: number, targetAge: number): number => {
-  const cur = ageFactor(currentAge, peakAge);
-  const tgt = ageFactor(targetAge, peakAge);
-  if (cur === 0) return currentMedia;
-  return Math.round(currentMedia * (tgt / cur));
+const caAtAge = (currentCa: number, currentAge: number, targetAge: number): number => {
+  const cur = ageFactor(currentAge);
+  const tgt = ageFactor(targetAge);
+  if (cur === 0) return currentCa;
+  return Math.round(currentCa * (tgt / cur));
 };
 
 export const PlayerDetailView = ({ player, teamName, history, seasonYear, onBack }: Props) => {
@@ -55,6 +42,12 @@ export const PlayerDetailView = ({ player, teamName, history, seasonYear, onBack
   const totalAssists = sortedHistory.reduce((s, r) => s + r.assists, 0) + player.seasonStats.assists;
   const totalSeasons = sortedHistory.length + 1;
   const yy = (y: number) => (y + 1).toString().slice(-2);
+
+  const ca = player.current_ability ?? Math.round((player.media ?? 50) * 2);
+  const pa = player.potential_ability;
+
+  // Top 5 position competences for display
+  const topPositions = [...(player.positions ?? [])].sort((a, b) => b.level - a.level).slice(0, 5);
 
   return (
     <div className="w-full max-w-3xl flex flex-col gap-4 animate-in fade-in duration-300">
@@ -83,8 +76,9 @@ export const PlayerDetailView = ({ player, teamName, history, seasonYear, onBack
             <div className="text-vga-bright-white text-[10px]">{t('misc.ageYears', { age: String(age) })}</div>
           </div>
           <div className="bg-vga-black border border-vga-gray p-2">
-            <div className="text-vga-cyan text-[7px] uppercase">{t('label.peak')}</div>
-            <div className="text-vga-bright-white text-[10px]">{t('misc.ageYears', { age: String(player.peakAge) })}</div>
+            <div className="text-vga-cyan text-[7px] uppercase">CA</div>
+            <div className="text-vga-light-green text-[10px] font-bold">{ca}</div>
+            {pa != null && <div className="text-vga-cyan text-[7px]">PA {pa}</div>}
           </div>
           <div className="bg-vga-black border border-vga-gray p-2">
             <div className="text-vga-cyan text-[7px] uppercase">{t('label.value')}</div>
@@ -95,16 +89,21 @@ export const PlayerDetailView = ({ player, teamName, history, seasonYear, onBack
         <div className="flex gap-3 items-stretch flex-wrap">
           <div className="flex flex-col items-center justify-center bg-vga-black vga-panel-inset px-3 py-2 min-w-[80px]">
             <PlayerPhoto sourceId={player.source_id} size="lg" className="mb-1" />
-            <span className="text-[8px] text-vga-cyan">{t('label.media').toUpperCase()}</span>
-            <span className="text-3xl text-vga-light-green leading-none">{player.media}</span>
+            <span className="text-[8px] text-vga-cyan">CA</span>
+            <span className="text-3xl text-vga-light-green leading-none">{ca}</span>
           </div>
-          <div className="flex-1 flex flex-col gap-1 justify-center min-w-[180px]">
-            {STAT_LABELS.map(s => (
-              <StatBar key={s.key} label={s.label} value={player.stats[s.key]} />
-            ))}
-          </div>
-          <div className="bg-vga-black vga-panel-inset p-2 flex items-center justify-center">
-            <StatRadar stats={player.stats} size={140} />
+          <div className="flex-1 flex flex-col gap-1 justify-center min-w-[160px]">
+            {topPositions.length > 0 ? topPositions.map(pos => (
+              <div key={pos.code} className="flex items-center gap-2">
+                <span className="text-vga-cyan text-[8px] w-10 shrink-0">{pos.code}</span>
+                <div className="flex-1 bg-vga-black h-2 border border-vga-gray">
+                  <div className="bg-vga-light-green h-full" style={{ width: `${(pos.level / 20) * 100}%` }} />
+                </div>
+                <span className="text-vga-bright-white text-[8px] w-4 text-right">{pos.level}</span>
+              </div>
+            )) : (
+              <div className="text-vga-gray text-[8px]">{player.position}</div>
+            )}
           </div>
         </div>
       </div>
@@ -167,14 +166,14 @@ export const PlayerDetailView = ({ player, teamName, history, seasonYear, onBack
               </thead>
               <tbody>
                 {sortedHistory.map((r, i) => {
-                  const medAtYear = mediaAtAge(player.media, age, player.peakAge, r.age);
+                  const caAtYear = caAtAge(ca, age, r.age);
                   return (
                     <tr key={i} className={i % 2 === 0 ? 'bg-vga-black' : 'bg-vga-gray'}>
                       <td className={`px-1 py-1 ${i % 2 === 0 ? 'text-vga-yellow' : 'text-vga-blue'}`}>{r.year}</td>
                       <td className={`px-1 py-1 truncate ${i % 2 === 0 ? 'text-vga-bright-white' : 'text-vga-black'}`}>{r.teamName}</td>
                       <td className={`px-1 py-1 text-center ${POS_COLOR[r.position] ?? 'text-vga-yellow'}`}>{r.position}</td>
                       <td className={`px-1 py-1 text-center ${i % 2 === 0 ? 'text-vga-bright-white' : 'text-vga-black'}`}>{r.age}</td>
-                      <td className={`px-1 py-1 text-center font-bold ${i % 2 === 0 ? 'text-vga-light-green' : 'text-vga-blue'}`}>{medAtYear}</td>
+                      <td className={`px-1 py-1 text-center font-bold ${i % 2 === 0 ? 'text-vga-light-green' : 'text-vga-blue'}`}>{caAtYear}</td>
                       <td className={`px-1 py-1 text-right ${i % 2 === 0 ? 'text-vga-light-green' : 'text-vga-blue'}`}>{r.goals}</td>
                       <td className={`px-1 py-1 text-right ${i % 2 === 0 ? 'text-vga-light-cyan' : 'text-vga-blue'}`}>{r.assists}</td>
                       <td className={`px-1 py-1 text-right ${i % 2 === 0 ? 'text-vga-yellow' : 'text-vga-blue'}`}>{r.yellowCards}</td>
