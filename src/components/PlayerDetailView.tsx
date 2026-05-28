@@ -1,9 +1,38 @@
+import { useMemo } from 'react';
 import type { Player } from '../types/game.d.ts';
 import type { PlayerSeasonRecord } from '../store/leagueStore';
 import { formatEuros, computePrice, playerAge } from '../data/economy';
 import { PlayerPhoto } from './PlayerPhoto';
 import { PlayerName } from './PlayerName';
 import { useT } from '../i18n';
+import { synthesizeAttributes } from '../data/playerAttributes';
+
+const TECH_LABELS: Array<[keyof ReturnType<typeof synthesizeAttributes>['technical'], string]> = [
+  ['corners', 'Córners'], ['crossing', 'Centros'], ['dribbling', 'Regate'],
+  ['finishing', 'Definición'], ['firstTouch', 'Primer toque'], ['freeKicks', 'Tiros libres'],
+  ['heading', 'Cabeza'], ['longShots', 'Tiros lejanos'], ['longThrows', 'Saques largos'],
+  ['marking', 'Marcaje'], ['passing', 'Pase'], ['penaltyTaking', 'Penaltis'],
+  ['tackling', 'Entrada'], ['technique', 'Técnica'],
+];
+const MENT_LABELS: Array<[keyof ReturnType<typeof synthesizeAttributes>['mental'], string]> = [
+  ['aggression', 'Agresividad'], ['anticipation', 'Anticipación'], ['bravery', 'Valentía'],
+  ['composure', 'Compostura'], ['concentration', 'Concentración'], ['decisions', 'Decisiones'],
+  ['determination', 'Determinación'], ['flair', 'Talento'], ['leadership', 'Liderazgo'],
+  ['offTheBall', 'Sin balón'], ['positioning', 'Posición'], ['teamwork', 'Trabajo en equipo'],
+  ['vision', 'Visión'], ['workRate', 'Ritmo de trabajo'],
+];
+const PHYS_LABELS: Array<[keyof ReturnType<typeof synthesizeAttributes>['physical'], string]> = [
+  ['acceleration', 'Aceleración'], ['agility', 'Agilidad'], ['balance', 'Equilibrio'],
+  ['jumping', 'Salto'], ['naturalFitness', 'Forma física'], ['pace', 'Velocidad'],
+  ['stamina', 'Resistencia'], ['strength', 'Fuerza'],
+];
+
+const attrColor = (v: number): string => {
+  if (v >= 16) return 'text-vga-light-green';
+  if (v >= 12) return 'text-vga-yellow';
+  if (v >= 8) return 'text-vga-bright-white';
+  return 'text-vga-gray';
+};
 
 interface Props {
   player: Player;
@@ -48,6 +77,12 @@ export const PlayerDetailView = ({ player, teamName, history, seasonYear, onBack
 
   // Top 5 position competences for display
   const topPositions = [...(player.positions ?? [])].sort((a, b) => b.level - a.level).slice(0, 5);
+
+  const primaryPosCode = topPositions[0]?.code ?? 'MC';
+  const attrs = useMemo(
+    () => synthesizeAttributes(ca, primaryPosCode, player.id),
+    [ca, primaryPosCode, player.id],
+  );
 
   return (
     <div className="w-full max-w-3xl flex flex-col gap-4 animate-in fade-in duration-300">
@@ -104,6 +139,41 @@ export const PlayerDetailView = ({ player, teamName, history, seasonYear, onBack
             )) : (
               <div className="text-vga-gray text-[8px]">{player.position}</div>
             )}
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-vga-blue border-2 border-vga-bright-white p-2 vga-panel">
+        <h3 className="text-vga-yellow text-[10px] font-bold mb-2 uppercase border-b border-vga-cyan pb-1">
+          Atributos
+        </h3>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-[8px]">
+          <div>
+            <div className="text-vga-cyan text-[8px] uppercase mb-1 border-b border-vga-cyan pb-1">Técnica</div>
+            {TECH_LABELS.map(([key, label]) => (
+              <div key={key} className="flex justify-between leading-tight py-px">
+                <span className="text-vga-bright-white truncate">{label}</span>
+                <span className={`${attrColor(attrs.technical[key])} font-bold w-5 text-right`}>{attrs.technical[key]}</span>
+              </div>
+            ))}
+          </div>
+          <div>
+            <div className="text-vga-cyan text-[8px] uppercase mb-1 border-b border-vga-cyan pb-1">Mental</div>
+            {MENT_LABELS.map(([key, label]) => (
+              <div key={key} className="flex justify-between leading-tight py-px">
+                <span className="text-vga-bright-white truncate">{label}</span>
+                <span className={`${attrColor(attrs.mental[key])} font-bold w-5 text-right`}>{attrs.mental[key]}</span>
+              </div>
+            ))}
+          </div>
+          <div>
+            <div className="text-vga-cyan text-[8px] uppercase mb-1 border-b border-vga-cyan pb-1">Físico</div>
+            {PHYS_LABELS.map(([key, label]) => (
+              <div key={key} className="flex justify-between leading-tight py-px">
+                <span className="text-vga-bright-white truncate">{label}</span>
+                <span className={`${attrColor(attrs.physical[key])} font-bold w-5 text-right`}>{attrs.physical[key]}</span>
+              </div>
+            ))}
           </div>
         </div>
       </div>
