@@ -8,7 +8,8 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "import-pack": "tsx scripts/import-pack/index.ts"
+    "import-pack": "tsx scripts/import-pack/index.ts",
+    "build-default-pack": "node scripts/build-default-pack/index.js"
   },
   "dependencies": {
     "react": "^19.2.6",
