@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import type { Pack } from '../types/game.d.ts';
 import { hasIndexedDB, loadPack, savePack, clearPack as clearStoredPack } from '../data/packStore';
+import { loadFifaStats } from '../data/fifaStatsStore';
 import { parsePack } from '../data/packLoader';
 
 const DISMISSED_KEY = 'openfutbol_pack_dismissed_default';
@@ -25,8 +26,10 @@ export const PackProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     let cancelled = false;
+    const fifaReady = loadFifaStats();
     (async () => {
       try {
+        await fifaReady;
         let stored: Pack | null = null;
         if (persistent) {
           try { stored = await loadPack(); }

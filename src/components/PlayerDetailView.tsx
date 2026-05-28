@@ -147,8 +147,11 @@ export const PlayerDetailView = ({ player, teamName, history, seasonYear, onBack
       </div>
 
       <div className="bg-vga-blue border-2 border-vga-bright-white p-2 vga-panel">
-        <h3 className="text-vga-yellow text-[10px] font-bold mb-2 uppercase border-b border-vga-cyan pb-1">
-          Atributos
+        <h3 className="text-vga-yellow text-[10px] font-bold mb-2 uppercase border-b border-vga-cyan pb-1 flex justify-between items-center">
+          <span>Atributos</span>
+          {player.fifa_year != null && (
+            <span className="text-vga-light-green text-[7px] bg-vga-black border border-vga-light-green px-1 py-0.5">FIFA {player.fifa_year}</span>
+          )}
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-[8px]">
           <div>

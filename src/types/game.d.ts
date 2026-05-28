@@ -153,6 +153,7 @@ export interface Player {
   value?: number;
   contract?: { salary: number; expiration: string } | null;
   attributes?: import('../data/playerAttributes').PlayerAttributes;
+  fifa_year?: number; // when stats sourced from a FIFA CSV (15-22)
 
   // Runtime/game state
   number: number;

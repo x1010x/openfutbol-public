@@ -1,6 +1,17 @@
 // TODO(phase-4): delete shim fields from Player; use current_ability/positions directly.
 import type { PackPlayer, Player, PlayerStats, PositionCode, Position, PlayerPositionEntry } from '../types/game.d.ts';
 import { synthesizeAttributes, type PlayerAttributes } from './playerAttributes';
+import { getFifaStats, attributesFromFifa, type FifaEntry } from './fifaStatsStore';
+
+const statsFromFifa = (e: FifaEntry, isGK: boolean): PlayerStats => ({
+  speed: e.macro.pa,
+  shooting: e.macro.sh,
+  passing: e.macro.ps,
+  dribbling: e.macro.dr,
+  defending: e.macro.de,
+  physical: e.macro.ph,
+  goalkeeping: e.macro.gk ?? (isGK ? 70 : 10),
+});
 
 const avg = (...vals: number[]) => vals.reduce((s, v) => s + v, 0) / vals.length;
 
@@ -52,8 +63,15 @@ export const runtimePlayerFromPack = (
   const allowedPositions: Position[] = [...allowedSet];
 
   const halfCa = Math.round(packPlayer.current_ability / 2);
-  const attributes = synthesizeAttributes(packPlayer.current_ability, primaryCode, packPlayer.id);
-  const stats: PlayerStats = statsFromAttributes(attributes, primaryCode === 'GK');
+  const isGK = primaryCode === 'GK';
+  const fifa = getFifaStats(packPlayer.source_id);
+  const attributes: PlayerAttributes = fifa
+    ? attributesFromFifa(fifa)
+    : synthesizeAttributes(packPlayer.current_ability, primaryCode, packPlayer.id);
+  const stats: PlayerStats = fifa
+    ? statsFromFifa(fifa, isGK)
+    : statsFromAttributes(attributes, isGK);
+  const fifaYear = fifa?.fy;
 
   return {
     id: packPlayer.id,
@@ -67,6 +85,7 @@ export const runtimePlayerFromPack = (
     current_ability: packPlayer.current_ability,
     potential_ability: packPlayer.potential_ability,
     attributes,
+    fifa_year: fifaYear,
     value: packPlayer.value,
     contract: packPlayer.contract,
     number,
