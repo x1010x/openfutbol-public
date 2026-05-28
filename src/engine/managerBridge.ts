@@ -1,10 +1,29 @@
 // Bridge between the manager (Team/Player, MatchEvent) and the zone engine
 // (EnginePlayer, MatchTimeline). This is the only module that imports both the
 // manager types and the engine types; the renderer never touches it.
-import type { Team, MatchEvent } from '../types/game.d.ts';
+import type { Team, Player, MatchEvent } from '../types/game.d.ts';
 import type { EnginePlayer } from './zoneEngine';
 import type { MatchTimeline, PlayerId } from '../types/match';
 import { buildLineupLayout } from './lineup';
+
+// Engine stat block for one manager player, with the pre-match fitness scaling
+// (Bloque 2) applied to the athletic stats. Shared by the starting XI builder
+// and the live-substitution path so a bench player who comes on is scaled the
+// same way. See teamToEnginePlayers for the fatigue rationale.
+export function engineStatsFromPlayer(p: Player): Pick<EnginePlayer,
+  'speed' | 'dribbling' | 'passing' | 'shooting' | 'defending' | 'physical' | 'goalkeeping'> {
+  const stamina = Number.isFinite(p.stamina) ? Math.max(0, Math.min(99, p.stamina)) : 99;
+  const fitness = 0.85 + 0.15 * (stamina / 99);
+  return {
+    speed: p.stats.speed * fitness,
+    dribbling: p.stats.dribbling,
+    passing: p.stats.passing,
+    shooting: p.stats.shooting,
+    defending: p.stats.defending,
+    physical: p.stats.physical * fitness,
+    goalkeeping: p.stats.goalkeeping,
+  };
+}
 
 // Build the 11 EnginePlayers for one side from the manager's selected lineup.
 // `team.lineup` is already ordered by formation slot (lineup[i] occupies slot i
@@ -26,6 +45,9 @@ export function teamToEnginePlayers(team: Team, side: 'home' | 'away' = 'home'):
     // goal). The away side's slots are mirrored across x, so "forward" is the
     // -x direction there; flip dx. Lateral (dy) is preserved by the mirror.
     const fwdSign = side === 'home' ? 1 : -1;
+    // Pre-match fitness scaling (Bloque 2) lives in engineStatsFromPlayer: a
+    // tired player (low stamina) runs/duels slightly worse. It's arrival
+    // fitness, not in-match decay (the engine precomputes the timeline).
     out.push({
       id: p.id as PlayerId,
       slotIndex,
@@ -33,13 +55,7 @@ export function teamToEnginePlayers(team: Team, side: 'home' | 'away' = 'home'):
       slotOffset: off ? { x: off.dx * fwdSign, y: off.dy } : undefined,
       role: layout.roles[slotIndex] ?? 'mid',
       tag: layout.tags[slotIndex] ?? 'cm',
-      speed: p.stats.speed,
-      dribbling: p.stats.dribbling,
-      passing: p.stats.passing,
-      shooting: p.stats.shooting,
-      defending: p.stats.defending,
-      physical: p.stats.physical,
-      goalkeeping: p.stats.goalkeeping,
+      ...engineStatsFromPlayer(p),
       foulsCommitted: 0,
       yellowCount: 0,
       redCard: false,
@@ -68,6 +84,8 @@ export interface MatchResult {
   awayShotsOnTarget: number;
   homePossession: number; // percentage, sums to 100 with away
   awayPossession: number;
+  homeSubsUsed: number;
+  awaySubsUsed: number;
   stoppageTime1: number;  // added minutes, first / second half
   stoppageTime2: number;
 }
@@ -99,7 +117,16 @@ export function timelineToMatchResult(
   awayTeamId: string,
 ): MatchResult {
   const events: MatchEvent[] = [];
+  // Full per-side roster (final eleven + anyone involved in a sub), so a player
+  // subbed off is still attributed to the right side for fouls/possession even
+  // though they're absent from the final lineup. Mirrors the renderer's roster
+  // reconstruction.
   const homeSet = new Set(timeline.homeLineup);
+  for (const ev of timeline.events) {
+    if (ev.kind !== 'sub' || ev.side !== 'home') continue;
+    if (ev.actor) homeSet.add(ev.actor);
+    if (ev.target) homeSet.add(ev.target);
+  }
   const isHomeId = (id: string | undefined) => id !== undefined && homeSet.has(id);
 
   const homeSentOff: string[] = [], awaySentOff: string[] = [];
@@ -108,6 +135,7 @@ export function timelineToMatchResult(
   let homeFouls = 0, awayFouls = 0;
   let homeShots = 0, awayShots = 0;
   let homeShotsOnTarget = 0, awayShotsOnTarget = 0;
+  let homeSubsUsed = 0, awaySubsUsed = 0;
 
   // The viewer compresses a full match into a short timeline; remap each event's
   // timestamp back to a 0–90' minute so standings/player stats record the real
@@ -153,6 +181,13 @@ export function timelineToMatchResult(
       case 'shot_off':
         if (ev.side === 'home') homeShots++; else awayShots++;
         break;
+      case 'sub':
+        // `actor` came on, `target` came off; `side` is their team.
+        if (ev.actor) {
+          events.push({ minute, type: 'sub', playerId: ev.actor, playerOffId: ev.target, teamId });
+          if (ev.side === 'home') homeSubsUsed++; else awaySubsUsed++;
+        }
+        break;
     }
   }
 
@@ -177,6 +212,7 @@ export function timelineToMatchResult(
     homeShots, awayShots,
     homeShotsOnTarget, awayShotsOnTarget,
     homePossession, awayPossession,
+    homeSubsUsed, awaySubsUsed,
     stoppageTime1: calcStoppage(events, 0, 45),
     stoppageTime2: calcStoppage(events, 45, 90),
   };

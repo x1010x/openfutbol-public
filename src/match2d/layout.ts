@@ -36,6 +36,35 @@ export function toDisplayMs(t: number, durationMs: number, nominalMatchMs?: numb
   return t * (nominalMatchMs / durationMs);
 }
 
+// Map an engine timestamp to the cosmetic 0–nominal match clock, holding it at
+// 0' / 45' through the player entrances (B2): the clock stays at 0 until the
+// first-half ball-in-play, then spans [live1, halfTime] → [0', 45'], holds at
+// 45' through the half-time break, and spans [live2, end] → [45', 90'].
+// Falls back to the plain linear remap when the timeline carries no nominal
+// length or no entrance marks (sandbox clips).
+export function toClockMs(
+  t: number,
+  timeline: { durationMs: number; nominalMatchMs?: number; entranceLiveMs?: number[] },
+  halfTimeMs: number | null,
+): number {
+  const { durationMs, nominalMatchMs, entranceLiveMs } = timeline;
+  if (!nominalMatchMs || durationMs <= 0) return t;
+  const half = nominalMatchMs / 2;
+  const live1 = entranceLiveMs?.[0];
+  const live2 = entranceLiveMs?.[1];
+
+  if (halfTimeMs === null || t < halfTimeMs) {
+    if (live1 == null) return t * (nominalMatchMs / durationMs);
+    if (t <= live1) return 0;
+    const end = halfTimeMs ?? durationMs;
+    return Math.min(half, ((t - live1) / Math.max(1, end - live1)) * half);
+  }
+
+  if (live2 == null) return t * (nominalMatchMs / durationMs);
+  if (t <= live2) return half;
+  return Math.min(nominalMatchMs, half + ((t - live2) / Math.max(1, durationMs - live2)) * half);
+}
+
 export const FIELD_SCALE = 2;
 export const PLAYER_SCALE = 2;
 export const CANVAS_W = 640 * FIELD_SCALE;

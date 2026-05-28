@@ -28,7 +28,9 @@ export type MatchPhase =
   | 'foul_release'
   | 'expulsion_hold'
   | 'expulsion_walk'
-  | 'expulsion_walkout';
+  | 'expulsion_walkout'
+  | 'halftime_walkout'
+  | 'fulltime_walkout';
 
 export type GkPressStrategy = 'full' | 'partial' | 'drop';
 
@@ -47,8 +49,22 @@ export interface PendingImpulse {
 export const FREEZE_TICKS          = 6;
 export const TRANSITION_TICKS      = 6;
 export const CELEBRATION_TICKS     = 12;
-// Match start: players already teleported into formation — brief intro.
-export const KICKOFF_INITIAL_TICKS = 12;
+// Match start / second-half restart: the 22 spawn off the north touchline and
+// jog into formation (a boosted entrance speed, see move.ts). Since they all
+// come from the north now (B3), a south-side slot crosses nearly the whole
+// pitch, so the window is longer than the old nearest-band entrance to let the
+// slowest entrant reach their slot before the kickoff pass; the kicker-arrival
+// gate in tickKickoffSetup extends it if needed.
+export const KICKOFF_INITIAL_TICKS = 40;
+// Half-time walk-off: after the whistle the 22 jog through the top-centre
+// tunnel (single-file per team) and off the frame before the second-half
+// kickoff is restaged. Window sized for the slowest player (deep on the south
+// half) to cross the diagonal and queue out — at the calmer walk pace.
+export const HALFTIME_WALKOUT_TICKS = 28;
+// Full-time walk-off: same single-file tunnel exit as half-time but with no
+// kickoff restart afterwards — the simulation loop terminates once the window
+// closes so the timeline reflects the players leaving the pitch at the whistle.
+export const FULLTIME_WALKOUT_TICKS = 32;
 // After-goal: ball teleports to the centre spot but players walk back to
 // their kickoff formation naturally. The longer window covers the walk; the
 // kickoff_setup exit logic extends it further if the kicker isn't yet at
@@ -147,6 +163,11 @@ export interface PhaseForceCtx {
   allPlayers: EnginePlayer[];
   expelledIds: Set<PlayerId>;
   pos: Record<PlayerId, Vec2>;
+  // True only during the match-start / second-half kickoff entrance window.
+  // Lets applyKickoffForces switch on the tunnel walk-in (single-file column
+  // down to the touchline, then disperse to slots) instead of the post-goal
+  // walk-back. Cleared by tickKickoffSetup when phase flips to 'live'.
+  kickoffEntrance: boolean;
 }
 
 // ── tickPhase contract ───────────────────────────────────────────────────

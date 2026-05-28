@@ -59,6 +59,47 @@ function nearestShade(hex: string | undefined, fallback: Shade): Shade {
   return best;
 }
 
+function rgbToHex([r, g, b]: [number, number, number]): string {
+  const h = (n: number) => n.toString(16).padStart(2, '0');
+  return `#${h(r)}${h(g)}${h(b)}`;
+}
+
+// Away anti-clash kit. The away team keeps its normal primary kit UNLESS its
+// shirt colour would clash with the home shirt after VGA quantisation — i.e.
+// both resolve to the same dark palette index (the shirt's dominant slots use
+// `primary.dark`). Comparing the resolved shade index (not raw hex) matches
+// what actually renders: two near blues that quantise to the same index look
+// identical on screen. When they clash, the away team is dressed in the
+// printable shade whose RGB is farthest from the home shirt's, keeping its
+// chosen pattern. The home team always wears its primary kit (handled by the
+// caller, which only ever rewrites the away props).
+export function resolveAwayKit(
+  homeColors: string[] | undefined,
+  awayColors: string[] | undefined,
+  awayStyle: KitStyle | undefined,
+): { colors?: string[]; style?: KitStyle } {
+  const fallback = SHADES[0];
+  const homeShade = nearestShade(homeColors?.[0], fallback);
+  const awayShade = nearestShade(awayColors?.[0], fallback);
+  if (homeShade.dark !== awayShade.dark) {
+    return { colors: awayColors, style: awayStyle }; // no clash → normal kit
+  }
+  // Clash: pick the shade farthest from the home shirt (skipping any that share
+  // its dark index, so the alternative is genuinely distinguishable).
+  let alt = fallback;
+  let bestD = -1;
+  for (const s of SHADES) {
+    if (s.dark === homeShade.dark) continue;
+    const dr = s.rgb[0] - homeShade.rgb[0];
+    const dg = s.rgb[1] - homeShade.rgb[1];
+    const db = s.rgb[2] - homeShade.rgb[2];
+    const d = dr * dr + dg * dg + db * db;
+    if (d > bestD) { bestD = d; alt = s; }
+  }
+  const hex = rgbToHex(alt.rgb);
+  return { colors: [hex, hex], style: awayStyle };
+}
+
 // Build the 16-entry palette (BASE_PAL colours) for a team from its colours.
 // colors[0] = shirt (primary), colors[1] = shorts (secondary, falls back to
 // primary). On striped/sash sprites the secondary colour also appears on the

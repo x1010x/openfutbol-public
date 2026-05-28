@@ -1,8 +1,9 @@
 # Handoff — Integración motor 2D ↔ Manager
 
-> Documento de self-handoff. Rama: `feature/engine-integration`. Última sesión: 2026-05-26/27.
+> Documento de self-handoff. Rama: `feature/engine-integration`. Última sesión: 2026-05-27 (2ª tanda: bugs B1/B2/B3 arreglados + auditoría de pendientes).
 > Objetivo: terminar de integrar el motor de simulación 2D (Pixi) con el manager (PC-Fútbol-like).
 > Hay memorias relacionadas: `2d-speed-time-model`, `engine-hardcoded-slots`.
+> **Estado de un vistazo**: ver la tabla "📋 ESTADO ACTUAL" al final. Bloques 1,3,4,5,6,7 ✅ · Bloques 2,8,9 🟡 (parciales) · Bugs B1/B2/B3 ✅ (pendiente revalidación visual).
 
 ---
 
@@ -26,6 +27,30 @@ Recomendado: **(A)**. Diseñar `Match2D` para pedir "simula hasta X, devuélveme
 
 ---
 
+## 🐞 BUGS (validación visual del usuario — 2026-05-27)
+
+Detectados al probar a ojo lo implementado (bloques 7.b + 8). **B1, B2 y B3 ARREGLADOS** (sesión 2026-05-27, segunda tanda — pendiente revalidación visual del usuario).
+
+### B1 — ✅ ARREGLADO: al volver de "CAMBIOS" el partido no se renderizaba y todo quedaba deshabilitado
+**Causa raíz confirmada**: el efecto de `Match2D` dependía de `[timeline]`; su cleanup ejecutaba `app.destroy(true, {children:true})`. El primer argumento `true` **elimina el `<canvas>` del DOM**. Como el `canvasRef` de React seguía apuntando a ese nodo ya desconectado, el nuevo `app.init({canvas})` renderizaba sobre un canvas fuera del documento → 2D en blanco. Y como `setIsPaused(false)` + `app.ticker.add` vivían dentro del efecto async que podía abortarse, los controles quedaban muertos.
+- **Fix** (`Match2D.tsx`): se separó en **dos efectos** (la opción robusta del plan):
+  - **Efecto 1 (deps `[]`)**: crea el `Application` UNA vez por mount, registra el ticker (que lee `sceneRef.current` cada frame) y marca `appReady`. Solo se destruye en el unmount real (cierre del visor).
+  - **Efecto 2 (deps `[timeline, appReady]`)**: reconstruye SOLO la escena al cambiar el timeline, reutilizando app+canvas+ticker. Tira los display objects anteriores (`app.stage.removeChildren().forEach(c => c.destroy({children:true}))`, sin destruir texturas) y hace `buildScene` + `primeResume` + `setIsPaused(false)`. Nunca toca el canvas.
+
+### B2 — ✅ ARREGLADO: el reloj empezaba a contar antes del saque
+Ahora el minuto se congela a **0'** hasta el saque inicial y a **45'** durante el descanso + entrada de la 2ª parte.
+- **Fix**: se registra el instante (engine `t`) en que el balón entra en juego en cada parte (transición `kickoff_setup→live` de una entrada) en `state.entranceLiveMs` (`phases/kickoff.ts tickKickoffSetup`, solo cuando `kickoffEntrance`), se expone en `MatchTimeline.entranceLiveMs` (`zoneEngine.ts` + `types/match.ts`), y el animator usa una nueva **`toClockMs(t, timeline, halfTimeMs)`** (`layout.ts`) que remapea por tramos: `0` hasta `live1`; `[live1, halfTime]→[0',45']`; `45'` durante el descanso; `[live2, durationMs]→[45',90']`. Fallback al remap lineal cuando no hay `nominalMatchMs`/marcas (sandbox). El log usa la misma función → coherente con el reloj.
+- Verificado headless: `entranceLiveMs=[7500, 2037000]` en un 90' (half_time=2025000).
+- **Nota / desbloqueo parcial Bloque 9**: el reloj YA es no-lineal con frontera de parte. El display "45+X'/90+X'" sigue ⬜ porque el motor no tiene una noción de "fin del tiempo reglamentario vs descuento" (el medio tiempo cae exacto en `halfTimeMs`→45'); habría que reservar parte del tiempo de motor como descuento. El valor del descuento ya se calcula en `MatchState.stoppageTime1/2` (Bloque 9).
+
+### B3 — ✅ ARREGLADO: los jugadores entraban desde norte Y sur; ahora entran TODOS desde el norte
+- **Fix** (`phases/kickoff.ts` branch `teleport`): los 22 spawnean en `{ x: 0.5 + (slot.x-0.5)*0.4, y: -0.30 }` — todos fuera por el **norte**, embudados cerca del centro en x (spread suave por slot para que no se enreden), y `applyKickoffForces` los reparte a sus slots. El clamp vertical se relajó a `yMin=-0.40` durante `kickoff_setup && kickoffEntrance` (`move.ts`).
+- **Distancia**: como un slot sur cruza casi todo el campo, se subió el boost de entrada a `MAX_SPEED=0.07` (separado del walkout que sigue en 0.05) y `KICKOFF_INITIAL_TICKS` 18→**30**. Verificado headless: kf0 con los 22 en `y=-0.30`, `x∈[0.302,0.698]`; tras la ventana, 22/22 dentro del campo.
+- **Suplente unificado** (`substitution.ts`): spawnea siempre por el norte (`offY=-0.12`, antes por banda cercana); el clamp de juego vivo lo deja en la banda norte y el spring off-ball lo mete a su slot.
+- ⚠️ **Determinismo**: subir `KICKOFF_INITIAL_TICKS` a 30 vuelve a desplazar el consumo de RNG del arranque → el "guion" exacto del partido cambia respecto a sesiones previas (sim seed-based igualmente válida, no es regresión).
+
+---
+
 ## 1. ✅ HECHO — Velocidad + tiempo + layout
 
 Modelo confirmado con el usuario (ver memoria `2d-speed-time-model`):
@@ -42,9 +67,14 @@ Layout `Match2D.tsx`: campo a **tamaño nativo** (1280×960), contenedor `overfl
 
 ---
 
-## 2. 🟡 PARCIAL — Stats del motor (goalkeeping ✅ + extras ⬜)
+## 2. 🟡 PARCIAL — Stats del motor (goalkeeping ✅ + stamina inicial ✅ + decaimiento ⬜)
 
 **Objetivo**: que las stats que recoge el manager repercutan en el juego; inyectar las que faltan y decidir el efecto de las que el motor no contempla.
+
+**✅ HECHO — stamina (escalado inicial)** (sesión 2026-05-27):
+- En `teamToEnginePlayers` (`managerBridge.ts`): factor de forma física pre-partido `fitness = 0.85 + 0.15*(stamina/99)` (99→×1.0, 1→×0.85, defaultea a fit si el campo falta). Escala SOLO `speed` y `physical` del `EnginePlayer` (lo atlético; los stats técnicos son ~independientes de la fatiga, como dice el handoff). Es forma de LLEGADA al partido, no decaimiento en vivo (el motor precomputa → el decaimiento real es del Bloque 8).
+- Verificado `tsc`+eslint limpios; sanity headless (8 partidos fresco 99 vs cansado 40): el efecto es **modesto y direccional** (el fresco gana en goles; la posesión queda en ruido con pocas muestras). Intencionado: forma física ≠ stat grande. **Pendiente validación** con datos reales de stamina variada.
+- `media`/edad NO se inyectan al motor: ya influyen en `media` del manager y el motor usa stats individuales, no la media.
 
 **✅ HECHO — goalkeeping** (sesión 2026-05-27):
 - `goalkeeping` añadido a `EnginePlayer` (`zoneEngine.ts`) y mapeado en `teamToEnginePlayers` (`managerBridge.ts`). Sandbox `presets.ts` actualizado (POR 80, def 12, mid 8, del 5) para no romper compile.
@@ -52,10 +82,7 @@ Layout `Match2D.tsx`: campo a **tamaño nativo** (1280×960), contenedor `overfl
 - `move/gk.ts`: ganancia de reacción en estirada on-target escala con el stat: `0.24 + 0.16*(gk/99)` (~0.29 a 30 → ~0.40 a 99) → buen portero llega a más tiros.
 - Verificado `npx tsc -b` limpio. **Pendiente validación visual** (portero bueno vs malo debe parar más).
 
-⬜ **PENDIENTE — stats adicionales** del manager sin equivalente en el motor: `stamina` (el motor NO modela decaimiento — ver nota en `handleClose2D`), `media`, edad (`peakAge`/`birthYear`). Decidir efecto:
-  - `stamina` → podría reducir `speed`/`physical` efectivos a lo largo del partido (pero el motor precomputa; afecta al bloque 8). De momento, al menos un escalado inicial.
-  - edad/peakAge → ya influye en `media` del manager; probablemente no haga falta en el motor.
-- Mirar `formations.ts` `STAT_WEIGHTS`/`computePositionWeightedMedia` por si conviene reusar la ponderación.
+⬜ **PENDIENTE — decaimiento de stamina en vivo**: reducir `speed`/`physical` efectivos *a lo largo del partido* (no solo a la llegada). El motor precomputa toda la línea temporal, así que un decaimiento progresivo real se acopla al **Bloque 8** (simulación por segmentos): al regenerar la cola se recalcula el fitness según los minutos jugados. El escalado inicial ya cubre la forma de llegada.
 
 **Verificación**: comparar resultados con porteros buenos vs malos; un portero con `goalkeeping` alto debe parar más.
 
@@ -72,7 +99,36 @@ Layout `Match2D.tsx`: campo a **tamaño nativo** (1280×960), contenedor `overfl
 - `Match2D` props `homeColors/awayColors/homeKitStyle/awayKitStyle`; App los pasa desde `team.colors`/`team.kitStyle`.
 - Tipo: añadido `kitStyle?: 'solid'|'stripes'|'sash'` a `Team` (decisión del usuario: campo opcional, por defecto liso). `npx tsc -b` + eslint limpios.
 
-**Pendiente menor**: (1) **validación visual** (no se pudo probar Pixi headless). (2) Ningún equipo trae `kitStyle` en los datos todavía → todos lisos; cuando se rellene en la BD hay que mapearlo en `mockTeams.ts` (hoy solo mapea `colors`). (3) No hay manejo de "clash" (dos equipos con colores parecidos): antes se distinguían por sprite liso/rayas, ahora por color.
+**Pendiente menor**: (1) **validación visual** (no se pudo probar Pixi headless). (2) Ningún equipo trae `kitStyle` en los datos todavía → todos lisos; cuando se rellene en la BD hay que mapearlo en `mockTeams.ts` (hoy solo mapea `colors`).
+
+### 3.b ✅ HECHO — Equipación de VISITANTE (anti-clash) — pedido del usuario
+
+**Regla (clave, según el usuario)**: un equipo NO lleva la camiseta principal **solo** cuando se cumplen LAS DOS condiciones: (a) juega **de visitante** Y (b) su color principal es **parecido** al del equipo local. Si no hay parecido, ambos visten su equipación principal normal. El local SIEMPRE usa la principal.
+
+**✅ HECHO** (sesión 2026-05-27) — opción (a) **derivar en caliente**, solo render, datos intactos:
+- Nuevo `resolveAwayKit(homeColors, awayColors, awayStyle)` en `kit.ts`. **Clash** = el shirt local y el visitante resuelven al **mismo índice oscuro** de la paleta (`nearestShade(...).dark`), no por hex crudo: dos azules que cuantizan al mismo índice VGA se ven iguales en pantalla. Comparar por `dark` (no por identidad de SHADE) también pilla casos como rojo-vs-naranja (distinto SHADE, mismo `dark=8`).
+- Si hay clash → viste al visitante con el SHADE cuyo RGB está **más lejos** del shirt local (saltando los que comparten su `dark`, para que sea realmente distinguible); devuelve `colors:[hex,hex]` manteniendo el `kitStyle`. Si NO hay clash → devuelve el away normal. El local nunca se toca (el caller solo reescribe las props del away).
+- `App.tsx` (render `<Match2D>`): calcula `resolveAwayKit` y pasa el resultado a `awayColors`/`awayKitStyle`. No modifica `team.colors`.
+- Verificado `tsc -b` + eslint(kit.ts) limpios; sanity de la lógica (blanco↔casi-blanco→negro, azul↔azul→amarillo, rojo↔naranja→azul, sin clash conserva el color). **Pendiente validación visual** (Pixi headless no testeable).
+- **Nota**: con `[hex,hex]` el patrón de rayas degrada a liso (los 2 colores de raya coinciden) — aceptable para una alternativa legible. Si se quiere conservar rayas reales, habría que derivar 2 shades contrastantes.
+
+#### ⬜ FUTURO (opcional) — kit de visitante editable en el manager [opción (b)]
+Lo IDEAL según el usuario sería definir el kit de visitante en el manager (más fiel que derivarlo en caliente). **HOY NO ESTÁ SOPORTADO**: `EditorView.tsx` solo edita `colors` (3 `<input type=color>`: Cam.Izq=`colors[0]`, Cam.Dcha=`colors[1]`, Pantalón=`colors[2]`) y `Team` no tiene `awayColors`/`awayKitStyle`. Trabajo para soportarlo:
+1. **Tipo**: añadir `awayColors?: string[]` y (opcional) `awayKitStyle?: KitStyle` a `Team` (`src/types/game.d.ts`).
+2. **Editor**: ampliar la sección "Colores del kit" de `EditorView.tsx` (líneas ~132 form de edición y ~629 form de alta) con 3 inputs de color de visitante + un selector de `kitStyle`; persistir en `colors`/`awayColors`. OJO al `normalizeColors` (línea 64) y al guardado por temporada (`seasons[].colors`, líneas ~327/334) — habría que serializar también `awayColors`.
+3. **mockTeams.ts**: mapear los nuevos campos desde la BD (hoy solo mapea `colors`).
+4. **Render**: en `App.tsx`, cuando `resolveAwayKit` detecte clash y el equipo tenga `awayColors`, usar ESOS en vez del kit derivado. Es decir: `resolveAwayKit` (o el caller) prioriza `awayColors` reales sobre la derivación automática. La derivación actual queda como fallback cuando no hay datos.
+
+**Implementación sugerida** (solo en el render, sin tocar los datos del equipo):
+1. **Detección de clash**: comparar el color principal del home con el del away. Lo más robusto es reusar `kit.ts`: si `nearestShade(homeColors[0])` y `nearestShade(awayColors[0])` resuelven al **mismo SHADE** (o distancia RGB por debajo de un umbral) → hay clash. (Mejor por SHADE que por hex crudo, porque el render ya cuantiza a la paleta VGA de 16: dos azules distintos que caen en el mismo índice se verían iguales en pantalla.)
+2. **Equipación alternativa** (solo si hay clash y el equipo es el visitante): como NO hay datos de "away kit", opciones:
+   - (a) **Derivar** un kit contrastante en caliente: elegir el SHADE más lejano al del home (o usar el color de pantalón `colors[2]` como base de camiseta), manteniendo el `kitStyle`.
+   - (b) **Añadir datos**: campos opcionales `awayColors?: string[]` / `awayKitStyle?` al `Team` + soporte en el editor (ver abajo). Más fiel pero requiere rellenarlos.
+3. **Punto de aplicación**: en `App.startWatch2D` / `<Match2D>`, calcular el clash y, si procede, sustituir SOLO los `awayColors`/`awayKitStyle` que se pasan a `Match2D` por la equipación alternativa. No modificar `team.colors`.
+
+**¿Hay editor en el manager?** SÍ: `src/components/EditorView.tsx` → sección **"Colores del kit"** con 3 `<input type="color">`: **Cam. Izq.** = `colors[0]`, **Cam. Dcha.** = `colors[1]`, **Pantalón** = `colors[2]` (guarda `colors:[shirtL,shirtR,shorts]`). NO edita `kitStyle` ni equipación de visitante. Si se elige la opción (b), ampliar este editor con esos campos.
+
+**Nota sobre la semántica de `colors[]`** (la confirma el editor): `[camiseta-izq, camiseta-dcha, pantalón]`. Para lisa, izq==dcha; para rayas, son los **dos colores de raya**. ⚠️ `kit.ts buildKitPalette` hoy usa `colors[0]` (primario) y `colors[1]` como "secundario"→slots {10,11}; el **pantalón real es `colors[2]`**. Para rayas esto funciona (colors[1] = 2º color de raya → slots 10/11), pero para el pantalón en camiseta lisa convendría considerar `colors[2]`. Revisar al implementar el away kit.
 
 Hallazgos originales:
 - Sprites disponibles (`public/assets/match2d/base_sprites/`): **`JUGALISO`** (lisa), **`JUGARAYA`** (rayas verticales), **`JUGARAYO`** (franja/banda diagonal estilo Rayo). Porteros: `PORTEROI` (izq), `PORTEROD` (der).
@@ -163,7 +219,31 @@ Hallazgos originales:
 - `tsc`+eslint limpios. **Necesita validación visual** (no testeable headless): que en la 2ª parte los equipos cambien de banda, el balón entre por la portería correcta y el portero use el sprite del lado correcto.
 - **FIX descanso** (tras validación del usuario): antes el descanso era solo el espejo de render y la jugada **continuaba** (se veía un teletransporte + mirror). Corregido en `zoneEngine` HALF_TIME: ahora hace `resetKickoff(state,'home',true,...)` → para la jugada, recoloca los 22 en formación y monta **saque de centro de la 2ª parte sacado por el AWAY** (el que no sacó en la 1ª; el inicio siempre lo saca HOME). Emite un evento `kickoff` (log '¡Segunda parte!') en t del descanso. Verificado headless (balón al centro, dueño = jugador away). Con el espejo de render, los equipos cambian de banda en ese saque.
 - **Reloj en el descanso**: como `gt≈durationMs/2` en el descanso, el minuto mostrado se lee ~45' y no incrementa durante el breve setup del saque → "freeze" aproximado. El freeze exacto + "45+X'/90+X'" sigue necesitando el remap no-lineal (Bloque 9); el descuento YA se registra en el MatchState.
-- **Pendiente menor**: el cambio de banda sigue siendo **instantáneo en el pitido** (sin transición "salen y vuelven"); suavizable con overlay/freeze si se quiere.
+- **Pendiente menor**: el cambio de banda sigue siendo **instantáneo en el pitido** (sin transición "salen y vuelven"); suavizable con overlay/freeze si se quiere → ver 7.b.
+
+### 7.b ✅ HECHO — Secuencia "los jugadores se van y vuelven" — pedido del usuario
+
+**✅ HECHO** (sesión 2026-05-27) — enfoque **motor** (las posiciones de entrada/salida van en el timeline; el render las reproduce solo, sin tocar `animator`):
+- **Entrada (inicio + 2ª parte)**: en el branch `teleport` de `resetKickoff` (`phases/kickoff.ts`) los 22 ya NO hacen snap a su slot; spawnean **fuera de cuadro** en su banda más cercana (`y=-0.12 / 1.12`, misma `x` que el slot) y el campo de fuerzas de `kickoff_setup` (`applyKickoffForces`, ya existente) los **trota a formación**. Nuevo flag `state.kickoffEntrance` (true solo en teleport=true; el post-gol sigue caminando desde el juego, sin entrada). `KICKOFF_INITIAL_TICKS` subido 12→18 para que dé tiempo a la carrera; el gate de llegada del sacador en `tickKickoffSetup` lo extiende si hace falta. El flag se limpia al pasar a `live`.
+- **Salida (solo descanso)**: nueva fase `halftime_walkout`. En `zoneEngine`, al `half_time` ya no se hace el restage inmediato: se entra en `halftime_walkout` por `HALFTIME_WALKOUT_TICKS` (18). `applyHalftimeWalkoutForces` (en `kickoff.ts`) lleva a cada jugador a su banda más cercana y fuera de cuadro (`y=-0.30/1.30`, manteniendo `x`). Al acabar la ventana, `tickHalftimeWalkout` hace el `resetKickoff('home', true)` (la 2ª la saca el AWAY) → entrada de la 2ª parte. Emite el `kickoff` '¡Segunda parte!' en ese momento (no en el pitido).
+- **Velocidad**: boost `MAX_SPEED=0.05` en `move.ts` durante `kickoff_setup`+`kickoffEntrance` (trote de entrada) y durante `halftime_walkout` (salida). Clamp vertical relajado a `[-0.30, 1.30]` para `halftime_walkout` (todos cruzan su banda, unos por arriba y otros por abajo).
+- **Plumbing**: `halftime_walkout` añadido a `MatchPhase` (en `types.ts` Y `phases/shared.ts`), a `isGamePaused` (`state.ts`) y a los dos dispatchers de `phases.ts` (`applyPhaseForces`/`tickPhase`).
+- Verificado headless (2′ comprimido y 90′ completo): kf0 = 22/22 fuera → 0 fuera tras la ventana de entrada; `half_time` en el midpoint; los 22 salen de cuadro durante el walkout (max 22 fuera); '¡Segunda parte!' a t=half_time+walkout; 0 fuera tras la re-entrada. `tsc -b` + eslint limpios. Sandbox intacto (sus escenarios no emiten half_time ni usan teleport de entrada). **Pendiente validación visual** (Pixi).
+- ⚠️ **Determinismo**: subir `KICKOFF_INITIAL_TICKS` cambia el consumo de RNG del intro de inicio → la secuencia concreta del partido (goles) cambia respecto a antes. Es una sim seed-based igualmente válida; no es regresión funcional, pero el "guion" exacto del partido validado en sesiones previas ya no coincide.
+- **Opcional futuro**: overlay "DESCANSO"/"2ª PARTE" durante salida/entrada (no implementado).
+
+Objetivo original:
+- **Descanso (min 45)**: los 22 **salen del campo** (caminan hacia su banda/túnel, fuera de cuadro) y, tras un instante (con el cambio de banda ya aplicado = espejo de render), **vuelven a saltar** y se colocan en formación para el saque de centro de la 2ª parte.
+- **Inicio del partido**: misma secuencia de ENTRADA pero **sin salida previa** — los jugadores solo "saltan al campo" desde fuera y se colocan en formación :). (Hoy `resetKickoff(teleport=true)` los teletransporta directos a su slot.)
+
+**Implementación sugerida**:
+1. Reusar la animación de caminar/correr existente (la del expulsado `expulsion_walk` sirve de referencia para "salir por la banda"; para "entrar" basta animación de carrera hacia el slot).
+2. **Salida** (solo descanso): nueva fase de motor (p.ej. `halftime_walkout`) tras emitir `half_time`: mover a los 22 hacia fuera del campo (y > 1.0 / y < 0.0 o hacia el lateral) con su anim de carrera; al terminar, **entrada**.
+3. **Entrada** (inicio y descanso): en vez del teleport instantáneo de `resetKickoff`, arrancar a los jugadores **fuera de cuadro** (p.ej. en la banda más cercana a su slot) y dejar que las fuerzas del `kickoff_setup` (que ya tiran al "home position") los lleven corriendo a su sitio. Es decir: en el branch `teleport` de `kickoff.ts`, en vez de `state.pos[p.id]=slot`, poner `pos` en el borde y subir `KICKOFF_INITIAL_TICKS` para que se vea la carrera de entrada. Para el inicio: igual pero sin la fase de salida.
+4. **Render**: el espejo de la 2ª parte (animator `flipped`) ya gestiona el cambio de banda; la secuencia de entrada se reproduce sola al ser posiciones del timeline. Cuidado con que la entrada del descanso ocurra **después** de aplicar el flip (que los jugadores entren ya por su nueva banda).
+5. Opcional: overlay "DESCANSO" / "2ª PARTE" durante la salida/entrada.
+
+**Gotcha**: encaja con la decisión arquitectónica (A) y con el Bloque 8 (la salida reusa la mecánica del expulsado; la entrada del suplente en el Bloque 8 es la misma "entrada" que aquí).
 
 Hallazgos originales:
 - El motor emite `half_time` (`zoneEngine.ts` ~línea 146) en el tick medio, pero **solo si `durationMs >= 5min`** (`EMIT_HALF_TIME`). Con el modelo nuevo, las duraciones cortas (2/6 min → 90s/270s de motor) NO llegan a 5min → no se emite. **Ajustar**: emitir el descanso siempre a la mitad para partidos de match completo (usar `nominalMatchMs`/proporción, no el umbral fijo de 5 min de motor).
@@ -177,9 +257,22 @@ Hallazgos originales:
 
 ---
 
-## 8. ⬜ Pausa + cambios en vivo (alineación/táctica) + secuencia de sustitución
+## 8. 🟡 PARCIAL — Pausa + cambios en vivo (sustituciones ✅ + táctica/secuencia ⬜)
 
 **Objetivo**: poder pausar el partido para hacer cambios de alineación y táctica en vivo, reflejados en el motor. Botones de "entrenador". Secuencia visual de cambio (uno sale, otro entra) reutilizando la animación del expulsado para el que sale.
+
+**✅ HECHO — sustituciones en vivo** (sesión 2026-05-27) — **arquitectura por re-simulación determinista** (variante limpia de la (A), sin serializar `MatchState` ni concatenar colas):
+- **Decisión clave**: en vez de pausar el motor y continuar desde un `MatchState` serializado, se **re-simula desde cero con el mismo seed inyectando el cambio en su tick**. Como la sim es determinista, todos los ticks anteriores a la pausa se reproducen IDÉNTICOS (cabecera consistente con lo ya visto — verificado: events+keyframes idénticos pre-pausa) y solo se ramifica la cola. No hace falta reconstruir estado.
+- **Motor**: `simulateFromState`/`generateTimeline` aceptan `opts.subs: SubInjection[]` (`{atTick, apply(state,t)}`); el bucle aplica los `apply` due en su tick antes de decidir/mover. `half_time` se ubica por el `TOTAL_TICKS` global, así que sigue bien con subs.
+- **Mecánica de cambio**: `src/engine/substitution.ts` `applySubstitution(state, t, outId, incoming, log)` — intercambia el `EnginePlayer` en arrays/`playerMap`/`homeSet`, el entrante hereda slot/role/tag/`slotOffset` del saliente (formación intacta) y spawnea fuera de banda (reusa la entrada de 7.b → trota al campo en juego normal, sin fase especial); limpia estado del saliente; si tenía el balón lo suelta (`ballOwner=null`); emite evento `sub` (nuevo `EventKind`/`MatchEvent.type` 'sub', `playerId`=entra, `playerOffId`=sale).
+- **Render**: `renderer.ts` reconstruye el roster completo por banda (lineup final ∪ actores/targets de eventos `sub`) y pre-crea sprites de TODOS (suplentes incluidos) con el kit correcto; `animator.ts` oculta cada sprite mientras su id no esté en el keyframe actual (suplente antes de entrar / saliente tras salir). Nuevo `primeResume(scene, toMs)` reposiciona punteros de evento/gol/keyframe + marcador para reanudar en el instante de pausa sin re-disparar la cabecera.
+- **UI**: `Match2D` botón **CAMBIOS** (pausa + reporta `gameTime` vía `onRequestChanges`); prop `resumeAtMs` → `primeResume` y sigue a la última velocidad. `App` guarda los inputs de sim en `watch2dRef`, abre `AlignmentView ingame` sobre una copia de trabajo del equipo, `handle2DSubstitute` construye el entrante (mood+fitness vía `engineStatsFromPlayer`) y lo encola, `handle2DContinue` regenera el timeline con TODOS los subs y reanuda. `timelineToMatchResult` mapea `sub`→MatchEvent + `homeSubsUsed/awaySubsUsed` (y arregla la atribución de roster del saliente en faltas/posesión). `handleClose2D` vuelca `subsUsed`.
+- Verificado `tsc -b` + eslint limpios (0 errores nuevos en App; los 7 preexistentes siguen). Headless: cabecera idéntica pre-pausa, evento `sub` correcto, suplente entra y saliente desaparece, `subsUsed=2`, posesión 100, lineup final con subs. **Pendiente validación visual** (React/Pixi: overlay, seek, mostrar/ocultar sprites).
+
+⬜ **PENDIENTE — cambios de TÁCTICA en vivo + secuencia visual de cambio**:
+- **Táctica/formación en vivo**: hoy el `onContinue` regenera con los subs, pero NO con cambios de formación/offsets en vivo (el `AlignmentView ingame` no permite arrastre/cambio de formación; `onUpdate` es no-op). Para soportarlo: al regenerar, reconstruir los `EnginePlayer` del usuario desde la formación/offsets nuevos a partir del tick de pausa (vía otra `SubInjection` que reescriba slots, o un `apply` que mute `slot/slotOffset/role/tag` de los jugadores del usuario). `tacticalDiscipline` no lo modela el motor de zonas (toggle no-op).
+- **Secuencia visual del que SALE**: hoy el saliente simplemente desaparece (sprite oculto) y el entrante trota desde la banda. Falta la animación "el que sale camina hacia la banda" (reusar `expulsion_walk`/walkout como en 7.b). Encaja igual que 7.b.
+- **Overlay "CAMBIO"** opcional durante la sustitución.
 
 Hallazgos:
 - `AlignmentView` ya soporta modo `ingame` (`onSubstitute(outId,inId)`, `subsUsed`, `maxSubs`, `injuredIds`, `sentOff`, `htPaused`, `onContinue`). Reutilizable.
@@ -205,7 +298,7 @@ Hallazgos:
 - `timelineToMatchResult` calcula `stoppageTime1`/`stoppageTime2` con la MISMA heurística que el sim de texto (`calcStoppage` duplicado en el bridge para no acoplar i18n): base 1ª=1 (tope 3) / 2ª=3 (tope 7) + bonus por goles/cambios/lesiones/rojas del tramo. Opera sobre los MatchEvents (minutos ya remapeados 0–90, incluyen goles/rojas/lesiones del Bloque 6).
 - `handleClose2D` los vuelca en `MatchState.stoppageTime1/2` (antes 0) → consistente con los modos de texto. Verificado: st1∈[1,3], st2∈[3,7], escala con goles.
 
-⬜ **PENDIENTE — display en vivo "45+X'/90+X'"**: el reloj cosmético del 2D es lineal 0→90 (Bloque 1) y no tiene frontera de parte visible, así que mostrar el descuento en pantalla **se acopla al Bloque 7** (que introduce el descanso/medio tiempo real). Hacerlo ahí: cuando el reloj llega a 45'/90', mostrar "+stoppageTimeN". (Opción "crono se detiene en cada fase muerta" descartada por ahora: contar todos los `isGamePaused` —incluye saques de banda/puerta/córner— dispararía el descuento; requeriría además un remap no-lineal que toca el modelo de tiempo validado del Bloque 1.)
+⬜ **PENDIENTE — display en vivo "45+X'/90+X'"**: tras el fix de **B2** (2026-05-27) el reloj YA NO es lineal — `toClockMs` (`layout.ts`) remapea por tramos con **frontera de parte explícita** (0' hasta el saque, `[saque,descanso]→[0',45']`, 45' en el descanso, `[saque 2ª,final]→[45',90']`). Eso desbloquea parte de este punto, pero el "45+X'" sigue pendiente porque el motor **no distingue tiempo reglamentario de descuento**: el medio tiempo cae exacto en `halfTimeMs` (→45') y el final en `durationMs` (→90'), sin región de añadido que mostrar. Para hacerlo de verdad habría que (a) reservar una fracción del tiempo de motor de cada parte como "descuento" y que `toClockMs` mapee `[regulación]→[0',45']` y `[descuento]→[45'+0, 45'+N']`, usando `stoppageTime1/2`; o (b) inyectar `stoppageTime1/2` en el `MatchTimeline` y que el animator, al pasar de 45'/90', muestre "+X" mientras el motor sigue corriendo hasta el pitido. El valor del descuento ya se calcula y se vuelca en `MatchState.stoppageTime1/2`. (Opción "crono se detiene en cada fase muerta" descartada: contar todos los `isGamePaused` —saques de banda/puerta/córner— dispararía el descuento.)
 
 Hallazgos originales:
 - `MatchState` (manager) ya tiene `stoppageTime1`/`stoppageTime2`.
@@ -215,13 +308,27 @@ Hallazgos originales:
 
 ---
 
-## Orden sugerido para mañana
-1. **Bloque 3 (colores)** y **Bloque 2 (stats GK)** — independientes, visibles, bajo riesgo.
-2. **Bloque 4 (formación + drag)** — medio; toca motor + UI + persistencia.
-3. **Bloque 6 (eventos al manager)** — necesario para realismo de liga.
-4. **Decidir arquitectura (A)** y hacer **Bloque 7 (dos tiempos)** como primer punto de segmentación.
-5. **Bloque 8 (cambios en vivo)** sobre esa arquitectura.
-6. **Bloque 9 (crono)** al final, faseado.
+## 📋 ESTADO ACTUAL — qué está implementado y qué NO (auditado 2026-05-27)
+
+| Bloque | Estado | Detalle |
+|---|---|---|
+| 1 — Velocidad/tiempo/layout | ✅ | Falta solo validación visual del scroll. |
+| 2 — Stats motor | 🟡 | GK ✅, fitness pre-partido ✅. ⬜ **decaimiento de stamina EN VIVO** (no implementado: el motor usa `p.speed` estático por tick; solo se escala a la llegada). |
+| 3 — Colores + camiseta + away anti-clash | ✅ | Falta validación visual; ningún equipo trae `kitStyle`/`awayColors` en datos aún. |
+| 4 — Formación real + drag alineación | ✅ | Falta validación visual del arrastre. El rival no se arrastra. |
+| 5 — Tiempo→minuto | ✅ | (Mejorado por B2: ahora reloj no-lineal con frontera de parte.) |
+| 6 — Eventos al manager | ✅ | Falta `kind:'sub'` se emite ✅; posesión por keyframes (no tiempo exacto). |
+| 7 — Dos tiempos + cambio de campo + walkout/entrada | ✅ | Falta validación visual. |
+| 8 — Pausa + cambios en vivo | 🟡 | **Sustituciones ✅**. ⬜ **táctica/formación en vivo** (drag desactivado en `ingame`; los botones de formación enrutan a un `onUpdate` no-op → no hacen nada). ⬜ **secuencia visual del que SALE** (hoy el saliente se oculta; no camina fuera). |
+| 9 — Crono / descuento | 🟡 | Cálculo+registro de `stoppageTime1/2` ✅. Reloj no-lineal con frontera ✅ (B2). ⬜ **display "45+X'/90+X'"** (el motor no separa reglamentario de descuento — ver Bloque 9). |
+| Bugs B1/B2/B3 | ✅ | Arreglados esta sesión; **pendiente revalidación visual del usuario**. |
+
+### Qué queda por hacer (orden sugerido)
+1. **Validación visual** de B1/B2/B3 en navegador (lo más urgente: B1 era crítico y bloqueaba CAMBIOS). `npm run dev` → partido → VISIONAR 2D → CAMBIOS → continuar; comprobar reloj a 0'/45' y entrada por el norte.
+2. **Bloque 8 — secuencia visual del cambio**: que el saliente camine fuera (reusar `expulsion_walk`/walkout). Requiere mantener al saliente en la sim unos ticks como "walker" no participante (hoy `applySubstitution` lo sustituye en el sitio y el render solo oculta el sprite).
+3. **Bloque 8 — táctica/formación en vivo**: permitir cambiar formación/offsets en la pausa y regenerar la cola con una `SubInjection` que reescriba `slot/slotOffset/role/tag` de los jugadores del usuario desde el tick de pausa. Habilitar el drag/formación en el `AlignmentView ingame` y cablear su `onUpdate` (hoy no-op).
+4. **Bloque 2 — decaimiento de stamina en vivo**: recalcular `fitness` por minutos jugados al regenerar la cola (se apoya en la re-simulación del Bloque 8).
+5. **Bloque 9 — display "45+X'/90+X'"**: requiere que el motor separe reglamentario de descuento (ver nota del Bloque 9).
 
 ## Verificación general
 - `npx tsc -b` (debe pasar limpio).

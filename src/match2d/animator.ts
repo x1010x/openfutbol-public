@@ -14,7 +14,7 @@ import {
   dirFromDelta, MOVE_THRESHOLD,
   type Dir8,
 } from './states';
-import { lerp, toCanvasX, toCanvasY, ballHeightLevel, applyAnim, toDisplayMs } from './layout';
+import { lerp, toCanvasX, toCanvasY, ballHeightLevel, applyAnim, toClockMs } from './layout';
 import type { Scene } from './renderer';
 
 export interface AnimatorCtx {
@@ -24,6 +24,23 @@ export interface AnimatorCtx {
   logsRef: RefObject<HTMLDivElement | null>;
   scoreRef: RefObject<HTMLSpanElement | null>;
   minuteRef: RefObject<HTMLSpanElement | null>;
+}
+
+// Seek a freshly-built scene to `toMs` without re-firing the events/goals that
+// already played before it (used when a live substitution regenerates the
+// timeline — the deterministic head is identical, so playback resumes at the
+// pause point). Advances the event/goal/keyframe cursors past `toMs` and sets
+// the running score so the scoreboard reflects the state at the resume time.
+export function primeResume(scene: Scene, toMs: number): void {
+  const { rt, timeline, goalEvents } = scene;
+  rt.gameTime = toMs;
+  while (rt.evtPtr < timeline.events.length && timeline.events[rt.evtPtr].t <= toMs) rt.evtPtr++;
+  rt.homeScore = 0; rt.awayScore = 0; rt.goalIdx = 0;
+  while (rt.goalIdx < goalEvents.length && goalEvents[rt.goalIdx].t <= toMs) {
+    if (goalEvents[rt.goalIdx].side === 'home') rt.homeScore++; else rt.awayScore++;
+    rt.goalIdx++;
+  }
+  while (rt.kfPointer < timeline.keyframes.length - 2 && timeline.keyframes[rt.kfPointer + 1].t <= toMs) rt.kfPointer++;
 }
 
 export function updateScene(scene: Scene, ticker: Ticker, ctx: AnimatorCtx): void {
@@ -100,7 +117,7 @@ export function updateScene(scene: Scene, ticker: Ticker, ctx: AnimatorCtx): voi
 
       if (logsRef.current && actionStr && actionStr !== 'shot_on') {
         const el = document.createElement('div');
-        const dispT = toDisplayMs(ev.t, timeline.durationMs, timeline.nominalMatchMs);
+        const dispT = toClockMs(ev.t, timeline, scene.halfTimeMs);
         const m = Math.floor(dispT / 60000);
         const s = Math.floor((dispT % 60000) / 1000);
         el.className = 'text-[8px] text-vga-bright-white mb-1 font-mono uppercase leading-tight';
@@ -246,7 +263,12 @@ export function updateScene(scene: Scene, ticker: Ticker, ctx: AnimatorCtx): voi
   for (const [id, entry] of scene.spriteMap) {
     const posA = kfA.positions[id];
     const posB = kfB.positions[id];
-    if (!posA || !posB) continue;
+    // Substitutes are spawned up front but only belong on the pitch once they
+    // appear in the keyframes; a player subbed off drops out of them. Hide the
+    // sprite whenever its id is absent so bench players stay invisible until
+    // they enter and subbed-off players don't freeze on the field.
+    if (!posA || !posB) { entry.sp.visible = false; continue; }
+    entry.sp.visible = true;
 
     const nx = lerp(posA.x, posB.x, t);
     const ny = lerp(posA.y, posB.y, t);
@@ -402,7 +424,7 @@ export function updateScene(scene: Scene, ticker: Ticker, ctx: AnimatorCtx): voi
 
   // Minute display — remap the compressed timeline time to a 0–90' match minute.
   if (minuteRef.current) {
-    const dispT = toDisplayMs(gt, timeline.durationMs, timeline.nominalMatchMs);
+    const dispT = toClockMs(gt, timeline, scene.halfTimeMs);
     const cap = timeline.nominalMatchMs ? timeline.nominalMatchMs / 60000 : Infinity;
     const min = Math.min(cap, Math.floor(dispT / 60000));
     minuteRef.current.textContent = `${min}'`;

@@ -96,7 +96,22 @@ export async function buildScene(
   // Half-time whistle time (drives the second-half side switch). null = none.
   const halfTimeMs = timeline.events.find(e => e.kind === 'half_time')?.t ?? null;
 
+  // Full per-side roster, starters PLUS anyone involved in a substitution
+  // (Bloque 8): `homeLineup`/`awayLineup` hold the FINAL eleven, so a player
+  // subbed OFF is missing from them yet still appears in the first-half
+  // keyframes — and a player subbed ON is missing from the starting list.
+  // Reconstruct both sides from the sub events (which carry side + the on/off
+  // ids) so every sprite that ever appears gets created up front and assigned
+  // the correct kit. The animator hides each sprite while its id is absent
+  // from the current keyframe (before entering / after leaving).
   const homeSet = new Set(timeline.homeLineup);
+  const awaySet = new Set(timeline.awayLineup);
+  for (const ev of timeline.events) {
+    if (ev.kind !== 'sub') continue;
+    const set = ev.side === 'home' ? homeSet : awaySet;
+    if (ev.actor) set.add(ev.actor);
+    if (ev.target) set.add(ev.target);
+  }
   const homeGK = timeline.homeLineup[0];
   const awayGK = timeline.awayLineup[0];
 
@@ -200,9 +215,11 @@ export async function buildScene(
     }
   }
 
-  // Spawn in order: home players first, then away
-  for (const id of timeline.homeLineup) spawnPlayer(id);
-  for (const id of timeline.awayLineup) spawnPlayer(id);
+  // Spawn in order: home players first (starters then any bench subs), then
+  // away. Subs start hidden — the animator reveals them once they enter the
+  // keyframes (and hides players who have been subbed off).
+  for (const id of homeSet) spawnPlayer(id);
+  for (const id of awaySet) spawnPlayer(id);
 
   const ballFrames = ballAtlas.animations['ball_ground'] ?? ballAtlas.frames.slice(0, 4);
   const ballSp = new AnimatedSprite(ballFrames);

@@ -13,9 +13,11 @@ import { computeBoardObjective, computeTransferDelta, firingChance, applyMeterDe
 import { engineSettings, loadEngineSettings } from './engine/engineSettings';
 loadEngineSettings();
 import { Match2D } from './match2d/Match2D';
+import { resolveAwayKit } from './match2d/kit';
 import { BASE_SPEED_FACTOR, engineDurationMs } from './match2d/layout';
-import { generateTimeline } from './engine/zoneEngine';
-import { teamToEnginePlayers, timelineToMatchResult } from './engine/managerBridge';
+import { generateTimeline, TICK_MS, type EnginePlayer, type SubInjection } from './engine/zoneEngine';
+import { teamToEnginePlayers, timelineToMatchResult, engineStatsFromPlayer } from './engine/managerBridge';
+import { applySubstitution, applyFormationChange } from './engine/substitution';
 import type { MatchTimeline } from './types/match';
 import { LeagueTable } from './components/LeagueTable';
 import { StatusBar } from './components/StatusBar';
@@ -133,6 +135,35 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
   // Visionado 2D (motor de zonas): timeline2d != null => renderer Pixi montado.
   const [timeline2d, setTimeline2d] = useState<MatchTimeline | null>(null);
   const [watchDuration2d, setWatchDuration2d] = useState<number>(6); // minutos reales para los 90'
+  // Cambios en vivo 2D (Bloque 8). Inputs de la simulación (para regenerar el
+  // timeline de forma determinista al hacer un cambio), subs acumulados, equipo
+  // de trabajo para la pantalla de cambios, y el instante de reanudación.
+  const watch2dRef = useRef<{
+    seed: number; durationMs: number;
+    homePlayers: EnginePlayer[]; awayPlayers: EnginePlayer[];
+    homeTeamId: string; awayTeamId: string;
+    userSide: 'home' | 'away';
+    baseUserTeam: Team;
+    subs: { atTick: number; outId: string; incoming: EnginePlayer; log: string }[];
+    // Tactical changes (formation / lineup ordering / per-slot offsets) made by
+    // the user from the in-match changes screen. Applied at the pause tick
+    // AFTER subs at that tick so they reshape the post-sub eleven.
+    tacticalChanges: {
+      atTick: number;
+      formation: FormationId;
+      lineup: string[];
+      offsets?: Record<number, { dx: number; dy: number }>;
+    }[];
+  } | null>(null);
+  const changes2dAtMsRef = useRef<number>(0);
+  const [show2dChanges, setShow2dChanges] = useState<boolean>(false);
+  const [resume2dMs, setResume2dMs] = useState<number | undefined>(undefined);
+  const [live2dTeam, setLive2dTeam] = useState<Team | null>(null);
+  const [live2dSubsUsed, setLive2dSubsUsed] = useState<number>(0);
+  // Players unavailable for selection in the in-game changes screen (red cards /
+  // injuries up to the pause), computed when the screen opens so the render
+  // doesn't read refs/timeline directly.
+  const [changes2dCtx, setChanges2dCtx] = useState<{ sentOff: string[]; injuredIds: string[] }>({ sentOff: [], injuredIds: [] });
   const [showPreview, setShowPreview] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [showPlayFlow, setShowPlayFlow] = useState(false);
@@ -1038,18 +1069,122 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
       alert(t('msg.injuredInLineup', { players: injuredInLineup.map(p => p.name).join(', ') }));
       return;
     }
+    const seed = Math.floor(Math.random() * 0xffffffff);
+    const durationMs = engineDurationMs(watchDuration2d);
+    const homePlayers = teamToEnginePlayers(applyMoodToTeam(homeTeam), 'home');
+    const awayPlayers = teamToEnginePlayers(applyMoodToTeam(awayTeam), 'away');
     const tl = generateTimeline({
       homeTeamId: homeTeam.id,
       awayTeamId: awayTeam.id,
-      homePlayers: teamToEnginePlayers(applyMoodToTeam(homeTeam), 'home'),
-      awayPlayers: teamToEnginePlayers(applyMoodToTeam(awayTeam), 'away'),
-      seed: Math.floor(Math.random() * 0xffffffff),
+      homePlayers,
+      awayPlayers,
+      seed,
       // Compressed timeline so the match plays in `watchDuration2d` real minutes
       // at 1x (fixed 0.75 pace); raising speed finishes it sooner.
-      durationMs: engineDurationMs(watchDuration2d),
+      durationMs,
     });
+    // Stash the sim inputs so a live change can regenerate the timeline
+    // deterministically (Bloque 8), and reset the live-change state.
+    const userSide: 'home' | 'away' = userTeam.id === homeTeam.id ? 'home' : 'away';
+    watch2dRef.current = {
+      seed, durationMs, homePlayers, awayPlayers,
+      homeTeamId: homeTeam.id, awayTeamId: awayTeam.id,
+      userSide, baseUserTeam: userTeam, subs: [], tacticalChanges: [],
+    };
+    changes2dAtMsRef.current = 0;
+    setResume2dMs(undefined);
+    setShow2dChanges(false);
+    setLive2dSubsUsed(0);
+    setLive2dTeam(null);
     setShowPreview(false);
     setTimeline2d(tl);
+  };
+
+  // Bloque 8 — live changes in the 2D viewer. Match2D pauses and reports the
+  // current game-time; we open the in-game lineup screen over the user's team.
+  const handleRequest2DChanges = (gameTimeMs: number) => {
+    const inp = watch2dRef.current;
+    if (!inp || !timeline2d) return;
+    changes2dAtMsRef.current = gameTimeMs;
+    // Red-carded / injured user players up to the pause can't be selected.
+    const side = inp.userSide;
+    const sentOff = timeline2d.events
+      .filter(e => e.kind === 'card' && (e.detail === 'red' || e.detail === 'second_yellow') && e.side === side && e.t <= gameTimeMs)
+      .map(e => e.actor).filter((id): id is string => !!id);
+    const injuredIds = timeline2d.events
+      .filter(e => e.kind === 'injury' && e.side === side && e.t <= gameTimeMs)
+      .map(e => e.actor).filter((id): id is string => !!id);
+    setChanges2dCtx({ sentOff, injuredIds });
+    // Working copy of the user team whose lineup reflects subs made so far this
+    // match (the real squad is only mutated on finalize). Seeds from the base
+    // team on first open.
+    setLive2dTeam(prev => prev ?? { ...inp.baseUserTeam });
+    setShow2dChanges(true);
+  };
+
+  // Apply one substitution during a 2D pause: build the incoming player's
+  // engine stats (mood + fitness scaled, like the starters), queue it at the
+  // pause tick, and reflect it in the working lineup + sub count. The timeline
+  // is regenerated on continue.
+  const handle2DSubstitute = (outId: string, inId: string) => {
+    const inp = watch2dRef.current;
+    if (!inp) return;
+    const moodTeam = applyMoodToTeam(inp.baseUserTeam);
+    const moodPlayer = moodTeam.players.find(p => p.id === inId);
+    if (!moodPlayer) return;
+    const incoming: EnginePlayer = {
+      id: inId,
+      slotIndex: 0, slot: { x: 0, y: 0 },           // overwritten from the outgoing slot
+      role: 'mid', tag: 'cm',
+      ...engineStatsFromPlayer(moodPlayer),
+      foulsCommitted: 0, yellowCount: 0, redCard: false, injured: false,
+    };
+    const outName = inp.baseUserTeam.players.find(p => p.id === outId)?.name ?? '';
+    const inName = moodPlayer.name;
+    inp.subs.push({
+      atTick: Math.floor(changes2dAtMsRef.current / TICK_MS),
+      outId, incoming,
+      log: `Cambio: ${inName} por ${outName}`,
+    });
+    // Reflect in the working lineup so the screen shows the new XI.
+    setLive2dTeam(prev => {
+      const base = prev ?? { ...inp.baseUserTeam };
+      return { ...base, lineup: base.lineup.map(id => (id === outId ? inId : id)) };
+    });
+    setLive2dSubsUsed(n => n + 1);
+  };
+
+  // Resume after changes: regenerate the timeline from the stored inputs with
+  // all accumulated subs injected at their ticks (deterministic — the head up
+  // to the pause is reproduced exactly), then seek Match2D to the pause instant.
+  const handle2DContinue = () => {
+    const inp = watch2dRef.current;
+    setShow2dChanges(false);
+    if (!inp) return;
+    // Subs first, then tactical changes — the formation reshape needs to act on
+    // the post-sub eleven. simulateFromState applies same-tick injections in
+    // insertion order, so just concatenating gives the right ordering.
+    const subInjections: SubInjection[] = [
+      ...inp.subs.map(s => ({
+        atTick: s.atTick,
+        apply: (st, t) => applySubstitution(st, t, s.outId, s.incoming, s.log),
+      } as SubInjection)),
+      ...inp.tacticalChanges.map(c => ({
+        atTick: c.atTick,
+        apply: (st, t) => applyFormationChange(st, t, inp.userSide, c.formation, c.lineup, c.offsets),
+      } as SubInjection)),
+    ];
+    const newTl = generateTimeline({
+      homeTeamId: inp.homeTeamId,
+      awayTeamId: inp.awayTeamId,
+      homePlayers: inp.homePlayers,
+      awayPlayers: inp.awayPlayers,
+      seed: inp.seed,
+      durationMs: inp.durationMs,
+      subs: subInjections,
+    });
+    setResume2dMs(changes2dAtMsRef.current);
+    setTimeline2d(newTl);
   };
 
   const samplePoisson = (lambda: number): number => {
@@ -1359,8 +1494,8 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
       homeBoost: 1,
       homeStamina: Object.fromEntries(homeTeam.players.map(p => [p.id, p.stamina ?? 99])),
       awayStamina: Object.fromEntries(awayTeam.players.map(p => [p.id, p.stamina ?? 99])),
-      homeSubsUsed: 0,
-      awaySubsUsed: 0,
+      homeSubsUsed: r.homeSubsUsed,
+      awaySubsUsed: r.awaySubsUsed,
       homeInjuredInMatch: r.homeInjured,
       awayInjuredInMatch: r.awayInjured,
       homeStartingLineup: [...homeTeam.lineup],
@@ -2219,6 +2354,7 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
                               ? (idx) => setPreviewSwapSlot(prev => prev === idx ? null : idx)
                               : (idx) => { const pid = team.lineup[idx]; if (pid) showPlayerDetail(pid); }}
                             onNameClick={(pid) => showPlayerDetail(pid)}
+                            offsets={team.lineupOffsets}
                           />
                         </div>
                       );
@@ -2346,18 +2482,68 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
   return (
     <PlayerTooltipProvider year={league?.year ?? selectedYear ?? new Date().getFullYear()}>
     <div className="min-h-screen bg-vga-black cool:bg-rc-bg overflow-x-hidden">
-      {timeline2d && (
-        <Match2D
-          timeline={timeline2d}
-          homeTeamName={league.teams.find(tm => tm.id === timeline2d.homeTeamId)?.name}
-          awayTeamName={league.teams.find(tm => tm.id === timeline2d.awayTeamId)?.name}
-          homeColors={league.teams.find(tm => tm.id === timeline2d.homeTeamId)?.colors}
-          awayColors={league.teams.find(tm => tm.id === timeline2d.awayTeamId)?.colors}
-          homeKitStyle={league.teams.find(tm => tm.id === timeline2d.homeTeamId)?.kitStyle}
-          awayKitStyle={league.teams.find(tm => tm.id === timeline2d.awayTeamId)?.kitStyle}
-          initialSpeed={BASE_SPEED_FACTOR}
-          onClose={handleClose2D}
-        />
+      {timeline2d && (() => {
+        const homeTeam = league.teams.find(tm => tm.id === timeline2d.homeTeamId);
+        const awayTeam = league.teams.find(tm => tm.id === timeline2d.awayTeamId);
+        // Away anti-clash: swap only the away props when the away shirt would
+        // be indistinguishable from the home shirt. Team data is left untouched.
+        const awayKit = resolveAwayKit(homeTeam?.colors, awayTeam?.colors, awayTeam?.kitStyle);
+        return (
+          <Match2D
+            timeline={timeline2d}
+            homeTeamName={homeTeam?.name}
+            awayTeamName={awayTeam?.name}
+            homeColors={homeTeam?.colors}
+            awayColors={awayKit.colors}
+            homeKitStyle={homeTeam?.kitStyle}
+            awayKitStyle={awayKit.style}
+            initialSpeed={BASE_SPEED_FACTOR}
+            onRequestChanges={handleRequest2DChanges}
+            resumeAtMs={resume2dMs}
+            onClose={handleClose2D}
+          />
+        );
+      })()}
+
+      {/* Bloque 8 — pantalla de cambios en vivo (equipo del usuario), sobre el 2D */}
+      {show2dChanges && live2dTeam && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.88)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 60, padding: 8 }}>
+          <AlignmentView
+            team={live2dTeam}
+            onUpdate={(patch) => {
+              // In-match tactical edits: formation switch and per-slot drag
+              // offsets. Substitutions are handled separately via
+              // ingame.onSubstitute. Reflect the patch in the working team so
+              // the pitch redraws, then stash one tacticalChanges entry per
+              // pause (overwrite if there's already one queued at this tick)
+              // so the engine applies the final state on resume.
+              setLive2dTeam(prev => prev ? { ...prev, ...patch } : prev);
+              const inp = watch2dRef.current;
+              if (!inp) return;
+              const atTick = Math.floor(changes2dAtMsRef.current / TICK_MS);
+              const existing = inp.tacticalChanges.findIndex(c => c.atTick === atTick);
+              const entry = {
+                atTick,
+                formation: patch.formation,
+                lineup: patch.lineup,
+                offsets: patch.lineupOffsets,
+              };
+              if (existing >= 0) inp.tacticalChanges[existing] = entry;
+              else inp.tacticalChanges.push(entry);
+            }}
+            onBack={handle2DContinue}
+            onToggleDiscipline={() => { /* tactical discipline isn't modelled by the zone engine */ }}
+            ingame={{
+              subsUsed: live2dSubsUsed,
+              maxSubs: 3,
+              injuredIds: changes2dCtx.injuredIds,
+              sentOff: changes2dCtx.sentOff,
+              htPaused: false,
+              onSubstitute: handle2DSubstitute,
+              onContinue: handle2DContinue,
+            }}
+          />
+        </div>
       )}
       {showDisclaimer && <DisclaimerView onDismiss={dismissDisclaimer} />}
 

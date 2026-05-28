@@ -16,15 +16,21 @@ interface Props {
   draggable?: boolean;
   offsets?: Record<number, { dx: number; dy: number }>;
   onDragOffset?: (slotIdx: number, off: { dx: number; dy: number }) => void;
+  // Ids of players sent off during the live match. Their slot is greyed,
+  // marked with an X, and locked from interaction (no click, no drag) — the
+  // gap can only be covered by repositioning the remaining ten.
+  sentOffIds?: string[];
 }
 
 // Inner pitch spans: x 3..97 (94 units wide ↔ engine lateral 0..1),
 // y 3..107 (104 units tall ↔ engine forward 0..1, attack = up = -y).
 const PITCH_W = 94;
 const PITCH_H = 104;
-// Clamp drag so a player can be nudged a line or two, not teleported.
-const OFF_DX_MIN = -0.18, OFF_DX_MAX = 0.30; // back / forward
-const OFF_DY_ABS = 0.16;                      // lateral
+// Full-pitch drag: the engine clamps the resulting baseSlot to 0.03..0.97
+// (lineup.ts/baseSlot), so we allow the offset to span the whole field. The
+// user covers a sent-off teammate's zone by dragging anyone into that space.
+const OFF_DX_MIN = -0.95, OFF_DX_MAX = 0.95; // back / forward
+const OFF_DY_ABS = 0.95;                      // lateral
 const clamp = (v: number, lo: number, hi: number) => (v < lo ? lo : v > hi ? hi : v);
 
 const POS_FILL: Record<Position, string> = {
@@ -82,9 +88,10 @@ const shortName = (name: string): string =>
 const MOOD_COLORS = ['#FF5555', '#AA5500', '#FFFF55', '#55FFFF', '#55FF55'];
 const MOOD_SYMBOLS = ['▼▼', '▼', '—', '▲', '▲▲'];
 
-export const PitchDiagram = ({ team, selectedSlot, onSlotClick, onCircleClick, onNameClick, draggable, offsets, onDragOffset }: Props) => {
+export const PitchDiagram = ({ team, selectedSlot, onSlotClick, onCircleClick, onNameClick, draggable, offsets, onDragOffset, sentOffIds }: Props) => {
   const slots = FORMATIONS[team.formation];
   const layout = FORMATION_LAYOUTS[team.formation];
+  const sentOff = new Set(sentOffIds ?? []);
 
   const svgRef = useRef<SVGSVGElement>(null);
   const [drag, setDrag] = useState<{ slot: number; dx: number; dy: number; moved: boolean } | null>(null);
@@ -102,6 +109,7 @@ export const PitchDiagram = ({ team, selectedSlot, onSlotClick, onCircleClick, o
 
   const onTokenDown = (slotIdx: number, e: React.PointerEvent) => {
     if (!draggable || slotIdx === 0 || !team.lineup[slotIdx]) return; // GK / empty not draggable
+    if (sentOff.has(team.lineup[slotIdx])) return; // expelled slot is locked
     e.stopPropagation();
     const cur = offsets?.[slotIdx] ?? { dx: 0, dy: 0 };
     startRef.current = { cx: e.clientX, cy: e.clientY, baseDx: cur.dx, baseDy: cur.dy };
@@ -159,7 +167,8 @@ export const PitchDiagram = ({ team, selectedSlot, onSlotClick, onCircleClick, o
           const playerId = team.lineup[idx];
           const player = playerId ? team.players.find(p => p.id === playerId) : null;
           const oop = player ? isOOP(player, slotPos) : false;
-          const unavailable = player ? ((player.injuryWeeksRemaining ?? 0) > 0 || player.suspensionMatches > 0) : false;
+          const isSentOff = !!playerId && sentOff.has(playerId);
+          const unavailable = isSentOff || (player ? ((player.injuryWeeksRemaining ?? 0) > 0 || player.suspensionMatches > 0) : false);
           const color = unavailable ? '#555555' : POS_FILL[slotPos];
           const isSelected = selectedSlot === idx;
           const stamina = player ? (player.stamina ?? 99) : 99;
@@ -174,12 +183,12 @@ export const PitchDiagram = ({ team, selectedSlot, onSlotClick, onCircleClick, o
             ? (e: React.MouseEvent) => { e.stopPropagation(); onNameClick(player.id); }
             : undefined;
 
-          const canDrag = draggable && idx !== 0 && !!player;
+          const canDrag = draggable && idx !== 0 && !!player && !isSentOff;
           return (
             <g key={idx}
-              onClick={(draggable || onCircleClick) ? undefined : () => onSlotClick(idx)}
+              onClick={(draggable || onCircleClick || isSentOff) ? undefined : () => onSlotClick(idx)}
               onPointerDown={canDrag ? (e) => onTokenDown(idx, e) : undefined}
-              style={{ cursor: canDrag ? 'grab' : 'pointer', opacity: unavailable ? 0.45 : 1 }}>
+              style={{ cursor: isSentOff ? 'not-allowed' : (canDrag ? 'grab' : 'pointer'), opacity: unavailable ? 0.45 : 1 }}>
               {/* Drag indicator: faint marker at the formation base + line to the
                   shifted position, so the adjustment relative to the slot reads. */}
               {hasOff && canDrag && (
@@ -214,7 +223,7 @@ export const PitchDiagram = ({ team, selectedSlot, onSlotClick, onCircleClick, o
                   {/* unavailability icon */}
                   {unavailable && (
                     <text x={x + 3.6} y={y - 2.6} fontSize="3.5" fill="#FF5555" fontWeight="bold">
-                      {(player.injuryWeeksRemaining ?? 0) > 0 ? '✕' : 'S'}
+                      {isSentOff ? 'R' : ((player.injuryWeeksRemaining ?? 0) > 0 ? '✕' : 'S')}
                     </text>
                   )}
                   {/* stamina bar */}

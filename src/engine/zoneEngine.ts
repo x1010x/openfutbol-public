@@ -10,7 +10,7 @@ import {
   setCarrier,
   resetCarry,
 } from './state';
-import { tickPhase, resetKickoff } from './phases';
+import { tickPhase, resetKickoff, HALFTIME_WALKOUT_TICKS, FULLTIME_WALKOUT_TICKS } from './phases';
 import { decideAll, decideCarrierAction } from './decide';
 import { moveAll } from './move';
 import { checkTackle, checkOffBallAggression, resolvePass, resolveShot, type EffectorDeps } from './effectors';
@@ -47,7 +47,7 @@ export interface EnginePlayer {
   injured: boolean;
 }
 
-const TICK_MS        = 250;
+export const TICK_MS = 250;
 const DURATION_MS    = 90 * 60 * 1000;
 const KEYFRAME_EVERY = 4;
 
@@ -55,11 +55,21 @@ const KEYFRAME_EVERY = 4;
 // Caller is responsible for populating `state` with phase, positions, and any
 // phase-specific setup before invoking. `generateTimeline` (full match) and the
 // sandbox (scenario presets) are the two entry points.
+// A live change injected at a given tick during the deterministic run (Bloque
+// 8). `apply` mutates the state in place (e.g. applySubstitution). Because the
+// run is deterministic, re-simulating with the same seed reproduces every tick
+// before `atTick` exactly, so the already-played head stays consistent and the
+// change only branches the tail.
+export interface SubInjection {
+  atTick: number;
+  apply: (state: MatchState, t: number) => void;
+}
+
 export function simulateFromState(
   state: MatchState,
   durationMs: number,
   seed: number,
-  opts?: { emitHalfTime?: boolean },
+  opts?: { emitHalfTime?: boolean; subs?: SubInjection[] },
 ): MatchTimeline {
   const TOTAL_TICKS = Math.floor(durationMs / TICK_MS);
   // Full matches always get a half-time at the true midpoint regardless of how
@@ -68,6 +78,19 @@ export function simulateFromState(
   // scenario doesn't misfire a "Descanso" in the middle.
   const EMIT_HALF_TIME = opts?.emitHalfTime ?? (durationMs >= 5 * 60 * 1000);
   const HALF_TIME_TICK = Math.floor(TOTAL_TICKS / 2);
+  // Reserve the last FULLTIME_WALKOUT_TICKS for the final-whistle walk-off
+  // (tunnel exit, same motif as half-time). The whistle fires on the trigger
+  // tick; the remaining ticks just run the walkout movement. Skip when the
+  // window is too short to carry a meaningful walkout (sandbox clips).
+  const EMIT_FULL_TIME_WALKOUT = EMIT_HALF_TIME && TOTAL_TICKS > FULLTIME_WALKOUT_TICKS + 4;
+  const FULL_TIME_TRIGGER_TICK = EMIT_FULL_TIME_WALKOUT ? TOTAL_TICKS - FULLTIME_WALKOUT_TICKS : -1;
+  // Subs bucketed by tick for O(1) lookup in the loop.
+  const subsByTick = new Map<number, SubInjection[]>();
+  for (const s of opts?.subs ?? []) {
+    const list = subsByTick.get(s.atTick) ?? [];
+    list.push(s);
+    subsByTick.set(s.atTick, list);
+  }
 
   const effectorDeps: EffectorDeps = {
     setCarrier: (id, s) => setCarrier(state, id, s),
@@ -76,6 +99,11 @@ export function simulateFromState(
 
   for (let tick = 1; tick < TOTAL_TICKS; tick++) {
     const t = tick * TICK_MS;
+
+    // Apply any live changes scheduled for this tick before the tick's
+    // decisions/movement run, so the new player is in place from here on.
+    const due = subsByTick.get(tick);
+    if (due) for (const s of due) s.apply(state, t);
 
     // Time-based wall release: the foul_release branch keeps wallIds populated
     // through the ball's flight (so the formation holds visually and the
@@ -159,13 +187,24 @@ export function simulateFromState(
     if (EMIT_HALF_TIME && tick === HALF_TIME_TICK) {
       stateEmit(state, t, 'half_time', state.possession, undefined, undefined, 'Descanso');
       // Half-time is a hard break, not a continuation: stop the current play and
-      // restage a centre kickoff with the 22 teleported back into formation.
-      // The match always kicks off with HOME (see generateTimeline), so the
-      // second half is taken by AWAY → pass lastScorer='home' (kicker = the
-      // non-scorer side). The render mirrors the pitch from this point (see
-      // animator `flipped`), so the teams visibly change ends for the restart.
-      resetKickoff(state, 'home', true, { resetCarry: (p) => resetCarry(state, p) });
-      stateEmit(state, t, 'kickoff', state.possession, state.kickerId!, undefined, '¡Segunda parte!');
+      // send the 22 jogging off to the touchline. When the walk-off window
+      // ends, tickPhase('halftime_walkout') restages the second-half kickoff
+      // (taken by AWAY — HOME kicked off the match) with the entrance jog back
+      // in. The render mirrors the pitch from this point (see animator
+      // `flipped`), so the teams visibly change ends for the restart.
+      state.phase = 'halftime_walkout';
+      state.phaseTicks = HALFTIME_WALKOUT_TICKS;
+      stateSnap(state, t);
+    }
+
+    if (EMIT_FULL_TIME_WALKOUT && tick === FULL_TIME_TRIGGER_TICK) {
+      // Final whistle: emit full_time and send the 22 through the tunnel exit.
+      // No kickoff is restaged afterwards (the loop tail runs out the walkout
+      // ticks and returns). Snap so the keyframe immediately after the whistle
+      // captures everyone frozen at their current spot before the walk starts.
+      stateEmit(state, t, 'full_time', state.possession, undefined, undefined, '¡Pitido final!');
+      state.phase = 'fulltime_walkout';
+      state.phaseTicks = FULLTIME_WALKOUT_TICKS;
       stateSnap(state, t);
     }
 
@@ -207,7 +246,11 @@ export function simulateFromState(
     // 'dribble' (and any other) → keep moving; movement is handled by moveAll.
   }
 
-  stateEmit(state, durationMs, 'full_time', state.possession, undefined, undefined, '¡Pitido final!');
+  // When the walk-off ran, full_time was already emitted at the whistle. Only
+  // emit here for sandbox clips and other short timelines that skipped it.
+  if (!EMIT_FULL_TIME_WALKOUT) {
+    stateEmit(state, durationMs, 'full_time', state.possession, undefined, undefined, '¡Pitido final!');
+  }
   stateSnap(state, durationMs);
 
   return {
@@ -217,6 +260,7 @@ export function simulateFromState(
     homeLineup: state.homePlayers.map(p => p.id),
     awayLineup: state.awayPlayers.map(p => p.id),
     durationMs,
+    entranceLiveMs: state.entranceLiveMs,
     events: state.events,
     keyframes: state.keyframes,
     finalScore: state.score,
@@ -233,6 +277,10 @@ export function generateTimeline(cfg: {
   // the chosen watch duration (see the 2D speed/time model); omitted callers
   // get a full 90' worth of simulated time.
   durationMs?: number;
+  // Live changes (subs / tactic tweaks) to inject at their ticks. Re-running
+  // generateTimeline with the same seed + the accumulated subs reproduces the
+  // played head exactly and branches a new tail from each change (Bloque 8).
+  subs?: SubInjection[];
 }): MatchTimeline {
   const state = createInitialState(cfg);
   const seed  = cfg.seed ?? 0xdeadbeef;
@@ -242,7 +290,7 @@ export function generateTimeline(cfg: {
   stateEmit(state, 0, 'kickoff', 'home', state.kickerId!, undefined, '¡Saque inicial!');
   stateSnap(state, 0);
 
-  const tl = simulateFromState(state, durationMs, seed, { emitHalfTime: true });
+  const tl = simulateFromState(state, durationMs, seed, { emitHalfTime: true, subs: cfg.subs });
   // A full match is always shown as 0–90' regardless of how compressed the
   // timeline is; the log/stats remap each event's `t` accordingly.
   tl.nominalMatchMs = DURATION_MS;

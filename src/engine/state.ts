@@ -84,6 +84,8 @@ export function createInitialState(cfg: {
 
     kickerId: null,
     partnerId: null,
+    kickoffEntrance: false,
+    entranceLiveMs: [],
     needsKickoffPass: false,
     needsKickoffBackPass: false,
     throwInSpot: null,
@@ -199,7 +201,9 @@ export function isGamePaused(state: MatchState): boolean {
       || state.phase === 'corner_release'
       || state.phase === 'foul_setup'
       || state.phase === 'foul_holding'
-      || state.phase === 'foul_release';
+      || state.phase === 'foul_release'
+      || state.phase === 'halftime_walkout'
+      || state.phase === 'fulltime_walkout';
 }
 
 // Carry budget — how many ticks a carrier holds the ball before the decision

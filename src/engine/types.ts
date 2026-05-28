@@ -2,7 +2,7 @@ import type { PlayerId, TeamSide, Vec2, Cell, TimelineEvent } from '../types/mat
 import type { EnginePlayer } from './zoneEngine';
 import type { GkPressStrategy, PendingImpulse } from './phases';
 
-export type MatchPhase = 'live' | 'freeze' | 'transition' | 'celebration' | 'gk_holding' | 'gk_release' | 'kickoff_setup' | 'throw_in_setup' | 'throw_in_holding' | 'throw_in_release' | 'goal_kick_setup' | 'goal_kick_holding' | 'goal_kick_release' | 'corner_setup' | 'corner_holding' | 'corner_release' | 'foul_setup' | 'foul_holding' | 'foul_release' | 'expulsion_hold' | 'expulsion_walk' | 'expulsion_walkout';
+export type MatchPhase = 'live' | 'freeze' | 'transition' | 'celebration' | 'gk_holding' | 'gk_release' | 'kickoff_setup' | 'throw_in_setup' | 'throw_in_holding' | 'throw_in_release' | 'goal_kick_setup' | 'goal_kick_holding' | 'goal_kick_release' | 'corner_setup' | 'corner_holding' | 'corner_release' | 'foul_setup' | 'foul_holding' | 'foul_release' | 'expulsion_hold' | 'expulsion_walk' | 'expulsion_walkout' | 'halftime_walkout' | 'fulltime_walkout';
 
 // Free-kick variant. Decides the shape of the choreography (wall or not),
 // where teammates run, and whether the kicker shoots, crosses, or passes.
@@ -103,6 +103,15 @@ export interface MatchState {
 
   kickerId: PlayerId | null;
   partnerId: PlayerId | null;
+  // True while a kickoff_setup is the match-start / second-half entrance (the
+  // 22 spawn off-pitch and jog into formation), false for the post-goal
+  // restart (players walk back from open play). Drives the entrance speed
+  // boost in move.ts; cleared when the phase hands off to 'live'.
+  kickoffEntrance: boolean;
+  // Engine `t` (ms) at which the ball is first put into play for each half (the
+  // kickoff_setup→live transition of an entrance kickoff). Used by the viewer to
+  // freeze the cosmetic clock at 0' / 45' during the player entrances (B2).
+  entranceLiveMs: number[];
   needsKickoffPass: boolean;
   needsKickoffBackPass: boolean;
   throwInSpot: Vec2 | null;

@@ -5,9 +5,23 @@
 import type { Vec2, TeamSide } from '../../types/match';
 import type { EnginePlayer } from '../zoneEngine';
 import { spring, repel } from '../forces';
-import { baseSlot } from '../lineup';
 import { KICKOFF_INITIAL_TICKS, KICKOFF_SETUP_TICKS } from './shared';
 import type { CarrierRole, PhaseForceCtx, PhaseCallbacks, MatchState } from './shared';
+
+// Tunnel geometry shared by both the kickoff entrance and the half-time /
+// full-time walk-offs. The two teams use slightly offset x columns so the
+// entrance/exit reads as two parallel single-file lines instead of one pile of
+// 22 sprites converging on the same point. y=0.02 is the top touchline; the
+// pre-roll spawn / post-walkout disappear point sits well above that so the
+// spring keeps pulling at near-max speed before the sprite vanishes.
+const TUNNEL_HOME_X = 0.470;
+const TUNNEL_AWAY_X = 0.530;
+const TUNNEL_OFF_FIELD_Y = -0.30;
+
+// Per-team x column for the tunnel queue / exit.
+function tunnelX(side: TeamSide): number {
+  return side === 'home' ? TUNNEL_HOME_X : TUNNEL_AWAY_X;
+}
 
 // Phase entry used at match start (teleport=true) and after a goal
 // (teleport=false). Both branches put the ball on the centre spot and hand
@@ -38,43 +52,33 @@ export function resetKickoff(
   state.needsKickoffPass = true;
   state.needsKickoffBackPass = false;
 
-  state.phase      = 'kickoff_setup';
-  state.phaseTicks = teleport ? KICKOFF_INITIAL_TICKS : KICKOFF_SETUP_TICKS;
-
-  const behindX = state.possession === 'home' ? 0.485 : 0.515;
+  state.phase         = 'kickoff_setup';
+  state.phaseTicks    = teleport ? KICKOFF_INITIAL_TICKS : KICKOFF_SETUP_TICKS;
+  // teleport=true is the match-start / second-half entrance; teleport=false is
+  // the post-goal restart (players walk back from open play, no entrance).
+  state.kickoffEntrance = teleport;
 
   if (teleport) {
-    // Match start. 22 players snap into formation; the brief intro lets the
-    // user see the shape before the first pass.
-    for (const p of state.homePlayers) {
-      const slot = baseSlot(p);
-      if (p.id !== kicker.id && p.id !== partner.id) slot.x = Math.min(slot.x, 0.48);
-      state.pos[p.id] = slot;
-      state.vel[p.id] = { x: 0, y: 0 };
-    }
-    for (const p of state.awayPlayers) {
-      const slot = baseSlot(p);
-      if (p.id !== kicker.id && p.id !== partner.id) slot.x = Math.max(slot.x, 0.52);
-      state.pos[p.id] = slot;
-      state.vel[p.id] = { x: 0, y: 0 };
-    }
-    state.pos[kicker.id]  = { x: behindX, y: 0.50 };
-    state.pos[partner.id] = { x: behindX, y: 0.42 };
-
-    // Centre-circle clearance: shove anyone whose teleported slot lands
-    // inside the centre circle out to the boundary.
-    const CIRCLE_R = 0.15;
-    for (const p of state.allPlayers) {
-      if (p.id === kicker.id || p.id === partner.id) continue;
-      const d = Math.hypot(state.pos[p.id].x - 0.5, state.pos[p.id].y - 0.5);
-      if (d < CIRCLE_R && d > 0) {
-        const factor = CIRCLE_R / d;
-        state.pos[p.id] = {
-          x: 0.5 + (state.pos[p.id].x - 0.5) * factor,
-          y: 0.5 + (state.pos[p.id].y - 0.5) * factor,
-        };
+    // Tunnel entrance: each team forms a single-file column at the top-centre
+    // (TUNNEL_HOME_X / TUNNEL_AWAY_X), queued above the touchline by slotIndex
+    // so the GK leads each line. applyKickoffForces walks them straight down
+    // the column; once they cross the touchline they fan out to their slots.
+    // move.ts relaxes the vertical clamp during kickoffEntrance so the deep
+    // queue spawns can sit well off the top of the frame.
+    const homeSorted = [...state.homePlayers].sort((a, b) => a.slotIndex - b.slotIndex);
+    const awaySorted = [...state.awayPlayers].sort((a, b) => a.slotIndex - b.slotIndex);
+    const QUEUE_STEP = 0.045; // vertical gap between consecutive players in the column
+    const QUEUE_HEAD_Y = -0.10; // leader of the line sits just off the touchline
+    const placeQueue = (sorted: EnginePlayer[], side: TeamSide): void => {
+      const xCol = tunnelX(side);
+      for (let i = 0; i < sorted.length; i++) {
+        const p = sorted[i];
+        state.pos[p.id] = { x: xCol, y: QUEUE_HEAD_Y - QUEUE_STEP * i };
+        state.vel[p.id] = { x: 0, y: 0 };
       }
-    }
+    };
+    placeQueue(homeSorted, 'home');
+    placeQueue(awaySorted, 'away');
   }
   // Post-goal: keep all 22 player positions as-is. The kickoff_setup phase
   // forces will walk them to their kickoff stations; the tickPhase exit
@@ -107,6 +111,35 @@ export function applyKickoffForces(
   ctx: PhaseForceCtx,
 ): boolean {
   const { ball, ballOwner, kickerId, partnerId, homePlayers, awayPlayers, pos } = ctx;
+
+  // Tunnel entrance leg: while still above the top touchline the player walks
+  // straight down their team's column. Only the queue x/y matters here; the
+  // slot/kicker pull is skipped so 22 players don't all sprint diagonally at
+  // the centre spot from the queue. Once their sprite crosses the touchline
+  // (TUNNEL_ENTER_Y) the normal kickoff pull below takes over.
+  const TUNNEL_ENTER_Y = 0.06;
+  if (ctx.kickoffEntrance && ppos.y < TUNNEL_ENTER_Y) {
+    const xCol = tunnelX(pSide);
+    const sfTunnel = spring(ppos, { x: xCol, y: TUNNEL_ENTER_Y + 0.04 }, 0.30);
+    force.x += sfTunnel.x;
+    force.y += sfTunnel.y;
+    // Light vertical repulsion so two queued players don't end up at the same y.
+    const teammates = pSide === 'home' ? homePlayers : awayPlayers;
+    for (const other of teammates) {
+      if (other.id === p.id) continue;
+      const opos = pos[other.id];
+      if (opos.y >= TUNNEL_ENTER_Y) continue; // only repel queue mates still above the line
+      const dy = opos.y - ppos.y;
+      const dx = opos.x - ppos.x;
+      const d = Math.hypot(dx, dy);
+      if (d < 0.035 && d > 0) {
+        const r = repel(ppos, opos, (0.035 - d) * 2.5);
+        force.x += r.x;
+        force.y += r.y;
+      }
+    }
+    return true;
+  }
 
   let target: Vec2 = { ...base };
   if (pSide === 'home') target.x = Math.min(target.x, 0.48);
@@ -199,6 +232,77 @@ export function tickKickoffSetup(state: MatchState, t: number, _callbacks: Phase
       state.vel[state.partnerId] = { x: 0, y: 0 };
       state.kickFrozenUntil.set(state.partnerId, t + 250);
     }
+    // Record the instant the ball goes into play on an entrance kickoff (match
+    // start + second half) so the viewer can hold the clock at 0'/45' through
+    // the player entrance (B2).
+    if (state.kickoffEntrance) state.entranceLiveMs.push(t);
+    state.kickoffEntrance = false;
     state.phase = 'live';
   }
+}
+
+// Half-time / full-time walk-off. All 22 leave through the top-centre tunnel,
+// inspired by the expulsion sequence: a diagonal leg toward the touchline
+// column, then a straight-north walkout past the camera. Home and away use
+// slightly offset columns (TUNNEL_HOME_X / TUNNEL_AWAY_X) so the two teams
+// form two parallel single-file lines instead of converging to one point.
+// Teammate repulsion (only on the diagonal leg) staggers each line into a
+// natural queue. Claims the phase (returns true) so open-play forces don't
+// fight the walk-off.
+export function applyHalftimeWalkoutForces(
+  p: EnginePlayer,
+  _isGK: boolean,
+  pSide: TeamSide,
+  _role: CarrierRole,
+  _base: Vec2,
+  ppos: Vec2,
+  _pvel: Vec2,
+  force: Vec2,
+  ctx: PhaseForceCtx,
+): boolean {
+  const TUNNEL_EXIT_Y = 0.06; // top touchline crossover
+  const xCol = tunnelX(pSide);
+
+  if (ppos.y > TUNNEL_EXIT_Y) {
+    // Diagonal leg: pull each player to the tunnel column at the touchline.
+    const sf = spring(ppos, { x: xCol, y: TUNNEL_EXIT_Y }, 0.45);
+    force.x += sf.x;
+    force.y += sf.y;
+    // Teammate repulsion so the line stays single-file rather than a pile-up.
+    const teammates = pSide === 'home' ? ctx.homePlayers : ctx.awayPlayers;
+    for (const other of teammates) {
+      if (other.id === p.id) continue;
+      const opos = ctx.pos[other.id];
+      const d = Math.hypot(opos.x - ppos.x, opos.y - ppos.y);
+      if (d < 0.055 && d > 0) {
+        const r = repel(ppos, opos, (0.055 - d) * 2.0);
+        force.x += r.x;
+        force.y += r.y;
+      }
+    }
+  } else {
+    // Walkout leg: straight north past the camera, hugging the column x.
+    const sf = spring(ppos, { x: xCol, y: TUNNEL_OFF_FIELD_Y }, 0.55);
+    force.x += sf.x;
+    force.y += sf.y;
+  }
+  return true;
+}
+
+// End of the half-time walk-off: restage the second-half kickoff. HOME kicked
+// off the match, so AWAY takes the second half → lastScorer='home' (kicker =
+// the non-kicking side). teleport=true spawns the 22 off-pitch for the
+// entrance jog back in; the render has already mirrored ends at the whistle.
+export function tickHalftimeWalkout(state: MatchState, t: number, callbacks: PhaseCallbacks): void {
+  callbacks.resetKickoff('home', true);
+  callbacks.emit(t, 'kickoff', state.possession, state.kickerId!, undefined, '¡Segunda parte!');
+  callbacks.snap(t);
+}
+
+// Full-time walk-off ends. No restart: the simulation loop terminates right
+// after the walkout window closes. Snap so the final off-frame positions are
+// captured in a keyframe the viewer can interpolate to.
+export function tickFulltimeWalkout(state: MatchState, t: number, callbacks: PhaseCallbacks): void {
+  state.phase = 'live'; // cosmetic terminator; the loop is about to exit
+  callbacks.snap(t);
 }

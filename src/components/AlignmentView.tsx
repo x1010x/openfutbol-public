@@ -279,9 +279,12 @@ export const AlignmentView = ({ team, onUpdate, onBack, onToggleDiscipline, inga
 
   const assignToSlot = (slotIdx: number, playerId: string | null) => {
     if (ingame) {
-      // In-game mode: real substitution (permanent)
+      // In-game mode: real substitution (permanent). Sent-off slots are
+      // locked — once a player is expelled, no replacement comes on (one
+      // man down rule). The hole has to be covered by repositioning.
       if (playerId === null) { setSelectedSlot(null); return; }
       const outId = team.lineup[slotIdx];
+      if (outId && ingame.sentOff.includes(outId)) { setSelectedSlot(null); return; }
       if (outId && ingame.subsUsed < ingame.maxSubs) {
         ingame.onSubstitute(outId, playerId);
       }
@@ -430,12 +433,19 @@ export const AlignmentView = ({ team, onUpdate, onBack, onToggleDiscipline, inga
               team={team}
               selectedSlot={selectedSlot}
               onSlotClick={(idx) => {
-                if (ingame && ingame.subsUsed >= ingame.maxSubs) return;
+                if (ingame) {
+                  // Block clicks on sent-off slots: that gap can only be
+                  // covered by repositioning, not by a fresh substitute.
+                  const pid = team.lineup[idx];
+                  if (pid && ingame.sentOff.includes(pid)) return;
+                  if (ingame.subsUsed >= ingame.maxSubs) return;
+                }
                 setSelectedSlot(idx === selectedSlot ? null : idx);
               }}
-              draggable={!ingame}
+              draggable={true}
               offsets={team.lineupOffsets}
               onDragOffset={handleDragOffset}
+              sentOffIds={ingame?.sentOff}
             />
             {inPickMode && currentSlotPlayerId && !ingame && (
               <button

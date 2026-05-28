@@ -69,6 +69,7 @@ export function moveAll(state: MatchState, intents: Map<PlayerId, Intent>, t: nu
     allPlayers: state.allPlayers,
     expelledIds: state.expelledIds,
     pos: state.pos,
+    kickoffEntrance: state.kickoffEntrance,
   };
 
   const inExpulsionPhase = state.phase === 'expulsion_hold'
@@ -181,6 +182,22 @@ export function moveAll(state: MatchState, intents: Map<PlayerId, Intent>, t: nu
     // multiplier compounds with all other MAX_SPEED tweaks below.
     if (state.injuredIds.has(p.id)) MAX_SPEED *= 0.35;
 
+    // Entrance jog (match start / second-half restart): the 22 walk in from
+    // the top-centre tunnel in two single-file lines and disperse to slots
+    // once they cross the touchline. Pace is a calm walk-on (not a sprint) so
+    // the line stays visibly orderly. KICKOFF_INITIAL_TICKS is sized to give
+    // the slowest player (deep in the queue + a south-side slot) time to
+    // reach formation; the kicker-arrival gate extends the window if needed.
+    if (state.phase === 'kickoff_setup' && state.kickoffEntrance) {
+      MAX_SPEED = 0.035 * globalFactor;
+    } else if (state.phase === 'halftime_walkout' || state.phase === 'fulltime_walkout') {
+      // Walk-off to the locker room: every player diagonals to the top-centre
+      // tunnel and queues out. A brisk-jog pace so deep south-side players
+      // can still cross the diagonal and exit the frame within the walkout
+      // window before kickoff (or the loop) takes over.
+      MAX_SPEED = 0.045 * globalFactor;
+    }
+
     // Special speeds for Goal Kick
     const inGoalKickPhase =
          state.phase === 'goal_kick_setup'
@@ -283,6 +300,14 @@ export function moveAll(state: MatchState, intents: Map<PlayerId, Intent>, t: nu
     // camera — well past the canvas top. Same player is filtered out of all
     // other loops via expelledIds so loosening the bound only affects them.
     if (inExpulsionPhase && p.id === walkerId) { yMin = -0.30; }
+    // Half-time / full-time walk-off: every player leaves through the top
+    // tunnel and disappears above the camera. Only the top bound needs to
+    // open up — nobody exits south anymore.
+    if (state.phase === 'halftime_walkout' || state.phase === 'fulltime_walkout') { yMin = -0.40; }
+    // Tunnel entrance: the 22 spawn queued well above the touchline
+    // (slot-stacked at y as low as -0.55), so loosen the top clamp until the
+    // force field walks them onto the pitch.
+    if (state.phase === 'kickoff_setup' && state.kickoffEntrance) { yMin = -0.60; }
 
     ppos.x = clamp(ppos.x + pvel.x, xMin, xMax);
     ppos.y = clamp(ppos.y + pvel.y, yMin, yMax);

@@ -21,11 +21,13 @@ export type EventKind =
   | 'penalty'
   | 'card'
   | 'injury'
+  | 'sub'
   | 'corner'
   | 'throw_in'
   | 'goal_kick'
   | 'gk_distribute'
   | 'reception'
+  | 'tactic'
   | 'half_time'
   | 'full_time';
 
@@ -66,6 +68,10 @@ export interface MatchTimeline {
   // event's `t` to a 0–90' minute via `nominalMatchMs / durationMs`. Left unset
   // by sandbox clips, which then show raw time instead of a fake 0–90' minute.
   nominalMatchMs?: number;
+  // Engine `t` (ms) at which the ball goes into play for each half (entrance
+  // kickoffs). entranceLiveMs[0] = first half, [1] = second half. The viewer
+  // holds the clock at 0'/45' until these instants (B2). Unset by sandbox clips.
+  entranceLiveMs?: number[];
   events: TimelineEvent[];
   keyframes: Keyframe[];
   finalScore: { home: number; away: number };
