@@ -60,7 +60,7 @@ const Tooltip = ({ player, x, y, year }: TooltipState & { year: number }) => {
         <span className="text-[8px] font-bold truncate">{player.fullName}</span>
       </div>
       <div className="flex gap-2 p-2">
-        <PlayerPhoto playerId={player.id} size="md" className="shrink-0 border border-vga-gray" />
+        <PlayerPhoto sourceId={player.source_id} size="md" className="shrink-0 border border-vga-gray" />
         <div className="flex flex-col gap-0.5 min-w-0">
           <div className="text-vga-bright-white text-[9px] font-bold leading-tight">{player.fullName}</div>
           <div className="text-vga-gray text-[7px]">{age} años · pico {player.peakAge}a</div>

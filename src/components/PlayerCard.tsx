@@ -62,7 +62,7 @@ export const PlayerCard = ({ player, seasonYear, highlight, onNameClick, footer,
 
       <div className="flex gap-2 mb-2">
         <div className="flex flex-col items-center justify-center bg-vga-black vga-panel-inset w-14 py-1">
-          <PlayerPhoto playerId={player.id} size="sm" className="mb-0.5" />
+          <PlayerPhoto sourceId={player.source_id} size="sm" className="mb-0.5" />
           <span className="text-[7px] text-vga-cyan">MEDIA</span>
           <div className="flex items-center gap-1">
             <span className="text-xl text-vga-light-green leading-none">{medDisplay}</span>
