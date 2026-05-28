@@ -50,3 +50,5 @@ Thumbs.db
 
 # Temporary files
 temp/
+*.pack.json
+open-football-database/
