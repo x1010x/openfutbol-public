@@ -62,12 +62,14 @@ export const runtimePlayerFromPack = (
   if (allowedSet.size === 0) allowedSet.add(primaryLegacy);
   const allowedPositions: Position[] = [...allowedSet];
 
-  const halfCa = Math.round(packPlayer.current_ability / 2);
   const isGK = primaryCode === 'GK';
   const fifa = getFifaStats(packPlayer.source_id);
+  // When FIFA stats hit, FIFA overall (0-100) replaces the pack's CA (1-200).
+  const currentAbility = fifa ? Math.min(200, fifa.ov * 2) : packPlayer.current_ability;
+  const halfCa = Math.round(currentAbility / 2);
   const attributes: PlayerAttributes = fifa
     ? attributesFromFifa(fifa)
-    : synthesizeAttributes(packPlayer.current_ability, primaryCode, packPlayer.id);
+    : synthesizeAttributes(currentAbility, primaryCode, packPlayer.id);
   const stats: PlayerStats = fifa
     ? statsFromFifa(fifa, isGK)
     : statsFromAttributes(attributes, isGK);
@@ -82,8 +84,8 @@ export const runtimePlayerFromPack = (
     last_name: packPlayer.last_name,
     birth_date: packPlayer.birth_date,
     positions: packPlayer.positions,
-    current_ability: packPlayer.current_ability,
-    potential_ability: packPlayer.potential_ability,
+    current_ability: currentAbility,
+    potential_ability: Math.max(packPlayer.potential_ability, currentAbility),
     attributes,
     fifa_year: fifaYear,
     value: packPlayer.value,

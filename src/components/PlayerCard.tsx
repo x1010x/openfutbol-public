@@ -57,7 +57,12 @@ export const PlayerCard = ({ player, seasonYear, highlight, onNameClick, footer,
             <PlayerName player={player} useShirt className="text-[12px] truncate" />
           )}
         </div>
-        <span className="text-[8px] text-vga-cyan shrink-0">#{player.number}</span>
+        <div className="flex items-center gap-1 shrink-0">
+          {player.fifa_year != null && (
+            <span className="text-[7px] text-vga-light-green bg-vga-black border border-vga-light-green px-1">F{player.fifa_year}</span>
+          )}
+          <span className="text-[8px] text-vga-cyan">#{player.number}</span>
+        </div>
       </div>
 
       <div className="flex gap-2 mb-2">
