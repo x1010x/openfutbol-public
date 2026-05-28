@@ -74,6 +74,9 @@ export const PlayerDetailView = ({ player, teamName, history, seasonYear, onBack
 
   const ca = player.current_ability ?? Math.round((player.media ?? 50) * 2);
   const pa = player.potential_ability;
+  // UI scale 0-100 (CA/PA are stored on the 1-200 FM scale).
+  const caDisplay = Math.round(ca / 2);
+  const paDisplay = pa != null ? Math.round(pa / 2) : null;
 
   // Top 5 position competences for display
   const topPositions = [...(player.positions ?? [])].sort((a, b) => b.level - a.level).slice(0, 5);
@@ -112,8 +115,8 @@ export const PlayerDetailView = ({ player, teamName, history, seasonYear, onBack
           </div>
           <div className="bg-vga-black border border-vga-gray p-2">
             <div className="text-vga-cyan text-[7px] uppercase">CA</div>
-            <div className="text-vga-light-green text-[10px] font-bold">{ca}</div>
-            {pa != null && <div className="text-vga-cyan text-[7px]">PA {pa}</div>}
+            <div className="text-vga-light-green text-[10px] font-bold">{caDisplay}</div>
+            {paDisplay != null && <div className="text-vga-cyan text-[7px]">PA {paDisplay}</div>}
           </div>
           <div className="bg-vga-black border border-vga-gray p-2">
             <div className="text-vga-cyan text-[7px] uppercase">{t('label.value')}</div>
@@ -125,7 +128,7 @@ export const PlayerDetailView = ({ player, teamName, history, seasonYear, onBack
           <div className="flex flex-col items-center justify-center bg-vga-black vga-panel-inset px-3 py-2 min-w-[80px]">
             <PlayerPhoto sourceId={player.source_id} size="lg" className="mb-1" />
             <span className="text-[8px] text-vga-cyan">CA</span>
-            <span className="text-3xl text-vga-light-green leading-none">{ca}</span>
+            <span className="text-3xl text-vga-light-green leading-none">{caDisplay}</span>
           </div>
           <div className="flex-1 flex flex-col gap-1 justify-center min-w-[160px]">
             {topPositions.length > 0 ? topPositions.map(pos => (
@@ -236,7 +239,7 @@ export const PlayerDetailView = ({ player, teamName, history, seasonYear, onBack
               </thead>
               <tbody>
                 {sortedHistory.map((r, i) => {
-                  const caAtYear = caAtAge(ca, age, r.age);
+                  const caAtYear = Math.round(caAtAge(ca, age, r.age) / 2);
                   return (
                     <tr key={i} className={i % 2 === 0 ? 'bg-vga-black' : 'bg-vga-gray'}>
                       <td className={`px-1 py-1 ${i % 2 === 0 ? 'text-vga-yellow' : 'text-vga-blue'}`}>{r.year}</td>

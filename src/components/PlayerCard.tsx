@@ -76,8 +76,8 @@ export const PlayerCard = ({ player, seasonYear, highlight, onNameClick, footer,
         <div className="flex-1 flex flex-col gap-0.5">
           {player.current_ability != null ? (
             <>
-              <StatBar label="CA" value={player.current_ability} max={200} segments={8} size="sm" />
-              <StatBar label="PA" value={player.potential_ability ?? player.current_ability} max={200} segments={8} size="sm" />
+              <StatBar label="CA" value={Math.round(player.current_ability / 2)} max={100} segments={8} size="sm" />
+              <StatBar label="PA" value={Math.round((player.potential_ability ?? player.current_ability) / 2)} max={100} segments={8} size="sm" />
               {(player.positions ?? []).slice(0, 5).map(pos => (
                 <StatBar key={pos.code} label={pos.code} value={pos.level} max={20} segments={4} size="sm" />
               ))}
