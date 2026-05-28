@@ -1,40 +1,19 @@
-// Converts pcfurbo legacy DB into public/default.pack.json
-// Usage: node scripts/build-default-pack/index.js --source /path/to/pcfurbo
+// Builds public/default.pack.json from this repo's main branch DB.
+// Usage: node scripts/build-default-pack/index.js
 
-import * as fs from 'fs';
-import * as path from 'path';
-import * as crypto from 'crypto';
+import { execSync } from 'child_process';
+import { writeFileSync, mkdirSync } from 'fs';
+import { resolve } from 'path';
 
-// ─── Arg parsing ─────────────────────────────────────────────────────────────
-
-function parseArgs() {
-  const argv = process.argv.slice(2);
-  const get = (flag) => {
-    const i = argv.indexOf(flag);
-    return i !== -1 ? argv[i + 1] : undefined;
-  };
-  const source = get('--source');
-  if (!source) {
-    console.error('Usage: node scripts/build-default-pack/index.js --source <pcfurbo-root>');
-    process.exit(1);
-  }
-  return { source: path.resolve(source) };
+function gitShow(ref) {
+  return JSON.parse(execSync(`git show ${ref}`, { encoding: 'utf-8' }));
 }
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
-
-function readJson(filePath) {
-  return JSON.parse(fs.readFileSync(filePath, 'utf-8'));
-}
-
-// Deterministic hash to derive potential from UUID
 function deterministicExtra(uuid) {
   let h = 0;
   for (const c of uuid) h = ((h * 31) + c.charCodeAt(0)) | 0;
-  return Math.abs(h) % 16;
+  return Math.abs(h) % 31; // 0–30 PA bonus over CA
 }
-
-// ─── Position mapping ─────────────────────────────────────────────────────────
 
 const POS_MAP = {
   POR: [{ code: 'GK', level: 18 }],
@@ -45,191 +24,151 @@ const POS_MAP = {
   DEL: [{ code: 'FC', level: 18 }, { code: 'AMC', level: 9 }],
 };
 
-// ─── Main ─────────────────────────────────────────────────────────────────────
+const COUNTRY_NAMES = {
+  AR: 'Argentina', BE: 'Belgium', BR: 'Brazil', CZ: 'Czech Republic',
+  DE: 'Germany', ES: 'Spain', FR: 'France', GB: 'England',
+  IL: 'Israel', IT: 'Italy', NL: 'Netherlands', PL: 'Poland',
+  PT: 'Portugal', RU: 'Russia', SE: 'Sweden',
+};
 
 function main() {
-  const args = parseArgs();
-  const dbDir = path.join(args.source, 'src', 'data', 'db');
+  const DB = 'main:src/data/db';
 
-  // Support worktree path if main src/data/db doesn't exist
-  const worktreeDbDir = path.join(
-    args.source,
-    '.claude', 'worktrees', 'agent-aad48304b791b01e5', 'src', 'data', 'db'
-  );
-  const actualDbDir = fs.existsSync(dbDir) ? dbDir : (fs.existsSync(worktreeDbDir) ? worktreeDbDir : null);
-
-  if (!actualDbDir) {
-    console.error(`Error: DB directory not found at ${dbDir}`);
-    console.error(`Also tried: ${worktreeDbDir}`);
-    process.exit(1);
-  }
-
-  const teamsDir = path.join(actualDbDir, 'teams');
-  const playersFile = path.join(actualDbDir, 'players.json');
-  const freeAgentsFile = path.join(actualDbDir, 'free_agents.json');
-
-  if (!fs.existsSync(teamsDir)) { console.error(`Missing: ${teamsDir}`); process.exit(1); }
-  if (!fs.existsSync(playersFile)) { console.error(`Missing: ${playersFile}`); process.exit(1); }
-  if (!fs.existsSync(freeAgentsFile)) { console.error(`Missing: ${freeAgentsFile}`); process.exit(1); }
-
-  const allPlayersRaw = readJson(playersFile);
-  const freeAgentIds = new Set(readJson(freeAgentsFile));
+  const teamsRaw  = gitShow(`${DB}/teams/teams_test.json`);
+  const playersRaw = gitShow(`${DB}/players/players_2024.json`);
+  const freeAgentIds = new Set(gitShow(`${DB}/free_agents.json`));
+  const playerNames  = gitShow(`${DB}/names/player_names.json`);
+  const teamNames    = gitShow(`${DB}/names/team_names.json`);
+  const stadiumNames = gitShow(`${DB}/names/stadium_names.json`);
 
   // Index players by UUID
-  const playerMap = new Map();
-  for (const p of allPlayersRaw) playerMap.set(p.id, p);
+  const playerMap = new Map(playersRaw.map(p => [p.id, p]));
 
-  // Load all team files — each file is an array of season objects
-  const teamFiles = fs.readdirSync(teamsDir).filter(f => f.endsWith('.json'));
-  const allSeasons = [];
-  for (const file of teamFiles) {
-    const seasons = readJson(path.join(teamsDir, file));
-    allSeasons.push(...(Array.isArray(seasons) ? seasons : [seasons]));
-  }
-
-  // Pick latest year per team id (numeric id from original data)
-  const latestByTeamId = new Map();
-  for (const s of allSeasons) {
-    const existing = latestByTeamId.get(s.id);
-    if (!existing || s.year > existing.year) {
-      latestByTeamId.set(s.id, s);
-    }
-  }
-  const teams = Array.from(latestByTeamId.values());
-
-  // All teams are Spanish (pcfurbo only has Spanish teams)
-  const COUNTRY_CODE = 'esp';
-  const COUNTRY_NAME = 'España';
-
-  // ── Continent ───────────────────────────────────────────────────────────────
-  const continentId = crypto.randomUUID();
+  // ── Continent ────────────────────────────────────────────────────────────────
+  const continentId = '00000000-0000-0000-0000-000000000001';
   const continents = [{ id: continentId, source_id: 1, name: 'World' }];
 
-  // ── Country ─────────────────────────────────────────────────────────────────
-  const countryId = crypto.randomUUID();
-  const countries = [{
-    id: countryId,
-    source_id: 1,
-    code: COUNTRY_CODE,
-    slug: COUNTRY_CODE,
-    name: COUNTRY_NAME,
-    continent_id: continentId,
-    reputation: 80,
-  }];
-
-  // ── League ──────────────────────────────────────────────────────────────────
-  const leagueId = crypto.randomUUID();
-  const leagues = [{
-    id: leagueId,
-    source_id: 1,
-    country_id: countryId,
-    slug: 'esp-liga',
-    name: 'España Liga',
-    reputation: 90,
-    tier: 1,
-    promotion_spots: 0,
-    relegation_spots: 0,
-  }];
-
-  // ── Clubs — sorted by team UUID for stability ───────────────────────────────
-  // Teams use numeric IDs in legacy DB. Convert to stable string for sorting.
-  const sortedTeams = [...teams].sort((a, b) => String(a.id).localeCompare(String(b.id)));
-
-  const clubs = [];
-  const clubIdByTeamId = new Map(); // legacy team numeric id → pack Club UUID
-
-  for (let i = 0; i < sortedTeams.length; i++) {
-    const t = sortedTeams[i];
-    const clubUuid = crypto.randomUUID();
-    clubIdByTeamId.set(t.id, clubUuid);
-
-    let colors = null;
-    if (Array.isArray(t.colors) && t.colors.length >= 2) {
-      colors = { background: t.colors[0], foreground: t.colors[1] };
-    }
-
-    clubs.push({
-      id: clubUuid,
+  // ── Countries — one per unique country code ──────────────────────────────────
+  const countryCodes = [...new Set(teamsRaw.map(t => t.country))].sort();
+  const countryByCode = new Map();
+  const countries = countryCodes.map((code, i) => {
+    const id = `00000000-0000-0000-0001-${String(i + 1).padStart(12, '0')}`;
+    const entry = {
+      id,
       source_id: i + 1,
-      league_id: leagueId,
-      name: t.name,
+      code: code.toLowerCase(),
+      slug: code.toLowerCase(),
+      name: COUNTRY_NAMES[code] ?? code,
+      continent_id: continentId,
+      reputation: 80,
+    };
+    countryByCode.set(code, entry);
+    return entry;
+  });
+
+  // ── Leagues — one per country ────────────────────────────────────────────────
+  const leagueByCode = new Map();
+  const leagues = countries.map((country, i) => {
+    const id = `00000000-0000-0000-0002-${String(i + 1).padStart(12, '0')}`;
+    const entry = {
+      id,
+      source_id: i + 1,
+      country_id: country.id,
+      slug: `${country.code}-liga`,
+      name: `${country.name} Liga`,
+      reputation: 85,
+      tier: 1,
+      promotion_spots: 0,
+      relegation_spots: 0,
+    };
+    leagueByCode.set(country.code.toUpperCase(), entry);
+    return entry;
+  });
+
+  // ── Clubs — preserve original UUID, sorted for stable source_id ──────────────
+  const sortedTeams = [...teamsRaw].sort((a, b) => a.id.localeCompare(b.id));
+  const clubs = sortedTeams.map((t, i) => {
+    const season = t.seasons?.[t.seasons.length - 1] ?? {};
+    const colors = Array.isArray(season.colors) && season.colors.length >= 2
+      ? { background: season.colors[0], foreground: season.colors[1] }
+      : null;
+    const country = countryByCode.get(t.country);
+    const league  = leagueByCode.get(t.country);
+    return {
+      id: t.id, // preserve UUID — logos are named by this
+      source_id: i + 1,
+      league_id: league?.id ?? leagues[0].id,
+      country_id: country?.id ?? countries[0].id,
+      name: teamNames[t.id] ?? t.id,
+      stadium_name: stadiumNames[t.id] ?? null,
+      stadium_capacity: season.stadiumCapacity ?? null,
       colors,
       rivals_source_ids: [],
-    });
-  }
+    };
+  });
 
-  // ── Players ─────────────────────────────────────────────────────────────────
-  // Collect rostered player IDs and their club mapping
-  const rosteredPlayerClub = new Map(); // player UUID → club UUID
-  for (const t of sortedTeams) {
-    const clubUuid = clubIdByTeamId.get(t.id);
-    for (const entry of (t.players || [])) {
-      if (entry.player_id) rosteredPlayerClub.set(entry.player_id, clubUuid);
+  // ── Collect roster assignments ───────────────────────────────────────────────
+  const playerClub = new Map(); // player UUID → club UUID
+  for (const t of teamsRaw) {
+    const season = t.seasons?.[t.seasons.length - 1] ?? {};
+    for (const entry of (season.players ?? [])) {
+      if (entry.player_id) playerClub.set(entry.player_id, t.id);
     }
   }
 
-  // Eligible: rostered OR free agent
-  const eligiblePlayerIds = new Set([
-    ...rosteredPlayerClub.keys(),
-    ...freeAgentIds,
-  ]);
-
-  // Sort by UUID for stable source_id assignment
-  const eligibleSorted = [...eligiblePlayerIds].sort();
+  // ── Players — preserve UUID + name, random CA/PA ─────────────────────────────
+  const eligibleIds = new Set([...playerClub.keys(), ...freeAgentIds]);
+  const sortedIds = [...eligibleIds].sort();
+  const contractExpiry = `${new Date().getFullYear() + 3}-06-30`;
 
   const players = [];
-  const contractExpiration = `${new Date().getFullYear() + 3}-06-30`;
+  for (let i = 0; i < sortedIds.length; i++) {
+    const uuid = sortedIds[i];
+    const db = playerMap.get(uuid);
+    if (!db) continue;
 
-  for (let i = 0; i < eligibleSorted.length; i++) {
-    const uuid = eligibleSorted[i];
-    const dbPlayer = playerMap.get(uuid);
-    if (!dbPlayer) continue; // not in DB — skip
+    const nameEntry = playerNames[uuid];
+    const fullName  = nameEntry?.f ?? uuid;
+    const shirtName = nameEntry?.s ?? fullName;
+    const lastSpace = fullName.lastIndexOf(' ');
+    const firstName = lastSpace > 0 ? fullName.slice(0, lastSpace) : fullName;
 
-    const pos = dbPlayer.preferred_pos;
-    const posStats = dbPlayer.positions?.[pos];
-
+    const pos = db.preferred_pos ?? 'MED';
+    const posStats = db.positions?.[pos];
     let ca = 100;
     if (posStats) {
       const { speed, dribbling, passing, shooting, defending, physical } = posStats;
-      const avg = (speed + dribbling + passing + shooting + defending + physical) / 6;
-      ca = Math.round(avg * 2);
+      ca = Math.round((speed + dribbling + passing + shooting + defending + physical) / 6 * 2);
+      ca = Math.max(1, Math.min(200, ca));
     }
-    ca = Math.max(1, Math.min(200, ca));
+    const pa = Math.min(200, ca + deterministicExtra(uuid));
 
-    const extra = deterministicExtra(uuid);
-    const pa = Math.min(200, ca + extra);
-
-    const fullName = dbPlayer.full_name || dbPlayer.shirt_name || '';
-    const shirtName = dbPlayer.shirt_name || fullName;
-    const lastSpace = fullName.lastIndexOf(' ');
-    const firstName = lastSpace > 0 ? fullName.slice(0, lastSpace) : shirtName;
-    const lastName = shirtName;
-
-    const clubUuid = rosteredPlayerClub.get(uuid) ?? null;
+    const clubId = playerClub.get(uuid) ?? null;
+    const club = clubs.find(c => c.id === clubId);
+    const countryId = club?.country_id ?? countries[0].id;
 
     players.push({
-      id: crypto.randomUUID(),
+      id: uuid, // preserve UUID — photos are named by this
       source_id: i + 1,
-      club_id: clubUuid,
+      club_id: clubId,
       country_id: countryId,
       first_name: firstName,
-      last_name: lastName,
-      birth_date: `${dbPlayer.birth_year}-01-01`,
-      positions: POS_MAP[pos] || [{ code: 'MC', level: 10 }],
+      last_name: shirtName,
+      birth_date: `${db.birth_year}-01-01`,
+      positions: POS_MAP[pos] ?? [{ code: 'MC', level: 10 }],
       current_ability: ca,
       potential_ability: pa,
       value: Math.round(Math.pow(ca, 3) * 5),
-      contract: { salary: ca * 1000, expiration: contractExpiration },
+      contract: { salary: ca * 1000, expiration: contractExpiry },
     });
   }
 
-  // ── Build pack ───────────────────────────────────────────────────────────────
+  // ── Write ─────────────────────────────────────────────────────────────────────
   const pack = {
     meta: {
       name: 'OpenFutbol Default Pack',
       version: '1.0.0',
-      source_url: 'https://github.com/x1010x/pcfurbo',
-      source_commit: null,
+      source_url: null,
       imported_at: new Date().toISOString(),
       schema_version: 1,
     },
@@ -240,20 +179,18 @@ function main() {
     players,
   };
 
-  const outPath = path.resolve('public/default.pack.json');
+  const outPath = resolve('public/default.pack.json');
   const output = JSON.stringify(pack, null, 2);
-  fs.mkdirSync(path.dirname(outPath), { recursive: true });
-  fs.writeFileSync(outPath, output, 'utf-8');
+  mkdirSync('public', { recursive: true });
+  writeFileSync(outPath, output, 'utf-8');
 
-  const sizeKb = (Buffer.byteLength(output, 'utf-8') / 1024).toFixed(1);
-  const sizeMb = (Buffer.byteLength(output, 'utf-8') / 1024 / 1024).toFixed(2);
-
+  const kb = (Buffer.byteLength(output) / 1024).toFixed(1);
   console.log(`continents: ${continents.length}`);
   console.log(`countries:  ${countries.length}`);
   console.log(`leagues:    ${leagues.length}`);
   console.log(`clubs:      ${clubs.length}`);
   console.log(`players:    ${players.length}`);
-  console.log(`-> wrote ${outPath} (${sizeKb} KB / ${sizeMb} MB)`);
+  console.log(`-> ${outPath} (${kb} KB)`);
 }
 
 main();
