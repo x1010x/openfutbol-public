@@ -15,6 +15,17 @@ const statsFromFifa = (e: FifaEntry, isGK: boolean): PlayerStats => ({
 
 const avg = (...vals: number[]) => vals.reduce((s, v) => s + v, 0) / vals.length;
 
+const joinPlayerName = (first: string, last: string): string => {
+  const f = first.trim();
+  const l = last.trim();
+  if (!f) return l;
+  if (!l) return f;
+  if (f === l) return f;
+  if (l.startsWith(f + ' ')) return l;
+  if (f.startsWith(l + ' ')) return f;
+  return `${f} ${l}`;
+};
+
 // Map FM 1-20 attribute groups into the legacy 0-100 PlayerStats. Five-times the
 // attribute average lands the result on the same 0-100 scale the engine expects.
 const statsFromAttributes = (a: PlayerAttributes, isGK: boolean): PlayerStats => {
@@ -99,8 +110,8 @@ export const runtimePlayerFromPack = (
       appearances: 0, minutes: 0, ratingSum: 0,
       cleanSheets: 0, goalsAgainst: 0,
     },
-    name: packPlayer.first_name === packPlayer.last_name ? packPlayer.first_name : `${packPlayer.first_name} ${packPlayer.last_name}`,
-    fullName: packPlayer.first_name === packPlayer.last_name ? packPlayer.first_name : `${packPlayer.first_name} ${packPlayer.last_name}`,
+    name: joinPlayerName(packPlayer.first_name, packPlayer.last_name),
+    fullName: joinPlayerName(packPlayer.first_name, packPlayer.last_name),
     birthYear: parseInt(packPlayer.birth_date.slice(0, 4), 10),
     peakAge: 28,
     position: primaryLegacy,
