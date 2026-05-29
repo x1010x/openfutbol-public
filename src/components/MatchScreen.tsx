@@ -78,13 +78,13 @@ const MINI_LAYOUTS: Record<FormationId, [number, number][]> = {
 
 function eventIcon(type: string): string {
   switch (type) {
-    case 'goal': return '*';
+    case 'goal': return '⚽';
     case 'yellow': return '■';
     case 'red': return '■';
-    case 'sub': return '<>';
+    case 'sub': return '⇄';
     case 'injury': return '+';
     case 'shot': return '·';
-    default: return '>';
+    default: return '›';
   }
 }
 
@@ -187,7 +187,7 @@ function MiniPitch({ match, userTeamId, onPlayerClick }: { match: MatchState; us
         const handle = () => { if (clickable && p) onPlayerClick!(p.id); };
         return (
           <g key={`h${i}`} onClick={clickable ? handle : undefined} style={clickable ? { cursor: 'pointer' } : undefined}>
-            <circle cx={cx} cy={cy} r={3.6} fill={fill} stroke="#000" strokeWidth={0.4} />
+            <rect x={cx - 3.2} y={cy - 3.2} width={6.4} height={6.4} fill={fill} stroke="#000" strokeWidth={0.4} shapeRendering="crispEdges" />
             {viv != null && (
               <text x={cx} y={cy + 1.1} textAnchor="middle" fill="#000" fontSize={2.6} fontFamily="monospace" fontWeight={700}>
                 {viv}
@@ -214,7 +214,7 @@ function MiniPitch({ match, userTeamId, onPlayerClick }: { match: MatchState; us
         const handle = () => { if (clickable && p) onPlayerClick!(p.id); };
         return (
           <g key={`a${i}`} onClick={clickable ? handle : undefined} style={clickable ? { cursor: 'pointer' } : undefined}>
-            <circle cx={cx} cy={cy} r={3.6} fill={fill} stroke="#000" strokeWidth={0.4} />
+            <rect x={cx - 3.2} y={cy - 3.2} width={6.4} height={6.4} fill={fill} stroke="#000" strokeWidth={0.4} shapeRendering="crispEdges" />
             {viv != null && (
               <text x={cx} y={cy + 1.1} textAnchor="middle" fill="#000" fontSize={2.6} fontFamily="monospace" fontWeight={700}>
                 {viv}
@@ -445,7 +445,7 @@ export default function MatchScreen({
                 return (
                   <div key={i} className="flex items-center gap-2 py-0.5">
                     <span className="text-vga-yellow font-mono w-7">{g.minute}'</span>
-                    <span className="inline-block w-2 h-2 bg-vga-bright-white border border-black align-middle" title="Gol" />
+                    <span className="text-vga-light-green">{'⚽'}</span>
                     <span className="text-vga-bright-white truncate flex-1">{shirtName(scorer)}</span>
                     <span className={`${tagCol} text-[7px]`}>({tag})</span>
                   </div>
