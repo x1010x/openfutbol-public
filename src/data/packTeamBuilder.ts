@@ -36,7 +36,10 @@ export const getPackTemplates = (pack: Pack): PackTeamTemplate[] => {
 
 export const buildTeamFromPackClub = (club: Club, pack: Pack, year: number): Team => {
   const clubPlayers = pack.players.filter(p => p.club_id === club.id);
-  const players: Player[] = clubPlayers.map((p, i) => runtimePlayerFromPack(p, i + 1));
+  const countryById = new Map(pack.countries.map(c => [c.id, c.code?.toUpperCase()]));
+  const players: Player[] = clubPlayers.map((p, i) =>
+    runtimePlayerFromPack(p, i + 1, p.country_id ? countryById.get(p.country_id) : undefined)
+  );
 
   const eligible = players.filter(p => p.allowedPositions.length > 0);
   const { formation, lineup } = pickBestFormation(eligible);

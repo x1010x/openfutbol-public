@@ -61,6 +61,7 @@ const NEW_CODE_TO_LEGACY: Record<PositionCode, Position> = {
 export const runtimePlayerFromPack = (
   packPlayer: PackPlayer,
   number: number,
+  countryCode?: string,
 ): Player => {
   const sorted = [...packPlayer.positions].sort((a, b) => b.level - a.level);
   const primaryEntry: PlayerPositionEntry | undefined = sorted[0];
@@ -91,6 +92,7 @@ export const runtimePlayerFromPack = (
     source_id: packPlayer.source_id,
     club_id: packPlayer.club_id,
     country_id: packPlayer.country_id,
+    country_code: countryCode,
     first_name: packPlayer.first_name,
     last_name: packPlayer.last_name,
     birth_date: packPlayer.birth_date,

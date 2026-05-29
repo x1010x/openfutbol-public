@@ -159,6 +159,7 @@ export interface Player {
   source_id?: number;
   club_id?: string | null;
   country_id?: string;
+  country_code?: string;          // uppercase ISO-ish code (ES, GB, BR…)
   first_name?: string;
   last_name?: string;
   birth_date?: string;            // ISO YYYY-MM-DD
