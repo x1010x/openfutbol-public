@@ -242,13 +242,9 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
   const [muted, setMuted] = useState<boolean>(() => localStorage.getItem('openfutbol_muted') === '1');
   const toggleMute = () => setMuted(m => { localStorage.setItem('openfutbol_muted', m ? '0' : '1'); return !m; });
 
-  const [theme, setThemeState] = useState<'retrocutre' | 'retrocool'>(() =>
+  const [theme] = useState<'retrocutre' | 'retrocool'>(() =>
     (localStorage.getItem('openfutbol_theme') as 'retrocutre' | 'retrocool') ?? 'retrocool'
   );
-  const setTheme = (t: 'retrocutre' | 'retrocool') => {
-    localStorage.setItem('openfutbol_theme', t);
-    setThemeState(t);
-  };
   useEffect(() => {
     if (theme === 'retrocool') {
       document.body.dataset.theme = 'retrocool';
@@ -2547,14 +2543,6 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
               className={`text-[7px] font-bold px-1.5 py-0.5 border ${muted ? 'border-vga-gray text-vga-gray hover:text-vga-bright-white hover:border-vga-bright-white' : theme === 'retrocool' ? 'border-rc-accent text-rc-accent hover:text-white hover:border-white' : 'border-vga-light-green text-vga-light-green hover:border-vga-bright-white hover:text-vga-bright-white'}`}
             >
               {muted ? 'SFX:OFF' : 'SFX:ON'}
-            </button>
-            <button
-              type="button"
-              onClick={() => setTheme(theme === 'retrocool' ? 'retrocutre' : 'retrocool')}
-              title="Cambiar tema visual"
-              className={`text-[7px] font-bold px-1.5 py-0.5 border ${theme === 'retrocool' ? 'border-rc-hot text-rc-hot hover:text-white hover:border-white' : 'border-vga-gray text-vga-gray hover:text-vga-bright-white hover:border-vga-bright-white'}`}
-            >
-              {theme === 'retrocool' ? 'RETROCOOL' : 'RETROCUTRE'}
             </button>
             <div className="flex items-center gap-1">
               {getSupportedLangs().map(lang => (
