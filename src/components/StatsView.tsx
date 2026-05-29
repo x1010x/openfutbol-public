@@ -60,6 +60,11 @@ export const StatsView = ({ teams, onPlayerClick, onBack }: Props) => {
   const t = useT();
   const allPlayers: EnrichedPlayer[] = teams.flatMap(team => team.players.map(p => ({ ...p, teamName: team.name, teamId: team.id })));
   const withApps = allPlayers.filter(p => p.seasonStats.appearances > 0);
+  // Scale the "regular" threshold to the season's progress: the most-used
+  // player gives us an upper bound on matches played, so a regular needs at
+  // least ~40% of that, with a floor of 5 to filter out 1-game wonders.
+  const maxAppsAny = withApps.reduce((m, p) => Math.max(m, p.seasonStats.appearances), 0);
+  const minAppsRegular = Math.max(5, Math.floor(maxAppsAny * 0.4));
 
   const goalsRanked = [...allPlayers].filter(p => p.seasonStats.goals > 0).sort((a, b) => b.seasonStats.goals - a.seasonStats.goals);
   const assistsRanked = [...allPlayers].filter(p => p.seasonStats.assists > 0).sort((a, b) => b.seasonStats.assists - a.seasonStats.assists);
@@ -68,7 +73,7 @@ export const StatsView = ({ teams, onPlayerClick, onBack }: Props) => {
     .sort((a, b) => (b.seasonStats.redCards * 5 + b.seasonStats.yellowCards) - (a.seasonStats.redCards * 5 + a.seasonStats.yellowCards));
 
   const ratingRanked = [...withApps]
-    .filter(p => p.seasonStats.appearances >= 3)
+    .filter(p => p.seasonStats.appearances >= minAppsRegular)
     .sort((a, b) => (b.seasonStats.ratingSum / b.seasonStats.appearances) - (a.seasonStats.ratingSum / a.seasonStats.appearances));
 
   const minutesRanked = [...withApps].sort((a, b) => b.seasonStats.minutes - a.seasonStats.minutes);

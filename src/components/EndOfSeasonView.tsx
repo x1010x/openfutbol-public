@@ -90,17 +90,23 @@ export const EndOfSeasonView = ({ league, onContinueSameTeam, onAdvanceAndChange
     team.players.map(p => ({ ...p, teamName: team.name, teamId: team.id }))
   );
   const withApps = allPlayers.filter(p => p.seasonStats.appearances > 0);
+  // Minimum appearances required to qualify for rate-based / "regular" awards.
+  // 50% of a team's played matches, with a floor of 5 so it never drops to
+  // "1 game with a 9.0 rating wins MVP".
+  const perTeamMatches = Math.max(...Object.values(stats).map(s => s.played), 0);
+  const minAppsRegular = Math.max(5, Math.floor(perTeamMatches * 0.5));
 
   // ── Hero awards ──────────────────────────────────────────────────────────
   const pichichi = [...allPlayers].sort((a, b) => b.seasonStats.goals - a.seasonStats.goals)[0];
   const topAssister = [...allPlayers].sort((a, b) => b.seasonStats.assists - a.seasonStats.assists)[0];
 
-  const eligibleGks = allPlayers.filter(p => p.position === 'POR' && p.seasonStats.appearances >= 3);
+  const eligibleGks = allPlayers.filter(p => p.position === 'POR' && p.seasonStats.appearances >= minAppsRegular);
   const zamora = [...eligibleGks].sort((a, b) =>
     (a.seasonStats.goalsAgainst / a.seasonStats.appearances) - (b.seasonStats.goalsAgainst / b.seasonStats.appearances)
   )[0];
 
-  const mvp = [...withApps].sort((a, b) =>
+  const mvpPool = withApps.filter(p => p.seasonStats.appearances >= minAppsRegular);
+  const mvp = [...mvpPool].sort((a, b) =>
     (b.seasonStats.ratingSum / Math.max(1, b.seasonStats.appearances)) -
     (a.seasonStats.ratingSum / Math.max(1, a.seasonStats.appearances))
   )[0];
@@ -165,14 +171,14 @@ export const EndOfSeasonView = ({ league, onContinueSameTeam, onAdvanceAndChange
   const scorers = allPlayers.filter(p => p.seasonStats.goals > 0);
   const youngestScorer = [...scorers].sort((a, b) => playerAge(a, year) - playerAge(b, year))[0];
   const oldestScorer = [...scorers].sort((a, b) => playerAge(b, year) - playerAge(a, year))[0];
-  const youngestRegular = [...withApps].filter(p => p.seasonStats.appearances >= 3).sort((a, b) => playerAge(a, year) - playerAge(b, year))[0];
-  const oldestActive = [...withApps].sort((a, b) => playerAge(b, year) - playerAge(a, year))[0];
+  const youngestRegular = [...withApps].filter(p => p.seasonStats.appearances >= minAppsRegular).sort((a, b) => playerAge(a, year) - playerAge(b, year))[0];
+  const oldestActive = [...withApps].filter(p => p.seasonStats.appearances >= minAppsRegular).sort((a, b) => playerAge(b, year) - playerAge(a, year))[0];
 
   const mostYellows = [...allPlayers].sort((a, b) => b.seasonStats.yellowCards - a.seasonStats.yellowCards)[0];
   const mostReds = [...allPlayers].sort((a, b) => b.seasonStats.redCards - a.seasonStats.redCards)[0];
 
   const phantom = [...withApps]
-    .filter(p => p.seasonStats.goals === 0 && p.seasonStats.assists === 0 && p.position !== 'POR')
+    .filter(p => p.seasonStats.appearances >= minAppsRegular && p.seasonStats.goals === 0 && p.seasonStats.assists === 0 && p.position !== 'POR')
     .sort((a, b) => b.seasonStats.appearances - a.seasonStats.appearances)[0];
 
   const teamCards = teams.map(team => ({
