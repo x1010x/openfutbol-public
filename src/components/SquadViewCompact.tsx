@@ -29,7 +29,7 @@ interface Props {
 }
 
 type FilterKey = 'ALL' | 'POR' | 'DEF' | 'MED' | 'EXT' | 'DEL';
-type SortKey = 'pos' | 'ovr' | 'age' | 'value' | 'salary' | 'name';
+type SortKey = 'pos' | 'ovr' | 'age' | 'value' | 'salary' | 'name' | 'goals' | 'assists' | 'minutes' | 'apps';
 
 const FILTERS: { key: FilterKey; label: string; positions: Position[] }[] = [
   { key: 'ALL', label: 'TODO', positions: [] },
@@ -147,6 +147,10 @@ export const SquadViewCompact = ({
         case 'age':    return ageFromBirthYear(a.birthYear, seasonYear) - ageFromBirthYear(b.birthYear, seasonYear);
         case 'value':  return computePrice(b, seasonYear) - computePrice(a, seasonYear);
         case 'salary': return (b.contract?.salary ?? 0) - (a.contract?.salary ?? 0);
+        case 'apps':   return b.seasonStats.appearances - a.seasonStats.appearances;
+        case 'goals':  return b.seasonStats.goals - a.seasonStats.goals;
+        case 'assists':return b.seasonStats.assists - a.seasonStats.assists;
+        case 'minutes':return b.seasonStats.minutes - a.seasonStats.minutes;
         case 'name':   return (a.name ?? '').localeCompare(b.name ?? '');
         case 'pos':
         default: {
@@ -238,6 +242,10 @@ export const SquadViewCompact = ({
           <option value="pos">Posición</option>
           <option value="ovr">OVR</option>
           <option value="age">Edad</option>
+          <option value="apps">PG</option>
+          <option value="goals">Goles</option>
+          <option value="assists">Asistencias</option>
+          <option value="minutes">Minutos</option>
           <option value="value">Valor</option>
           <option value="salary">Sueldo</option>
           <option value="name">Nombre</option>
@@ -248,7 +256,7 @@ export const SquadViewCompact = ({
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-2 items-stretch">
         {/* Compact table */}
         <div className="border border-vga-blue bg-vga-black flex flex-col min-h-0">
-          <div className="grid grid-cols-[1.8rem_1.5rem_minmax(8rem,1.6fr)_2.4rem_2rem_2.4rem_2.4rem_1.8rem_minmax(5rem,1fr)_minmax(4.5rem,1fr)_minmax(5rem,1fr)] gap-x-3 px-3 py-1.5 border-b border-vga-blue text-[7px] uppercase tracking-widest text-vga-magenta">
+          <div className="grid grid-cols-[1.8rem_1.5rem_minmax(7rem,1.5fr)_2.4rem_2rem_2.4rem_2.4rem_1.8rem_2rem_1.8rem_1.8rem_2.8rem_minmax(5rem,1fr)] gap-x-3 px-3 py-1.5 border-b border-vga-blue text-[7px] uppercase tracking-widest text-vga-magenta">
             <span>#</span>
             <span />
             <span>Jugador</span>
@@ -257,8 +265,10 @@ export const SquadViewCompact = ({
             <span className="text-right">Ovr</span>
             <span className="text-center">Forma</span>
             <span className="text-center">Mor</span>
-            <span className="text-right">Valor</span>
-            <span className="text-right">Sueldo</span>
+            <span className="text-right">PG</span>
+            <span className="text-right">G</span>
+            <span className="text-right">A</span>
+            <span className="text-right">Min</span>
             <span className="text-right">Estado</span>
           </div>
           <div className="flex-1 overflow-y-auto min-h-0">
@@ -271,8 +281,10 @@ export const SquadViewCompact = ({
               const age = ageFromBirthYear(p.birthYear, seasonYear);
               const form = formIndicator(p.stamina ?? 99);
               const mood = moodStateOf(p, inLineup);
-              const value = computePrice(p, seasonYear);
-              const salary = p.contract?.salary ?? 0;
+              const apps = p.seasonStats.appearances;
+              const goals = p.seasonStats.goals;
+              const assists = p.seasonStats.assists;
+              const minutes = p.seasonStats.minutes;
               const status = statusOf(p, inLineup, !!p.forSale);
               const isSelected = p.id === selectedId;
               return (
@@ -281,7 +293,7 @@ export const SquadViewCompact = ({
                   type="button"
                   onClick={() => setSelectedId(p.id)}
                   onDoubleClick={() => onPlayerClick?.(p.id)}
-                  className={`w-full grid grid-cols-[1.8rem_1.5rem_minmax(8rem,1.6fr)_2.4rem_2rem_2.4rem_2.4rem_1.8rem_minmax(5rem,1fr)_minmax(4.5rem,1fr)_minmax(5rem,1fr)] gap-x-3 px-3 py-1 text-[8px] items-center text-left border-b border-vga-blue/40 last:border-b-0 ${
+                  className={`w-full grid grid-cols-[1.8rem_1.5rem_minmax(7rem,1.5fr)_2.4rem_2rem_2.4rem_2.4rem_1.8rem_2rem_1.8rem_1.8rem_2.8rem_minmax(5rem,1fr)] gap-x-3 px-3 py-1 text-[8px] items-center text-left border-b border-vga-blue/40 last:border-b-0 ${
                     isSelected ? 'bg-vga-blue/30 border-l-2 border-l-vga-yellow' : 'hover:bg-vga-blue/20'
                   }`}
                 >
@@ -303,8 +315,10 @@ export const SquadViewCompact = ({
                   <span className={`text-right font-bold font-mono ${ovr >= 85 ? 'text-vga-light-green' : ovr >= 75 ? 'text-vga-yellow' : 'text-vga-gray'}`}>{ovr}</span>
                   <span className={`text-center font-mono ${form.color}`}>{form.glyph}</span>
                   <span className={`text-center font-mono ${MOOD_COLOR[mood]}`}>{MOOD_FACE[mood]}</span>
-                  <span className="text-right font-mono text-vga-cyan">{formatEuros(value)}</span>
-                  <span className="text-right font-mono text-vga-gray">{formatEuros(salary)}</span>
+                  <span className={`text-right font-mono tabular-nums ${apps > 0 ? 'text-vga-bright-white' : 'text-vga-gray'}`}>{apps}</span>
+                  <span className={`text-right font-mono tabular-nums ${goals > 0 ? 'text-vga-light-green' : 'text-vga-gray'}`}>{goals}</span>
+                  <span className={`text-right font-mono tabular-nums ${assists > 0 ? 'text-vga-light-cyan' : 'text-vga-gray'}`}>{assists}</span>
+                  <span className={`text-right font-mono tabular-nums ${minutes > 0 ? 'text-vga-bright-white' : 'text-vga-gray'}`}>{minutes}</span>
                   <span className={`text-right uppercase ${status.color}`}>{status.label}</span>
                 </button>
               );
