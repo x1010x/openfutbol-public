@@ -316,8 +316,11 @@ export default function MatchScreen({
   const canSub = userSubsUsed < 3 && !match.isFinished;
 
   const stadium = match.homeTeam.stadiumName || '—';
+  const capacity = match.homeTeam.stadiumCapacity ?? 0;
+  const attendance = match.attendance;
   const dateStr = formatJornadaDate(year, currentJornada);
   const cashStr = budget.toLocaleString('es-ES');
+  const fmtNum = (n: number) => n.toLocaleString('es-ES');
 
   const StatBar = ({ label, h, a }: { label: string; h: number; a: number }) => {
     const total = h + a;
@@ -342,7 +345,7 @@ export default function MatchScreen({
     <div className="w-full border-2 border-vga-blue bg-vga-black p-2 vga-panel" style={{ maxWidth: `${engineSettings.matchScreenMaxWidthPx}px`, marginLeft: 'auto', marginRight: 'auto' }}>
       {/* Top HUD */}
       <div className="flex items-center justify-between border border-vga-blue bg-vga-black px-3 py-1 text-[8px] uppercase">
-        <div className="flex items-center gap-3 text-vga-cyan">
+        <div className="flex items-center gap-3 text-vga-cyan flex-wrap">
           <span className="text-vga-yellow">[*]</span>
           <span className="text-vga-bright-white">Liga {year}/{(year + 1) % 100}</span>
           <span className="text-vga-magenta">|</span>
@@ -350,7 +353,22 @@ export default function MatchScreen({
           <span className="text-vga-magenta">|</span>
           <span>{dateStr}</span>
           <span className="text-vga-magenta">|</span>
-          <span className="truncate max-w-[16ch]" title={stadium}>{stadium}</span>
+          <span className="truncate max-w-[20ch]" title={stadium}>{stadium}</span>
+          {capacity > 0 && (
+            <>
+              <span className="text-vga-magenta">|</span>
+              {attendance ? (
+                <span className="tabular-nums">
+                  <span className="text-vga-light-green font-bold">{fmtNum(attendance.count)}</span>
+                  <span className="text-vga-gray"> / </span>
+                  <span className="text-vga-bright-white">{fmtNum(capacity)}</span>
+                  <span className="text-vga-yellow font-bold ml-1">({Math.round(attendance.fillPct * 100)}%)</span>
+                </span>
+              ) : (
+                <span className="tabular-nums text-vga-gray">aforo {fmtNum(capacity)}</span>
+              )}
+            </>
+          )}
         </div>
         <div className="flex items-center gap-2">
           <span className="text-vga-cyan">CAJA</span>

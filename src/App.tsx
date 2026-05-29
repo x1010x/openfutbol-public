@@ -48,7 +48,7 @@ import { FantasyDraftView } from './components/FantasyDraftView';
 import type { StatKey } from './components/StatDrillDown';
 import { extractDbId } from './data/mockTeams';
 import { startAmbiance, stopAmbiance, fadeOutAmbiance, setAmbianceMuted, playGoalSignal, playGoalWithCelebration, playMissed, playWhistle, playWhistleEnd } from './sfx';
-import { computePrice, evaluateOffer, formatEuros, computeClausulazoPrice } from './data/economy';
+import { computePrice, evaluateOffer, formatEuros, computeClausulazoPrice, computeAttendance } from './data/economy';
 import { PlayerTooltipProvider } from './contexts/PlayerTooltipContext';
 import { formatJornadaDate } from './engine/calendar';
 import type { OfferResult } from './data/economy';
@@ -1059,6 +1059,7 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
       awayStartingLineup: [...awayTeam.lineup],
       stoppageTime1: 0,
       stoppageTime2: 0,
+      attendance: computeAttendance(homeTeam, awayTeam),
     };
 
     setHtPaused(false);

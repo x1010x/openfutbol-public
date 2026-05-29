@@ -260,4 +260,9 @@ export interface MatchState {
   awayStartingLineup: string[];
   stoppageTime1: number;
   stoppageTime2: number;
+  attendance?: {
+    count: number;
+    capacity: number;
+    fillPct: number;
+  };
 }
