@@ -719,11 +719,15 @@ export const deductWeeklySalaries = (state: LeagueState): LeagueState => {
 
 // Re-elige formación y alineación óptimas para todos los equipos AI tras cambios de plantilla.
 // El equipo del usuario se mantiene tal cual (lo gestiona él).
+// We deliberately pass `disciplined: false` so the AI considers every formation and every
+// player×slot combination — the OOP penalty is already baked into the selection score via
+// positionLevelFactor, so an off-position player is only chosen when their penalised ability
+// still beats the native alternative. The result is the lineup with the highest combined
+// match strength, which is what the user expects from a "best possible MED" rotation.
 export const repickAiFormations = (state: LeagueState): LeagueState => {
   const newTeams = state.teams.map(team => {
     if (team.id === state.userTeamId) return team;
-    const disc = team.tacticalDiscipline ?? true;
-    const { formation, lineup } = pickBestFormation(team.players, new Set(), disc);
+    const { formation, lineup } = pickBestFormation(team.players, new Set(), false);
     return { ...team, formation, lineup };
   });
   return { ...state, teams: newTeams };

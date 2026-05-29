@@ -31,6 +31,8 @@ const BAND_SIZE = 5;
 const BAND_THRESHOLDS = [170, 160, 150, 140, 130, 0]; // CA bands (last = catch-all)
 
 const playerCa = (p: Player): number => p.current_ability ?? Math.round((p.media ?? 50) * 2);
+// 0-100 OVR (Media scale) — derived from the 1-200 CA so it lines up with the rest of the UI.
+const playerOvr = (p: Player): number => Math.round(playerCa(p) / 2);
 
 // Deterministic shuffle so the same jornada always shows the same rotation.
 const seededShuffle = <T,>(arr: T[], seed: number): T[] => {
@@ -457,7 +459,7 @@ export const TransfersView = ({
                           {isChollo && <span className="ml-1 text-[7px] text-vga-light-green border border-vga-light-green px-0.5">CHOLLO</span>}
                         </td>
                         <td className="text-right text-vga-gray">{playerAge(p, seasonYear)}</td>
-                        <td className="text-right text-vga-light-green font-bold">{playerCa(p)}</td>
+                        <td className="text-right text-vga-light-green font-bold">{playerOvr(p)}</td>
                         <td className="text-right text-vga-cyan text-[8px]">{p.seasonStats.goals}/{p.seasonStats.assists}</td>
                         <td className="pl-2 truncate max-w-[140px] text-vga-cyan">{e.teamName}</td>
                         <td className="text-right pr-2 text-vga-light-green font-bold">{formatEuros(price)}</td>
@@ -496,7 +498,7 @@ export const TransfersView = ({
                     </div>
                   </div>
                   <div className="text-[9px] grid grid-cols-2 gap-y-0.5">
-                    <span className="text-vga-gray">OVR</span><span className="text-vga-light-green font-bold text-right">{playerCa(p)}</span>
+                    <span className="text-vga-gray">OVR</span><span className="text-vga-light-green font-bold text-right">{playerOvr(p)}</span>
                     <span className="text-vga-gray">Edad</span><span className="text-right">{playerAge(p, seasonYear)}</span>
                     <span className="text-vga-gray">Posición</span><span className="text-vga-magenta text-right">{p.position}</span>
                     <span className="text-vga-gray">Club</span><span className="text-vga-cyan text-right truncate">{selected.teamName}</span>
