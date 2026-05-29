@@ -54,7 +54,7 @@ const byPosThenLive = (slotPos: Position) => (a: Player, b: Player) => {
 
 const Divider = ({ label, color, bg, border }: { label: string; color: string; bg: string; border: string }) => (
   <tr>
-    <td colSpan={6} style={{ background: bg, borderTop: `1px solid ${border}`, borderBottom: `1px solid ${border}`, padding: '1px 4px', fontSize: 5, color, textAlign: 'center', textTransform: 'uppercase', letterSpacing: 2 }}>
+    <td colSpan={6} style={{ background: bg, borderTop: `1px solid ${border}`, borderBottom: `1px solid ${border}`, padding: '1px 4px', fontSize: 9, color, textAlign: 'center', textTransform: 'uppercase', letterSpacing: 2 }}>
       ─── {label} ───
     </td>
   </tr>
@@ -82,8 +82,8 @@ const PickerRows = ({
     const isCurrent = p.id === currentSlotPlayerId;
     const oopFlag = isOOP(p, slotPos);
     const stam = p.stamina ?? 99;
-    const pLive = liveMed(p, stam, slotPos);
-    const effMed = Math.round(effectiveMedia(p, slotPos));
+    const pLive = Math.round(liveMed(p, stam, slotPos) / 2);
+    const effMed = Math.round(effectiveMedia(p, slotPos) / 2);
     const baseBg = isCurrent ? 'rgba(255,255,85,0.12)' : isTitular ? 'rgba(0,0,170,0.35)' : 'transparent';
     return (
       <tr
@@ -93,20 +93,20 @@ const PickerRows = ({
         onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(85,85,255,0.22)'; }}
         onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = baseBg; }}
       >
-        <td style={{ width: 14, textAlign: 'center', paddingLeft: 2, paddingRight: 2, fontSize: 7, color: '#ffff55', borderRight: '1px solid #222244' }}>
+        <td style={{ width: 56, textAlign: 'center', paddingLeft: 2, paddingRight: 2, fontSize: 13, color: '#ffff55', borderRight: '1px solid #222244' }}>
           {isCurrent ? '▶' : ''}
         </td>
-        <td className={`font-bold ${getPositionColor(p.position)}`} style={{ width: 24, textAlign: 'center', fontSize: 7, borderRight: '1px solid #222244', padding: '2px 2px' }}>
+        <td className={`font-bold ${getPositionColor(p.position)}`} style={{ width: 44, textAlign: 'center', fontSize: 13, borderRight: '1px solid #222244', padding: '2px 2px' }}>
           {p.position}
         </td>
-        <td style={{ fontSize: 7, color: '#ffffff', padding: '2px 3px', borderRight: '1px solid #222244', maxWidth: 80, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
+        <td style={{ fontSize: 13, color: '#ffffff', padding: '2px 3px', borderRight: '1px solid #222244', maxWidth: 80, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
           <PlayerName player={p} />
-          {isTitular && <span style={{ fontSize: 5, color: '#55ffff', marginLeft: 3 }}>{t('misc.onFieldShort')}</span>}
+          {isTitular && <span style={{ fontSize: 9, color: '#55ffff', marginLeft: 3 }}>{t('misc.onFieldShort')}</span>}
         </td>
-        <td style={{ width: 26, textAlign: 'center', fontSize: 7, fontFamily: 'monospace', color: oopFlag ? '#ff5555' : '#55ff55', borderRight: '1px solid #222244', padding: '2px 2px' }}>
+        <td style={{ width: 52, textAlign: 'center', fontSize: 13, fontFamily: 'monospace', color: oopFlag ? '#ff5555' : '#55ff55', borderRight: '1px solid #222244', padding: '2px 2px' }}>
           {effMed}
         </td>
-        <td style={{ width: 26, textAlign: 'center', fontSize: 7, fontFamily: 'monospace', color: pLive < p.media ? '#ff5555' : '#55ffff', borderRight: '1px solid #222244', padding: '2px 2px' }}>
+        <td style={{ width: 52, textAlign: 'center', fontSize: 13, fontFamily: 'monospace', color: pLive < p.media ? '#ff5555' : '#55ffff', borderRight: '1px solid #222244', padding: '2px 2px' }}>
           {pLive}
         </td>
         <td style={{ padding: '2px 3px' }}>
@@ -118,7 +118,7 @@ const PickerRows = ({
 
   const t = useT();
   if (inPos.length === 0 && oop.length === 0 && field.length === 0) {
-    return <tr><td colSpan={6} style={{ padding: 8, textAlign: 'center', fontSize: 6, color: '#555577', fontStyle: 'italic' }}>{t('misc.noSquadAvail')}</td></tr>;
+    return <tr><td colSpan={6} style={{ padding: 8, textAlign: 'center', fontSize: 11, color: '#555577', fontStyle: 'italic' }}>{t('misc.noSquadAvail')}</td></tr>;
   }
 
   return (
@@ -152,7 +152,7 @@ const RosterRows = ({
     const isSuspended = player.suspensionMatches > 0;
     const isInjured = (player.injuryWeeksRemaining ?? 0) > 0;
     const unavailable = isSuspended || isInjured;
-    const effMed = isTitular && slotPos ? Math.round(effectiveMedia(player, slotPos)) : player.media;
+    const effMed = isTitular && slotPos ? Math.round(effectiveMedia(player, slotPos) / 2) : player.media;
     const stamina = player.stamina ?? 99;
     const mood = moodStateOf(player, isTitular);
     const moodInfo = MOOD[mood];
@@ -162,7 +162,7 @@ const RosterRows = ({
       suplenteDivider = true;
       rows.push(
         <tr key="div-suplentes">
-          <td colSpan={6} style={{ background: '#001800', borderTop: '1px solid #114411', borderBottom: '1px solid #114411', padding: '1px 4px', fontSize: 5, color: '#55aa55', textAlign: 'center', textTransform: 'uppercase', letterSpacing: 2 }}>
+          <td colSpan={6} style={{ background: '#001800', borderTop: '1px solid #114411', borderBottom: '1px solid #114411', padding: '1px 4px', fontSize: 9, color: '#55aa55', textAlign: 'center', textTransform: 'uppercase', letterSpacing: 2 }}>
             ─── {t('misc.reserves')} ───
           </td>
         </tr>
@@ -194,39 +194,39 @@ const RosterRows = ({
         onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = isSelected ? 'rgba(255,255,85,0.14)' : isTitular ? 'rgba(0,0,100,0.45)' : 'transparent'; }}
       >
         {/* slot # */}
-        <td style={{ width: 14, textAlign: 'center', fontSize: 7, color: isSelected ? '#ffff55' : '#555577', borderRight: '1px solid #222244', padding: '2px 2px' }}>
+        <td style={{ width: 56, textAlign: 'center', fontSize: 13, color: isSelected ? '#ffff55' : '#555577', borderRight: '1px solid #222244', padding: '2px 2px' }}>
           {isTitular ? (isSelected ? '▶' : String(slotIdx! + 1)) : '—'}
         </td>
         {/* position */}
-        <td style={{ width: 24, textAlign: 'center', fontSize: 7, borderRight: '1px solid #222244', padding: '2px 2px' }}>
+        <td style={{ width: 44, textAlign: 'center', fontSize: 13, borderRight: '1px solid #222244', padding: '2px 2px' }}>
           <span className={`font-bold ${isTitular ? getPositionColor(slotPos ?? player.position) : 'text-vga-gray'}`}>
             {isTitular ? slotPos : player.position}
           </span>
-          {oop && <span style={{ fontSize: 5, color: '#ff5555', marginLeft: 1 }}>!</span>}
+          {oop && <span style={{ fontSize: 9, color: '#ff5555', marginLeft: 1 }}>!</span>}
         </td>
         {/* name */}
-        <td style={{ fontSize: 7, padding: '2px 3px', borderRight: '1px solid #222244', color: isTitular ? '#ffffff' : '#888899', maxWidth: 90, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
+        <td style={{ fontSize: 13, padding: '2px 3px', borderRight: '1px solid #222244', color: isTitular ? '#ffffff' : '#888899', maxWidth: 90, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
           <span style={{ fontWeight: isTitular ? 'bold' : 'normal' }}>
             <PlayerName player={player} />
           </span>
           {player.seasonStats?.yellowCards > 0 && <span style={{ display: 'inline-block', width: 4, height: 6, background: '#ffff55', border: '0.5px solid black', marginLeft: 2, verticalAlign: 'middle' }} />}
           {player.seasonStats?.redCards > 0 && <span style={{ display: 'inline-block', width: 4, height: 6, background: '#aa0000', border: '0.5px solid black', marginLeft: 2, verticalAlign: 'middle' }} />}
-          {isSuspended && <span style={{ fontSize: 5, color: '#ff5555', marginLeft: 3, fontWeight: 'bold' }}>[SAN]</span>}
-          {isInjured && <span style={{ fontSize: 5, color: '#ff8855', marginLeft: 3, fontWeight: 'bold' }}>[LES {player.injuryWeeksRemaining}s]</span>}
+          {isSuspended && <span style={{ fontSize: 9, color: '#ff5555', marginLeft: 3, fontWeight: 'bold' }}>[SAN]</span>}
+          {isInjured && <span style={{ fontSize: 9, color: '#ff8855', marginLeft: 3, fontWeight: 'bold' }}>[LES {player.injuryWeeksRemaining}s]</span>}
         </td>
         {/* MED */}
-        <td style={{ width: 26, textAlign: 'center', fontSize: 7, fontFamily: 'monospace', color: oop ? '#ff5555' : isTitular ? '#55ff55' : '#888899', borderRight: '1px solid #222244', padding: '2px 2px' }}>
+        <td style={{ width: 52, textAlign: 'center', fontSize: 13, fontFamily: 'monospace', color: oop ? '#ff5555' : isTitular ? '#55ff55' : '#888899', borderRight: '1px solid #222244', padding: '2px 2px' }}>
           {effMed}
         </td>
         {/* LIVE */}
-        <td style={{ width: 26, textAlign: 'center', fontSize: 7, fontFamily: 'monospace', color: '#55ffff', borderRight: '1px solid #222244', padding: '2px 2px' }}>
-          {liveMed(player, stamina, isTitular && slotPos ? slotPos : undefined)}
+        <td style={{ width: 52, textAlign: 'center', fontSize: 13, fontFamily: 'monospace', color: '#55ffff', borderRight: '1px solid #222244', padding: '2px 2px' }}>
+          {Math.round(liveMed(player, stamina, isTitular && slotPos ? slotPos : undefined) / 2)}
         </td>
         {/* stamina + mood */}
         <td style={{ padding: '2px 3px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
             <StaminaBar value={stamina} />
-            <span className={moodInfo.colorClass} style={{ fontSize: 7, fontWeight: 'bold' }}>{moodInfo.symbol}</span>
+            <span className={moodInfo.colorClass} style={{ fontSize: 13, fontWeight: 'bold' }}>{moodInfo.symbol}</span>
           </div>
         </td>
       </tr>
@@ -239,7 +239,7 @@ const RosterRows = ({
 // ═══ MAIN COMPONENT ═══════════════════════════════════════════════════
 export const AlignmentView = ({ team, onUpdate, onBack, onToggleDiscipline, ingame }: Props) => {
   const t = useT();
-  const teamMED = Math.floor(calculateTeamStrength(team));
+  const teamMED = Math.floor(calculateTeamStrength(team) / 2);
   const slots = FORMATIONS[team.formation];
   const [selectedSlot, setSelectedSlot] = useState<number | null>(null);
 
@@ -345,7 +345,7 @@ export const AlignmentView = ({ team, onUpdate, onBack, onToggleDiscipline, inga
     borderBottom: '2px solid #333366',
     textAlign: 'center',
     padding: '2px 4px',
-    fontSize: 6,
+    fontSize: 11,
     color: '#ffff55',
     fontWeight: 'bold',
     textTransform: 'uppercase',
@@ -354,7 +354,7 @@ export const AlignmentView = ({ team, onUpdate, onBack, onToggleDiscipline, inga
   const tableHead: CSSProperties = {
     background: 'linear-gradient(180deg, #0004e0 0%, #0000cc 100%)',
     color: '#55ffff',
-    fontSize: 6,
+    fontSize: 11,
     textTransform: 'uppercase',
     letterSpacing: 1,
     position: 'sticky',
@@ -369,35 +369,91 @@ export const AlignmentView = ({ team, onUpdate, onBack, onToggleDiscipline, inga
         {/* ═══ HEADER BAR ═══════════════════════════════════════════ */}
         <div style={headerStyle}>
           <div>
-            <div style={{ fontSize: 9, color: '#ffff55', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: 2 }}>
+            <div style={{ fontSize: 15, color: '#ffff55', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: 2 }}>
               {ingame ? t('misc.changesHeader') : t('misc.alignmentHeader')} — {team.name}
-              {ingame?.htPaused && <span style={{ marginLeft: 8, fontSize: 6, color: '#55ffff' }}>{t('misc.halftime')}</span>}
+              {ingame?.htPaused && <span style={{ marginLeft: 8, fontSize: 11, color: '#55ffff' }}>{t('misc.halftime')}</span>}
             </div>
-            <div style={{ fontSize: 6, color: '#aaaaaa', textTransform: 'uppercase', marginTop: 2 }}>
+            <div style={{ fontSize: 11, color: '#aaaaaa', textTransform: 'uppercase', marginTop: 2 }}>
               ENT: {team.manager}
             </div>
           </div>
           <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-            <div style={{ background: '#000000', border: '2px solid #ffff55', padding: '2px 6px', fontSize: 8, color: '#ffff55', fontFamily: 'monospace', fontWeight: 'bold', boxShadow: 'inset 1px 1px 0 #888800, inset -1px -1px 0 #333300' }}>
+            <div style={{ background: '#000000', border: '2px solid #ffff55', padding: '2px 6px', fontSize: 14, color: '#ffff55', fontFamily: 'monospace', fontWeight: 'bold', boxShadow: 'inset 1px 1px 0 #888800, inset -1px -1px 0 #333300' }}>
               MED {teamMED}
             </div>
             {ingame ? (
-              <div style={{ background: '#000000', border: `2px solid ${ingame.subsUsed >= ingame.maxSubs ? '#ff5555' : '#55ff55'}`, padding: '2px 6px', fontSize: 8, color: ingame.subsUsed >= ingame.maxSubs ? '#ff5555' : '#55ff55', fontFamily: 'monospace', fontWeight: 'bold' }}>
+              <div style={{ background: '#000000', border: `2px solid ${ingame.subsUsed >= ingame.maxSubs ? '#ff5555' : '#55ff55'}`, padding: '2px 6px', fontSize: 14, color: ingame.subsUsed >= ingame.maxSubs ? '#ff5555' : '#55ff55', fontFamily: 'monospace', fontWeight: 'bold' }}>
                 {t('misc.subsCountFmt', { used: String(ingame.subsUsed), max: String(ingame.maxSubs) })}
               </div>
             ) : (
-              <div style={{ background: '#000000', border: `2px solid ${titularCount === 11 ? '#55ff55' : '#ff5555'}`, padding: '2px 6px', fontSize: 8, color: titularCount === 11 ? '#55ff55' : '#ff5555', fontFamily: 'monospace', fontWeight: 'bold' }}>
+              <div style={{ background: '#000000', border: `2px solid ${titularCount === 11 ? '#55ff55' : '#ff5555'}`, padding: '2px 6px', fontSize: 14, color: titularCount === 11 ? '#55ff55' : '#ff5555', fontFamily: 'monospace', fontWeight: 'bold' }}>
                 {titularCount}/11
               </div>
             )}
             <button
               onClick={ingame ? ingame.onContinue : onBack}
-              style={{ background: ingame ? '#0000aa' : '#aa0000', color: '#ffffff', border: '2px solid #aaaaaa', padding: '3px 10px', fontSize: 7, fontWeight: 'bold', textTransform: 'uppercase', cursor: 'pointer', boxShadow: ingame ? 'inset 1px 1px 0 #5555ff, inset -1px -1px 0 #000055' : 'inset 1px 1px 0 #ff5555, inset -1px -1px 0 #550000' }}
+              style={{ background: ingame ? '#0000aa' : '#aa0000', color: '#ffffff', border: '2px solid #aaaaaa', padding: '3px 10px', fontSize: 13, fontWeight: 'bold', textTransform: 'uppercase', cursor: 'pointer', boxShadow: ingame ? 'inset 1px 1px 0 #5555ff, inset -1px -1px 0 #000055' : 'inset 1px 1px 0 #ff5555, inset -1px -1px 0 #550000' }}
               onMouseEnter={e => { (e.target as HTMLElement).style.background = ingame ? '#0004e0' : '#ff5555'; }}
               onMouseLeave={e => { (e.target as HTMLElement).style.background = ingame ? '#0000aa' : '#aa0000'; }}
             >
               {ingame ? t('misc.continueIngame') : t('misc.saveAndExit')}
             </button>
+          </div>
+        </div>
+
+        {/* ═══ FORMATION BAR (top) ══════════════════════════════════ */}
+        <div style={{ background: 'linear-gradient(180deg, #0002cc 0%, #000088 100%)', borderTop: '4px solid #aaaaaa', borderBottom: '2px solid #333366', padding: '4px 8px', display: 'flex', alignItems: 'center', gap: 4, flexWrap: 'wrap' }}>
+          <span style={{ fontSize: 11, color: '#ffff55', fontWeight: 'bold', textTransform: 'uppercase', marginRight: 4, letterSpacing: 1 }}>{t('misc.formation')}</span>
+          {ALL_FORMATIONS.map(f => {
+            const active = f === team.formation;
+            return (
+              <button
+                key={f}
+                onClick={() => handleFormationChange(f)}
+                style={{
+                  padding: '2px 6px',
+                  fontSize: 13,
+                  fontWeight: 'bold',
+                  border: active ? '2px solid #ffffff' : '2px solid #555577',
+                  background: active ? '#ffff55' : '#000022',
+                  color: active ? '#000000' : '#aaaaaa',
+                  cursor: 'pointer',
+                  boxShadow: active
+                    ? 'inset 1px 1px 0 #ffff99, inset -1px -1px 0 #888800, 0 0 8px rgba(255,255,85,0.5)'
+                    : 'inset 1px 1px 0 #333355, inset -1px -1px 0 #000000',
+                }}
+                onMouseEnter={e => { if (!active) { (e.target as HTMLElement).style.color = '#ffff55'; (e.target as HTMLElement).style.borderColor = '#aaaaaa'; } }}
+                onMouseLeave={e => { if (!active) { (e.target as HTMLElement).style.color = '#aaaaaa'; (e.target as HTMLElement).style.borderColor = '#555577'; } }}
+              >
+                {f}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* ═══ COMMAND BAR (top) ════════════════════════════════════ */}
+        <div style={{ background: '#000008', borderTop: '2px solid #333344', padding: '4px 8px', display: 'flex', alignItems: 'center', gap: 6 }}>
+          {!ingame && (
+            <CmdButton onClick={handleAutoFix} color="#55ff55" hoverBg="#00aa00">
+              {t('misc.auto11')}
+            </CmdButton>
+          )}
+          <CmdButton
+            onClick={onToggleDiscipline}
+            color={team.tacticalDiscipline ? '#55ffff' : '#ff55ff'}
+            hoverBg={team.tacticalDiscipline ? '#00aaaa' : '#aa00aa'}
+          >
+            ■ {team.tacticalDiscipline ? t('misc.tactPos') : t('misc.tactFree')}
+          </CmdButton>
+          {inPickMode && (
+            <CmdButton onClick={() => setSelectedSlot(null)} color="#ffff55" hoverBg="#888800">
+              ■ {t('btn.cancel')}
+            </CmdButton>
+          )}
+          <div style={{ marginLeft: 'auto', fontSize: 11, color: '#333355' }}>
+            {ingame
+              ? (ingame.subsUsed >= ingame.maxSubs ? t('misc.subsExhausted') : inPickMode ? t('misc.pickIncoming') : t('misc.clickTitular'))
+              : (inPickMode ? t('misc.clickPlayer') : t('misc.clickSlot'))}
           </div>
         </div>
 
@@ -420,7 +476,7 @@ export const AlignmentView = ({ team, onUpdate, onBack, onToggleDiscipline, inga
             {inPickMode && currentSlotPlayerId && !ingame && (
               <button
                 onClick={() => assignToSlot(selectedSlot!, null)}
-                style={{ width: '100%', background: '#aa0000', color: '#ffffff', border: 'none', borderTop: '2px solid #555555', padding: '3px 0', fontSize: 6, fontWeight: 'bold', textTransform: 'uppercase', cursor: 'pointer', letterSpacing: 1 }}
+                style={{ width: '100%', background: '#aa0000', color: '#ffffff', border: 'none', borderTop: '2px solid #555555', padding: '3px 0', fontSize: 11, fontWeight: 'bold', textTransform: 'uppercase', cursor: 'pointer', letterSpacing: 1 }}
                 onMouseEnter={e => { (e.target as HTMLElement).style.background = '#ff5555'; }}
                 onMouseLeave={e => { (e.target as HTMLElement).style.background = '#aa0000'; }}
               >
@@ -428,7 +484,7 @@ export const AlignmentView = ({ team, onUpdate, onBack, onToggleDiscipline, inga
               </button>
             )}
             {inPickMode && !currentSlotPlayerId && (
-              <div style={{ textAlign: 'center', padding: '3px 0', fontSize: 6, color: '#555577', borderTop: '2px solid #333344' }}>
+              <div style={{ textAlign: 'center', padding: '3px 0', fontSize: 11, color: '#555577', borderTop: '2px solid #333344' }}>
                 {t('misc.emptySlot')}
               </div>
             )}
@@ -441,7 +497,7 @@ export const AlignmentView = ({ team, onUpdate, onBack, onToggleDiscipline, inga
               {inPickMode && (
                 <button
                   onClick={() => setSelectedSlot(null)}
-                  style={{ marginLeft: 8, background: 'transparent', border: '1px solid #ff5555', color: '#ff5555', fontSize: 5, padding: '1px 4px', cursor: 'pointer', fontWeight: 'bold' }}
+                  style={{ marginLeft: 8, background: 'transparent', border: '1px solid #ff5555', color: '#ff5555', fontSize: 9, padding: '1px 4px', cursor: 'pointer', fontWeight: 'bold' }}
                 >
                   ESC
                 </button>
@@ -451,12 +507,12 @@ export const AlignmentView = ({ team, onUpdate, onBack, onToggleDiscipline, inga
               <table style={{ width: '100%', borderCollapse: 'collapse', tableLayout: 'fixed' }}>
                 <thead>
                   <tr style={tableHead}>
-                    <th style={{ width: 16, textAlign: 'center', padding: '2px 2px', borderRight: '1px solid #222255', borderBottom: '2px solid #333366' }}>#</th>
-                    <th style={{ width: 26, textAlign: 'center', padding: '2px 2px', borderRight: '1px solid #222255', borderBottom: '2px solid #333366' }}>POS</th>
+                    <th style={{ width: 32, textAlign: 'center', padding: '2px 2px', borderRight: '1px solid #222255', borderBottom: '2px solid #333366' }}>#</th>
+                    <th style={{ width: 52, textAlign: 'center', padding: '2px 2px', borderRight: '1px solid #222255', borderBottom: '2px solid #333366' }}>POS</th>
                     <th style={{ textAlign: 'left', padding: '2px 4px', borderRight: '1px solid #222255', borderBottom: '2px solid #333366' }}>NOMBRE</th>
-                    <th style={{ width: 28, textAlign: 'center', padding: '2px 2px', borderRight: '1px solid #222255', borderBottom: '2px solid #333366' }}>MED</th>
-                    <th style={{ width: 28, textAlign: 'center', padding: '2px 2px', borderRight: '1px solid #222255', borderBottom: '2px solid #333366' }}>VIV</th>
-                    <th style={{ width: 50, textAlign: 'center', padding: '2px 4px', borderBottom: '2px solid #333366' }}>CAN</th>
+                    <th style={{ width: 56, textAlign: 'center', padding: '2px 2px', borderRight: '1px solid #222255', borderBottom: '2px solid #333366' }}>MED</th>
+                    <th style={{ width: 56, textAlign: 'center', padding: '2px 2px', borderRight: '1px solid #222255', borderBottom: '2px solid #333366' }}>VIV</th>
+                    <th style={{ width: 100, textAlign: 'center', padding: '2px 4px', borderBottom: '2px solid #333366' }}>CAN</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -485,62 +541,6 @@ export const AlignmentView = ({ team, onUpdate, onBack, onToggleDiscipline, inga
           </div>
         </div>
 
-        {/* ═══ FORMATION BAR ════════════════════════════════════════ */}
-        <div style={{ background: 'linear-gradient(180deg, #0002cc 0%, #000088 100%)', borderTop: '4px solid #aaaaaa', borderBottom: '2px solid #333366', padding: '4px 8px', display: 'flex', alignItems: 'center', gap: 4, flexWrap: 'wrap' }}>
-          <span style={{ fontSize: 6, color: '#ffff55', fontWeight: 'bold', textTransform: 'uppercase', marginRight: 4, letterSpacing: 1 }}>{t('misc.formation')}</span>
-          {ALL_FORMATIONS.map(f => {
-            const active = f === team.formation;
-            return (
-              <button
-                key={f}
-                onClick={() => handleFormationChange(f)}
-                style={{
-                  padding: '2px 6px',
-                  fontSize: 7,
-                  fontWeight: 'bold',
-                  border: active ? '2px solid #ffffff' : '2px solid #555577',
-                  background: active ? '#ffff55' : '#000022',
-                  color: active ? '#000000' : '#aaaaaa',
-                  cursor: 'pointer',
-                  boxShadow: active
-                    ? 'inset 1px 1px 0 #ffff99, inset -1px -1px 0 #888800, 0 0 8px rgba(255,255,85,0.5)'
-                    : 'inset 1px 1px 0 #333355, inset -1px -1px 0 #000000',
-                }}
-                onMouseEnter={e => { if (!active) { (e.target as HTMLElement).style.color = '#ffff55'; (e.target as HTMLElement).style.borderColor = '#aaaaaa'; } }}
-                onMouseLeave={e => { if (!active) { (e.target as HTMLElement).style.color = '#aaaaaa'; (e.target as HTMLElement).style.borderColor = '#555577'; } }}
-              >
-                {f}
-              </button>
-            );
-          })}
-        </div>
-
-        {/* ═══ COMMAND BAR ══════════════════════════════════════════ */}
-        <div style={{ background: '#000008', borderTop: '2px solid #333344', padding: '4px 8px', display: 'flex', alignItems: 'center', gap: 6 }}>
-          {!ingame && (
-            <CmdButton onClick={handleAutoFix} color="#55ff55" hoverBg="#00aa00">
-              {t('misc.auto11')}
-            </CmdButton>
-          )}
-          <CmdButton
-            onClick={onToggleDiscipline}
-            color={team.tacticalDiscipline ? '#55ffff' : '#ff55ff'}
-            hoverBg={team.tacticalDiscipline ? '#00aaaa' : '#aa00aa'}
-          >
-            ■ {team.tacticalDiscipline ? t('misc.tactPos') : t('misc.tactFree')}
-          </CmdButton>
-          {inPickMode && (
-            <CmdButton onClick={() => setSelectedSlot(null)} color="#ffff55" hoverBg="#888800">
-              ■ {t('btn.cancel')}
-            </CmdButton>
-          )}
-          <div style={{ marginLeft: 'auto', fontSize: 6, color: '#333355' }}>
-            {ingame
-              ? (ingame.subsUsed >= ingame.maxSubs ? t('misc.subsExhausted') : inPickMode ? t('misc.pickIncoming') : t('misc.clickTitular'))
-              : (inPickMode ? t('misc.clickPlayer') : t('misc.clickSlot'))}
-          </div>
-        </div>
-
       </div>
     </div>
   );
@@ -549,7 +549,7 @@ export const AlignmentView = ({ team, onUpdate, onBack, onToggleDiscipline, inga
 const CmdButton = ({ onClick, color, hoverBg, children }: { onClick: () => void; color: string; hoverBg: string; children: ReactNode }) => (
   <button
     onClick={onClick}
-    style={{ fontSize: 6, border: `1px solid ${color}`, color, background: 'transparent', padding: '2px 8px', fontWeight: 'bold', textTransform: 'uppercase', cursor: 'pointer', letterSpacing: 1 }}
+    style={{ fontSize: 11, border: `1px solid ${color}`, color, background: 'transparent', padding: '2px 8px', fontWeight: 'bold', textTransform: 'uppercase', cursor: 'pointer', letterSpacing: 1 }}
     onMouseEnter={e => { (e.target as HTMLElement).style.background = hoverBg; (e.target as HTMLElement).style.color = '#000000'; }}
     onMouseLeave={e => { (e.target as HTMLElement).style.background = 'transparent'; (e.target as HTMLElement).style.color = color; }}
   >

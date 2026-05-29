@@ -60,10 +60,10 @@ export const SwapModal = ({ slotPos, currentPlayer, candidates, inLineup, onSele
         onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(85,85,255,0.25)'; }}
         onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = baseBg; }}
       >
-        <td style={{ width: 14, textAlign: 'center', fontSize: 12, color: isCurrent ? '#ffff55' : '#333355', borderRight: '1px solid #222244', padding: '2px 2px' }}>
+        <td style={{ width: 56, textAlign: 'center', fontSize: 12, color: isCurrent ? '#ffff55' : '#333355', borderRight: '1px solid #222244', padding: '2px 2px' }}>
           {isCurrent ? '▶' : ''}
         </td>
-        <td style={{ width: 26, textAlign: 'center', fontSize: 12, fontWeight: 'bold', color: POS_COLOR[p.position] ?? '#ffffff', borderRight: '1px solid #222244', padding: '2px 2px' }}>
+        <td style={{ width: 52, textAlign: 'center', fontSize: 12, fontWeight: 'bold', color: POS_COLOR[p.position] ?? '#ffffff', borderRight: '1px solid #222244', padding: '2px 2px' }}>
           {p.position}
         </td>
         <td style={{ fontSize: 12, color: '#ffffff', padding: '2px 4px', borderRight: '1px solid #222244', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis', maxWidth: 200 }}>
@@ -71,10 +71,10 @@ export const SwapModal = ({ slotPos, currentPlayer, candidates, inLineup, onSele
           {isCurrent && <span style={{ fontSize: 9, color: '#ffff55', marginLeft: 3 }}>(sale)</span>}
           {isTitular && !isCurrent && <span style={{ fontSize: 9, color: '#55ffff', marginLeft: 3 }}>(campo)</span>}
         </td>
-        <td style={{ width: 28, textAlign: 'center', fontSize: 12, fontFamily: 'monospace', color: oopFlag ? '#ff5555' : '#55ff55', borderRight: '1px solid #222244', padding: '2px 2px' }}>
-          {effMed}{oopFlag && <span style={{ fontSize: 5 }}> !</span>}
+        <td style={{ width: 56, textAlign: 'center', fontSize: 12, fontFamily: 'monospace', color: oopFlag ? '#ff5555' : '#55ff55', borderRight: '1px solid #222244', padding: '2px 2px' }}>
+          {effMed}{oopFlag && <span style={{ fontSize: 9}}> !</span>}
         </td>
-        <td style={{ width: 28, textAlign: 'center', fontSize: 12, fontFamily: 'monospace', color: pLiveMedDisplay < p.media ? '#ff5555' : '#55ffff', borderRight: '1px solid #222244', padding: '2px 2px' }}>
+        <td style={{ width: 56, textAlign: 'center', fontSize: 12, fontFamily: 'monospace', color: pLiveMedDisplay < p.media ? '#ff5555' : '#55ffff', borderRight: '1px solid #222244', padding: '2px 2px' }}>
           {pLiveMedDisplay}
         </td>
         <td style={{ padding: '2px 4px' }}>
@@ -120,8 +120,8 @@ export const SwapModal = ({ slotPos, currentPlayer, candidates, inLineup, onSele
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50, padding: 8 }}>
       {/* ═══ MODAL FRAME ═══════════════════════════════════════════ */}
       <div style={{
-        maxWidth: 1400,
-        width: '100%',
+        maxWidth: 1800,
+        width: '95vw',
         maxHeight: '96vh',
         display: 'flex',
         flexDirection: 'column',
@@ -165,12 +165,12 @@ export const SwapModal = ({ slotPos, currentPlayer, candidates, inLineup, onSele
           <table style={{ width: '100%', borderCollapse: 'collapse', tableLayout: 'fixed' }}>
             <thead>
               <tr style={{ background: 'linear-gradient(180deg, #0004e0 0%, #0000cc 100%)', color: '#55ffff', fontSize: 11, textTransform: 'uppercase', letterSpacing: 1, position: 'sticky', top: 0, zIndex: 1 }}>
-                <th style={{ width: 14, textAlign: 'center', padding: '2px 2px', borderRight: '1px solid #222255', borderBottom: '2px solid #333366' }}>◉</th>
-                <th style={{ width: 26, textAlign: 'center', padding: '2px 2px', borderRight: '1px solid #222255', borderBottom: '2px solid #333366' }}>POS</th>
+                <th style={{ width: 56, textAlign: 'center', padding: '2px 2px', borderRight: '1px solid #222255', borderBottom: '2px solid #333366' }}>◉</th>
+                <th style={{ width: 52, textAlign: 'center', padding: '2px 2px', borderRight: '1px solid #222255', borderBottom: '2px solid #333366' }}>POS</th>
                 <th style={{ textAlign: 'left', padding: '2px 4px', borderRight: '1px solid #222255', borderBottom: '2px solid #333366' }}>NOMBRE</th>
-                <th style={{ width: 28, textAlign: 'center', padding: '2px 2px', borderRight: '1px solid #222255', borderBottom: '2px solid #333366' }}>MED</th>
-                <th style={{ width: 28, textAlign: 'center', padding: '2px 2px', borderRight: '1px solid #222255', borderBottom: '2px solid #333366' }}>VIV</th>
-                <th style={{ width: 48, textAlign: 'center', padding: '2px 4px', borderBottom: '2px solid #333366' }}>CAN</th>
+                <th style={{ width: 56, textAlign: 'center', padding: '2px 2px', borderRight: '1px solid #222255', borderBottom: '2px solid #333366' }}>MED</th>
+                <th style={{ width: 56, textAlign: 'center', padding: '2px 2px', borderRight: '1px solid #222255', borderBottom: '2px solid #333366' }}>VIV</th>
+                <th style={{ width: 96, textAlign: 'center', padding: '2px 4px', borderBottom: '2px solid #333366' }}>CAN</th>
               </tr>
             </thead>
             <tbody>{rows}</tbody>
