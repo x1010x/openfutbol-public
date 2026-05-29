@@ -1309,7 +1309,10 @@ export const simulateAiClausulazos = (state: LeagueState): LeagueState => {
 
   // Single per-jornada probability roll — prevents the effective chance from
   // multiplying across player×rival combinations (avoids near-certain firing each jornada).
-  if (Math.random() > engineSettings.aiClausulazoProb) return state;
+  // On the last jornada of an open window the deadline-day pressure multiplies the chance.
+  const left = windowJornadasLeft(state.currentJornada, state.schedule.length);
+  const probMult = left === 1 ? 5 : 1;
+  if (Math.random() > engineSettings.aiClausulazoProb * probMult) return state;
 
   // Only consider unlisted high-media players as clausulazo targets
   const targets = userTeam.players.filter(p => !p.forSale && p.media >= 72);
@@ -1394,6 +1397,103 @@ export const simulateAiClausulazos = (state: LeagueState): LeagueState => {
     }
   }
   return state;
+};
+
+// Deadline-day frenzy: on the last jornada of an open transfer window, rivals
+// trigger clausulazos against each other too. Up to 3 attempts per jornada so
+// you can see real movement between AI clubs on the last day.
+export const simulateAiInterClausulazos = (state: LeagueState): LeagueState => {
+  const left = windowJornadasLeft(state.currentJornada, state.schedule.length);
+  if (left !== 1) return state;
+
+  let working = state;
+  const ATTEMPTS = 3;
+
+  for (let attempt = 0; attempt < ATTEMPTS; attempt++) {
+    // Each attempt has its own probability roll.
+    if (Math.random() > engineSettings.aiClausulazoProb * 6) continue;
+
+    const aiTeams = working.teams.filter(t => t.id !== working.userTeamId);
+    if (aiTeams.length < 2) break;
+    const shuffledBuyers = [...aiTeams].sort(() => Math.random() - 0.5);
+    const shuffledTargets = [...aiTeams].sort(() => Math.random() - 0.5);
+
+    let executed = false;
+    outer:
+    for (const seller of shuffledTargets) {
+      // Tebas rule: each team can only receive 2 clausulazos per season.
+      const received = (working.seasonClausulazosReceived ?? {})[seller.id] ?? 0;
+      if (received >= 2) continue;
+
+      // Best targets: unlisted, high-media, not already traded this season.
+      const candidates = seller.players.filter(p =>
+        !p.forSale &&
+        p.media >= 72 &&
+        !(working.blockedSignings ?? []).includes(transferredKey(p.id))
+      );
+      if (candidates.length === 0) continue;
+
+      for (const player of candidates) {
+        const price = computePrice(player, working.year);
+        const clausulaPrice = Math.round(price * engineSettings.clausulazoMult / 100_000) * 100_000;
+        const group = groupFor(player.position);
+
+        for (const buyer of shuffledBuyers) {
+          if (buyer.id === seller.id) continue;
+          if (buyer.budget < clausulaPrice) continue;
+
+          const buyerInGroup = buyer.players.filter(pl => groupFor(pl.position) === group);
+          const weakestMedia = buyerInGroup.length > 0
+            ? Math.min(...buyerInGroup.map(pl => pl.media))
+            : 0;
+          if (player.media <= weakestMedia + 5) continue;
+
+          const newTeams = working.teams.map(t => {
+            if (t.id === seller.id) return {
+              ...t,
+              players: t.players.filter(pl => pl.id !== player.id),
+              lineup: t.lineup.filter(id => id !== player.id),
+              budget: t.budget + clausulaPrice,
+            };
+            if (t.id === buyer.id) return {
+              ...t,
+              players: [...t.players, { ...player, forSale: false }],
+              budget: t.budget - clausulaPrice,
+            };
+            return t;
+          });
+
+          const record: TransferRecord = {
+            id: `ai_clausulazo_${working.currentJornada}_${player.id}_${buyer.id}`,
+            jornada: working.currentJornada,
+            year: working.year,
+            playerName: player.name,
+            playerPosition: player.position,
+            fromTeamName: seller.name,
+            toTeamName: buyer.name,
+            amount: clausulaPrice,
+          };
+
+          const prevReceived = working.seasonClausulazosReceived ?? {};
+          working = {
+            ...working,
+            teams: newTeams,
+            transferLog: appendTransfer(working.transferLog, record),
+            blockedSignings: [...(working.blockedSignings ?? []), transferredKey(player.id)],
+            seasonClausulazosReceived: {
+              ...prevReceived,
+              [seller.id]: (prevReceived[seller.id] ?? 0) + 1,
+            },
+          };
+          executed = true;
+          break outer;
+        }
+      }
+    }
+    if (!executed) break; // nothing more to do
+  }
+
+  return working;
 };
 
 // AI-vs-AI player swaps. One try per jornada. Players must share a position group
