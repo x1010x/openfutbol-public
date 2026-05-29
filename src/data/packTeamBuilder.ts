@@ -7,6 +7,7 @@ export interface PackTeamTemplate {
   name: string;
   leagueName: string;
   countryName: string;
+  countryCode: string;
   colors: { background: string; foreground: string } | null;
   playerCount: number;
 }
@@ -26,6 +27,7 @@ export const getPackTemplates = (pack: Pack): PackTeamTemplate[] => {
       name: club.name,
       leagueName: league?.name ?? '',
       countryName: country?.name ?? '',
+      countryCode: country?.code?.toUpperCase() ?? 'unknown',
       colors: club.colors,
       playerCount: playerCountByClub.get(club.id) ?? 0,
     };

@@ -30,7 +30,7 @@ export const LeagueSetupView = ({ year, existingTeams, onConfirm, onBack }: Prop
       name: pt.name,
       colors: pt.colors ? [pt.colors.background, pt.colors.foreground] : undefined,
       playerCount: pt.playerCount,
-      country: pt.countryName || pt.leagueName || 'unknown',
+      country: pt.countryCode || 'unknown',
     }));
   }, [pack]);
 
@@ -120,7 +120,9 @@ export const LeagueSetupView = ({ year, existingTeams, onConfirm, onBack }: Prop
   for (const t of allTemplates) {
     const isEditor = editorTemplates.some(et => et.id === t.id);
     const isImported = importedTemplates.some(it => it.id === t.id);
-    const country = isEditor || isImported ? 'editor' : getTeamCountry(t.id);
+    const country = isEditor || isImported
+      ? 'editor'
+      : (t.country && t.country !== 'unknown' && t.country !== 'other' ? t.country : getTeamCountry(t.id));
     const bucket = byCountry.get(country) ?? [];
     bucket.push(t);
     byCountry.set(country, bucket);
