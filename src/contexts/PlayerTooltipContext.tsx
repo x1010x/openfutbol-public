@@ -26,8 +26,6 @@ const KEY_STATS: Record<string, string[]> = {
   DEL: ['shooting', 'dribbling', 'speed'],
 };
 
-const ALL_STATS = ['speed', 'dribbling', 'passing', 'shooting', 'defending', 'physical', 'goalkeeping'];
-
 interface TooltipState {
   player: Player;
   x: number;
@@ -125,7 +123,7 @@ const Tooltip = ({ player, x, y, year }: TooltipState & { year: number }) => {
   const avgMin = s.appearances > 0 ? Math.round(s.minutes / s.appearances) : 0;
 
   const W = 440;
-  const H = 640;
+  const H = 460;
   const left = x + W + 20 > window.innerWidth ? x - W - 8 : x + 16;
   const top = y + H > window.innerHeight ? Math.max(8, window.innerHeight - H - 8) : y - 8;
 
@@ -171,8 +169,8 @@ const Tooltip = ({ player, x, y, year }: TooltipState & { year: number }) => {
       </div>
 
       {/* Radar */}
-      <div className="flex items-center justify-center py-2 border-b border-vga-gray bg-vga-black">
-        <Radar stats={player.stats as unknown as Record<string, number>} isGK={isGK} size={180} />
+      <div className="flex items-center justify-center py-1 border-b border-vga-gray bg-vga-black">
+        <Radar stats={player.stats as unknown as Record<string, number>} isGK={isGK} size={150} />
       </div>
 
       {/* Season stats */}
@@ -219,22 +217,14 @@ const Tooltip = ({ player, x, y, year }: TooltipState & { year: number }) => {
         )}
       </div>
 
-      {/* Stats */}
-      <div className="px-3 py-2 flex flex-col gap-1">
-        {ALL_STATS.map(stat => {
+      {/* Key stat callouts (replaces bars list — radar shows the full shape) */}
+      <div className="flex justify-around px-3 py-1 border-b border-vga-gray">
+        {keyStats.map(stat => {
           const val = (player.stats as unknown as Record<string, number>)[stat] ?? 0;
-          const isKey = keyStats.includes(stat);
           return (
-            <div key={stat} className="flex items-center gap-2">
-              <span className={`text-[12px] w-10 shrink-0 font-bold ${isKey ? 'text-vga-yellow' : 'text-vga-cyan'}`}>
-                {STAT_LABELS[stat]}
-              </span>
-              <div className="flex-1 h-3 border border-vga-white" style={{ background: '#000000' }}>
-                <div className="h-full" style={{ width: `${val}%`, background: isKey ? '#ffff55' : '#55ffff' }} />
-              </div>
-              <span className={`text-[13px] w-8 text-right shrink-0 font-bold ${isKey ? 'text-vga-yellow' : 'text-vga-bright-white'}`}>
-                {val}
-              </span>
+            <div key={stat} className="flex flex-col items-center">
+              <span className="text-vga-yellow text-[11px] font-bold">{STAT_LABELS[stat]}</span>
+              <span className="text-vga-bright-white text-[16px] font-bold">{val}</span>
             </div>
           );
         })}
