@@ -34,6 +34,7 @@ interface Props {
   onAcceptIncomingOffer?: (offerId: string) => void;
   onRejectIncomingOffer?: (offerId: string) => void;
   onCounterIncomingOffer?: (offerId: string, requestedCash: number, requestedPlayerIds: string[]) => void;
+  onSwitchCompact?: () => void;
 }
 
 const POS_GROUPS: { key: string; positions: Position[] }[] = [
@@ -57,6 +58,7 @@ export const SquadView = ({
   onAcceptIncomingOffer,
   onRejectIncomingOffer,
   onCounterIncomingOffer,
+  onSwitchCompact,
 }: Props) => {
   const t = useT();
   const [counterOfferId, setCounterOfferId] = useState<string | null>(null);
@@ -94,12 +96,23 @@ export const SquadView = ({
     <div className="w-full max-w-5xl flex flex-col gap-4">
       <div className="flex justify-between items-center bg-vga-blue p-2 border-2 border-vga-white vga-panel">
         <h2 className="text-vga-yellow text-xs">{t('section.squad', { team: team.name })}</h2>
-        <button
-          onClick={onBack}
-          className="bg-vga-red text-vga-bright-white px-2 py-1 text-[8px] border border-vga-black"
-        >
-          {t('btn.back')}
-        </button>
+        <div className="flex items-center gap-2">
+          {onSwitchCompact && (
+            <button
+              onClick={onSwitchCompact}
+              className="bg-vga-black text-vga-cyan px-2 py-1 text-[7px] border border-vga-cyan uppercase font-bold hover:bg-vga-cyan hover:text-vga-black"
+              title="Vista tabla compacta"
+            >
+              VISTA TABLA
+            </button>
+          )}
+          <button
+            onClick={onBack}
+            className="bg-vga-red text-vga-bright-white px-2 py-1 text-[8px] border border-vga-black"
+          >
+            {t('btn.back')}
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-3 gap-2 text-[8px]">

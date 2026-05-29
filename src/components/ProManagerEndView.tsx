@@ -33,6 +33,7 @@ interface Props {
   boardObjective: BoardObjective;
   managerReputation: number;
   year: number;
+  firedByTeamIds?: string[];
   onPickTeam: (teamId: string) => void;
   onRetire: () => void;
 }
@@ -46,6 +47,7 @@ export const ProManagerEndView = ({
   boardObjective,
   managerReputation,
   year,
+  firedByTeamIds,
   onPickTeam,
   onRetire,
 }: Props) => {
@@ -75,8 +77,10 @@ export const ProManagerEndView = ({
     meter >= 2 ? '#ff5555' :
     '#aa0000';
 
-  const jobOffers = teamsOfferingJobs(teams, userTeamId, managerReputation)
+  const jobOffers = teamsOfferingJobs(teams, userTeamId, managerReputation, firedByTeamIds ?? [])
     .sort((a, b) => calculateTeamStrength(b) - calculateTeamStrength(a));
+  const blacklistedCount = (firedByTeamIds ?? []).length;
+  const noTeamsLeft = jobOffers.length === 0 && !teams.some(t => t.id === userTeamId && !(firedByTeamIds ?? []).includes(t.id));
   const currentTeam = teams.find(t => t.id === userTeamId);
   const yy = (y: number) => (y + 1).toString().slice(-2);
 
@@ -242,14 +246,34 @@ export const ProManagerEndView = ({
         </div>
       </div>
 
+      {/* ─── GAME OVER (no team will hire you) ────────────────────── */}
+      {noTeamsLeft && (
+        <div className="w-full border-4 border-vga-light-red bg-vga-black p-4 flex flex-col gap-3 items-center text-center">
+          <div className="text-vga-light-red text-[12px] uppercase tracking-widest font-bold">Fin de carrera</div>
+          <div className="text-vga-bright-white text-[10px] max-w-xl">
+            Todos los clubes te han despedido. Nadie te quiere en su banquillo.
+            {blacklistedCount > 0 && <> Has sido despedido por {blacklistedCount} {blacklistedCount === 1 ? 'club' : 'clubes'}.</>}
+          </div>
+          <button
+            onClick={onRetire}
+            className="bg-vga-light-red hover:bg-vga-red text-vga-bright-white text-[10px] font-bold uppercase tracking-widest px-6 py-2 border-2 border-vga-black"
+          >
+            Retirarse y ver carrera
+          </button>
+        </div>
+      )}
+
       {/* ─── JOB OFFERS ──────────────────────────────────────────── */}
       <div className="w-full border-2 border-vga-gray" style={{ background: '#00000a' }}>
         <div className="px-4 py-2 border-b border-vga-gray flex items-center gap-3">
           <h3 className="text-vga-yellow text-[9px] font-bold uppercase tracking-widest">{t('promanager.offers')}</h3>
           <span className="text-vga-gray text-[7px]">{t('promanager.offersCount', { n: String(jobOffers.length) })}</span>
+          {blacklistedCount > 0 && (
+            <span className="text-vga-light-red text-[7px] uppercase">· {blacklistedCount} club{blacklistedCount === 1 ? '' : 'es'} te han descartado</span>
+          )}
         </div>
 
-        {jobOffers.length === 0 && (
+        {jobOffers.length === 0 && !noTeamsLeft && (
           <p className="text-vga-gray text-[8px] text-center py-8">{t('promanager.noOffers')}</p>
         )}
 

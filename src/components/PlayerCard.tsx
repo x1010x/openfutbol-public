@@ -57,12 +57,17 @@ export const PlayerCard = ({ player, seasonYear, highlight, onNameClick, footer,
             <PlayerName player={player} useShirt className="text-[12px] truncate" />
           )}
         </div>
-        <span className="text-[8px] text-vga-cyan shrink-0">#{player.number}</span>
+        <div className="flex items-center gap-1 shrink-0">
+          {player.stats_year != null && (
+            <span className="text-[7px] text-vga-light-green bg-vga-black border border-vga-light-green px-1">{player.stats_year}</span>
+          )}
+          <span className="text-[8px] text-vga-cyan">#{player.number}</span>
+        </div>
       </div>
 
       <div className="flex gap-2 mb-2">
         <div className="flex flex-col items-center justify-center bg-vga-black vga-panel-inset w-14 py-1">
-          <PlayerPhoto playerId={player.id} size="sm" className="mb-0.5" />
+          <PlayerPhoto sourceId={player.source_id} size="sm" className="mb-0.5" />
           <span className="text-[7px] text-vga-cyan">MEDIA</span>
           <div className="flex items-center gap-1">
             <span className="text-xl text-vga-light-green leading-none">{medDisplay}</span>
@@ -74,13 +79,25 @@ export const PlayerCard = ({ player, seasonYear, highlight, onNameClick, footer,
           <span className="text-[7px] text-vga-yellow mt-1">{age}a</span>
         </div>
         <div className="flex-1 flex flex-col gap-0.5">
-          <StatBar label="VEL" value={player.stats.speed} segments={6} size="sm" />
-          <StatBar label="REG" value={player.stats.dribbling} segments={6} size="sm" />
-          <StatBar label="PAS" value={player.stats.passing} segments={6} size="sm" />
-          <StatBar label="TIR" value={player.stats.shooting} segments={6} size="sm" />
-          <StatBar label="DEF" value={player.stats.defending} segments={6} size="sm" />
-          <StatBar label="FIS" value={player.stats.physical} segments={6} size="sm" />
-          <StatBar label="POR" value={player.stats.goalkeeping} segments={6} size="sm" />
+          {player.current_ability != null ? (
+            <>
+              <StatBar label="CA" value={Math.round(player.current_ability / 2)} max={100} segments={8} size="sm" />
+              <StatBar label="PA" value={Math.round((player.potential_ability ?? player.current_ability) / 2)} max={100} segments={8} size="sm" />
+              {(player.positions ?? []).slice(0, 5).map(pos => (
+                <StatBar key={pos.code} label={pos.code} value={pos.level} max={20} segments={4} size="sm" />
+              ))}
+            </>
+          ) : (
+            <>
+              <StatBar label="VEL" value={player.stats.speed} segments={6} size="sm" />
+              <StatBar label="REG" value={player.stats.dribbling} segments={6} size="sm" />
+              <StatBar label="PAS" value={player.stats.passing} segments={6} size="sm" />
+              <StatBar label="TIR" value={player.stats.shooting} segments={6} size="sm" />
+              <StatBar label="DEF" value={player.stats.defending} segments={6} size="sm" />
+              <StatBar label="FIS" value={player.stats.physical} segments={6} size="sm" />
+              <StatBar label="POR" value={player.stats.goalkeeping} segments={6} size="sm" />
+            </>
+          )}
         </div>
       </div>
 

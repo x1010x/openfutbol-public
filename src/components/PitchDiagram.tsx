@@ -115,11 +115,14 @@ export const PitchDiagram = ({ team, selectedSlot, onSlotClick, onCircleClick, o
               )}
               {player ? (
                 <>
-                  <circle cx={x} cy={y} r={4.6} fill={color} stroke="#000000" strokeWidth="0.4"
-                    onClick={handleCircle} style={{ cursor: 'pointer' }} />
-                  <text x={x} y={y + 1.4} fontSize="3.6" textAnchor="middle" fill={unavailable ? '#AAAAAA' : '#000000'} fontWeight="bold"
+                  <g transform={`translate(${x - 4.5}, ${y - 4.5}) scale(0.375)`} shapeRendering="crispEdges"
                     onClick={handleCircle} style={{ cursor: 'pointer' }}>
-                    {playerLiveMed}
+                    <path d="M4 4 L20 4 L20 5 L23 5 L23 11 L20 11 L20 14 L18 14 L18 21 L6 21 L6 14 L4 14 L4 11 L1 11 L1 5 L4 5 Z"
+                      fill={color} stroke="#000000" strokeWidth="1.1" />
+                  </g>
+                  <text x={x} y={y + 1.7} fontSize="3.4" textAnchor="middle" fill={unavailable ? '#AAAAAA' : '#000000'} fontWeight="bold"
+                    onClick={handleCircle} style={{ cursor: 'pointer' }}>
+                    {Math.round(playerLiveMed / 2)}
                   </text>
                   {(() => {
                     const sn = shortName(player.name);

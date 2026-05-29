@@ -235,6 +235,9 @@ export interface LeagueState {
   seasonTransferSpent?: number;
   seasonTransferEarned?: number;
   managerCareer?: ManagerSeasonRecord[];
+  // ProManager: clubs that have already fired the user. They will never offer
+  // a new job. If every other club is on this list, it's game over.
+  firedByTeamIds?: string[];
   boardRewardThreshold?: number; // 0 = none, 7 = praise given, 9 = marbella given
   managerStartJornada?: number;  // jornada when current manager took over (for grace period)
   managerWins?: number;          // wins since current manager took over (not full team season)
@@ -247,6 +250,7 @@ export interface LeagueState {
   // Tebas rules: max 2 clausulazos made by user per season, max 2 received per team per season
   seasonClausulazosMade?: number;
   seasonClausulazosReceived?: Record<string, number>;
+  schema_version?: number;
 }
 
 export const emptyTeamRecords = (): TeamRecords => ({
@@ -352,6 +356,7 @@ export const getInitialLeagueState = (
     managerCareer: [],
     seasonClausulazosMade: 0,
     seasonClausulazosReceived: {},
+    schema_version: 2,
   };
 };
 
@@ -654,7 +659,7 @@ export const decayTeamStaminaAfterMatch = (state: LeagueState, teamId: string): 
       ...team,
       players: team.players.map(p => {
         if (!team.lineup.includes(p.id)) return p;
-        const rate = 0.25 + (1 - p.stats.physical / 99) * 0.15;
+        const rate = 0.25 + (1 - (p.current_ability ?? 100) / 200) * 0.15;
         return { ...p, stamina: Math.max(1, Math.round((p.stamina ?? 99) - rate * 90)) };
       }),
     };
@@ -677,7 +682,7 @@ export const applyStaminaRecovery = (state: LeagueState): LeagueState => {
     ...team,
     players: team.players.map(p => ({
       ...p,
-      stamina: Math.min(99, (p.stamina ?? 99) + Math.round((12 + (p.stats.physical / 99) * 13) * engineSettings.staminaRecoveryMult)),
+      stamina: Math.min(99, (p.stamina ?? 99) + Math.round((12 + ((p.current_ability ?? 100) / 200) * 13) * engineSettings.staminaRecoveryMult)),
     })),
   }));
   return { ...state, teams: newTeams };
@@ -714,11 +719,15 @@ export const deductWeeklySalaries = (state: LeagueState): LeagueState => {
 
 // Re-elige formación y alineación óptimas para todos los equipos AI tras cambios de plantilla.
 // El equipo del usuario se mantiene tal cual (lo gestiona él).
+// We deliberately pass `disciplined: false` so the AI considers every formation and every
+// player×slot combination — the OOP penalty is already baked into the selection score via
+// positionLevelFactor, so an off-position player is only chosen when their penalised ability
+// still beats the native alternative. The result is the lineup with the highest combined
+// match strength, which is what the user expects from a "best possible MED" rotation.
 export const repickAiFormations = (state: LeagueState): LeagueState => {
   const newTeams = state.teams.map(team => {
     if (team.id === state.userTeamId) return team;
-    const disc = team.tacticalDiscipline ?? true;
-    const { formation, lineup } = pickBestFormation(team.players, new Set(), disc);
+    const { formation, lineup } = pickBestFormation(team.players, new Set(), false);
     return { ...team, formation, lineup };
   });
   return { ...state, teams: newTeams };
@@ -767,16 +776,21 @@ export const simulateAiMarketSignings = (state: LeagueState): LeagueState => {
 
   let working = state;
   for (const buyer of [...aiTeams].sort(() => Math.random() - 0.5)) {
-    if (Math.random() > engineSettings.aiSigningProb) continue;
     const liveTeam = working.teams.find(t => t.id === buyer.id);
     if (!liveTeam || liveTeam.players.length >= 25) continue;
+
+    const needs = squadNeeds(liveTeam);
+    const maxNeed = Math.max(needs.POR, needs.DEF, needs.MED, needs.DEL);
+
+    // Critical shortage bypasses the probability gate — the team has to fill the gap.
+    // Mild shortage or upgrade-shopping uses the normal aiSigningProb roll.
+    if (maxNeed < 2 && Math.random() > engineSettings.aiSigningProb) continue;
 
     const market = working.teams
       .filter(t => t.id !== buyer.id && t.id !== working.userTeamId)
       .flatMap(t => t.players.filter(p => p.forSale).map(p => ({ player: p, seller: t })));
     if (market.length === 0) continue;
 
-    const needs = squadNeeds(liveTeam);
     let best: { player: Player; seller: typeof market[0]['seller']; gain: number } | null = null;
 
     for (const { player, seller } of market) {
@@ -784,12 +798,18 @@ export const simulateAiMarketSignings = (state: LeagueState): LeagueState => {
       const price = computePrice(player, working.year);
       if (liveTeam.budget < price) continue;
 
-      if (needs[grp] > 0) {
-        if (player.media > 55 && (!best || player.media > best.gain)) {
-          best = { player, seller, gain: player.media };
+      const need = needs[grp];
+      if (need > 0) {
+        // Position shortage: take whoever fits, but never sign useless filler.
+        // Critical shortage (need >= 2) lowers the bar to "decent reserve" (45);
+        // mild shortage (need == 1) keeps a higher floor.
+        const mediaFloor = need >= 2 ? 45 : 50;
+        if (player.media >= mediaFloor && (!best || player.media > best.gain)) {
+          best = { player, seller, gain: player.media + need * 100 }; // tie-break: bigger need wins
         }
         continue;
       }
+      // No shortage — only sign if it's a clear upgrade for the position group.
       const inGroup = liveTeam.players.filter(p => groupFor(p.position) === grp);
       if (inGroup.length === 0) continue;
       const weakest = inGroup.reduce((m, p) => p.media < m.media ? p : m, inGroup[0]);
@@ -1235,12 +1255,14 @@ export const simulateAiFreeAgentSignings = (state: LeagueState): LeagueState => 
   const shuffled = [...aiTeams].sort(() => Math.random() - 0.5);
 
   for (const team of shuffled) {
-    if (Math.random() > engineSettings.aiSigningProb) continue;
     const liveTeam = working.teams.find(t => t.id === team.id);
     if (!liveTeam || liveTeam.players.length >= 25) continue;
     if (working.freeAgents.length === 0) break;
 
     const needs = squadNeeds(liveTeam);
+    const maxNeed = Math.max(needs.POR, needs.DEF, needs.MED, needs.DEL);
+    // Critical shortage forces the AI to act; otherwise roll for opportunistic signings.
+    if (maxNeed < 2 && Math.random() > engineSettings.aiSigningProb) continue;
     const candidates = working.freeAgents.map(p => {
       const age = working.year - p.birthYear;
       const group = groupFor(p.position);
@@ -1304,7 +1326,10 @@ export const simulateAiClausulazos = (state: LeagueState): LeagueState => {
 
   // Single per-jornada probability roll — prevents the effective chance from
   // multiplying across player×rival combinations (avoids near-certain firing each jornada).
-  if (Math.random() > engineSettings.aiClausulazoProb) return state;
+  // On the last jornada of an open window the deadline-day pressure multiplies the chance.
+  const left = windowJornadasLeft(state.currentJornada, state.schedule.length);
+  const probMult = left === 1 ? 5 : 1;
+  if (Math.random() > engineSettings.aiClausulazoProb * probMult) return state;
 
   // Only consider unlisted high-media players as clausulazo targets
   const targets = userTeam.players.filter(p => !p.forSale && p.media >= 72);
@@ -1322,7 +1347,7 @@ export const simulateAiClausulazos = (state: LeagueState): LeagueState => {
     if (state.blockedSignings.includes(transferredKey(player.id))) continue;
 
     const price = computePrice(player, state.year);
-    const clausulaPrice = price * 2;
+    const clausulaPrice = Math.round(price * engineSettings.clausulazoMult / 100_000) * 100_000;
     const group = groupFor(player.position);
 
     for (const rival of shuffledAi) {
@@ -1389,6 +1414,103 @@ export const simulateAiClausulazos = (state: LeagueState): LeagueState => {
     }
   }
   return state;
+};
+
+// Deadline-day frenzy: on the last jornada of an open transfer window, rivals
+// trigger clausulazos against each other too. Up to 3 attempts per jornada so
+// you can see real movement between AI clubs on the last day.
+export const simulateAiInterClausulazos = (state: LeagueState): LeagueState => {
+  const left = windowJornadasLeft(state.currentJornada, state.schedule.length);
+  if (left !== 1) return state;
+
+  let working = state;
+  const ATTEMPTS = 3;
+
+  for (let attempt = 0; attempt < ATTEMPTS; attempt++) {
+    // Each attempt has its own probability roll.
+    if (Math.random() > engineSettings.aiClausulazoProb * 6) continue;
+
+    const aiTeams = working.teams.filter(t => t.id !== working.userTeamId);
+    if (aiTeams.length < 2) break;
+    const shuffledBuyers = [...aiTeams].sort(() => Math.random() - 0.5);
+    const shuffledTargets = [...aiTeams].sort(() => Math.random() - 0.5);
+
+    let executed = false;
+    outer:
+    for (const seller of shuffledTargets) {
+      // Tebas rule: each team can only receive 2 clausulazos per season.
+      const received = (working.seasonClausulazosReceived ?? {})[seller.id] ?? 0;
+      if (received >= 2) continue;
+
+      // Best targets: unlisted, high-media, not already traded this season.
+      const candidates = seller.players.filter(p =>
+        !p.forSale &&
+        p.media >= 72 &&
+        !(working.blockedSignings ?? []).includes(transferredKey(p.id))
+      );
+      if (candidates.length === 0) continue;
+
+      for (const player of candidates) {
+        const price = computePrice(player, working.year);
+        const clausulaPrice = Math.round(price * engineSettings.clausulazoMult / 100_000) * 100_000;
+        const group = groupFor(player.position);
+
+        for (const buyer of shuffledBuyers) {
+          if (buyer.id === seller.id) continue;
+          if (buyer.budget < clausulaPrice) continue;
+
+          const buyerInGroup = buyer.players.filter(pl => groupFor(pl.position) === group);
+          const weakestMedia = buyerInGroup.length > 0
+            ? Math.min(...buyerInGroup.map(pl => pl.media))
+            : 0;
+          if (player.media <= weakestMedia + 5) continue;
+
+          const newTeams = working.teams.map(t => {
+            if (t.id === seller.id) return {
+              ...t,
+              players: t.players.filter(pl => pl.id !== player.id),
+              lineup: t.lineup.filter(id => id !== player.id),
+              budget: t.budget + clausulaPrice,
+            };
+            if (t.id === buyer.id) return {
+              ...t,
+              players: [...t.players, { ...player, forSale: false }],
+              budget: t.budget - clausulaPrice,
+            };
+            return t;
+          });
+
+          const record: TransferRecord = {
+            id: `ai_clausulazo_${working.currentJornada}_${player.id}_${buyer.id}`,
+            jornada: working.currentJornada,
+            year: working.year,
+            playerName: player.name,
+            playerPosition: player.position,
+            fromTeamName: seller.name,
+            toTeamName: buyer.name,
+            amount: clausulaPrice,
+          };
+
+          const prevReceived = working.seasonClausulazosReceived ?? {};
+          working = {
+            ...working,
+            teams: newTeams,
+            transferLog: appendTransfer(working.transferLog, record),
+            blockedSignings: [...(working.blockedSignings ?? []), transferredKey(player.id)],
+            seasonClausulazosReceived: {
+              ...prevReceived,
+              [seller.id]: (prevReceived[seller.id] ?? 0) + 1,
+            },
+          };
+          executed = true;
+          break outer;
+        }
+      }
+    }
+    if (!executed) break; // nothing more to do
+  }
+
+  return working;
 };
 
 // AI-vs-AI player swaps. One try per jornada. Players must share a position group

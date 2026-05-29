@@ -6,7 +6,7 @@ import { StatBar } from './StatBar';
 import { PlayerEditorPanel } from './PlayerEditorPanel';
 import { PlayerPickerPanel } from './PlayerPickerPanel';
 import { getTeamDefaults, extractDbId, buildPlayerForYear, getAllDBPlayerEntries, buildTeamFromSeason } from '../data/mockTeams';
-import { exportTeamPack, exportPlayerPack, loadPackFromFile } from '../data/packLoader';
+import { exportTeamPack, exportPlayerPack, loadLegacyPackFromFile as loadPackFromFile } from '../data/packLoader';
 import { pickBestFormation, computePositionWeightedMedia } from '../engine/formations';
 import { PlayerName } from './PlayerName';
 import { useT as useTranslation } from '../i18n';

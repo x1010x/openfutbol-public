@@ -1,5 +1,5 @@
 import type { Team, MatchState, MatchEvent, Player, Position } from '../types/game.d.ts';
-import { FORMATIONS, buildSlotMap, effectiveStat, rawMedia, slotPenalty } from './formations';
+import { FORMATIONS, buildSlotMap, effectiveStat, positionLevelFactor } from './formations';
 import { t } from '../i18n';
 import { engineSettings } from './engineSettings';
 
@@ -13,11 +13,11 @@ export const calculateTeamStrength = (team: Team, sentOff: string[] = [], stamin
     if (sentOff.includes(pid)) continue;
     const p = team.players.find(pp => pp.id === pid);
     if (!p) continue;
-    const stam = stamina ? (stamina[pid] ?? 99) : (p.stamina ?? 99);
-    const stamFactor = 0.7 + 0.3 * (stam / 99);
-    // Use rawMedia * slotPenalty instead of effectiveMedia to avoid double stamina penalty
-    // because effectiveMedia also applies its own stamina factor based on p.stamina.
-    total += rawMedia(p) * slotPenalty(p, slots[i]) * stamFactor;
+    // Temporarily override stamina on player object so effectiveAbility reads the match value.
+    const overrideStam = stamina ? (stamina[pid] ?? p.stamina ?? 99) : (p.stamina ?? 99);
+    const ca = p.current_ability ?? (p.media ?? 50) * 2;
+    const stamFactor = 0.8 + 0.2 * (overrideStam / 99);
+    total += ca * positionLevelFactor(p, slots[i]) * stamFactor;
   }
   return total / 11;
 };
