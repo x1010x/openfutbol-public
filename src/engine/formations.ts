@@ -145,6 +145,17 @@ export const slotPositionFor = (team: Team, playerId: string): Position | null =
   return slots[idx] ?? null;
 };
 
+// Score used to rank players *for lineup selection*. Steeper stamina penalty than
+// effectiveAbility so the AI naturally rotates tired stars out when a fresher sub
+// is in striking distance. Match-time strength still uses effectiveAbility.
+const selectionScore = (player: Player, slotPos: Position): number => {
+  const stam = player.stamina ?? 99;
+  // Curve: 99 → 1.00, 80 → 0.87, 60 → 0.72, 40 → 0.58, 20 → 0.44
+  const stamFactor = 0.3 + 0.7 * (stam / 99);
+  const ca = player.current_ability ?? (player.media ?? 50) * 2;
+  return ca * positionLevelFactor(player, slotPos) * stamFactor;
+};
+
 export const pickBestXI = (
   players: Player[],
   formationId: FormationId,
@@ -170,7 +181,7 @@ export const pickBestXI = (
 
     for (const p of pool) {
       if (used.has(p.id)) continue;
-      const score = effectiveAbility(p, slotPos);
+      const score = selectionScore(p, slotPos);
       if (score > bestScore) {
         bestScore = score;
         best = p;
@@ -180,7 +191,7 @@ export const pickBestXI = (
     if (!best && disciplined) {
       for (const p of eligible) {
         if (used.has(p.id)) continue;
-        const score = effectiveAbility(p, slotPos);
+        const score = selectionScore(p, slotPos);
         if (score > bestScore) {
           bestScore = score;
           best = p;
@@ -191,7 +202,8 @@ export const pickBestXI = (
     if (best) {
       lineup.push(best.id);
       used.add(best.id);
-      strength += bestScore;
+      // Report match-time strength (used by pickBestFormation to compare formations).
+      strength += effectiveAbility(best, slotPos);
     } else {
       lineup.push('');
     }
