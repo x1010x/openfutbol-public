@@ -106,11 +106,26 @@ export const EndOfSeasonView = ({ league, onContinueSameTeam, onAdvanceAndChange
   )[0];
 
   const mvpPool = withApps.filter(p => p.seasonStats.appearances >= minAppsRegular);
-  const mvp = [...mvpPool].sort((a, b) =>
+  const mvpSorted = [...mvpPool].sort((a, b) =>
     (b.seasonStats.ratingSum / Math.max(1, b.seasonStats.appearances)) -
     (a.seasonStats.ratingSum / Math.max(1, a.seasonStats.appearances))
-  )[0];
+  );
+  const mvp = mvpSorted[0];
   const mvpAvg = mvp ? (mvp.seasonStats.ratingSum / Math.max(1, mvp.seasonStats.appearances)).toFixed(2) : '0';
+
+  // Top 5 lists for the leaderboards row
+  const top5Scorers = [...allPlayers]
+    .filter(p => p.seasonStats.goals > 0)
+    .sort((a, b) => b.seasonStats.goals - a.seasonStats.goals)
+    .slice(0, 5);
+  const top5Assisters = [...allPlayers]
+    .filter(p => p.seasonStats.assists > 0)
+    .sort((a, b) => b.seasonStats.assists - a.seasonStats.assists)
+    .slice(0, 5);
+  const top5Rating = mvpSorted.slice(0, 5);
+  const top5Keepers = [...eligibleGks]
+    .sort((a, b) => (a.seasonStats.goalsAgainst / a.seasonStats.appearances) - (b.seasonStats.goalsAgainst / b.seasonStats.appearances))
+    .slice(0, 5);
 
   // ── Team-level records ──────────────────────────────────────────────────
   const totalGoals = sortedStats.reduce((sum, s) => sum + s.goalsFor, 0);
@@ -262,6 +277,39 @@ export const EndOfSeasonView = ({ league, onContinueSameTeam, onAdvanceAndChange
         {mvp && (
           <StatCard label="MVP" primary={mvp.name} secondary={`${mvp.teamName} · ${mvpAvg} avg`} photoId={mvp.source_id} valueColor="text-vga-light-cyan" size="lg" onClick={onPlayerClick ? () => onPlayerClick(mvp.id) : undefined} player={mvp} />
         )}
+      </div>
+
+      {/* Top 5 leaderboards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
+        {[
+          { title: 'Top 5 · Goleadores', list: top5Scorers, valueOf: (p: EnrichedPlayer) => `${p.seasonStats.goals}G`, color: 'text-vga-light-green' },
+          { title: 'Top 5 · Asistentes', list: top5Assisters, valueOf: (p: EnrichedPlayer) => `${p.seasonStats.assists}A`, color: 'text-vga-light-cyan' },
+          { title: 'Top 5 · Mejor media', list: top5Rating, valueOf: (p: EnrichedPlayer) => (p.seasonStats.ratingSum / Math.max(1, p.seasonStats.appearances)).toFixed(2), color: 'text-vga-yellow' },
+          { title: 'Top 5 · Porteros', list: top5Keepers, valueOf: (p: EnrichedPlayer) => (p.seasonStats.goalsAgainst / Math.max(1, p.seasonStats.appearances)).toFixed(2) + ' GC/p', color: 'text-vga-light-red' },
+        ].map(board => (
+          <Panel key={board.title} title={board.title}>
+            {board.list.length === 0 ? (
+              <div className="text-vga-gray text-[8px] p-3 text-center">Sin datos.</div>
+            ) : (
+              <table className="w-full text-[9px]">
+                <tbody>
+                  {board.list.map((p, i) => (
+                    <tr
+                      key={p.id}
+                      onClick={onPlayerClick ? () => onPlayerClick(p.id) : undefined}
+                      className={onPlayerClick ? 'cursor-pointer hover:bg-vga-blue/30' : ''}
+                    >
+                      <td className={`pl-2 py-0.5 w-4 font-bold tabular-nums ${i === 0 ? 'text-vga-yellow' : 'text-vga-magenta'}`}>{i + 1}</td>
+                      <td className="text-vga-bright-white truncate max-w-[120px]"><PlayerName player={p} /></td>
+                      <td className="text-vga-cyan text-[7px] truncate max-w-[80px]">{p.teamName}</td>
+                      <td className={`text-right pr-2 font-bold tabular-nums ${board.color}`}>{board.valueOf(p)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </Panel>
+        ))}
       </div>
 
       {/* Main grid: classification | records */}
