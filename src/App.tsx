@@ -5,7 +5,7 @@ import { getAvailableYears, getAvailableYearsWithStats, getTeamColorsForYear, mi
 import type { FormationId, MatchEvent, MatchState, Team } from './types/game.d.ts';
 import { applyMoodToTeam } from './engine/playerMood';
 import { simulateMinute, calculateTeamStrength } from './engine/simEngine';
-import { FORMATIONS } from './engine/formations';
+import { FORMATIONS, pickBestXI } from './engine/formations';
 import { getInitialLeagueState, getFantasyLeagueState, updateLeagueStats, deductWeeklySalaries, generateIncomingOffers, autoListAiPlayers, simulateAiMarketSignings, advanceSeason, simulateAiTrades, simulateAiFreeAgentSignings, simulateAiClausulazos, simulateAiInterClausulazos, appendTransfer, decrementSuspensions, signingBlockKey, transferredKey, squadNeeds, groupFor, repickAiFormations, writebackMatchStamina, decayTeamStaminaAfterMatch, decrementInjuries, applyStaminaRecovery, computeTvBonus, applyTvBonus, isTransferWindowOpen, windowJornadasLeft, jornadasUntilWindowOpen } from './store/leagueStore';
 import type { TransferRecord, ManagerSeasonRecord } from './store/leagueStore';
 import type { LeagueState } from './store/leagueStore';
@@ -2417,6 +2417,19 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
                       </div>
                     ) : null;
                   })()}
+                  <button
+                    onClick={() => {
+                      const { lineup } = pickBestXI(userTeam.players, userTeam.formation, new Set(), userTeam.tacticalDiscipline ?? true);
+                      setLeague(prev => ({
+                        ...prev,
+                        teams: prev.teams.map(t => t.id === userTeam.id ? { ...t, lineup } : t),
+                      }));
+                      setPreviewSwapSlot(null);
+                    }}
+                    className="w-full text-[8px] font-bold text-vga-black bg-vga-yellow border border-vga-bright-white py-1 mb-1 hover:bg-vga-bright-white uppercase tracking-wider"
+                  >
+                    ★ Auto-Fix XI ({userTeam.formation})
+                  </button>
                   <button
                     onClick={() => setView('ALIGNMENT')}
                     className="w-full text-[7px] text-vga-cyan border border-vga-cyan py-1 mb-2 hover:bg-vga-cyan hover:text-vga-black"
