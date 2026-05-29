@@ -53,7 +53,7 @@ import type { OfferResult } from './data/economy';
 import { PackLoaderView } from './components/PackLoaderView';
 import { usePack } from './state/PackContext';
 import { buildTeamFromPackClub } from './data/packTeamBuilder';
-import { runtimePlayerFromPack } from './data/playerBuilder';
+import { runtimePlayerFromPack, joinPlayerName } from './data/playerBuilder';
 
 type View = 'LEAGUE' | 'SQUAD' | 'ALIGNMENT' | 'RESULTS' | 'STATS' | 'FINANCES' | 'TRANSFERS' | 'JORNADA_RESULTS' | 'END_OF_SEASON' | 'PLAYER_DETAIL' | 'BACKUP' | 'EDITOR' | 'EQUIPO' | 'MANAGER_CAREER' | 'PACK_LOADER';
 
@@ -95,6 +95,11 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
       const hydratedTeams = parsed.teams.map((t: Team) => migrateTeam({
         ...t,
         colors: t.colors ?? colorsByTeamId.get(t.id),
+        players: (t.players ?? []).map(p => {
+          if (!p.first_name || !p.last_name) return p;
+          const joined = joinPlayerName(p.first_name, p.last_name);
+          return { ...p, name: joined, fullName: joined };
+        }),
       }));
       const teamRecords: Record<string, import('./store/leagueStore').TeamRecords> = parsed.teamRecords && typeof parsed.teamRecords === 'object' ? parsed.teamRecords : {};
       hydratedTeams.forEach((t: Team) => {

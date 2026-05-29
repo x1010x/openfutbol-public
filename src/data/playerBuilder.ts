@@ -15,7 +15,7 @@ const statsFromFifa = (e: FifaEntry, isGK: boolean): PlayerStats => ({
 
 const avg = (...vals: number[]) => vals.reduce((s, v) => s + v, 0) / vals.length;
 
-const joinPlayerName = (first: string, last: string): string => {
+export const joinPlayerName = (first: string, last: string): string => {
   const f = first.trim();
   const l = last.trim();
   if (!f) return l;
