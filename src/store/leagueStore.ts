@@ -776,16 +776,21 @@ export const simulateAiMarketSignings = (state: LeagueState): LeagueState => {
 
   let working = state;
   for (const buyer of [...aiTeams].sort(() => Math.random() - 0.5)) {
-    if (Math.random() > engineSettings.aiSigningProb) continue;
     const liveTeam = working.teams.find(t => t.id === buyer.id);
     if (!liveTeam || liveTeam.players.length >= 25) continue;
+
+    const needs = squadNeeds(liveTeam);
+    const maxNeed = Math.max(needs.POR, needs.DEF, needs.MED, needs.DEL);
+
+    // Critical shortage bypasses the probability gate — the team has to fill the gap.
+    // Mild shortage or upgrade-shopping uses the normal aiSigningProb roll.
+    if (maxNeed < 2 && Math.random() > engineSettings.aiSigningProb) continue;
 
     const market = working.teams
       .filter(t => t.id !== buyer.id && t.id !== working.userTeamId)
       .flatMap(t => t.players.filter(p => p.forSale).map(p => ({ player: p, seller: t })));
     if (market.length === 0) continue;
 
-    const needs = squadNeeds(liveTeam);
     let best: { player: Player; seller: typeof market[0]['seller']; gain: number } | null = null;
 
     for (const { player, seller } of market) {
@@ -793,12 +798,17 @@ export const simulateAiMarketSignings = (state: LeagueState): LeagueState => {
       const price = computePrice(player, working.year);
       if (liveTeam.budget < price) continue;
 
-      if (needs[grp] > 0) {
-        if (player.media > 55 && (!best || player.media > best.gain)) {
-          best = { player, seller, gain: player.media };
+      const need = needs[grp];
+      if (need > 0) {
+        // Position shortage: take whoever fits. Critical shortage (need >= 2) drops the
+        // floor entirely; mild shortage keeps a modest quality bar.
+        const mediaFloor = need >= 2 ? 0 : 50;
+        if (player.media >= mediaFloor && (!best || player.media > best.gain)) {
+          best = { player, seller, gain: player.media + need * 100 }; // tie-break: bigger need wins
         }
         continue;
       }
+      // No shortage — only sign if it's a clear upgrade for the position group.
       const inGroup = liveTeam.players.filter(p => groupFor(p.position) === grp);
       if (inGroup.length === 0) continue;
       const weakest = inGroup.reduce((m, p) => p.media < m.media ? p : m, inGroup[0]);
@@ -1244,12 +1254,14 @@ export const simulateAiFreeAgentSignings = (state: LeagueState): LeagueState => 
   const shuffled = [...aiTeams].sort(() => Math.random() - 0.5);
 
   for (const team of shuffled) {
-    if (Math.random() > engineSettings.aiSigningProb) continue;
     const liveTeam = working.teams.find(t => t.id === team.id);
     if (!liveTeam || liveTeam.players.length >= 25) continue;
     if (working.freeAgents.length === 0) break;
 
     const needs = squadNeeds(liveTeam);
+    const maxNeed = Math.max(needs.POR, needs.DEF, needs.MED, needs.DEL);
+    // Critical shortage forces the AI to act; otherwise roll for opportunistic signings.
+    if (maxNeed < 2 && Math.random() > engineSettings.aiSigningProb) continue;
     const candidates = working.freeAgents.map(p => {
       const age = working.year - p.birthYear;
       const group = groupFor(p.position);
