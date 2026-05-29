@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 
 interface Props {
   sourceId?: number;
-  size?: 'xs' | 'sm' | 'md' | 'lg';
+  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
   className?: string;
 }
 
@@ -11,6 +11,7 @@ const SIZE: Record<NonNullable<Props['size']>, string> = {
   sm: 'w-6 h-6',
   md: 'w-9 h-9',
   lg: 'w-16 h-16',
+  xl: 'w-24 h-24',
 };
 
 // TODO swap to self-hosted CDN once available.
