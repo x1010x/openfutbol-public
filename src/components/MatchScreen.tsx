@@ -124,6 +124,21 @@ function staminaFill(stam: number): string {
   return '#ff5555';
 }
 
+// Pixel-art football shirt — same shape as TeamCrest. The path is in a 24x24
+// box; we scale it to ~8 units on the mini-pitch and centre it on (cx, cy).
+const JERSEY_PATH =
+  'M4 4 L20 4 L20 5 L23 5 L23 11 L20 11 L20 14 L18 14 L18 21 L6 21 L6 14 L4 14 L4 11 L1 11 L1 5 L4 5 Z';
+
+const JerseyMarker = ({ cx, cy, fill }: { cx: number; cy: number; fill: string }) => {
+  const size = 7.5;
+  const scale = size / 24;
+  return (
+    <g transform={`translate(${cx - size / 2}, ${cy - size / 2}) scale(${scale})`} shapeRendering="crispEdges">
+      <path d={JERSEY_PATH} fill={fill} stroke="#000" strokeWidth={1.2} />
+    </g>
+  );
+};
+
 function MiniPitch({ match, userTeamId, onPlayerClick }: { match: MatchState; userTeamId: string; onPlayerClick?: (playerId: string) => void }) {
   const home = match.homeTeam;
   const away = match.awayTeam;
@@ -187,9 +202,9 @@ function MiniPitch({ match, userTeamId, onPlayerClick }: { match: MatchState; us
         const handle = () => { if (clickable && p) onPlayerClick!(p.id); };
         return (
           <g key={`h${i}`} onClick={clickable ? handle : undefined} style={clickable ? { cursor: 'pointer' } : undefined}>
-            <rect x={cx - 3.2} y={cy - 3.2} width={6.4} height={6.4} fill={fill} stroke="#000" strokeWidth={0.4} shapeRendering="crispEdges" />
+            <JerseyMarker cx={cx} cy={cy} fill={fill} />
             {viv != null && (
-              <text x={cx} y={cy + 1.1} textAnchor="middle" fill="#000" fontSize={2.6} fontFamily="monospace" fontWeight={700}>
+              <text x={cx} y={cy + 0.9} textAnchor="middle" fill="#000" fontSize={2.4} fontFamily="monospace" fontWeight={700}>
                 {viv}
               </text>
             )}
@@ -214,9 +229,9 @@ function MiniPitch({ match, userTeamId, onPlayerClick }: { match: MatchState; us
         const handle = () => { if (clickable && p) onPlayerClick!(p.id); };
         return (
           <g key={`a${i}`} onClick={clickable ? handle : undefined} style={clickable ? { cursor: 'pointer' } : undefined}>
-            <rect x={cx - 3.2} y={cy - 3.2} width={6.4} height={6.4} fill={fill} stroke="#000" strokeWidth={0.4} shapeRendering="crispEdges" />
+            <JerseyMarker cx={cx} cy={cy} fill={fill} />
             {viv != null && (
-              <text x={cx} y={cy + 1.1} textAnchor="middle" fill="#000" fontSize={2.6} fontFamily="monospace" fontWeight={700}>
+              <text x={cx} y={cy + 0.9} textAnchor="middle" fill="#000" fontSize={2.4} fontFamily="monospace" fontWeight={700}>
                 {viv}
               </text>
             )}

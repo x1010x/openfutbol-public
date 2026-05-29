@@ -800,9 +800,10 @@ export const simulateAiMarketSignings = (state: LeagueState): LeagueState => {
 
       const need = needs[grp];
       if (need > 0) {
-        // Position shortage: take whoever fits. Critical shortage (need >= 2) drops the
-        // floor entirely; mild shortage keeps a modest quality bar.
-        const mediaFloor = need >= 2 ? 0 : 50;
+        // Position shortage: take whoever fits, but never sign useless filler.
+        // Critical shortage (need >= 2) lowers the bar to "decent reserve" (45);
+        // mild shortage (need == 1) keeps a higher floor.
+        const mediaFloor = need >= 2 ? 45 : 50;
         if (player.media >= mediaFloor && (!best || player.media > best.gain)) {
           best = { player, seller, gain: player.media + need * 100 }; // tie-break: bigger need wins
         }
