@@ -78,13 +78,13 @@ const MINI_LAYOUTS: Record<FormationId, [number, number][]> = {
 
 function eventIcon(type: string): string {
   switch (type) {
-    case 'goal': return '⚽';
+    case 'goal': return '*';
     case 'yellow': return '■';
     case 'red': return '■';
-    case 'sub': return '⇄';
+    case 'sub': return '<>';
     case 'injury': return '+';
     case 'shot': return '·';
-    default: return '›';
+    default: return '>';
   }
 }
 
@@ -445,7 +445,7 @@ export default function MatchScreen({
                 return (
                   <div key={i} className="flex items-center gap-2 py-0.5">
                     <span className="text-vga-yellow font-mono w-7">{g.minute}'</span>
-                    <span className="text-vga-light-green">{'⚽'}</span>
+                    <span className="inline-block w-2 h-2 bg-vga-bright-white border border-black align-middle" title="Gol" />
                     <span className="text-vga-bright-white truncate flex-1">{shirtName(scorer)}</span>
                     <span className={`${tagCol} text-[7px]`}>({tag})</span>
                   </div>
