@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
-import type { FormationId, MatchState } from '../types/game.d.ts';
+import type { FormationId, MatchState, Position } from '../types/game.d.ts';
 import { calculateTeamStrength } from '../engine/simEngine';
+import { FORMATIONS, liveMed } from '../engine/formations';
 import { formatJornadaDate } from '../engine/calendar';
 import { engineSettings } from '../engine/engineSettings';
 import { TeamCrest } from './TeamCrest';
@@ -177,14 +178,21 @@ function MiniPitch({ match, userTeamId, onPlayerClick }: { match: MatchState; us
         const stam = p ? (match.homeStamina[p.id] ?? p.stamina ?? 99) : 99;
         const fill = p ? staminaFill(stam) : '#666';
         const name = shortName(p);
+        const slotPos: Position | undefined = FORMATIONS[home.formation]?.[i];
+        const viv = p ? Math.max(1, Math.floor(liveMed({ ...p, stamina: stam }, stam, slotPos) / 2)) : null;
         const isUserSide = home.id === userTeamId;
         const clickable = !!(isUserSide && p && onPlayerClick);
         const handle = () => { if (clickable && p) onPlayerClick!(p.id); };
         return (
           <g key={`h${i}`} onClick={clickable ? handle : undefined} style={clickable ? { cursor: 'pointer' } : undefined}>
-            <circle cx={cx} cy={cy} r={3.2} fill={fill} stroke="#000" strokeWidth={0.4} />
+            <circle cx={cx} cy={cy} r={3.6} fill={fill} stroke="#000" strokeWidth={0.4} />
+            {viv != null && (
+              <text x={cx} y={cy + 1.1} textAnchor="middle" fill="#000" fontSize={2.6} fontFamily="monospace" fontWeight={700}>
+                {viv}
+              </text>
+            )}
             {name && (
-              <text x={cx} y={cy + 5.6} textAnchor="middle" fill="#ff5555" stroke="#000" strokeWidth={0.25} paintOrder="stroke" fontSize={2.8} fontFamily="'Press Start 2P', monospace" fontWeight={400}>
+              <text x={cx} y={cy + 6.4} textAnchor="middle" fill="#ff5555" stroke="#000" strokeWidth={0.25} paintOrder="stroke" fontSize={2.8} fontFamily="'Press Start 2P', monospace" fontWeight={400}>
                 {name.toUpperCase()}
               </text>
             )}
@@ -197,14 +205,21 @@ function MiniPitch({ match, userTeamId, onPlayerClick }: { match: MatchState; us
         const stam = p ? (match.awayStamina[p.id] ?? p.stamina ?? 99) : 99;
         const fill = p ? staminaFill(stam) : '#666';
         const name = shortName(p);
+        const slotPos: Position | undefined = FORMATIONS[away.formation]?.[i];
+        const viv = p ? Math.max(1, Math.floor(liveMed({ ...p, stamina: stam }, stam, slotPos) / 2)) : null;
         const isUserSide = away.id === userTeamId;
         const clickable = !!(isUserSide && p && onPlayerClick);
         const handle = () => { if (clickable && p) onPlayerClick!(p.id); };
         return (
           <g key={`a${i}`} onClick={clickable ? handle : undefined} style={clickable ? { cursor: 'pointer' } : undefined}>
-            <circle cx={cx} cy={cy} r={3.2} fill={fill} stroke="#000" strokeWidth={0.4} />
+            <circle cx={cx} cy={cy} r={3.6} fill={fill} stroke="#000" strokeWidth={0.4} />
+            {viv != null && (
+              <text x={cx} y={cy + 1.1} textAnchor="middle" fill="#000" fontSize={2.6} fontFamily="monospace" fontWeight={700}>
+                {viv}
+              </text>
+            )}
             {name && (
-              <text x={cx} y={cy + 5.6} textAnchor="middle" fill="#55ffff" stroke="#000" strokeWidth={0.25} paintOrder="stroke" fontSize={2.8} fontFamily="'Press Start 2P', monospace" fontWeight={400}>
+              <text x={cx} y={cy + 6.4} textAnchor="middle" fill="#55ffff" stroke="#000" strokeWidth={0.25} paintOrder="stroke" fontSize={2.8} fontFamily="'Press Start 2P', monospace" fontWeight={400}>
                 {name.toUpperCase()}
               </text>
             )}

@@ -15,6 +15,7 @@ loadEngineSettings();
 import { LeagueTable } from './components/LeagueTable';
 import { StatusBar } from './components/StatusBar';
 import { SquadView } from './components/SquadView';
+import { SquadViewCompact } from './components/SquadViewCompact';
 import { TeamSelection } from './components/TeamSelection';
 import { AlignmentView } from './components/AlignmentView';
 import { ResultsView } from './components/ResultsView';
@@ -45,6 +46,7 @@ import { FantasySetupView } from './components/FantasySetupView';
 import { FantasyDraftView } from './components/FantasyDraftView';
 import type { StatKey } from './components/StatDrillDown';
 import { extractDbId } from './data/mockTeams';
+import { startAmbiance, stopAmbiance, fadeOutAmbiance, setAmbianceMuted, playGoalSignal, playGoalWithCelebration, playMissed, playWhistle, playWhistleEnd } from './sfx';
 import { computePrice, evaluateOffer, formatEuros } from './data/economy';
 import { PlayerTooltipProvider } from './contexts/PlayerTooltipContext';
 import { formatJornadaDate } from './engine/calendar';
@@ -153,6 +155,20 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
   const [htPaused, setHtPaused] = useState(false);
   const [showSubPanel, setShowSubPanel] = useState(false);
   const [preselectedSubPlayerId, setPreselectedSubPlayerId] = useState<string | null>(null);
+  const [isCelebrating, setIsCelebrating] = useState(false);
+  const [squadCompact, setSquadCompact] = useState<boolean>(() => {
+    try {
+      const v = localStorage.getItem('openfutbol_squad_compact');
+      return v === null ? true : v === '1';
+    } catch { return true; }
+  });
+  const toggleSquadCompact = () => {
+    setSquadCompact(prev => {
+      const next = !prev;
+      try { localStorage.setItem('openfutbol_squad_compact', next ? '1' : '0'); } catch { /* noop */ }
+      return next;
+    });
+  };
   const [previewSwapSlot, setPreviewSwapSlot] = useState<number | null>(null);
   const [showFantasyFlow, setShowFantasyFlow] = useState(false);
   const [showProManagerFlow, setShowProManagerFlow] = useState(false);
@@ -1508,19 +1524,100 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
 
   useEffect(() => {
     let interval: number;
-    if (isPlaying && match && !match.isFinished) {
+    if (isPlaying && match && !match.isFinished && !isCelebrating) {
       interval = window.setInterval(() => {
         setMatch(prev => prev ? simulateMinute(prev, league.userTeamId) : null);
       }, match.matchSpeed);
     }
     return () => clearInterval(interval);
-  }, [isPlaying, match]);
+  }, [isPlaying, match, isCelebrating]);
 
   useEffect(() => {
     if (eventLogRef.current) {
       eventLogRef.current.scrollTop = eventLogRef.current.scrollHeight;
     }
   }, [match?.events]);
+
+  // Ambiance: loops in the background while a live match is in progress.
+  // Volume scales with the home stadium capacity (bigger venue → louder crowd).
+  // When the match ends we fade out instead of cutting; when the user leaves
+  // the match (match becomes null) we stop immediately.
+  useEffect(() => {
+    if (match && !match.isFinished) {
+      if (!muted) startAmbiance(match.homeTeam?.stadiumCapacity);
+    } else if (match && match.isFinished) {
+      fadeOutAmbiance(2.5);
+    } else {
+      stopAmbiance();
+    }
+  }, [match?.isFinished, !!match, match?.homeTeam?.stadiumCapacity, muted]);
+
+  // React to mute toggle without restarting ambiance.
+  useEffect(() => {
+    if (muted) { stopAmbiance(); }
+    else if (match && !match.isFinished) { startAmbiance(match.homeTeam?.stadiumCapacity); }
+    setAmbianceMuted(muted);
+  }, [muted]);
+
+  // Watch match events for new goals, missed chances, fouls / cards, halftime
+  // and full-time so we can fire the right sound effect.
+  // - Home-team goals get the crowd celebration (pauses the tick loop)
+  // - Away-team goals only get the basic goal sound
+  // - Cards (yellow/red) trigger a foul whistle
+  // - Halftime fires the whistle once when htPaused flips true
+  // - Full-time fires the end whistle and the ambiance fade-out runs in parallel
+  const lastGoalCountRef = useRef<number>(0);
+  const lastShotCountRef = useRef<number>(0);
+  const lastCardCountRef = useRef<number>(0);
+  const lastHtPausedRef = useRef<boolean>(false);
+  const lastFinishedRef = useRef<boolean>(false);
+  useEffect(() => {
+    if (!match) {
+      lastGoalCountRef.current = 0;
+      lastShotCountRef.current = 0;
+      lastCardCountRef.current = 0;
+      lastHtPausedRef.current = false;
+      lastFinishedRef.current = false;
+      return;
+    }
+    const events = match.events;
+    const goals = events.filter(e => e.type === 'goal');
+    const shots = events.filter(e => e.type === 'shot');
+    const cards = events.filter(e => e.type === 'yellow' || e.type === 'red');
+
+    if (goals.length > lastGoalCountRef.current) {
+      const newest = goals[goals.length - 1];
+      lastGoalCountRef.current = goals.length;
+      // Always pause the tick loop until the goal sound has been heard. Home
+      // team gets the full crowd celebration; away team only gets the basic
+      // signal but the clock still freezes for the duration of that signal.
+      setIsCelebrating(true);
+      const goalSequence = newest.teamId === match.homeTeam.id
+        ? playGoalWithCelebration()
+        : playGoalSignal();
+      goalSequence.finally(() => setIsCelebrating(false));
+    }
+
+    if (shots.length > lastShotCountRef.current) {
+      lastShotCountRef.current = shots.length;
+      playMissed();
+    }
+
+    if (cards.length > lastCardCountRef.current) {
+      lastCardCountRef.current = cards.length;
+      playWhistle();
+    }
+
+    if (htPaused && !lastHtPausedRef.current) {
+      playWhistle();
+    }
+    lastHtPausedRef.current = htPaused;
+
+    if (match.isFinished && !lastFinishedRef.current) {
+      playWhistleEnd();
+    }
+    lastFinishedRef.current = match.isFinished;
+  }, [match?.events.length, match, htPaused]);
 
   // Auto-pause at halftime for user subs
   useEffect(() => {
@@ -1922,6 +2019,30 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
     if (view === 'SQUAD') {
       const viewedTeam = (viewingTeamId && league.teams.find(t => t.id === viewingTeamId)) || userTeam;
       const isOpponent = viewedTeam.id !== userTeam.id;
+      if (squadCompact) {
+        return (
+          <SquadViewCompact
+            team={viewedTeam}
+            seasonYear={league.year}
+            currentJornada={league.currentJornada}
+            onToggleForSale={handleToggleForSale}
+            onPlayerClick={showPlayerDetail}
+            onBack={() => { setViewingTeamId(null); setView('LEAGUE'); }}
+            readOnly={isOpponent}
+            incomingOffers={league.incomingOffers}
+            teams={league.teams}
+            userTeam={userTeam}
+            windowOpen={windowOpen}
+            blockedSignings={league.blockedSignings}
+            onAcceptIncomingOffer={isOpponent ? undefined : handleAcceptIncomingOffer}
+            onRejectIncomingOffer={isOpponent ? undefined : handleRejectIncomingOffer}
+            onCounterIncomingOffer={isOpponent ? undefined : handleCounterIncomingOffer}
+            onOffer={isOpponent ? (pid, amount) => handleOfferForPlayer(pid, viewedTeam.id, amount) : undefined}
+            onPayClausula={isOpponent ? (pid) => handleClausula(pid, viewedTeam.id) : undefined}
+            onSwitchClassic={toggleSquadCompact}
+          />
+        );
+      }
       return (
         <SquadView
           team={viewedTeam}
@@ -1936,6 +2057,7 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
           onAcceptIncomingOffer={isOpponent ? undefined : handleAcceptIncomingOffer}
           onRejectIncomingOffer={isOpponent ? undefined : handleRejectIncomingOffer}
           onCounterIncomingOffer={isOpponent ? undefined : handleCounterIncomingOffer}
+          onSwitchCompact={toggleSquadCompact}
         />
       );
     }
@@ -2259,14 +2381,20 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
                   </button>
                   <div className="mb-3">
                     <label className="text-[8px] block mb-1 font-bold text-vga-blue">{t('misc.durationSecs')}</label>
-                    <div className="grid grid-cols-7 gap-1">
-                      {[0, 10, 20, 30, 40, 50, 60].map((sec) => (
+                    <div className="grid grid-cols-4 gap-1">
+                      {[
+                        { sec: 0,   label: 'INSTANTE' },
+                        { sec: 30,  label: 'RÁPIDO' },
+                        { sec: 60,  label: 'NORMAL' },
+                        { sec: 120, label: 'LARGO' },
+                      ].map(({ sec, label }) => (
                         <button
                           key={sec}
                           onClick={() => setMatchDuration(sec)}
-                          className={`text-[7px] py-1 border font-bold ${matchDuration === sec ? 'bg-vga-blue text-vga-bright-white border-vga-bright-white' : 'bg-vga-black text-vga-bright-white border-vga-gray hover:border-vga-light-green'}`}
+                          className={`text-[8px] py-1.5 border font-bold uppercase ${matchDuration === sec ? 'bg-vga-blue text-vga-bright-white border-vga-bright-white' : 'bg-vga-black text-vga-bright-white border-vga-gray hover:border-vga-light-green'}`}
                         >
-                          {sec === 0 ? t('misc.instant') : sec}
+                          {label}
+                          <div className="text-[6px] text-vga-cyan font-normal">{sec === 0 ? '—' : `${sec}s`}</div>
                         </button>
                       ))}
                     </div>
@@ -2357,7 +2485,7 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
               className="text-vga-cyan text-[8px] hover:text-vga-yellow underline decoration-dotted underline-offset-2 cool:text-rc-accent cool:hover:text-rc-primary flex items-center gap-1"
               title="Ver cambios recientes"
             >
-              OPENFUTBOL v1.5.12-{__BUILD_TIMESTAMP__}
+              OPENFUTBOL v1.6.0-{__BUILD_TIMESTAMP__}
               {hasNewVersion && (
                 <span className="bg-vga-red text-vga-bright-white text-[7px] px-1 font-bold animate-pulse">
                   NUEVO
