@@ -1,12 +1,11 @@
 import { useState, useRef, useMemo } from 'react';
 import type { RawPlayerDB, RawTeamDB } from '../types/game.d.ts';
 import type { Team } from '../types/game.d.ts';
-import { getTeamTemplatesForYear, getTeamCountry, type TeamTemplate } from '../data/mockTeams';
+import { getTeamTemplatesForYear, type TeamTemplate } from '../data/mockTeams';
 import { loadLegacyPackFromFile as loadPackFromFile } from '../data/packLoader';
 import { getPackTemplates } from '../data/packTeamBuilder';
 import { usePack } from '../state/PackContext';
-import { TeamCrest } from './TeamCrest';
-import { CountryBadge } from './CountryBadge';
+import { TeamSelector } from './TeamSelector';
 import { useT as useTranslation } from '../i18n';
 
 interface Props {
@@ -62,8 +61,6 @@ export const LeagueSetupView = ({ year, existingTeams, onConfirm, onBack }: Prop
   const [importedTemplates, setImportedTemplates] = useState<TeamTemplate[]>([]);
   const [importedPacks, setImportedPacks] = useState<string[]>([]);
   const [importError, setImportError] = useState<string | null>(null);
-  const [openCountries, setOpenCountries] = useState<Set<string>>(new Set());
-  const [teamSearch, setTeamSearch] = useState('');
   const fileRef = useRef<HTMLInputElement>(null);
 
   const n = selected.size;
@@ -73,9 +70,6 @@ export const LeagueSetupView = ({ year, existingTeams, onConfirm, onBack }: Prop
 
   const toggle = (id: string) =>
     setSelected(prev => { const next = new Set(prev); next.has(id) ? next.delete(id) : next.add(id); return next; });
-
-  const toggleCountry = (c: string) =>
-    setOpenCountries(prev => { const n = new Set(prev); n.has(c) ? n.delete(c) : n.add(c); return n; });
 
   const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -110,48 +104,8 @@ export const LeagueSetupView = ({ year, existingTeams, onConfirm, onBack }: Prop
 
   const selectedNames = allTemplates.filter(t => selected.has(t.id)).map(t => t.name);
 
-  const isSearching = teamSearch.trim().length > 0;
-  const filteredFlat = isSearching
-    ? allTemplates.filter(t => t.name.toLowerCase().includes(teamSearch.trim().toLowerCase()))
-    : null;
-
-  // Group by country for non-search view
-  const byCountry = new Map<string, TeamTemplate[]>();
-  for (const t of allTemplates) {
-    const isEditor = editorTemplates.some(et => et.id === t.id);
-    const isImported = importedTemplates.some(it => it.id === t.id);
-    const country = isEditor || isImported
-      ? 'editor'
-      : (t.country && t.country !== 'unknown' && t.country !== 'other' ? t.country : getTeamCountry(t.id));
-    const bucket = byCountry.get(country) ?? [];
-    bucket.push(t);
-    byCountry.set(country, bucket);
-  }
-  const sortedCountries = Array.from(byCountry.entries()).sort((a, b) => b[1].length - a[1].length);
-
-  const renderTeamButton = (t: TeamTemplate) => {
-    const active = selected.has(t.id);
-    const isImported = importedTemplates.some(it => it.id === t.id);
-    const isEditor = editorTemplates.some(et => et.id === t.id);
-    const accent = isImported ? 'text-vga-cyan' : isEditor ? 'text-vga-magenta' : 'text-vga-gray';
-    const borderActive = isImported ? 'border-vga-cyan' : isEditor ? 'border-vga-magenta' : 'border-vga-light-green';
-    return (
-      <button
-        key={t.id}
-        onClick={() => toggle(t.id)}
-        className={`flex flex-col items-center gap-2 p-3 border-2 text-center transition-colors group ${
-          active ? `${borderActive} border-4 bg-vga-blue shadow-[0_0_0_2px_rgba(255,255,255,0.3)]` : 'border-vga-gray bg-vga-black hover:border-vga-white hover:bg-vga-blue'
-        }`}
-      >
-        <TeamCrest colors={t.colors ?? ['#888', '#888', '#888']} size="lg" title={t.name} teamId={t.id} />
-        <span className="text-vga-bright-white text-[9px] font-bold uppercase leading-tight">{t.name}</span>
-        <span className={`text-[7px] ${accent}`}>{t.playerCount} {tr('setup.playersShort')}</span>
-        <span className={`text-[10px] font-bold ${active ? 'text-vga-light-green' : 'text-vga-gray'}`}>
-          {active ? '✓' : '○'}
-        </span>
-      </button>
-    );
-  };
+  const editorIds = new Set(editorTemplates.map(t => t.id));
+  const importedIds = new Set(importedTemplates.map(t => t.id));
 
   return (
     <div className="w-full max-w-2xl flex flex-col gap-4 animate-in fade-in duration-300">
@@ -165,50 +119,14 @@ export const LeagueSetupView = ({ year, existingTeams, onConfirm, onBack }: Prop
       </div>
 
       <div className="bg-vga-gray border-4 border-vga-blue p-4 flex flex-col gap-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-        <div className="flex items-center gap-2">
-          <input
-            value={teamSearch}
-            onChange={e => setTeamSearch(e.target.value)}
-            placeholder={tr('placeholder.searchTeam')}
-            className="flex-1 bg-vga-bright-white text-vga-black text-[9px] px-2 py-1 border-2 border-vga-black font-mono"
-          />
-          <span className="text-vga-blue text-[8px] font-bold shrink-0">{n}/{MAX_TEAMS}</span>
-        </div>
-
-        <div className="overflow-y-auto" style={{ maxHeight: '480px' }}>
-          {isSearching ? (
-            <div className="grid grid-cols-3 gap-2">
-              {filteredFlat!.map(renderTeamButton)}
-              {filteredFlat!.length === 0 && (
-                <span className="col-span-2 text-vga-black text-[8px] opacity-60 p-2">{tr('misc.noResults')}</span>
-              )}
-            </div>
-          ) : (
-            <div className="flex flex-col gap-1">
-              {sortedCountries.map(([country, countryTeams]) => {
-                const open = openCountries.has(country);
-                return (
-                  <div key={country}>
-                    <button
-                      onClick={() => toggleCountry(country)}
-                      className="w-full flex items-center justify-between bg-vga-blue border border-vga-white px-3 py-1.5 hover:bg-vga-cyan hover:text-vga-black text-left"
-                    >
-                      <span className="text-vga-yellow text-[9px] font-bold">
-                        <CountryBadge code={country} size="lg" />
-                      </span>
-                      <span className="text-vga-gray text-[7px]">{tr('setup.teamsCount', { n: String(countryTeams.length) })}  {open ? '▲' : '▼'}</span>
-                    </button>
-                    {open && (
-                      <div className="grid grid-cols-3 gap-2 mt-1 pl-2">
-                        {countryTeams.map(renderTeamButton)}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
+        <TeamSelector
+          templates={allTemplates}
+          selected={selected}
+          onToggle={toggle}
+          maxTeams={MAX_TEAMS}
+          editorIds={editorIds}
+          importedIds={importedIds}
+        />
 
         <div className="border-t-2 border-vga-blue pt-3 flex flex-col gap-2">
           <div className="flex items-center justify-between">
