@@ -44,9 +44,11 @@ const ContentES = ({ onColaborar, changelogRef, engineRef }: {
         <span className="text-vga-cyan">Florentinómetro</span> (0–10). Gana partidos, haz buenos fichajes
         y cúmplete el objetivo marcado para mantenerlos contentos. Si el medidor cae demasiado,
         Florentino llama por teléfono. La primera vez avisa. La segunda avisa más fuerte.
-        La tercera… recoges tus cosas. Cuando te echan (o acabas la temporada) recibes
-        ofertas de nuevos clubes según tu historial. Buenas temporadas abren puertas a equipos mejores.
-        Si llegas a 9 puntos, Florentino te regala Marbella y da bonus a los jugadores.
+        La tercera… recoges tus cosas. Cuando te echan recibes ofertas de nuevos clubes según tu historial:
+        los clubes que ya te despidieron <span className="text-vga-light-red">nunca</span> volverán a llamarte.
+        Si nadie quiere saber nada de ti, fin de carrera. Si llegas a 9 puntos en el medidor,
+        Florentino te regala Marbella y da bonus a los jugadores. Tu carrera entera vive en una vista
+        propia con cada temporada desglosada (posición, W/D/L, puntos, Florentinómetro y balance de fichajes).
       </p>
       <p>
         <span className="text-vga-yellow">FANTASY</span> — Crea tu propia liga y haz un draft de jugadores
@@ -58,6 +60,12 @@ const ContentES = ({ onColaborar, changelogRef, engineRef }: {
         <span className="text-vga-yellow">EDITOR</span> — Crea equipos desde cero, ponle un nombre ridículo,
         unos colores horribles y compártelo. Los equipos del editor se pueden meter directamente en una liga
         FANTASY para hacerle la vida imposible a tus amigos.
+      </p>
+      <p>
+        <span className="text-vga-yellow">VARIAS CARRERAS A LA VEZ</span> — Cualquiera de estos modos
+        vive en una partida guardada propia. Puedes tener una Pro Manager en serio, una de prueba
+        para experimentar, y una FANTASY con amigos, todas en paralelo. Cambias entre ellas desde
+        COPIA → PARTIDAS sin perder nada.
       </p>
     </Section>
 
@@ -136,6 +144,33 @@ const ContentES = ({ onColaborar, changelogRef, engineRef }: {
       <p>
         La EDAD también influye. Cerca de su pico (varía por posición) el jugador
         rinde al máximo. Alejarse del prime penaliza el rendimiento, pero nunca por debajo del 70%.
+      </p>
+    </Section>
+
+    <Section title="POSICIONES">
+      <p>
+        Cada posición pondera las estadísticas de forma distinta, así que un mismo número en
+        TIR vale mucho más para un delantero que para un central. Estas son las posiciones que
+        usa el motor y los atributos que más pesan en cada una:
+      </p>
+      <ul className="list-disc pl-5 space-y-1">
+        <li><span className="text-vga-yellow">POR</span> — Portero. Solo cuenta su estadística de portero; defender goles es lo único que importa.</li>
+        <li><span className="text-vga-yellow">DEF</span> — Defensa. DEF y FIS pesan mucho; PAS y VEL ayudan al juego de salida. Los defensas agresivos cometen más faltas.</li>
+        <li><span className="text-vga-yellow">MED</span> — Centrocampista. PAS, REG y FIS equilibrados. La pieza que más toca el balón.</li>
+        <li><span className="text-vga-yellow">AML / AMR</span> — Extremos. REG y VEL mandan. Generan ocasiones y pueden rematar. Una de las posiciones más rentables.</li>
+        <li><span className="text-vga-yellow">DEL</span> — Delantero. TIR por encima de todo. Cada disparo se enfrenta al portero rival y la defensa.</li>
+      </ul>
+      <p>
+        <span className="text-vga-light-red">Jugar fuera de posición</span> baja todas las
+        estadísticas en torno al 82% (ajustable en AJUSTES DEL MOTOR). En el caso del portero
+        la penalización es aún mayor: poner un jugador de campo en la portería es prácticamente
+        regalar goles. AUTO-FIX 11 elige el mejor XI respetando posiciones naturales siempre que
+        puede.
+      </p>
+      <p>
+        Cada jugador puede tener varias posiciones permitidas (por ejemplo, un MED que también
+        rinde como AML). Las posiciones permitidas vienen del pack importado o se calculan a
+        partir de las stats del jugador. Verás todas las posiciones de un jugador en su ficha.
       </p>
     </Section>
 
@@ -319,6 +354,32 @@ const ContentES = ({ onColaborar, changelogRef, engineRef }: {
     </Section>
     </div>
 
+    <Section title="AJUSTES DEL MOTOR">
+      <p>
+        En COPIA → ENGINE tienes un panel con todas las constantes de equilibrio del juego.
+        Cada cambio se guarda en tu navegador y afecta de inmediato a la siguiente
+        situación relevante. Puedes exportarlos a un archivo para compartir tu preset, o
+        resetear cualquier deslizador a su valor por defecto con el botón ↺.
+      </p>
+      <p>
+        Los grupos disponibles:
+      </p>
+      <ul className="list-disc pl-5 space-y-1">
+        <li><span className="text-vga-cyan">Junta y Presión</span> — recompensas/castigos del Florentinómetro por victoria, empate, derrota, fichajes, semana, objetivo cumplido.</li>
+        <li><span className="text-vga-cyan">Reputación</span> — multiplicadores sobre la reputación ganada y perdida en Pro Manager.</li>
+        <li><span className="text-vga-cyan">Simulación de Partido</span> — probabilidad de gol, lesiones, decay y recuperación de la condición física, severidad arbitral, exponente de posesión, tasa de eventos y de asistencias, y ventaja del local.</li>
+        <li><span className="text-vga-cyan">Jugadores y Táctica</span> — penalización por jugar fuera de posición, bonus/penalización de moral en titulares y suplentes.</li>
+        <li><span className="text-vga-cyan">Mercado de Fichajes</span> — agresividad de la IA al activar clausulazos, hacer intercambios y firmar nuevos jugadores.</li>
+        <li><span className="text-vga-cyan">Negociaciones</span> — qué tan bajo es "insultante", probabilidad de que una oferta insultante o rechazada bloquee al jugador, umbral de aceptación automática, anchura del rango de negociación y coste del clausulazo.</li>
+        <li><span className="text-vga-cyan">Economía</span> — inflación de precios, multiplicador de salarios, ingresos por taquilla y bonus de prima edad para jugadores jóvenes.</li>
+        <li><span className="text-vga-cyan">Interfaz</span> — anchura máxima de la pantalla de partido.</li>
+      </ul>
+      <p>
+        Sube las negociaciones al máximo para una experiencia brutal, baja el clausulazo a 1.2× para
+        un mercado salvaje, o multiplica los salarios por 3 para arruinarte. Lo que quieras.
+      </p>
+    </Section>
+
     <Section title="CONSEJOS PARA GANAR">
       <Tip>Pon siempre a cada jugador en su posición natural. Un delantero de centrocampista es MED tirada.</Tip>
       <Tip>El portero gana partidos por sí solo. No escatimes en el POR.</Tip>
@@ -443,9 +504,11 @@ const ContentEN = ({ onColaborar, changelogRef, engineRef }: {
         <span className="text-vga-cyan">Florentinometer</span> (0–10). Win matches, make smart signings,
         and meet your objective to keep them happy. If the meter drops too low, Florentino calls.
         First time he warns you. Second time he's blunter. Third time — pack your things.
-        When you're sacked (or finish the season) you get new offers based on your track record.
-        Good seasons open doors to better clubs. Hit 9 on the meter and Florentino gives you Marbella,
-        hands out bonuses to the players, and wires €2M to the club.
+        When you're sacked you get new offers based on your track record, but any club that already
+        fired you <span className="text-vga-light-red">never</span> calls again. If nobody wants you
+        anymore, career's over. Hit 9 on the meter and Florentino gives you Marbella,
+        hands out bonuses, and wires €2M to the club. Your full career lives in a dedicated view
+        with every season broken down (position, W/D/L, points, Florentinometer and transfer balance).
       </p>
       <p>
         <span className="text-vga-yellow">FANTASY</span> — Build your own league and run a player draft
@@ -457,6 +520,11 @@ const ContentEN = ({ onColaborar, changelogRef, engineRef }: {
         <span className="text-vga-yellow">EDITOR</span> — Create teams from scratch, give them a ridiculous
         name, horrible colours, and share them. Editor teams can be dropped straight into a FANTASY league
         to ruin your friends' evenings.
+      </p>
+      <p>
+        <span className="text-vga-yellow">MULTIPLE CAREERS</span> — Each of the modes above lives in
+        its own save. Run a serious Pro Manager, a sandbox PLAY save and a FANTASY league with friends
+        in parallel. Switch between them in BACKUP → PARTIDAS without losing anything.
       </p>
     </Section>
 
@@ -532,6 +600,32 @@ const ContentEN = ({ onColaborar, changelogRef, engineRef }: {
       <p>
         <span className="text-vga-yellow">AGE</span> matters too. Near their peak (which varies by position)
         a player performs at their best. Drifting from their prime hurts performance, but never below 70%.
+      </p>
+    </Section>
+
+    <Section title="POSITIONS">
+      <p>
+        Each position weights the base stats differently, so the same TIR number is far more
+        valuable to a striker than to a centre-back. These are the positions the engine uses
+        and what matters most in each:
+      </p>
+      <ul className="list-disc pl-5 space-y-1">
+        <li><span className="text-vga-yellow">POR</span> — Goalkeeper. Only the goalkeeping stat matters; stopping goals is the only job.</li>
+        <li><span className="text-vga-yellow">DEF</span> — Defender. DEF and FIS dominate; PAS and VEL help with build-up. Aggressive defenders commit more fouls.</li>
+        <li><span className="text-vga-yellow">MED</span> — Midfielder. Balanced PAS, REG and FIS. The most-on-the-ball role.</li>
+        <li><span className="text-vga-yellow">AML / AMR</span> — Wingers. REG and VEL rule. They create chances and can finish — one of the highest-value roles.</li>
+        <li><span className="text-vga-yellow">DEL</span> — Striker. TIR above all. Every shot duels the rival keeper and defence.</li>
+      </ul>
+      <p>
+        <span className="text-vga-light-red">Playing out of position</span> cuts every stat to
+        about 82% (tunable in ENGINE SETTINGS). The penalty is even harsher for goalkeepers —
+        slotting an outfielder in goal is basically gifting goals. AUTO-FIX 11 picks the best XI
+        respecting natural positions whenever possible.
+      </p>
+      <p>
+        Each player can have several allowed positions (e.g. a MED who can also play AML).
+        Allowed positions come from the imported pack or are derived from the player's stats.
+        You'll see every position a player can fill on their card.
       </p>
     </Section>
 
@@ -701,6 +795,30 @@ const ContentEN = ({ onColaborar, changelogRef, engineRef }: {
       </p>
     </Section>
     </div>
+
+    <Section title="ENGINE SETTINGS">
+      <p>
+        Under BACKUP → ENGINE you'll find a panel with every balance constant in the game.
+        Changes are persisted in your browser and take effect immediately on the next relevant
+        event. Export your tweaks to a file to share a preset, or reset any individual slider
+        with the ↺ button.
+      </p>
+      <p>Available groups:</p>
+      <ul className="list-disc pl-5 space-y-1">
+        <li><span className="text-vga-cyan">Board & Pressure</span> — Florentinometer rewards/penalties for win, draw, loss, signings, weekly drift, season objective.</li>
+        <li><span className="text-vga-cyan">Reputation</span> — multipliers on reputation gained and lost in Pro Manager.</li>
+        <li><span className="text-vga-cyan">Match Simulation</span> — goal chance, injuries, stamina decay and recovery, referee strictness, possession exponent, event and assist rates, plus home advantage.</li>
+        <li><span className="text-vga-cyan">Player & Tactics</span> — out-of-position penalty, mood lineup bonus and bench penalty.</li>
+        <li><span className="text-vga-cyan">Transfer Market</span> — AI aggressiveness on buyouts, trades and new signings.</li>
+        <li><span className="text-vga-cyan">Negotiations</span> — what counts as insulting, chance an insulting/rejected offer blocks the player, auto-accept multiplier, negotiation window width and buyout-clause cost.</li>
+        <li><span className="text-vga-cyan">Economy</span> — price inflation, salary multiplier, ticket revenue and the prime-age bonus.</li>
+        <li><span className="text-vga-cyan">Interface</span> — match screen max width.</li>
+      </ul>
+      <p>
+        Crank negotiations to max for brutal mode, drop the buyout multiplier to 1.2× for a wild
+        market, or triple salaries to go bankrupt on purpose. Knock yourself out.
+      </p>
+    </Section>
 
     <Section title="TIPS TO WIN">
       <Tip>Always play each player in their natural position. A striker in midfield is wasted MED.</Tip>

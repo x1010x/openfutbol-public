@@ -116,6 +116,20 @@ export const SquadViewCompact = ({
 
   const lineupSet = useMemo(() => new Set(team.lineup), [team.lineup]);
   const listedCount = team.players.filter(p => p.forSale).length;
+  const offerCountByPlayer = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const o of incomingOffers ?? []) {
+      const buyer = teams?.find(t => t.id === o.fromTeamId);
+      if (!buyer || buyer.budget < o.amount) continue;
+      map.set(o.playerId, (map.get(o.playerId) ?? 0) + 1);
+    }
+    return map;
+  }, [incomingOffers, teams, team.id]);
+  const totalActiveOffers = useMemo(() => {
+    let total = 0;
+    for (const n of offerCountByPlayer.values()) total += n;
+    return total;
+  }, [offerCountByPlayer]);
 
   const filtered = useMemo(() => {
     const activeFilter = FILTERS.find(f => f.key === filter)!;
@@ -182,7 +196,7 @@ export const SquadViewCompact = ({
       </div>
 
       {/* Header strip: team summary */}
-      <div className="grid grid-cols-[auto_1fr_auto_auto_auto] gap-3 items-center border border-vga-blue bg-vga-black px-3 py-2">
+      <div className="grid grid-cols-[auto_1fr_auto_auto_auto_auto] gap-3 items-center border border-vga-blue bg-vga-black px-3 py-2">
         <TeamCrest colors={team.colors} size="lg" title={team.name} teamId={team.id} />
         <div className="min-w-0">
           <div className="text-vga-magenta text-[8px] uppercase tracking-widest">Plantilla</div>
@@ -191,6 +205,7 @@ export const SquadViewCompact = ({
         <Stat label="Presupuesto" value={formatEuros(team.budget)} color="text-vga-light-green" />
         <Stat label="Jugadores"   value={String(team.players.length)} color="text-vga-light-cyan" />
         <Stat label="En mercado"  value={String(listedCount)} color={listedCount > 0 ? 'text-vga-yellow' : 'text-vga-gray'} />
+        <Stat label="Ofertas"     value={String(totalActiveOffers)} color={totalActiveOffers > 0 ? 'text-vga-magenta' : 'text-vga-gray'} />
       </div>
 
       {/* Filter tabs + search + sort */}
@@ -272,7 +287,17 @@ export const SquadViewCompact = ({
                 >
                   <span className="text-vga-yellow font-mono">{p.number ?? '-'}</span>
                   <span>{p.country_code ? <CountryBadge code={p.country_code} size="sm" flagOnly /> : null}</span>
-                  <span className="text-vga-bright-white uppercase truncate">{p.name ?? '—'}</span>
+                  <span className="text-vga-bright-white uppercase truncate flex items-center gap-1">
+                    <span className="truncate">{p.name ?? '—'}</span>
+                    {offerCountByPlayer.has(p.id) && (
+                      <span
+                        className="text-[7px] px-1 border border-vga-magenta text-vga-magenta font-bold tracking-wider shrink-0 animate-pulse"
+                        title={`${offerCountByPlayer.get(p.id)} oferta(s) entrante(s)`}
+                      >
+                        OFERTA{offerCountByPlayer.get(p.id)! > 1 ? `×${offerCountByPlayer.get(p.id)}` : ''}
+                      </span>
+                    )}
+                  </span>
                   <span className={`${POS_COLOR[p.position] ?? 'text-vga-white'} font-bold uppercase`}>{p.position}</span>
                   <span className="text-right text-vga-gray font-mono">{age}</span>
                   <span className={`text-right font-bold font-mono ${ovr >= 85 ? 'text-vga-light-green' : ovr >= 75 ? 'text-vga-yellow' : 'text-vga-gray'}`}>{ovr}</span>
