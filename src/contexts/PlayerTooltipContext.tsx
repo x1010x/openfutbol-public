@@ -159,8 +159,8 @@ const Tooltip = ({ player, x, y, year }: TooltipState & { year: number }) => {
             </div>
           </div>
           <div className="text-vga-bright-white text-[11px] mt-0.5">
-            VAL <span className="text-vga-bright-white">{fmtEur(player.value)}</span>
-            {contractExp && <> · CTR <span className="text-vga-bright-white">{contractExp}</span></>}
+            <span title="Valor">🪙</span> {fmtEur(player.value)}
+            {contractExp && <> · <span title="Contrato">📅</span> {contractExp}</>}
           </div>
           {player.fifa_year && (
             <div className="text-vga-magenta text-[10px] font-bold">FIFA {player.fifa_year}</div>
@@ -178,41 +178,41 @@ const Tooltip = ({ player, x, y, year }: TooltipState & { year: number }) => {
         <div className="text-vga-cyan text-[10px] font-bold uppercase mb-1">Temporada</div>
         <div className="grid grid-cols-4 gap-2 text-center">
           <div>
-            <div className="text-vga-cyan text-[11px] font-bold">PJ</div>
+            <div className="text-[14px]" title="Partidos jugados">📊</div>
             <div className="text-vga-bright-white text-[14px] font-bold">{s.appearances}</div>
           </div>
           {isGK ? (
             <>
               <div>
-                <div className="text-vga-cyan text-[11px] font-bold">PI</div>
+                <div className="text-[14px]" title="Porterías imbatidas">❤️</div>
                 <div className="text-vga-bright-white text-[14px] font-bold">{s.cleanSheets ?? 0}</div>
               </div>
               <div>
-                <div className="text-vga-cyan text-[11px] font-bold">GC</div>
+                <div className="text-[14px]" title="Goles encajados">🧤</div>
                 <div className="text-vga-bright-white text-[14px] font-bold">{s.goalsAgainst ?? 0}</div>
               </div>
             </>
           ) : (
             <>
               <div>
-                <div className="text-vga-cyan text-[11px] font-bold">G</div>
+                <div className="text-[14px]" title="Goles">⚽</div>
                 <div className="text-vga-light-green text-[14px] font-bold">{s.goals}</div>
               </div>
               <div>
-                <div className="text-vga-cyan text-[11px] font-bold">A</div>
+                <div className="text-[14px]" title="Asistencias">👟</div>
                 <div className="text-vga-cyan text-[14px] font-bold">{s.assists}</div>
               </div>
             </>
           )}
           <div>
-            <div className="text-vga-cyan text-[11px] font-bold">MIN/PJ</div>
+            <div className="text-[14px]" title="Minutos / partido">🕒</div>
             <div className="text-vga-bright-white text-[14px] font-bold">{avgMin}</div>
           </div>
         </div>
         {(s.yellowCards > 0 || s.redCards > 0) && (
-          <div className="flex justify-center gap-3 mt-1 text-[10px]">
-            {s.yellowCards > 0 && <span className="text-vga-yellow font-bold">▮ {s.yellowCards}</span>}
-            {s.redCards > 0 && <span className="text-vga-red font-bold">▮ {s.redCards}</span>}
+          <div className="flex justify-center gap-3 mt-1 text-[12px]">
+            {s.yellowCards > 0 && <span className="text-vga-yellow font-bold">🟨 {s.yellowCards}</span>}
+            {s.redCards > 0 && <span className="text-vga-red font-bold">🟥 {s.redCards}</span>}
           </div>
         )}
       </div>
@@ -231,13 +231,13 @@ const Tooltip = ({ player, x, y, year }: TooltipState & { year: number }) => {
       </div>
 
       {(player.injuryWeeksRemaining ?? 0) > 0 && (
-        <div className="px-3 py-1 bg-vga-red text-vga-bright-white text-[10px] font-bold uppercase">
-          ✕ Lesionado · {player.injuryWeeksRemaining}s
+        <div className="px-3 py-1 bg-vga-red text-vga-bright-white text-[11px] font-bold uppercase">
+          🩼 Lesionado · {player.injuryWeeksRemaining}s
         </div>
       )}
       {player.suspensionMatches > 0 && (
-        <div className="px-3 py-1 bg-vga-red text-vga-bright-white text-[10px] font-bold uppercase">
-          S Sancionado · {player.suspensionMatches}j
+        <div className="px-3 py-1 bg-vga-red text-vga-bright-white text-[11px] font-bold uppercase">
+          ⚖️ Sancionado · {player.suspensionMatches}j
         </div>
       )}
     </div>,
