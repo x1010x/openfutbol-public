@@ -32,6 +32,8 @@ interface Props {
   onShowSubs: () => void;
   onPlayerClick?: (playerId: string) => void;
   onContinue: () => void;
+  stats?: Record<string, import('../store/leagueStore').TeamStats>;
+  schedule?: import('../engine/calendar').Jornada[];
 }
 
 // Mini-pitch layouts in a 0-100 / 0-100 viewBox. Each team renders into its own half.
@@ -231,7 +233,7 @@ function MiniPitch({ match, userTeamId, onPlayerClick }: { match: MatchState; us
 }
 
 export default function MatchScreen({
-  match, userTeamId, year, currentJornada, budget,
+  match, userTeamId, year, currentJornada, budget, stats, schedule,
   isPlaying, showSubPanel, htPaused,
   onPlay, onPause, onShowSubs, onPlayerClick, onContinue,
 }: Props) {
@@ -245,6 +247,34 @@ export default function MatchScreen({
 
   const homeMED = Math.floor(calculateTeamStrength(match.homeTeam, match.homeSentOff, match.homeStamina) / 2);
   const awayMED = Math.floor(calculateTeamStrength(match.awayTeam, match.awaySentOff, match.awayStamina) / 2);
+
+  // League position + last-5 form for both teams.
+  const sortedStats = stats ? Object.values(stats).sort((a, b) => {
+    if (b.points !== a.points) return b.points - a.points;
+    return (b.goalsFor - b.goalsAgainst) - (a.goalsFor - a.goalsAgainst);
+  }) : [];
+  const totalTeams = sortedStats.length;
+  const positionOf = (teamId: string): number => sortedStats.findIndex(s => s.teamId === teamId) + 1;
+  const last5FormOf = (teamId: string): ('W' | 'D' | 'L')[] => {
+    if (!schedule) return [];
+    const out: ('W' | 'D' | 'L')[] = [];
+    for (let i = schedule.length - 1; i >= 0 && out.length < 5; i--) {
+      const m = schedule[i].matches.find(x => x.played && (x.homeId === teamId || x.awayId === teamId));
+      if (!m || m.homeScore == null || m.awayScore == null) continue;
+      const isHome = m.homeId === teamId;
+      const my = isHome ? m.homeScore : m.awayScore;
+      const opp = isHome ? m.awayScore : m.homeScore;
+      out.push(my > opp ? 'W' : my === opp ? 'D' : 'L');
+    }
+    return out.reverse();
+  };
+  const homePos = positionOf(match.homeTeam.id);
+  const awayPos = positionOf(match.awayTeam.id);
+  const homeForm = last5FormOf(match.homeTeam.id);
+  const awayForm = last5FormOf(match.awayTeam.id);
+  const homeStats = stats?.[match.homeTeam.id];
+  const awayStats = stats?.[match.awayTeam.id];
+  const formColor = (c: 'W' | 'D' | 'L') => c === 'W' ? 'bg-vga-light-green' : c === 'D' ? 'bg-vga-yellow' : 'bg-vga-light-red';
 
   const totalPoss = match.homePossession + match.awayPossession;
   const homePoss = totalPoss === 0 ? 50 : Math.round((match.homePossession / totalPoss) * 100);
@@ -319,7 +349,18 @@ export default function MatchScreen({
           <div className="flex items-center gap-2 justify-end min-w-0">
             <div className="text-right min-w-0">
               <p className="text-vga-light-red text-[11px] truncate uppercase font-bold tracking-wide whitespace-nowrap">{match.homeTeam.name}</p>
-              <p className="text-vga-cyan text-[7px]">MED {homeMED}</p>
+              <p className="text-vga-cyan text-[7px]">
+                MED {homeMED}
+                {homePos > 0 && <span className="text-vga-magenta"> · POS {homePos}/{totalTeams}</span>}
+                {homeStats && <span className="text-vga-gray"> · {homeStats.points}p</span>}
+              </p>
+              {homeForm.length > 0 && (
+                <div className="flex gap-0.5 justify-end mt-0.5">
+                  {homeForm.map((f, i) => (
+                    <span key={i} className={`${formColor(f)} w-2.5 h-2.5 text-vga-black text-[6px] font-bold flex items-center justify-center leading-none`}>{f}</span>
+                  ))}
+                </div>
+              )}
             </div>
             <TeamCrest colors={match.homeTeam.colors} size="lg" title={match.homeTeam.name} teamId={match.homeTeam.id} />
           </div>
@@ -334,7 +375,18 @@ export default function MatchScreen({
             <TeamCrest colors={match.awayTeam.colors} size="lg" title={match.awayTeam.name} teamId={match.awayTeam.id} />
             <div className="text-left min-w-0">
               <p className="text-vga-light-cyan text-[11px] truncate uppercase font-bold tracking-wide whitespace-nowrap">{match.awayTeam.name}</p>
-              <p className="text-vga-cyan text-[7px]">MED {awayMED}</p>
+              <p className="text-vga-cyan text-[7px]">
+                MED {awayMED}
+                {awayPos > 0 && <span className="text-vga-magenta"> · POS {awayPos}/{totalTeams}</span>}
+                {awayStats && <span className="text-vga-gray"> · {awayStats.points}p</span>}
+              </p>
+              {awayForm.length > 0 && (
+                <div className="flex gap-0.5 mt-0.5">
+                  {awayForm.map((f, i) => (
+                    <span key={i} className={`${formColor(f)} w-2.5 h-2.5 text-vga-black text-[6px] font-bold flex items-center justify-center leading-none`}>{f}</span>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>

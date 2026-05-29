@@ -2603,6 +2603,8 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
               onShowSubs={() => { setIsPlaying(false); setPreselectedSubPlayerId(null); setShowSubPanel(true); }}
               onPlayerClick={(pid) => { setIsPlaying(false); setPreselectedSubPlayerId(pid); setShowSubPanel(true); }}
               onContinue={handleMatchEnd}
+              stats={league.stats}
+              schedule={league.schedule}
             />
 
 
