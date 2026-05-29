@@ -2364,7 +2364,7 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
                           <div className="text-center mb-1">
                             <TeamCrest colors={team.colors} size="lg" title={team.name} teamId={team.id} />
                             <div className={`text-[8px] font-bold text-center leading-tight ${i === 0 ? 'text-vga-light-red' : 'text-vga-light-cyan'}`}>{team.name}</div>
-                            <div className="text-[7px] text-vga-cyan">{team.formation} · {calculateTeamStrength(team).toFixed(0)}</div>
+                            <div className="text-[7px] text-vga-cyan">{team.formation} · MED {Math.floor(calculateTeamStrength(team) / 2)}</div>
                           </div>
                           <PitchDiagram
                             team={team}

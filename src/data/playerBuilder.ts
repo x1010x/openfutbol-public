@@ -77,7 +77,13 @@ export const runtimePlayerFromPack = (
   const isGK = primaryCode === 'GK';
   const stats_entry = getStatsForPlayer(packPlayer.source_id);
   // When stat-pack stats hit, the pack's overall (0-100) replaces the base CA (1-200).
-  const currentAbility = stats_entry ? Math.min(200, stats_entry.ov * 2) : packPlayer.current_ability;
+  // But: a suspiciously low overall (<40) usually means the stats-pack entry is a
+  // mis-match or a junior placeholder, not a real rating — fall back to the data
+  // pack's own current_ability so we don't end up with media-4 first-teamers.
+  const statsCa = stats_entry ? Math.min(200, stats_entry.ov * 2) : null;
+  const currentAbility = statsCa != null && statsCa >= 80
+    ? statsCa
+    : packPlayer.current_ability;
   const halfCa = Math.round(currentAbility / 2);
   const attributes: PlayerAttributes = stats_entry
     ? attributesFromStats(stats_entry)
