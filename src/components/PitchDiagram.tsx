@@ -119,7 +119,7 @@ export const PitchDiagram = ({ team, selectedSlot, onSlotClick, onCircleClick, o
                     onClick={handleCircle} style={{ cursor: 'pointer' }} />
                   <text x={x} y={y + 1.4} fontSize="3.6" textAnchor="middle" fill={unavailable ? '#AAAAAA' : '#000000'} fontWeight="bold"
                     onClick={handleCircle} style={{ cursor: 'pointer' }}>
-                    {playerLiveMed}
+                    {Math.round(playerLiveMed / 2)}
                   </text>
                   {(() => {
                     const sn = shortName(player.name);
