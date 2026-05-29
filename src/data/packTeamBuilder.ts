@@ -1,6 +1,53 @@
-import type { Pack, Club, Player, Team } from '../types/game.d.ts';
+import type { Pack, Club, Player, Position, Team } from '../types/game.d.ts';
 import { runtimePlayerFromPack } from './playerBuilder';
 import { pickBestFormation } from '../engine/formations';
+
+const MAX_SQUAD = 22;
+const MIN_GK = 3;
+const MIN_DEF = 6;
+const MIN_MID = 6;
+const MIN_FWD = 6;
+
+const FORWARD_SLOTS: Position[] = ['DEL', 'AML', 'AMR'];
+
+const ratingOf = (p: Player): number => p.current_ability ?? (p.media ?? 50) * 2;
+
+// Cap a roster at MAX_SQUAD players while guaranteeing a minimum at each role
+// (best-rated first). Any remaining slots are filled by the next best players
+// regardless of position.
+export const trimRoster = (players: Player[]): Player[] => {
+  if (players.length <= MAX_SQUAD) return players;
+
+  const sorted = [...players].sort((a, b) => ratingOf(b) - ratingOf(a));
+  const picked = new Set<string>();
+  const result: Player[] = [];
+
+  const pickN = (filter: (p: Player) => boolean, n: number) => {
+    let taken = 0;
+    for (const p of sorted) {
+      if (taken >= n || result.length >= MAX_SQUAD) break;
+      if (picked.has(p.id)) continue;
+      if (!filter(p)) continue;
+      picked.add(p.id);
+      result.push(p);
+      taken++;
+    }
+  };
+
+  pickN(p => p.allowedPositions.includes('POR'), MIN_GK);
+  pickN(p => p.allowedPositions.includes('DEF'), MIN_DEF);
+  pickN(p => p.allowedPositions.includes('MED'), MIN_MID);
+  pickN(p => p.allowedPositions.some(pos => FORWARD_SLOTS.includes(pos)), MIN_FWD);
+
+  for (const p of sorted) {
+    if (result.length >= MAX_SQUAD) break;
+    if (picked.has(p.id)) continue;
+    picked.add(p.id);
+    result.push(p);
+  }
+
+  return result;
+};
 
 export interface PackTeamTemplate {
   clubId: string;
@@ -37,10 +84,11 @@ export const getPackTemplates = (pack: Pack): PackTeamTemplate[] => {
 export const buildTeamFromPackClub = (club: Club, pack: Pack, year: number): Team => {
   const clubPlayers = pack.players.filter(p => p.club_id === club.id);
   const countryById = new Map(pack.countries.map(c => [c.id, c.code?.toUpperCase()]));
-  const players: Player[] = clubPlayers.map((p, i) =>
+  const allPlayers: Player[] = clubPlayers.map((p, i) =>
     runtimePlayerFromPack(p, i + 1, p.country_id ? countryById.get(p.country_id) : undefined)
   );
 
+  const players = trimRoster(allPlayers);
   const eligible = players.filter(p => p.allowedPositions.length > 0);
   const { formation, lineup } = pickBestFormation(eligible);
 

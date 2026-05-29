@@ -31,6 +31,8 @@ export interface EngineSettings {
   aiClausulazoProb: number;
   aiTradeProb: number;
   aiSigningProb: number;
+  // UI
+  matchScreenMaxWidthPx: number;
 }
 
 export const DEFAULT_ENGINE_SETTINGS: Readonly<EngineSettings> = {
@@ -60,6 +62,7 @@ export const DEFAULT_ENGINE_SETTINGS: Readonly<EngineSettings> = {
   aiClausulazoProb: 0.05,
   aiTradeProb: 0.45,
   aiSigningProb: 0.28,
+  matchScreenMaxWidthPx: 2400,
 };
 
 export const engineSettings: EngineSettings = { ...DEFAULT_ENGINE_SETTINGS };

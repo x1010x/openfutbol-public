@@ -47,12 +47,12 @@ import type { StatKey } from './components/StatDrillDown';
 import { extractDbId } from './data/mockTeams';
 import { computePrice, evaluateOffer, formatEuros } from './data/economy';
 import { PlayerTooltipProvider } from './contexts/PlayerTooltipContext';
-import { PlayerName } from './components/PlayerName';
 import { formatJornadaDate } from './engine/calendar';
 import type { OfferResult } from './data/economy';
 import { PackLoaderView } from './components/PackLoaderView';
+import MatchScreen from './components/MatchScreen';
 import { usePack } from './state/PackContext';
-import { buildTeamFromPackClub } from './data/packTeamBuilder';
+import { buildTeamFromPackClub, trimRoster } from './data/packTeamBuilder';
 import { runtimePlayerFromPack, joinPlayerName } from './data/playerBuilder';
 
 type View = 'LEAGUE' | 'SQUAD' | 'ALIGNMENT' | 'RESULTS' | 'STATS' | 'FINANCES' | 'TRANSFERS' | 'JORNADA_RESULTS' | 'END_OF_SEASON' | 'PLAYER_DETAIL' | 'BACKUP' | 'EDITOR' | 'EQUIPO' | 'MANAGER_CAREER' | 'PACK_LOADER';
@@ -152,6 +152,7 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
   const [lastBoardAlert, setLastBoardAlert] = useState<{ title: string; body: string; tone: 'danger' | 'warning' | 'success' } | null>(null);
   const [htPaused, setHtPaused] = useState(false);
   const [showSubPanel, setShowSubPanel] = useState(false);
+  const [preselectedSubPlayerId, setPreselectedSubPlayerId] = useState<string | null>(null);
   const [previewSwapSlot, setPreviewSwapSlot] = useState<number | null>(null);
   const [showFantasyFlow, setShowFantasyFlow] = useState(false);
   const [showProManagerFlow, setShowProManagerFlow] = useState(false);
@@ -300,7 +301,24 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
         .filter((p): p is import('./types/game.d.ts').Player => p !== null);
     }
 
-    setLeague(getInitialLeagueState(selectedYear!, selectedTeamIds, extraFreeAgents, extraTeams));
+    // Belt-and-suspenders: enforce 22-player cap at selection time. Any squad
+    // overflow becomes free agents so they're not lost.
+    const overflowFreeAgents: import('./types/game.d.ts').Player[] = [];
+    const trimmedExtraTeams = extraTeams.map(t => {
+      const kept = trimRoster(t.players);
+      if (kept.length < t.players.length) {
+        const keptIds = new Set(kept.map(p => p.id));
+        overflowFreeAgents.push(...t.players.filter(p => !keptIds.has(p.id)));
+      }
+      return { ...t, players: kept, lineup: t.lineup.filter(id => kept.some(p => p.id === id)) };
+    });
+
+    setLeague(getInitialLeagueState(
+      selectedYear!,
+      selectedTeamIds,
+      [...extraFreeAgents, ...overflowFreeAgents],
+      trimmedExtraTeams,
+    ));
     setLeagueSetupDone(true);
   };
 
@@ -317,16 +335,13 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
   };
 
   const handleProManagerSelectYear = (year: number) => {
-    if (year === 0) { setSelectedYear(null); return; }
-    setSelectedYear(year);
-    if (pack) {
-      const extraTeams = pack.clubs.map(club => buildTeamFromPackClub(club, pack, year));
-      const allTeamIds = pack.clubs.map(c => c.id);
-      setLeague(getInitialLeagueState(year, allTeamIds, [], extraTeams));
-    } else {
-      const allTeamIds = getTeamTemplatesForYear(year).map(t => t.id);
-      setLeague(getInitialLeagueState(year, allTeamIds, [], []));
+    if (year === 0) {
+      setSelectedYear(null);
+      setLeagueSetupDone(false);
+      return;
     }
+    setSelectedYear(year);
+    setLeagueSetupDone(false);
   };
 
   const handleSelectTeamProManager = (teamId: string, managerName: string) => {
@@ -1738,6 +1753,20 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
       const proYearStats = pack
         ? [{ year: PACK_YEAR, teams: pack.clubs.length, leagues: pack.leagues.length, players: pack.players.length }]
         : getAvailableYearsWithStats();
+
+      // After year is picked, route through the same team-selection view used by Liga
+      // mode. Once teams are confirmed, ProManagerSetupView renders the offers screen.
+      if (selectedYear && !leagueSetupDone) {
+        return (
+          <LeagueSetupView
+            year={selectedYear}
+            existingTeams={league.teams}
+            onConfirm={handleLeagueSetupConfirm}
+            onBack={() => handleProManagerSelectYear(0)}
+          />
+        );
+      }
+
       return (
         <ProManagerSetupView
           teams={league.teams}
@@ -1749,7 +1778,7 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
           onSelectYear={handleProManagerSelectYear}
           onSelectTeam={handleSelectTeamProManager}
           onImport={handleImportCareer}
-          onBack={() => { setShowProManagerFlow(false); setSelectedYear(null); }}
+          onBack={() => { setShowProManagerFlow(false); setSelectedYear(null); setLeagueSetupDone(false); }}
         />
       );
     }
@@ -2328,7 +2357,7 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
               className="text-vga-cyan text-[8px] hover:text-vga-yellow underline decoration-dotted underline-offset-2 cool:text-rc-accent cool:hover:text-rc-primary flex items-center gap-1"
               title="Ver cambios recientes"
             >
-              OPENFUTBOL v1.3.0-{__BUILD_TIMESTAMP__}
+              OPENFUTBOL v1.5.12-{__BUILD_TIMESTAMP__}
               {hasNewVersion && (
                 <span className="bg-vga-red text-vga-bright-white text-[7px] px-1 font-bold animate-pulse">
                   NUEVO
@@ -2382,156 +2411,25 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
       </div>
 
       {!match ? renderMainContent() : (() => {
-        const homeMED = Math.floor(calculateTeamStrength(match.homeTeam, match.homeSentOff, match.homeStamina));
-        const awayMED = Math.floor(calculateTeamStrength(match.awayTeam, match.awaySentOff, match.awayStamina));
-
-        const teamSummary = (team: typeof match.homeTeam, colorClass: string) => {
-          const goals = match.events.filter(e => e.type === 'goal' && e.teamId === team.id);
-          const yellows = match.events.filter(e => e.type === 'yellow' && e.teamId === team.id);
-          const reds = match.events.filter(e => e.type === 'red' && e.teamId === team.id);
-          const findP = (id?: string) => team.players.find(p => p.id === id);
-          return (
-            <div className="bg-vga-black border-2 border-vga-gray p-2 text-[8px]">
-              <div className={`${colorClass} font-bold mb-1 border-b border-vga-gray pb-1 truncate`}>{team.name}</div>
-              {goals.length === 0 && yellows.length === 0 && reds.length === 0 && (
-                <div className="text-vga-gray text-[7px]">{t('misc.noIncidents')}</div>
-              )}
-              {goals.length > 0 && (
-                <div className="mb-1">
-                  <div className="text-vga-yellow text-[7px] uppercase mb-0.5">{t('label.goals')}</div>
-                  {goals.map((g, i) => {
-                    const scorer = findP(g.playerId);
-                    const asst = findP(g.assistantId);
-                    return (
-                      <div key={`g${i}`} className="text-vga-bright-white">
-                        {g.minute}' {scorer ? <PlayerName player={scorer} /> : '—'}{asst ? <> ({t('misc.asist')} <PlayerName player={asst} />)</> : ''}
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-              {(yellows.length > 0 || reds.length > 0) && (
-                <div>
-                  <div className="text-vga-yellow text-[7px] uppercase mb-0.5">{t('misc.tarjetas')}</div>
-                  {yellows.map((c, i) => (
-                    <div key={`y${i}`} className="flex items-center gap-1 text-vga-bright-white">
-                      <div className="w-1.5 h-2.5 bg-vga-yellow border border-black flex-shrink-0"></div>
-                      <span>{c.minute}' {(() => { const pl = findP(c.playerId); return pl ? <PlayerName player={pl} /> : '—'; })()}</span>
-                    </div>
-                  ))}
-                  {reds.map((c, i) => (
-                    <div key={`r${i}`} className="flex items-center gap-1 text-vga-bright-white">
-                      <div className="w-1.5 h-2.5 bg-vga-red border border-black flex-shrink-0"></div>
-                      <span>{c.minute}' {(() => { const pl = findP(c.playerId); return pl ? <PlayerName player={pl} /> : '—'; })()}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          );
-        };
-
-        const totalPossForBar = match.homePossession + match.awayPossession;
-        const homePossPct = totalPossForBar === 0 ? 50 : Math.round((match.homePossession / totalPossForBar) * 100);
-        const awayPossPct = 100 - homePossPct;
-
+        const userBudget = league.teams.find(tm => tm.id === league.userTeamId)?.budget ?? 0;
         return (
-          <div className="w-full max-w-4xl border-4 border-vga-white bg-vga-blue p-4 vga-panel">
-            <div className="bg-vga-black border-2 border-vga-gray vga-panel-inset p-4 mb-2">
-              <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
-                <div className="flex items-center gap-3 justify-end min-w-0">
-                  <div className="text-right min-w-0">
-                    <p className="text-vga-light-red text-[8px] mb-1 truncate uppercase">{match.homeTeam.name}</p>
-                    <p className="text-vga-cyan text-[7px]">MED {homeMED}</p>
-                  </div>
-                  <TeamCrest colors={match.homeTeam.colors} size="xl" title={match.homeTeam.name} teamId={match.homeTeam.id} />
-                </div>
-                <div className="text-center px-2">
-                  <p className="text-3xl text-vga-bright-white tracking-wider">
-                    <span className="text-vga-light-red">{match.homeScore}</span>
-                    <span className="text-vga-gray mx-2">:</span>
-                    <span className="text-vga-light-cyan">{match.awayScore}</span>
-                  </p>
-                  <p className="text-vga-yellow text-[8px] mt-1">{match.minute}'</p>
-                </div>
-                <div className="flex items-center gap-3 justify-start min-w-0">
-                  <TeamCrest colors={match.awayTeam.colors} size="xl" title={match.awayTeam.name} teamId={match.awayTeam.id} />
-                  <div className="text-left min-w-0">
-                    <p className="text-vga-light-cyan text-[8px] mb-1 truncate uppercase">{match.awayTeam.name}</p>
-                    <p className="text-vga-cyan text-[7px]">MED {awayMED}</p>
-                  </div>
-                </div>
-              </div>
+          <div className="w-full flex flex-col gap-2">
+            <MatchScreen
+              match={match}
+              userTeamId={league.userTeamId}
+              year={league.year}
+              currentJornada={league.currentJornada}
+              budget={userBudget}
+              isPlaying={isPlaying}
+              showSubPanel={showSubPanel}
+              htPaused={htPaused}
+              onPlay={() => setIsPlaying(true)}
+              onPause={() => setIsPlaying(false)}
+              onShowSubs={() => { setIsPlaying(false); setPreselectedSubPlayerId(null); setShowSubPanel(true); }}
+              onPlayerClick={(pid) => { setIsPlaying(false); setPreselectedSubPlayerId(pid); setShowSubPanel(true); }}
+              onContinue={handleMatchEnd}
+            />
 
-              <div className="mt-3">
-                <div className="flex h-3 border border-vga-gray vga-panel-inset">
-                  <div className="bg-vga-light-red h-full" style={{ width: `${homePossPct}%` }} />
-                  <div className="bg-vga-light-cyan h-full" style={{ width: `${awayPossPct}%` }} />
-                </div>
-                <div className="flex justify-between text-[7px] mt-0.5">
-                  <span className="text-vga-light-red">{homePossPct}%</span>
-                  <span className="text-vga-cyan uppercase">{t('label.possession')}</span>
-                  <span className="text-vga-light-cyan">{awayPossPct}%</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-2 mb-3">
-              {teamSummary(match.homeTeam, 'text-vga-light-red')}
-              {teamSummary(match.awayTeam, 'text-vga-light-cyan')}
-            </div>
-
-            <div ref={eventLogRef} className="bg-vga-black h-48 overflow-y-auto p-3 border-2 border-vga-gray font-mono text-[10px] leading-relaxed">
-              {match.events.map((event, i) => (
-                <div key={i} className={`mb-2 ${event.type === 'goal' ? 'text-vga-light-green animate-pulse' : 'text-vga-white'}`}>
-                  <span className="text-vga-yellow mr-2">[{event.minute}']</span>
-                  {event.description}
-                </div>
-              ))}
-            </div>
-
-            {!match.isFinished && (() => {
-              const isUserHome = match.homeTeam.id === league.userTeamId;
-              const userSubsUsed = isUserHome ? match.homeSubsUsed : match.awaySubsUsed;
-              const canSub = userSubsUsed < 3;
-              return (
-                <div className="mt-3 flex gap-2">
-                  {canSub && (
-                    <button
-                      onClick={() => { setIsPlaying(false); setShowSubPanel(true); }}
-                      className="flex-1 bg-vga-yellow text-vga-black py-1 px-2 text-[8px] border border-vga-black hover:bg-vga-bright-white font-bold uppercase"
-                    >
-                      {t('misc.subsCountFmt', { used: String(userSubsUsed), max: '3' })}
-                    </button>
-                  )}
-                  {!isPlaying && !showSubPanel && (
-                    <button
-                      onClick={() => setIsPlaying(true)}
-                      className="flex-1 bg-vga-green text-vga-bright-white py-1 px-2 text-[8px] border border-vga-black hover:bg-vga-light-green font-bold uppercase"
-                    >
-                      {t('btn.resume')}
-                    </button>
-                  )}
-                  {isPlaying && (
-                    <button
-                      onClick={() => setIsPlaying(false)}
-                      className="bg-vga-gray text-vga-black py-1 px-2 text-[8px] border border-vga-black hover:bg-vga-white font-bold uppercase"
-                    >
-                      {t('btn.pause')}
-                    </button>
-                  )}
-                </div>
-              );
-            })()}
-
-            {match.isFinished && (
-              <button
-                onClick={handleMatchEnd}
-                className="mt-4 w-full bg-vga-red hover:bg-vga-light-red text-vga-bright-white py-2 px-4 border-b-4 border-r-4 border-vga-black text-xs"
-              >
-                {t('btn.continue')}
-              </button>
-            )}
 
             {showSubPanel && !match.isFinished && (() => {
               const isUserHome = match.homeTeam.id === league.userTeamId;
@@ -2559,7 +2457,7 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
                         return isHome ? { ...prev, homeTeam: updated } : { ...prev, awayTeam: updated };
                       });
                     }}
-                    onBack={() => { setShowSubPanel(false); setIsPlaying(true); }}
+                    onBack={() => { setShowSubPanel(false); setPreselectedSubPlayerId(null); setIsPlaying(true); }}
                     onToggleDiscipline={() => {
                       setMatch(prev => {
                         if (!prev) return null;
@@ -2574,39 +2472,16 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
                       injuredIds,
                       sentOff,
                       htPaused,
-                      onSubstitute: (outId, inId) => performUserSub(outId, inId),
-                      onContinue: () => { setShowSubPanel(false); setIsPlaying(true); },
+                      onSubstitute: (outId, inId) => { performUserSub(outId, inId); setPreselectedSubPlayerId(null); },
+                      onContinue: () => { setShowSubPanel(false); setPreselectedSubPlayerId(null); setIsPlaying(true); },
+                      initialSelectedPlayerId: preselectedSubPlayerId,
                     }}
                   />
                 </div>
               );
             })()}
 
-            {(() => {
-              const rows: [string, string | number, string | number][] = [
-                ['Tiros', match.homeShots, match.awayShots],
-                ['A puerta', match.homeShotsOnTarget, match.awayShotsOnTarget],
-                ['Faltas', match.homeFouls, match.awayFouls],
-              ];
-              return (
-                <div className="mt-4 bg-vga-black border-2 border-vga-gray p-2 text-[8px]">
-                  <div className="text-[7px] text-vga-yellow uppercase mb-1 text-center border-b border-vga-gray pb-1">
-                    Estadísticas
-                  </div>
-                  <div className="grid grid-cols-3 gap-x-2 gap-y-0.5 font-mono">
-                    {rows.map(([label, h, a]) => (
-                      <div key={label} className="contents">
-                        <div className="text-vga-light-red text-right">{h}</div>
-                        <div className="text-vga-gray text-center text-[7px] uppercase">{label}</div>
-                        <div className="text-vga-light-cyan">{a}</div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              );
-            })()}
-
-            {/* Alineaciones eliminadas */}
+            {/* Stats and lineups now live inside MatchScreen */}
           </div>
         );
       })()}

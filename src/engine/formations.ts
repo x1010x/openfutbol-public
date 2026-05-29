@@ -25,7 +25,24 @@ const LEGACY_SLOT_TO_CODES: Record<Position, PositionCode[]> = {
   AMR: ['AMR', 'WBR', 'MR'],
 };
 
+// Soccer-geography distance between formation slots. Used when a player has no
+// native rating for the slot they're forced into. POR is disconnected from field
+// roles (any GK<->outfield swap is catastrophic).
+const SLOT_DISTANCE: Record<Position, Record<Position, number>> = {
+  POR: { POR: 0, DEF: 99, MED: 99, AML: 99, AMR: 99, DEL: 99 },
+  DEF: { POR: 99, DEF: 0, MED: 1, AML: 2, AMR: 2, DEL: 3 },
+  MED: { POR: 99, DEF: 1, MED: 0, AML: 1, AMR: 1, DEL: 2 },
+  AML: { POR: 99, DEF: 2, MED: 1, AML: 0, AMR: 1, DEL: 1 },
+  AMR: { POR: 99, DEF: 2, MED: 1, AML: 1, AMR: 0, DEL: 1 },
+  DEL: { POR: 99, DEF: 3, MED: 2, AML: 1, AMR: 1, DEL: 0 },
+};
+
+const ALL_SLOTS: Position[] = ['POR', 'DEF', 'MED', 'AML', 'AMR', 'DEL'];
+
+const nativeFactor = (level: number): number => (level / 20) ** 1.5;
+
 export const positionLevelFactor = (player: Player, slotPos: Position): number => {
+  // Native rating for this exact slot — use it.
   const codes = LEGACY_SLOT_TO_CODES[slotPos];
   let bestLevel = 0;
   for (const entry of player.positions ?? []) {
@@ -33,8 +50,28 @@ export const positionLevelFactor = (player: Player, slotPos: Position): number =
       bestLevel = entry.level;
     }
   }
-  if (bestLevel === 0) return 0.1;
-  return Math.max(0.1, (bestLevel / 20) ** 1.5);
+  if (bestLevel > 0) return Math.max(0.1, nativeFactor(bestLevel));
+
+  // OOP: find the player's best-rated slot and apply a distance penalty.
+  let bestSlot: Position | null = null;
+  let bestSlotLevel = 0;
+  for (const slot of ALL_SLOTS) {
+    const cs = LEGACY_SLOT_TO_CODES[slot];
+    let lvl = 0;
+    for (const entry of player.positions ?? []) {
+      if (cs.includes(entry.code) && entry.level > lvl) lvl = entry.level;
+    }
+    if (lvl > bestSlotLevel) { bestSlotLevel = lvl; bestSlot = slot; }
+  }
+  if (!bestSlot) return 0.1; // player with no positional data at all
+
+  const distance = SLOT_DISTANCE[bestSlot][slotPos] ?? 99;
+  // GK <-> outfield swap: hard floor.
+  if (distance >= 99) return Math.max(0.1, engineSettings.gkOopPenalty);
+
+  const base = engineSettings.oopPenalty; // e.g. 0.825 per step
+  const distancePenalty = Math.pow(base, distance);
+  return Math.max(0.25, nativeFactor(bestSlotLevel) * distancePenalty);
 };
 
 export const effectiveAbility = (player: Player, slotPos: Position): number => {

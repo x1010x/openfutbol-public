@@ -12,7 +12,7 @@ interface SettingDef {
   max: number;
   step: number;
   format: (v: number) => string;
-  group: 'board' | 'match' | 'tactics' | 'transfer';
+  group: 'board' | 'match' | 'tactics' | 'transfer' | 'ui';
 }
 
 const pct  = (v: number) => `${(v * 100).toFixed(0)}%`;
@@ -56,9 +56,12 @@ const SETTINGS: SettingDef[] = [
   { key: 'aiClausulazoProb',        labelKey: 'engine.aiClausulazoProb.label',        descKey: 'engine.aiClausulazoProb.desc',        tipKey: 'engine.aiClausulazoProb.tip',        min: 0,    max: 0.25, step: 0.01, format: pct,                                         group: 'transfer' },
   { key: 'aiTradeProb',             labelKey: 'engine.aiTradeProb.label',             descKey: 'engine.aiTradeProb.desc',             tipKey: 'engine.aiTradeProb.tip',             min: 0,    max: 1,    step: 0.05, format: pct,                                         group: 'transfer' },
   { key: 'aiSigningProb',           labelKey: 'engine.aiSigningProb.label',           descKey: 'engine.aiSigningProb.desc',           tipKey: 'engine.aiSigningProb.tip',           min: 0,    max: 1,    step: 0.05, format: pct,                                         group: 'transfer' },
+
+  // UI
+  { key: 'matchScreenMaxWidthPx',   labelKey: 'engine.matchScreenMaxWidthPx.label',   descKey: 'engine.matchScreenMaxWidthPx.desc',                                                  min: 900,  max: 3200, step: 50,   format: v => `${int(v)} px`,                         group: 'ui' },
 ];
 
-const GROUPS = ['board', 'match', 'tactics', 'transfer'] as const;
+const GROUPS = ['board', 'match', 'tactics', 'transfer', 'ui'] as const;
 
 export const EngineSettingsView = () => {
   const t = useT();

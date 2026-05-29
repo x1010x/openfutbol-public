@@ -16,6 +16,8 @@ interface IngameProps {
   htPaused: boolean;
   onSubstitute: (outId: string, inId: string) => void;
   onContinue: () => void;
+  // If set, opens with this player's slot already selected (e.g. clicked from match pitch)
+  initialSelectedPlayerId?: string | null;
 }
 
 interface Props {
@@ -241,7 +243,10 @@ export const AlignmentView = ({ team, onUpdate, onBack, onToggleDiscipline, inga
   const t = useT();
   const teamMED = Math.floor(calculateTeamStrength(team) / 2);
   const slots = FORMATIONS[team.formation];
-  const [selectedSlot, setSelectedSlot] = useState<number | null>(null);
+  const initialSelectedSlot = ingame?.initialSelectedPlayerId
+    ? (() => { const i = team.lineup.indexOf(ingame.initialSelectedPlayerId); return i >= 0 ? i : null; })()
+    : null;
+  const [selectedSlot, setSelectedSlot] = useState<number | null>(initialSelectedSlot);
 
   const slotOfPlayer = new Map<string, number>();
   team.lineup.forEach((id, idx) => { if (id) slotOfPlayer.set(id, idx); });
