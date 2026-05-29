@@ -1,10 +1,17 @@
 // Bridge between the manager (Team/Player, MatchEvent) and the zone engine
 // (EnginePlayer, MatchTimeline). This is the only module that imports both the
 // manager types and the engine types; the renderer never touches it.
-import type { Team, Player, MatchEvent } from '../types/game.d.ts';
+import type { Team, Player, MatchEvent, Position } from '../types/game.d.ts';
 import type { EnginePlayer } from './zoneEngine';
 import type { MatchTimeline, PlayerId } from '../types/match';
+import type { SlotRole, SlotTag } from './zones';
 import { buildLineupLayout } from './lineup';
+
+// Natural engine role for a manager position — used to seed bench players so the
+// AI sub picker matches a replacement to the slot it's covering.
+const POS_TO_ROLE: Record<Position, SlotRole> = {
+  POR: 'gk', DEF: 'def', MED: 'mid', DEL: 'fwd', AML: 'fwd', AMR: 'fwd',
+};
 
 // Engine stat block for one manager player, with the pre-match fitness scaling
 // (Bloque 2) applied to the athletic stats. Shared by the starting XI builder
@@ -70,6 +77,32 @@ export function teamToEnginePlayers(team: Team, side: 'home' | 'away' = 'home'):
     });
   }
   return out;
+}
+
+// Build EnginePlayers for a team's available bench — everyone NOT in the starting
+// lineup who is fit to play (not injured, not suspended). Used to feed the AI
+// substitution manager (engine/aiSubs.ts) the opponent's options. `slot` is a
+// placeholder: a bench player inherits the slot/role/tag of whoever they replace
+// when they come on (applySubstitution); only `role` here is read, to match a
+// replacement to the right kind of slot. Stats get the same fitness scaling as
+// the starters.
+export function benchEnginePlayers(team: Team): EnginePlayer[] {
+  const inLineup = new Set(team.lineup);
+  return team.players
+    .filter(p => !inLineup.has(p.id))
+    .filter(p => (p.injuryWeeksRemaining ?? 0) === 0 && (p.suspensionMatches ?? 0) === 0)
+    .map(p => ({
+      id: p.id as PlayerId,
+      slotIndex: 0,
+      slot: { x: 0, y: 0 },
+      role: POS_TO_ROLE[p.position] ?? 'mid',
+      tag: 'cm' as SlotTag,
+      ...engineStatsFromPlayer(p),
+      foulsCommitted: 0,
+      yellowCount: 0,
+      redCard: false,
+      injured: false,
+    }));
 }
 
 export interface MatchResult {

@@ -170,4 +170,14 @@ export interface MatchState {
   subResumePhaseTicks: number;
   subWalkoutStartMs: number;
   clockFrozenSpans: [number, number][];
+
+  // AI-managed substitutions (engine/aiSubs.ts). Populated per side with the
+  // bench the engine may bring on — only for the side(s) the engine controls
+  // (the opponent; the user subs via the UI, so their bench stays empty). The
+  // bench EnginePlayers carry their natural `role` for matching but no slot
+  // (inherited from whoever they replace on the way in). `subsUsed` caps at
+  // MAX_SUBS; `lastSubTick` spaces out voluntary (fatigue/tactical) changes —
+  // injuries bypass the spacing. Decisions are deterministic (no RNG) so the
+  // Bloque 8 replay reproduces them exactly.
+  aiSub: Record<TeamSide, { bench: EnginePlayer[]; subsUsed: number; lastSubTick: number }>;
 }

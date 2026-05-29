@@ -16,7 +16,7 @@ import { Match2D } from './match2d/Match2D';
 import { resolveAwayKit } from './match2d/kit';
 import { BASE_SPEED_FACTOR, engineDurationMs } from './match2d/layout';
 import { generateTimeline, TICK_MS, type EnginePlayer, type SubInjection } from './engine/zoneEngine';
-import { teamToEnginePlayers, timelineToMatchResult, engineStatsFromPlayer } from './engine/managerBridge';
+import { teamToEnginePlayers, timelineToMatchResult, engineStatsFromPlayer, benchEnginePlayers } from './engine/managerBridge';
 import { applyFormationChange } from './engine/substitution';
 import { queueSubstitution } from './engine/phases/subWalkout';
 import type { MatchTimeline } from './types/match';
@@ -155,6 +155,10 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
       lineup: string[];
       offsets?: Record<number, { dx: number; dy: number }>;
     }[];
+    // Bench feeding the engine's AI substitutions — only the opponent side is
+    // populated (the user subs from the UI). Stored so the deterministic Bloque 8
+    // regeneration reuses the exact same bench each time.
+    benches: Partial<Record<'home' | 'away', EnginePlayer[]>>;
   } | null>(null);
   const changes2dAtMsRef = useRef<number>(0);
   const [show2dChanges, setShow2dChanges] = useState<boolean>(false);
@@ -1072,8 +1076,17 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
     }
     const seed = Math.floor(Math.random() * 0xffffffff);
     const durationMs = engineDurationMs(watchDuration2d);
-    const homePlayers = teamToEnginePlayers(applyMoodToTeam(homeTeam), 'home');
-    const awayPlayers = teamToEnginePlayers(applyMoodToTeam(awayTeam), 'away');
+    const moodHomeTeam = applyMoodToTeam(homeTeam);
+    const moodAwayTeam = applyMoodToTeam(awayTeam);
+    const homePlayers = teamToEnginePlayers(moodHomeTeam, 'home');
+    const awayPlayers = teamToEnginePlayers(moodAwayTeam, 'away');
+    const userSide: 'home' | 'away' = userTeam.id === homeTeam.id ? 'home' : 'away';
+    // Give the OPPONENT an AI-managed bench (the engine makes its subs); the user
+    // subs from the UI, so their side gets no bench.
+    const oppSide: 'home' | 'away' = userSide === 'home' ? 'away' : 'home';
+    const benches: Partial<Record<'home' | 'away', EnginePlayer[]>> = {
+      [oppSide]: benchEnginePlayers(oppSide === 'home' ? moodHomeTeam : moodAwayTeam),
+    };
     const tl = generateTimeline({
       homeTeamId: homeTeam.id,
       awayTeamId: awayTeam.id,
@@ -1083,14 +1096,14 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
       // Compressed timeline so the match plays in `watchDuration2d` real minutes
       // at 1x (fixed 0.75 pace); raising speed finishes it sooner.
       durationMs,
+      benches,
     });
     // Stash the sim inputs so a live change can regenerate the timeline
     // deterministically (Bloque 8), and reset the live-change state.
-    const userSide: 'home' | 'away' = userTeam.id === homeTeam.id ? 'home' : 'away';
     watch2dRef.current = {
       seed, durationMs, homePlayers, awayPlayers,
       homeTeamId: homeTeam.id, awayTeamId: awayTeam.id,
-      userSide, baseUserTeam: userTeam, subs: [], tacticalChanges: [],
+      userSide, baseUserTeam: userTeam, subs: [], tacticalChanges: [], benches,
     };
     changes2dAtMsRef.current = 0;
     setResume2dMs(undefined);
@@ -1186,6 +1199,9 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
       seed: inp.seed,
       durationMs: inp.durationMs,
       subs: subInjections,
+      // Reuse the exact same bench so the AI's subs replay identically up to the
+      // pause (deterministic Bloque 8 head reproduction).
+      benches: inp.benches,
     });
     setResume2dMs(changes2dAtMsRef.current);
     setTimeline2d(newTl);

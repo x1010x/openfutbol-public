@@ -10,6 +10,10 @@ export function createInitialState(cfg: {
   homePlayers: EnginePlayer[];
   awayPlayers: EnginePlayer[];
   seed?: number;
+  // Bench EnginePlayers the engine may bring on per side (AI substitutions,
+  // engine/aiSubs.ts). Only the engine-controlled side(s) carry one — the user
+  // subs via the UI. Sandbox omits it → no AI subs.
+  benches?: Partial<Record<TeamSide, EnginePlayer[]>>;
 }): MatchState {
   const seed = cfg.seed ?? 0xdeadbeef;
   const rng = mulberry32(seed);
@@ -29,6 +33,9 @@ export function createInitialState(cfg: {
   });
   const homePlayers = cfg.homePlayers.map(clone);
   const awayPlayers = cfg.awayPlayers.map(clone);
+  // Bench players are cloned too: applySubstitution mutates them when they come
+  // on, so the caller's arrays must stay pristine across the Bloque 8 replays.
+  const cloneBench = (arr?: EnginePlayer[]) => (arr ?? []).map(clone);
 
   const allPlayers = [...homePlayers, ...awayPlayers];
   const homeSet = new Set(homePlayers.map(p => p.id));
@@ -127,6 +134,11 @@ export function createInitialState(cfg: {
     subResumePhaseTicks: 0,
     subWalkoutStartMs: 0,
     clockFrozenSpans: [],
+
+    aiSub: {
+      home: { bench: cloneBench(cfg.benches?.home), subsUsed: 0, lastSubTick: -Infinity },
+      away: { bench: cloneBench(cfg.benches?.away), subsUsed: 0, lastSubTick: -Infinity },
+    },
   };
 }
 

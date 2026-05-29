@@ -1,4 +1,4 @@
-import type { MatchTimeline, PlayerId, Vec2 } from '../types/match';
+import type { MatchTimeline, PlayerId, Vec2, TeamSide } from '../types/match';
 import type { MatchState } from './types';
 import type { SlotRole, SlotTag } from './zones';
 import {
@@ -16,6 +16,7 @@ import { moveAll } from './move';
 import { checkTackle, checkOffBallAggression, resolvePass, resolveShot, type EffectorDeps } from './effectors';
 import { applyFatigue } from './fatigue';
 import { tryStartPendingSub } from './phases/subWalkout';
+import { decideAiSubs } from './aiSubs';
 import { tickSetupAndBallPhysics } from './loop/ballPickup';
 import { tickKickoffRoutine } from './loop/kickoffRoutine';
 
@@ -83,7 +84,7 @@ export function simulateFromState(
   state: MatchState,
   durationMs: number,
   seed: number,
-  opts?: { emitHalfTime?: boolean; subs?: SubInjection[]; fatigue?: boolean },
+  opts?: { emitHalfTime?: boolean; subs?: SubInjection[]; fatigue?: boolean; aiSubs?: boolean },
 ): MatchTimeline {
   const TOTAL_TICKS = Math.floor(durationMs / TICK_MS);
   // Full matches always get a half-time at the true midpoint regardless of how
@@ -130,6 +131,11 @@ export function simulateFromState(
     // Gated to full-match mode (generateTimeline) so sandbox clips that call
     // simulateFromState directly stay byte-for-byte unchanged.
     if (opts?.fatigue) applyFatigue(state, tick, TOTAL_TICKS);
+
+    // AI substitutions (engine/aiSubs.ts): the opponent's bench manager. Runs
+    // after fatigue so the tiredness read is current, and before the pending-sub
+    // check below so a change decided this tick can start at this same stoppage.
+    if (opts?.aiSubs) decideAiSubs(state, tick, TOTAL_TICKS);
 
     // Live substitutions (Bloque 8): a queued change waits for the next clean
     // stoppage, then plays through the sub_walkout phase. Checked before the
@@ -315,6 +321,10 @@ export function generateTimeline(cfg: {
   // generateTimeline with the same seed + the accumulated subs reproduces the
   // played head exactly and branches a new tail from each change (Bloque 8).
   subs?: SubInjection[];
+  // Bench EnginePlayers the engine may bring on per side (AI substitutions). The
+  // caller populates only the engine-controlled side(s) — the opponent — since
+  // the user subs via the UI. See engine/aiSubs.ts.
+  benches?: Partial<Record<TeamSide, EnginePlayer[]>>;
 }): MatchTimeline {
   const state = createInitialState(cfg);
   const seed  = cfg.seed ?? 0xdeadbeef;
@@ -324,7 +334,7 @@ export function generateTimeline(cfg: {
   stateEmit(state, 0, 'kickoff', 'home', state.kickerId!, undefined, '¡Saque inicial!');
   stateSnap(state, 0);
 
-  const tl = simulateFromState(state, durationMs, seed, { emitHalfTime: true, subs: cfg.subs, fatigue: true });
+  const tl = simulateFromState(state, durationMs, seed, { emitHalfTime: true, subs: cfg.subs, fatigue: true, aiSubs: true });
   // A full match is always shown as 0–90' regardless of how compressed the
   // timeline is; the log/stats remap each event's `t` accordingly.
   tl.nominalMatchMs = DURATION_MS;
