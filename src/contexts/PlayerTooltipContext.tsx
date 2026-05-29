@@ -162,8 +162,8 @@ const Tooltip = ({ player, x, y, year }: TooltipState & { year: number }) => {
             <span title="Valor">🪙</span> {fmtEur(player.value)}
             {contractExp && <> · <span title="Contrato">📅</span> {contractExp}</>}
           </div>
-          {player.fifa_year && (
-            <div className="text-vga-magenta text-[10px] font-bold">FIFA {player.fifa_year}</div>
+          {player.stats_year && (
+            <div className="text-vga-magenta text-[10px] font-bold">{player.stats_year}</div>
           )}
         </div>
       </div>

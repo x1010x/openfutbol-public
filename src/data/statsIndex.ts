@@ -1,11 +1,11 @@
 // In-memory index of stat-pack entries, keyed by data-pack source_id.
 // StatsPackProvider calls setStatsIndex() when a pack loads; playerBuilder
-// consults getFifaStats() during PackPlayer instantiation. Missing entries
+// consults getStatsForPlayer() during PackPlayer instantiation. Missing entries
 // fall back to the deterministic synthesizer.
 import type { PlayerAttributes } from './playerAttributes';
 
-interface FifaMacro { pa: number; sh: number; ps: number; dr: number; de: number; ph: number; gk?: number; }
-interface FifaMicro {
+interface StatsMacro { pa: number; sh: number; ps: number; dr: number; de: number; ph: number; gk?: number; }
+interface StatsMicro {
   crossing: number; finishing: number; heading: number; shortPassing: number; volleys: number;
   dribblingSkill: number; curve: number; fkAccuracy: number; longPassing: number; ballControl: number;
   longShots: number; marking: number; standingTackle: number; slidingTackle: number; penalties: number;
@@ -14,27 +14,27 @@ interface FifaMicro {
   acceleration: number; sprintSpeed: number; agility: number; balance: number; shotPower: number;
   jumping: number; stamina: number; strength: number;
 }
-export interface FifaEntry { fy: number; ov: number; macro: FifaMacro; micro: FifaMicro; gk: number; }
+export interface StatsEntry { fy: number; ov: number; macro: StatsMacro; micro: StatsMicro; gk: number; }
 
-let index: Map<number, FifaEntry> = new Map();
+let index: Map<number, StatsEntry> = new Map();
 
-export const setStatsIndex = (entries: Record<string, FifaEntry> | null): void => {
+export const setStatsIndex = (entries: Record<string, StatsEntry> | null): void => {
   if (!entries) { index = new Map(); return; }
-  const m = new Map<number, FifaEntry>();
+  const m = new Map<number, StatsEntry>();
   for (const [k, v] of Object.entries(entries)) m.set(Number(k), v);
   index = m;
 };
 
-export const getFifaStats = (sourceId: number | undefined): FifaEntry | undefined => {
+export const getStatsForPlayer = (sourceId: number | undefined): StatsEntry | undefined => {
   if (sourceId == null) return undefined;
   return index.get(sourceId);
 };
 
 const c20 = (n: number) => Math.max(1, Math.min(20, Math.round(n / 5)));
 
-// Map FIFA micros (0-100) to FM-style attributes (1-20). Where FIFA has no
-// direct equivalent we use a sensible proxy from a related field.
-export const attributesFromFifa = (e: FifaEntry): PlayerAttributes => {
+// Map stat-pack micros (0-100) to FM-style attributes (1-20). Where the source
+// has no direct equivalent we use a sensible proxy from a related field.
+export const attributesFromStats = (e: StatsEntry): PlayerAttributes => {
   const m = e.micro;
   const avg = (...v: number[]) => v.reduce((s, x) => s + x, 0) / v.length;
   return {

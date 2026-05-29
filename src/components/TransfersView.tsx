@@ -5,7 +5,7 @@ import type { TransferRecord } from '../store/leagueStore';
 import { signingBlockKey } from '../store/leagueStore';
 import { computePrice, formatEuros, offerStep, playerAge } from '../data/economy';
 import type { OfferResult } from '../data/economy';
-import { PlayerCard } from './PlayerCard';
+import { PlayerPhoto } from './PlayerPhoto';
 import { MessageModal } from './MessageModal';
 import { useT } from '../i18n';
 
@@ -56,25 +56,6 @@ interface MarketEntry {
 
 const POSITION_ORDER: Record<Position, number> = { POR: 0, DEF: 1, MED: 2, AML: 3, AMR: 3, DEL: 4 };
 
-const sortPlayers = (players: Player[]) =>
-  [...players].sort((a, b) => {
-    const pa = POSITION_ORDER[a.position] ?? 99;
-    const pb = POSITION_ORDER[b.position] ?? 99;
-    if (pa !== pb) return pa - pb;
-    return playerCa(b) - playerCa(a);
-  });
-
-const TransferRankRow = ({ rank, record }: { rank: number; record: TransferRecord }) => (
-  <div className="bg-vga-black border border-vga-gray px-2 py-1 text-[8px] flex items-center gap-2">
-    <span className="text-vga-yellow font-bold w-5 text-right shrink-0">{rank}.</span>
-    <span className="text-[7px] text-vga-cyan shrink-0">{record.playerPosition}</span>
-    <span className="text-vga-bright-white flex-1 truncate min-w-0">{record.playerName}</span>
-    <span className="text-[7px] text-vga-gray shrink-0 truncate hidden sm:block max-w-[160px]">
-      {record.fromTeamName ?? 'LIBRE'} → {record.toTeamName}
-    </span>
-    <span className="text-vga-light-green font-bold shrink-0">{formatEuros(record.amount)}</span>
-  </div>
-);
 
 const OfferModal = ({
   entry,
@@ -225,73 +206,6 @@ const OfferModal = ({
   );
 };
 
-const MarketCard = ({
-  entry,
-  seasonYear,
-  onOfferClick,
-  onClausulaClick,
-  onPlayerClick,
-  blocked,
-  windowOpen,
-}: {
-  entry: MarketEntry;
-  seasonYear: number;
-  onOfferClick: () => void;
-  onClausulaClick?: () => void;
-  onPlayerClick?: () => void;
-  blocked?: boolean;
-  windowOpen?: boolean;
-}) => {
-  const t = useT();
-  const price = computePrice(entry.player, seasonYear);
-  const isClausula = !entry.isFreeAgent && !entry.player.forSale && !!onClausulaClick;
-  const highlight = entry.isFreeAgent ? 'free' : entry.player.forSale ? 'listed' : 'rival';
-  return (
-    <PlayerCard
-      player={entry.player}
-      seasonYear={seasonYear}
-      highlight={highlight}
-      onNameClick={onPlayerClick}
-      footer={
-        <div className="flex flex-col gap-1">
-          <div className="flex items-center justify-between gap-2 text-[7px]">
-            <span className={entry.isFreeAgent ? 'text-vga-light-green font-bold' : 'text-vga-cyan truncate'}>
-              {entry.isFreeAgent ? t('label.freeAgent') : entry.teamName}
-            </span>
-            <span className="font-bold text-[9px] text-vga-light-green">
-              {formatEuros(price)}
-            </span>
-          </div>
-          {!windowOpen ? (
-            <div className="w-full px-2 py-1 text-[7px] border border-vga-gray text-vga-gray text-center uppercase opacity-60">
-              {t('transfer.windowClosed')}
-            </div>
-          ) : blocked ? (
-            <button disabled className="w-full px-2 py-1 text-[8px] border border-vga-black bg-vga-gray text-vga-black opacity-60 cursor-not-allowed">
-              {t('misc.blocked')}
-            </button>
-          ) : onClausulaClick && !entry.isFreeAgent ? (
-            <div className="flex gap-1">
-              {!isClausula && (
-                <button onClick={onOfferClick} className="flex-1 px-1 py-1 text-[8px] border border-vga-black bg-vga-green text-vga-bright-white hover:bg-vga-light-green">
-                  {t('btn.makeOffer')}
-                </button>
-              )}
-              <button onClick={onClausulaClick} className="flex-1 px-1 py-1 text-[8px] border border-vga-black bg-vga-red text-vga-bright-white hover:bg-vga-light-red font-bold">
-                {t('misc.clausulazo')}
-              </button>
-            </div>
-          ) : (
-            <button onClick={onOfferClick} className="w-full px-2 py-1 text-[8px] border border-vga-black bg-vga-green text-vga-bright-white hover:bg-vga-light-green">
-              {t('btn.makeOffer')}
-            </button>
-          )}
-        </div>
-      }
-    />
-  );
-};
-
 const ClausulaModal = ({
   entry,
   seasonYear,
@@ -373,29 +287,12 @@ export const TransfersView = ({
   const blockedSet = new Set(blockedSignings);
   const [offerEntry, setOfferEntry] = useState<MarketEntry | null>(null);
   const [clausulaEntry, setClausulaEntry] = useState<MarketEntry | null>(null);
-  const [expandedTeamId, setExpandedTeamId] = useState<string | null>(null);
   const [lastResult, setLastResult] = useState<{ accepted: boolean; message: string; playerName: string } | null>(null);
   const [posFilter, setPosFilter] = useState<Position | 'ALL'>('ALL');
-  const [typeFilter, setTypeFilter] = useState<'all' | 'listed' | 'free'>('all');
-
-  const rankable = (() => {
-    const seen = new Set<string>();
-    return transferLog.filter(r => {
-      if (r.kind === 'retirement') return false;
-      if (r.tradeId) {
-        if (seen.has(r.tradeId)) return false;
-        seen.add(r.tradeId);
-      }
-      return true;
-    });
-  })();
-  const topThisSeason = [...rankable]
-    .filter(r => r.year === seasonYear)
-    .sort((a, b) => b.amount - a.amount)
-    .slice(0, 5);
-  const topAllTime = [...rankable]
-    .sort((a, b) => b.amount - a.amount)
-    .slice(0, 5);
+  const [typeFilter, setTypeFilter] = useState<'all' | 'listed' | 'free' | 'rival'>('all');
+  const [search, setSearch] = useState('');
+  const [sortBy, setSortBy] = useState<'price' | 'ovr' | 'age' | 'pos' | 'club'>('price');
+  const [selectedId, setSelectedId] = useState<string | null>(null);
 
   const listedEntries: MarketEntry[] = rivalTeams.flatMap(rival =>
     rival.players
@@ -415,8 +312,37 @@ export const TransfersView = ({
     const band = freeAgentEntries.filter(e => playerCa(e.player) >= min && playerCa(e.player) <= max);
     rotatedFreeAgents.push(...seededShuffle(band, seed + b).slice(0, BAND_SIZE));
   }
-  const marketEntries = [...listedEntries, ...rotatedFreeAgents]
-    .sort((a, b) => computePrice(b.player, seasonYear) - computePrice(a.player, seasonYear));
+  // Include all rival players so the table is a one-stop shop (listed + free agents + rival rosters)
+  const rivalRosterEntries: MarketEntry[] = rivalTeams.flatMap(rival =>
+    rival.players
+      .filter(p => !p.forSale && !blockedSet.has(signingBlockKey(rival.id, p.id)))
+      .map(p => ({ player: p, teamName: rival.name, teamId: rival.id, isFreeAgent: false }))
+  );
+
+  const marketEntries: MarketEntry[] = [...listedEntries, ...rotatedFreeAgents, ...rivalRosterEntries];
+
+  const filtered = marketEntries
+    .filter(e => {
+      if (typeFilter === 'all') return true;
+      if (typeFilter === 'free') return e.isFreeAgent;
+      if (typeFilter === 'listed') return !e.isFreeAgent && e.player.forSale;
+      if (typeFilter === 'rival') return !e.isFreeAgent && !e.player.forSale;
+      return true;
+    })
+    .filter(e => posFilter === 'ALL' || e.player.position === posFilter)
+    .filter(e => !search.trim() || e.player.name.toLowerCase().includes(search.trim().toLowerCase()) || e.teamName.toLowerCase().includes(search.trim().toLowerCase()));
+
+  const sorted = useMemo(() => {
+    const out = [...filtered];
+    if (sortBy === 'price') out.sort((a, b) => computePrice(b.player, seasonYear) - computePrice(a.player, seasonYear));
+    else if (sortBy === 'ovr') out.sort((a, b) => playerCa(b.player) - playerCa(a.player));
+    else if (sortBy === 'age') out.sort((a, b) => playerAge(a.player, seasonYear) - playerAge(b.player, seasonYear));
+    else if (sortBy === 'pos') out.sort((a, b) => (POSITION_ORDER[a.player.position] ?? 99) - (POSITION_ORDER[b.player.position] ?? 99));
+    else if (sortBy === 'club') out.sort((a, b) => a.teamName.localeCompare(b.teamName));
+    return out;
+  }, [filtered, sortBy, seasonYear]);
+
+  const selected = sorted.find(e => e.player.id === selectedId) ?? null;
 
   const submitOffer = (entry: MarketEntry, amount: number, offeredPlayerIds: string[]) => {
     const result = entry.isFreeAgent
@@ -426,178 +352,214 @@ export const TransfersView = ({
     if (result.accepted) setOfferEntry(null);
   };
 
+  // ── Render ──
+  const PanelTitle = ({ title, accent = 'text-vga-magenta', right }: { title: string; accent?: string; right?: React.ReactNode }) => (
+    <div className={`${accent} text-[9px] uppercase tracking-widest px-2 py-1 border-b border-vga-blue flex items-center justify-between`}>
+      <span>{title}</span>
+      {right}
+    </div>
+  );
+
+  const seasonTransfers = transferLog.filter(r => r.year === seasonYear);
+
   return (
-    <div className="w-full max-w-5xl flex flex-col gap-4 animate-in fade-in duration-300">
-      <div className="bg-vga-blue p-2 border-2 border-vga-white flex justify-between items-center vga-panel">
-        <h2 className="text-vga-yellow text-xs uppercase font-bold">{t('section.transfers')}</h2>
-        <button onClick={onBack} className="bg-vga-red text-vga-bright-white px-3 py-1 text-[8px] border border-vga-black hover:bg-vga-light-red">
-          {t('btn.back')}
-        </button>
-      </div>
-
-      {windowOpen ? (
-        <div className="border-2 border-vga-light-green bg-vga-black p-2 text-[8px] flex items-center justify-between">
-          <span className="text-vga-light-green font-bold uppercase">{t('transfer.windowOpen')}</span>
-          <span className="text-vga-yellow">{t('transfer.windowOpenLeft', { n: String(windowJornadasLeft) })}</span>
-        </div>
-      ) : (
-        <div className="border-2 border-vga-light-red bg-vga-black p-2 text-[8px] flex items-center justify-between">
-          <span className="text-vga-light-red font-bold uppercase">{t('transfer.windowClosed')}</span>
-          <span className="text-vga-gray">
-            {jornadasUntilOpen < 900
-              ? t('transfer.windowClosedUntil', { n: String(jornadasUntilOpen) })
-              : t('transfer.windowClosedSeason')}
-          </span>
-        </div>
-      )}
-
-      <div className="bg-vga-gray border-2 border-vga-blue p-3">
-        <div className="text-[7px] text-vga-black uppercase font-bold mb-2">{t('misc.marketStatus', { j: String(currentJornada) })}</div>
-        <div className="flex justify-between items-start">
-          <div>
-            <div className="text-[7px] text-vga-black uppercase">{t('label.budget')}</div>
-            <div className="text-[12px] text-vga-blue font-bold">{formatEuros(userTeam.budget)}</div>
-          </div>
-          <div className="text-center">
-            <div className="text-[7px] text-vga-black uppercase">{t('label.players')}</div>
-            <div className="text-[10px] text-vga-blue font-bold">{userTeam.players.length}</div>
-          </div>
-          <div className="text-center">
-            <div className="text-[7px] text-vga-black uppercase">{t('label.freeAgents')}</div>
-            <div className="text-[10px] text-vga-blue font-bold">{freeAgents.length}</div>
-          </div>
-          <div className="text-right">
-            <div className="text-[7px] text-vga-black uppercase">{t('label.forSale')}</div>
-            <div className="text-[10px] text-vga-blue font-bold">{listedEntries.length}</div>
-          </div>
-        </div>
-      </div>
-
-      <div className="border-2 border-vga-cyan p-2 bg-vga-blue">
-        <div className="flex justify-between items-center mb-2">
-          <h3 className="text-vga-cyan text-[10px] font-bold uppercase">{t('section.freeAgentPool')}</h3>
-          <span className="text-[7px] text-vga-gray">
-            {t('misc.marketCounts', { listed: String(listedEntries.length), free: String(freeAgents.length), shown: String(rotatedFreeAgents.length) })}
-          </span>
-        </div>
-        <div className="flex flex-wrap gap-1 mb-2">
-          {(['all', 'listed', 'free'] as const).map(type => (
-            <button key={type} onClick={() => setTypeFilter(type)}
-              className={`text-[7px] px-2 py-0.5 border ${typeFilter === type ? 'bg-vga-cyan text-vga-black border-vga-cyan' : 'bg-vga-black text-vga-gray border-vga-gray hover:text-vga-bright-white'}`}>
-              {type === 'all' ? 'ALL' : type === 'listed' ? t('label.forSale') : t('label.freeAgents')}
-            </button>
-          ))}
-          <span className="text-vga-gray text-[7px] self-center mx-1">|</span>
-          {(['ALL', 'POR', 'DEF', 'MED', 'DEL', 'AML', 'AMR'] as const).map(p => (
-            <button key={p} onClick={() => setPosFilter(p)}
-              className={`text-[7px] px-2 py-0.5 border ${posFilter === p ? 'bg-vga-yellow text-vga-black border-vga-yellow' : 'bg-vga-black text-vga-gray border-vga-gray hover:text-vga-bright-white'}`}>
-              {p}
-            </button>
-          ))}
-        </div>
-        {(() => {
-          const filtered = marketEntries
-            .filter(e => typeFilter === 'all' || (typeFilter === 'listed' ? !e.isFreeAgent : e.isFreeAgent))
-            .filter(e => posFilter === 'ALL' || e.player.position === posFilter);
-          return filtered.length === 0 ? (
-            <div className="text-[8px] text-vga-gray text-center p-2">{t('misc.noPlayersFilter')}</div>
+    <div className="w-full flex flex-col gap-3 animate-in fade-in duration-300 px-2">
+      {/* Header strip */}
+      <div className="bg-vga-black border border-vga-blue px-3 py-2 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <span className="text-vga-magenta text-[10px] uppercase tracking-widest">Mercado de Fichajes</span>
+          <span className="text-vga-bright-white text-[11px] font-bold">{userTeam.name}</span>
+          <span className="text-vga-gray text-[8px]">J{currentJornada} · {seasonYear}</span>
+          {windowOpen ? (
+            <span className="text-[8px] px-2 py-0.5 border border-vga-light-green text-vga-light-green uppercase">Abierto · {windowJornadasLeft}J</span>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-              {filtered.map(entry => (
-                <MarketCard
-                  key={entry.player.id}
-                  entry={entry}
-                  seasonYear={seasonYear}
-                  onOfferClick={() => setOfferEntry(entry)}
-                  onClausulaClick={!entry.isFreeAgent && entry.teamId ? () => setClausulaEntry(entry) : undefined}
-                  onPlayerClick={onPlayerClick ? () => onPlayerClick(entry.player.id) : undefined}
-                  blocked={false}
-                  windowOpen={windowOpen}
-                />
-              ))}
-            </div>
-          );
-        })()}
-      </div>
-
-      <div className="border-2 border-vga-cyan p-2 bg-vga-blue">
-        <h3 className="text-vga-cyan text-[10px] font-bold mb-2 uppercase">{t('section.otherTeams')}</h3>
-        <div className="text-[7px] text-vga-gray mb-2">{t('misc.clausulazoHint')}</div>
-        <div className="flex flex-col gap-1">
-          {rivalTeams.map(rival => {
-            const open = expandedTeamId === rival.id;
-            const listedCount = rival.players.filter(p => p.forSale).length;
-            return (
-              <div key={rival.id} className="bg-vga-black border border-vga-gray">
-                <button
-                  onClick={() => setExpandedTeamId(open ? null : rival.id)}
-                  className="w-full text-left px-2 py-1 text-[9px] text-vga-bright-white hover:bg-vga-gray hover:text-vga-black flex justify-between items-center"
-                >
-                  <span>{rival.name}</span>
-                  <span className="flex items-center gap-2">
-                    {listedCount > 0 && (
-                      <span className="text-[7px] bg-vga-yellow text-vga-black px-1 border border-vga-black uppercase">
-                        {t('misc.listedCount', { n: String(listedCount) })}
-                      </span>
-                    )}
-                    <span className="text-vga-yellow">{open ? '−' : '+'}</span>
-                  </span>
-                </button>
-                {open && (
-                  <div className="p-2 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 border-t border-vga-gray">
-                    {sortPlayers(rival.players)
-                      .filter(p => !blockedSet.has(signingBlockKey(rival.id, p.id)))
-                      .map(p => {
-                        const entry: MarketEntry = { player: p, teamName: rival.name, teamId: rival.id, isFreeAgent: false };
-                        return (
-                          <MarketCard
-                            key={p.id}
-                            entry={entry}
-                            seasonYear={seasonYear}
-                            onOfferClick={() => setOfferEntry(entry)}
-                            onClausulaClick={() => setClausulaEntry(entry)}
-                            onPlayerClick={onPlayerClick ? () => onPlayerClick(p.id) : undefined}
-                            blocked={false}
-                            windowOpen={windowOpen}
-                          />
-                        );
-                      })}
-                  </div>
-                )}
-              </div>
-            );
-          })}
+            <span className="text-[8px] px-2 py-0.5 border border-vga-light-red text-vga-light-red uppercase">Cerrado{jornadasUntilOpen < 900 ? ` · vuelve en ${jornadasUntilOpen}J` : ''}</span>
+          )}
+        </div>
+        <div className="flex items-center gap-3">
+          <div className="text-right">
+            <div className="text-vga-gray text-[7px] uppercase">Presupuesto</div>
+            <div className="text-vga-light-green text-[11px] font-bold">{formatEuros(userTeam.budget)}</div>
+          </div>
+          <button onClick={onBack} className="bg-vga-red text-vga-bright-white px-3 py-1 text-[8px] border border-vga-black hover:bg-vga-light-red font-bold">
+            {t('btn.back')}
+          </button>
         </div>
       </div>
 
-      <div className="border-2 border-vga-magenta p-2 bg-vga-blue">
-        <h3 className="text-vga-magenta text-[10px] font-bold mb-2 uppercase">{t('section.topTransfers', { year: String(seasonYear) })}</h3>
-        {topThisSeason.length === 0 ? (
-          <div className="text-[8px] text-vga-gray text-center p-2">{t('misc.noTransfersSeason')}</div>
-        ) : (
-          <div className="flex flex-col gap-1">
-            {topThisSeason.map((r, i) => (
-              <TransferRankRow key={r.id} rank={i + 1} record={r} />
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-3">
+        {/* Left column: filters + table */}
+        <div className="flex flex-col gap-2 min-w-0">
+          {/* Filters bar */}
+          <div className="bg-vga-black border border-vga-blue flex flex-wrap items-center gap-1 p-2">
+            {(['all', 'listed', 'free', 'rival'] as const).map(type => (
+              <button key={type} onClick={() => setTypeFilter(type)}
+                className={`text-[8px] px-2 py-0.5 border font-bold uppercase ${typeFilter === type ? 'bg-vga-yellow text-vga-black border-vga-yellow' : 'text-vga-gray border-vga-gray hover:text-vga-bright-white hover:border-vga-bright-white'}`}>
+                {type === 'all' ? 'Todo' : type === 'listed' ? 'En venta' : type === 'free' ? 'Libres' : 'Cláusula'}
+              </button>
             ))}
-          </div>
-        )}
-      </div>
-
-      <div className="border-2 border-vga-magenta p-2 bg-vga-blue">
-        <h3 className="text-vga-magenta text-[10px] font-bold mb-2 uppercase">{t('section.topTransfersAll')}</h3>
-        {topAllTime.length === 0 ? (
-          <div className="text-[8px] text-vga-gray text-center p-2">{t('misc.noTransfersAll')}</div>
-        ) : (
-          <div className="flex flex-col gap-1">
-            {topAllTime.map((r, i) => (
-              <TransferRankRow key={r.id} rank={i + 1} record={r} />
+            <span className="text-vga-gray text-[7px] mx-1">|</span>
+            {(['ALL', 'POR', 'DEF', 'MED', 'AML', 'AMR', 'DEL'] as const).map(p => (
+              <button key={p} onClick={() => setPosFilter(p)}
+                className={`text-[8px] px-2 py-0.5 border font-bold ${posFilter === p ? 'bg-vga-cyan text-vga-black border-vga-cyan' : 'text-vga-gray border-vga-gray hover:text-vga-bright-white hover:border-vga-bright-white'}`}>
+                {p}
+              </button>
             ))}
+            <input
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              placeholder="Buscar jugador o equipo..."
+              className="ml-auto bg-vga-black border border-vga-blue text-vga-bright-white text-[9px] px-2 py-1 w-56 placeholder:text-vga-gray focus:outline-none focus:border-vga-cyan"
+            />
           </div>
-        )}
-      </div>
 
-      <div className="bg-vga-magenta p-2 border-2 border-vga-white text-[7px] text-vga-bright-white text-center uppercase">
-        {t('misc.transfersWarning')}
+          {/* Player table */}
+          <div className="bg-vga-black border border-vga-blue overflow-hidden">
+            <PanelTitle title={`Bolsa de fichajes · ${sorted.length} jugadores`} />
+            <div className="max-h-[70vh] overflow-y-auto">
+              <table className="w-full text-[9px] tabular-nums">
+                <thead className="bg-vga-black sticky top-0">
+                  <tr className="text-vga-magenta text-[7px] uppercase">
+                    <th className="text-left pl-2 py-1 cursor-pointer hover:text-vga-bright-white" onClick={() => setSortBy('pos')}>POS</th>
+                    <th className="text-left">Jugador</th>
+                    <th className="text-right cursor-pointer hover:text-vga-bright-white" onClick={() => setSortBy('age')}>Edad</th>
+                    <th className="text-right cursor-pointer hover:text-vga-bright-white" onClick={() => setSortBy('ovr')}>OVR</th>
+                    <th className="text-right">G/A</th>
+                    <th className="text-left pl-2 cursor-pointer hover:text-vga-bright-white" onClick={() => setSortBy('club')}>Club</th>
+                    <th className="text-right pr-2 cursor-pointer hover:text-vga-bright-white" onClick={() => setSortBy('price')}>Precio</th>
+                    <th className="text-center pr-2">Tipo</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {sorted.length === 0 ? (
+                    <tr><td colSpan={8} className="text-center text-vga-gray text-[8px] p-4">{t('misc.noPlayersFilter')}</td></tr>
+                  ) : sorted.map(e => {
+                    const p = e.player;
+                    const price = computePrice(p, seasonYear);
+                    const isSelected = p.id === selectedId;
+                    const isChollo = !e.isFreeAgent && price < (p.current_ability ?? 100) * 100_000 * 0.5;
+                    const isStar = playerCa(p) >= 170;
+                    const tag = e.isFreeAgent ? <span className="text-vga-light-green">LIBRE</span>
+                              : p.forSale ? <span className="text-vga-yellow">VENTA</span>
+                              : <span className="text-vga-cyan">RIVAL</span>;
+                    return (
+                      <tr
+                        key={p.id}
+                        onClick={() => setSelectedId(p.id)}
+                        className={`cursor-pointer ${isSelected ? 'bg-vga-blue/40 text-vga-bright-white' : 'text-vga-bright-white hover:bg-vga-blue/20'}`}
+                      >
+                        <td className="pl-2 py-0.5 text-vga-magenta">{p.position}</td>
+                        <td className="truncate max-w-[200px]">
+                          <PlayerName player={p} />
+                          {isStar && <span className="ml-1 text-vga-yellow">★</span>}
+                          {isChollo && <span className="ml-1 text-[7px] text-vga-light-green border border-vga-light-green px-0.5">CHOLLO</span>}
+                        </td>
+                        <td className="text-right text-vga-gray">{playerAge(p, seasonYear)}</td>
+                        <td className="text-right text-vga-light-green font-bold">{playerCa(p)}</td>
+                        <td className="text-right text-vga-cyan text-[8px]">{p.seasonStats.goals}/{p.seasonStats.assists}</td>
+                        <td className="pl-2 truncate max-w-[140px] text-vga-cyan">{e.teamName}</td>
+                        <td className="text-right pr-2 text-vga-light-green font-bold">{formatEuros(price)}</td>
+                        <td className="text-center pr-2 text-[8px]">{tag}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        {/* Right column: inspector + market activity */}
+        <div className="flex flex-col gap-3 min-w-0">
+          {/* Inspector */}
+          <div className="bg-vga-black border border-vga-blue">
+            <PanelTitle title="Ficha" />
+            {!selected ? (
+              <div className="p-3 text-vga-gray text-[8px]">Selecciona un jugador para ver su ficha y opciones de fichaje.</div>
+            ) : (() => {
+              const p = selected.player;
+              const price = computePrice(selected.player, seasonYear);
+              const blocked = !selected.isFreeAgent && selected.teamId ? blockedSet.has(signingBlockKey(selected.teamId, p.id)) : false;
+              return (
+                <div className="p-3 flex flex-col gap-2">
+                  <div className="flex items-center gap-3">
+                    <PlayerPhoto sourceId={p.source_id} size="xl" className="border border-vga-blue" />
+                    <div className="min-w-0 flex-1">
+                      <div className="text-vga-bright-white text-[11px] truncate"><PlayerName player={p} /></div>
+                      <div className="text-vga-cyan text-[8px] truncate">#{p.number} · {p.position}</div>
+                      {selected.isFreeAgent
+                        ? <div className="text-vga-light-green text-[7px] uppercase">Libre</div>
+                        : p.forSale ? <div className="text-vga-yellow text-[7px] uppercase">En venta</div>
+                        : <div className="text-vga-cyan text-[7px] uppercase">Cláusula disponible</div>}
+                    </div>
+                  </div>
+                  <div className="text-[9px] grid grid-cols-2 gap-y-0.5">
+                    <span className="text-vga-gray">OVR</span><span className="text-vga-light-green font-bold text-right">{playerCa(p)}</span>
+                    <span className="text-vga-gray">Edad</span><span className="text-right">{playerAge(p, seasonYear)}</span>
+                    <span className="text-vga-gray">Posición</span><span className="text-vga-magenta text-right">{p.position}</span>
+                    <span className="text-vga-gray">Club</span><span className="text-vga-cyan text-right truncate">{selected.teamName}</span>
+                    <span className="text-vga-gray">Sueldo</span><span className="text-right">{formatEuros(p.contract?.salary ?? 0)}</span>
+                    <span className="text-vga-gray">Valor</span><span className="text-vga-light-green font-bold text-right">{formatEuros(price)}</span>
+                    <span className="text-vga-gray">G / A</span><span className="text-right">{p.seasonStats.goals} / {p.seasonStats.assists}</span>
+                    <span className="text-vga-gray">TA / TR</span><span className="text-right">{p.seasonStats.yellowCards} / {p.seasonStats.redCards}</span>
+                  </div>
+                  <div className="flex flex-col gap-1 pt-1 border-t border-vga-blue">
+                    {!windowOpen ? (
+                      <div className="text-vga-gray text-[8px] text-center py-1 border border-vga-gray uppercase">{t('transfer.windowClosed')}</div>
+                    ) : blocked ? (
+                      <div className="text-vga-gray text-[8px] text-center py-1 border border-vga-gray uppercase">{t('misc.blocked')}</div>
+                    ) : (
+                      <>
+                        {!(selected.player.forSale === false && !selected.isFreeAgent && selected.teamId) && (
+                          <button onClick={() => setOfferEntry(selected)} className="bg-vga-green hover:bg-vga-light-green text-vga-bright-white text-[9px] px-2 py-1 border border-vga-black font-bold uppercase">
+                            {t('btn.makeOffer')}
+                          </button>
+                        )}
+                        {!selected.isFreeAgent && selected.teamId && (
+                          <button onClick={() => setClausulaEntry(selected)} className="bg-vga-red hover:bg-vga-light-red text-vga-bright-white text-[9px] px-2 py-1 border border-vga-black font-bold uppercase">
+                            {t('misc.clausulazo')}
+                          </button>
+                        )}
+                        {onPlayerClick && (
+                          <button onClick={() => onPlayerClick(p.id)} className="bg-vga-black hover:bg-vga-blue text-vga-cyan text-[8px] px-2 py-1 border border-vga-cyan uppercase">
+                            Ver ficha completa
+                          </button>
+                        )}
+                      </>
+                    )}
+                  </div>
+                </div>
+              );
+            })()}
+          </div>
+
+          {/* Market activity feed */}
+          <div className="bg-vga-black border border-vga-blue flex flex-col flex-1 min-h-0">
+            <PanelTitle title={`Actividad del mercado · ${seasonTransfers.length}`} />
+            <div className="overflow-y-auto max-h-[40vh] p-1 flex flex-col gap-0.5">
+              {seasonTransfers.length === 0 ? (
+                <div className="text-vga-gray text-[8px] p-3 text-center">Aún no hay movimientos esta temporada.</div>
+              ) : seasonTransfers.map(r => {
+                const isUserIn = r.toTeamName === userTeam.name;
+                const isUserOut = r.fromTeamName === userTeam.name;
+                const color = r.kind === 'retirement' ? 'text-vga-gray'
+                  : isUserIn ? 'text-vga-light-green'
+                  : isUserOut ? 'text-vga-light-cyan'
+                  : 'text-vga-bright-white';
+                const label = r.kind === 'retirement'
+                  ? `Retiro · ${r.playerName}${r.retirementAge ? ` (${r.retirementAge}a)` : ''} · ${r.fromTeamName ?? ''}`
+                  : `${r.playerName} · ${r.fromTeamName ?? 'Libre'} → ${r.toTeamName}`;
+                return (
+                  <div key={r.id} className="px-2 py-0.5 text-[8px] flex items-center gap-1 border-b border-vga-blue/30 last:border-b-0">
+                    <span className="text-vga-magenta text-[7px] w-7 shrink-0">J{r.jornada}</span>
+                    <span className={`flex-1 truncate ${color}`}>{label}</span>
+                    {r.amount > 0 && <span className="text-vga-light-green text-[7px] tabular-nums shrink-0">{formatEuros(r.amount)}</span>}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
       </div>
 
       {offerEntry && (

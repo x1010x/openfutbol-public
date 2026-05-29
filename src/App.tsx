@@ -9,6 +9,7 @@ import { FORMATIONS } from './engine/formations';
 import { getInitialLeagueState, getFantasyLeagueState, updateLeagueStats, deductWeeklySalaries, generateIncomingOffers, autoListAiPlayers, simulateAiMarketSignings, advanceSeason, simulateAiTrades, simulateAiFreeAgentSignings, simulateAiClausulazos, appendTransfer, decrementSuspensions, signingBlockKey, transferredKey, squadNeeds, groupFor, repickAiFormations, writebackMatchStamina, decayTeamStaminaAfterMatch, decrementInjuries, applyStaminaRecovery, computeTvBonus, applyTvBonus, isTransferWindowOpen, windowJornadasLeft, jornadasUntilWindowOpen } from './store/leagueStore';
 import type { TransferRecord, ManagerSeasonRecord } from './store/leagueStore';
 import type { LeagueState } from './store/leagueStore';
+import { migrateLegacyKey, getActiveSlotId, saveSlot, createSlotFromCurrent } from './store/saveSlots';
 import { computeBoardObjective, computeTransferDelta, firingChance, applyMeterDelta, isObjectiveMet, computeMatchMeterDelta, computeMatchReputationDelta, computeSeasonReputationDelta, computeSeasonMeterDelta } from './engine/florentinometro';
 import { engineSettings, loadEngineSettings } from './engine/engineSettings';
 loadEngineSettings();
@@ -64,6 +65,7 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
   const { pack, loading: packLoading } = usePack();
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
   const [league, setLeague] = useState<LeagueState>(() => {
+    migrateLegacyKey();
     const saved = localStorage.getItem('openfutbol_league');
     if (saved) {
       const parsed = JSON.parse(saved);
@@ -266,6 +268,14 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
   const didNotifyReady = useRef(false);
   useEffect(() => {
     localStorage.setItem('openfutbol_league', JSON.stringify(league));
+    if (league.isStarted) {
+      const activeId = getActiveSlotId();
+      if (activeId) {
+        try { saveSlot(activeId, league); } catch (e) { console.warn('saveSlot failed', e); }
+      } else {
+        try { createSlotFromCurrent(league); } catch (e) { console.warn('createSlotFromCurrent failed', e); }
+      }
+    }
     if (league.isStarted && !didNotifyReady.current) {
       didNotifyReady.current = true;
       onLeagueReady?.();
@@ -1978,28 +1988,38 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
     if (view === 'END_OF_SEASON') {
       if (league.gameMode === 'promanager') {
         return (
-          <ProManagerEndView
-            teams={league.teams}
-            stats={league.stats}
-            userTeamId={league.userTeamId}
-            managerName={league.managerName ?? ''}
-            florentinometro={league.florentinometro ?? 5}
-            boardObjective={league.boardObjective ?? 'avoid_relegation'}
-            managerReputation={league.managerReputation ?? 50}
-            year={league.year}
-            onPickTeam={handleProManagerPickTeam}
-            onRetire={handleProManagerRetire}
-          />
+          <div className="w-full flex flex-col gap-3">
+            <EndOfSeasonView
+              league={league}
+              hideActions
+              onCellClick={(teamId, stat) => setDrillDown({ teamId, stat })}
+              onTeamClick={(teamId) => { setViewingTeamId(teamId); setView('SQUAD'); }}
+              onPlayerClick={(playerId) => showPlayerDetail(playerId)}
+            />
+            <ProManagerEndView
+              teams={league.teams}
+              stats={league.stats}
+              userTeamId={league.userTeamId}
+              managerName={league.managerName ?? ''}
+              florentinometro={league.florentinometro ?? 5}
+              boardObjective={league.boardObjective ?? 'avoid_relegation'}
+              managerReputation={league.managerReputation ?? 50}
+              year={league.year}
+              onPickTeam={handleProManagerPickTeam}
+              onRetire={handleProManagerRetire}
+            />
+          </div>
         );
       }
       return (
         <EndOfSeasonView
-          teams={league.teams}
-          stats={league.stats}
-          userTeamId={league.userTeamId}
+          league={league}
           onContinueSameTeam={handleAdvanceSameTeam}
           onAdvanceAndChangeTeam={handleAdvanceChangeTeam}
           onResetGame={handleResetGame}
+          onCellClick={(teamId, stat) => setDrillDown({ teamId, stat })}
+          onTeamClick={(teamId) => { setViewingTeamId(teamId); setView('SQUAD'); }}
+          onPlayerClick={(playerId) => showPlayerDetail(playerId)}
         />
       );
     }
@@ -2485,7 +2505,7 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
               className="text-vga-cyan text-[8px] hover:text-vga-yellow underline decoration-dotted underline-offset-2 cool:text-rc-accent cool:hover:text-rc-primary flex items-center gap-1"
               title="Ver cambios recientes"
             >
-              OPENFUTBOL v1.6.0-{__BUILD_TIMESTAMP__}
+              OPENFUTBOL v1.7.0-{__BUILD_TIMESTAMP__}
               {hasNewVersion && (
                 <span className="bg-vga-red text-vga-bright-white text-[7px] px-1 font-bold animate-pulse">
                   NUEVO

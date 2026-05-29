@@ -112,7 +112,7 @@ export const StatDrillDown = ({ teamId, stat, teams, schedule, onClose }: Props)
       onClick={onClose}
     >
       <div
-        className="bg-vga-blue border-4 border-vga-white vga-panel w-full max-w-md max-h-[85vh] flex flex-col"
+        className="bg-vga-blue border-4 border-vga-white vga-panel w-full max-w-3xl max-h-[90vh] flex flex-col"
         onClick={e => e.stopPropagation()}
       >
         <div className="bg-vga-blue p-2 border-b-2 border-vga-white flex items-center gap-2">
@@ -157,7 +157,7 @@ export const StatDrillDown = ({ teamId, stat, teams, schedule, onClose }: Props)
                         {opponent?.name ?? '—'}
                       </span>
                       <span className="font-mono text-vga-yellow text-[10px] tabular-nums">
-                        {r.my}-{r.opp}
+                        {r.match.homeScore}-{r.match.awayScore}
                       </span>
                       <span className="text-vga-cyan text-[7px] w-3 text-right">
                         {isOpen ? '▾' : '▸'}

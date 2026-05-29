@@ -276,6 +276,17 @@ const ContentES = ({ onColaborar, changelogRef, engineRef }: {
       <Section title="CAMBIOS RECIENTES">
         <ul className="list-disc pl-5 space-y-1">
           <li>
+            <span className="text-vga-cyan">v1.7.0</span> — Partidas guardadas y fin de temporada arreglado.
+            Ahora puedes tener varias carreras a la vez: la pestaña PARTIDAS dentro de COPIA permite
+            cargar, renombrar, borrar y crear partidas independientes, y la actual se autoguarda
+            mientras juegas. Bug serio arreglado: los equipos ya no se vacían al pasar de temporada
+            — los jugadores de campo se retiran sobre los 35–38 y los porteros sobre los 38–42,
+            con un poco de aleatoriedad deterministica por jugador. Limpieza interna: las
+            referencias a la fuente externa de stats desaparecen del código y la interfaz; ahora se
+            habla simplemente de "pack de stats" y el año del pack se muestra como una etiqueta
+            pequeña junto al jugador.
+          </li>
+          <li>
             <span className="text-vga-cyan">v1.5.1</span> — Reglas Tebas y carrera en tiempo real.
             Límite Tebas de clausulazos recibidos por equipo (máx. 2 por temporada). En Pro Manager,
             Florentino veta tus clausulazos con probabilidad creciente después del segundo — con
@@ -581,6 +592,16 @@ const ContentEN = ({ onColaborar, changelogRef, engineRef }: {
     <div ref={changelogRef} id="changelog">
       <Section title="RECENT CHANGES">
         <ul className="list-disc pl-5 space-y-1">
+          <li>
+            <span className="text-vga-cyan">v1.7.0</span> — Save slots and an end-of-season fix.
+            You can now keep several careers at once: the PARTIDAS tab inside COPIA lets you
+            load, rename, delete and create independent saves, and the current one autosaves
+            while you play. Serious bug fix: teams no longer empty out at season's end —
+            outfielders retire around 35–38 and goalkeepers around 38–42, with a small
+            deterministic random band per player. Internal cleanup: every reference to the
+            external stats source has been stripped from the code and UI; the app now just
+            says "stats pack" and the year shows as a small badge next to a player.
+          </li>
           <li>
             <span className="text-vga-cyan">v1.5.1</span> — Tebas rules and live career screen.
             Tebas buyout limit: each team can only receive 2 buyout clauses per season. In Pro Manager

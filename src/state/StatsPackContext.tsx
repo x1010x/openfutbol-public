@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import type { StatsPack } from '../types/game.d.ts';
 import { hasIndexedDB } from '../data/packStore';
 import { saveStatsPack, loadStatsPack, clearStatsPack as clearStored } from '../data/statsPackStore';
-import { setStatsIndex, type FifaEntry } from '../data/fifaStatsStore';
+import { setStatsIndex, type StatsEntry } from '../data/statsIndex';
 
 interface StatsPackContextValue {
   pack: StatsPack | null;
@@ -26,7 +26,7 @@ export const StatsPackProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         if (!persistent) return;
         const stored = await loadStatsPack();
         if (cancelled || !stored) return;
-        setStatsIndex(stored.entries as Record<string, FifaEntry>);
+        setStatsIndex(stored.entries as Record<string, StatsEntry>);
         setPackState(stored);
       } catch (e) {
         console.error('StatsPackContext: failed to load from IDB', e);
@@ -38,7 +38,7 @@ export const StatsPackProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   }, [persistent]);
 
   const setPack = async (next: StatsPack) => {
-    setStatsIndex(next.entries as Record<string, FifaEntry>);
+    setStatsIndex(next.entries as Record<string, StatsEntry>);
     setPackState(next);
     if (persistent) {
       try { await saveStatsPack(next); }

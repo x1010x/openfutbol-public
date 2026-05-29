@@ -1,9 +1,9 @@
 // TODO(phase-4): delete shim fields from Player; use current_ability/positions directly.
 import type { PackPlayer, Player, PlayerStats, PositionCode, Position, PlayerPositionEntry } from '../types/game.d.ts';
 import { synthesizeAttributes, type PlayerAttributes } from './playerAttributes';
-import { getFifaStats, attributesFromFifa, type FifaEntry } from './fifaStatsStore';
+import { getStatsForPlayer, attributesFromStats, type StatsEntry } from './statsIndex';
 
-const statsFromFifa = (e: FifaEntry, isGK: boolean): PlayerStats => ({
+const statsFromEntry = (e: StatsEntry, isGK: boolean): PlayerStats => ({
   speed: e.macro.pa,
   shooting: e.macro.sh,
   passing: e.macro.ps,
@@ -75,17 +75,17 @@ export const runtimePlayerFromPack = (
   const allowedPositions: Position[] = [...allowedSet];
 
   const isGK = primaryCode === 'GK';
-  const fifa = getFifaStats(packPlayer.source_id);
-  // When FIFA stats hit, FIFA overall (0-100) replaces the pack's CA (1-200).
-  const currentAbility = fifa ? Math.min(200, fifa.ov * 2) : packPlayer.current_ability;
+  const stats_entry = getStatsForPlayer(packPlayer.source_id);
+  // When stat-pack stats hit, the pack's overall (0-100) replaces the base CA (1-200).
+  const currentAbility = stats_entry ? Math.min(200, stats_entry.ov * 2) : packPlayer.current_ability;
   const halfCa = Math.round(currentAbility / 2);
-  const attributes: PlayerAttributes = fifa
-    ? attributesFromFifa(fifa)
+  const attributes: PlayerAttributes = stats_entry
+    ? attributesFromStats(stats_entry)
     : synthesizeAttributes(currentAbility, primaryCode, packPlayer.id);
-  const stats: PlayerStats = fifa
-    ? statsFromFifa(fifa, isGK)
+  const stats: PlayerStats = stats_entry
+    ? statsFromEntry(stats_entry, isGK)
     : statsFromAttributes(attributes, isGK);
-  const fifaYear = fifa?.fy;
+  const statsYear = stats_entry?.fy;
 
   return {
     id: packPlayer.id,
@@ -100,7 +100,7 @@ export const runtimePlayerFromPack = (
     current_ability: currentAbility,
     potential_ability: Math.max(packPlayer.potential_ability, currentAbility),
     attributes,
-    fifa_year: fifaYear,
+    stats_year: statsYear,
     value: packPlayer.value,
     contract: packPlayer.contract,
     number,

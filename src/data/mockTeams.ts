@@ -51,7 +51,7 @@ export const getTeamsForYearWithOverflow = (_year: number): { teams: Team[]; ove
 
 export const getFreeAgents = (_year: number): Player[] => [];
 export const getEligibleFreeAgents = (_year: number, _excludeDbIds: Set<string>): Player[] => [];
-export const advancePlayerToYear = (_player: Player, _year: number): Player | null => null;
+export { advancePlayer as advancePlayerToYear } from '../engine/retirement';
 
 export const getFantasyPool = (_year: number): Player[] => [];
 export const buildFantasyTeam = (

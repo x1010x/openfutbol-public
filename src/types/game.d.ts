@@ -146,7 +146,7 @@ export interface StatsPackMeta {
 }
 export interface StatsPack {
   meta: StatsPackMeta;
-  entries: Record<string, unknown>; // shape validated by the consumer (e.g. FifaEntry)
+  entries: Record<string, unknown>; // shape validated by the consumer (e.g. StatsEntry)
 }
 
 // ── Runtime Player (canonical + legacy shim) ─────────────────────────────
@@ -169,7 +169,7 @@ export interface Player {
   value?: number;
   contract?: { salary: number; expiration: string } | null;
   attributes?: import('../data/playerAttributes').PlayerAttributes;
-  fifa_year?: number; // when stats sourced from a FIFA CSV (15-22)
+  stats_year?: number; // when stats sourced from a stats pack
 
   // Runtime/game state
   number: number;

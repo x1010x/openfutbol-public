@@ -157,8 +157,8 @@ export const PlayerDetailView = ({ player, teamName, history, seasonYear, onBack
 
       {/* Attributes panel */}
       <div className="border border-vga-blue bg-vga-black">
-        <PanelTitle accent="text-vga-magenta" right={player.fifa_year != null ? (
-          <span className="text-vga-light-green text-[7px] bg-vga-black border border-vga-light-green px-1 py-0.5">FIFA {player.fifa_year}</span>
+        <PanelTitle accent="text-vga-magenta" right={player.stats_year != null ? (
+          <span className="text-vga-light-green text-[7px] bg-vga-black border border-vga-light-green px-1 py-0.5">{player.stats_year}</span>
         ) : undefined}>Atributos</PanelTitle>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-6 gap-y-2 p-3 text-[8px]">
           <AttrColumn title="Técnica" labels={TECH_LABELS} values={attrs.technical as Record<string, number>} />
