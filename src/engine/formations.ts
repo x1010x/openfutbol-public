@@ -146,12 +146,15 @@ export const slotPositionFor = (team: Team, playerId: string): Position | null =
 };
 
 // Score used to rank players *for lineup selection*. Steeper stamina penalty than
-// effectiveAbility so the AI naturally rotates tired stars out when a fresher sub
-// is in striking distance. Match-time strength still uses effectiveAbility.
+// effectiveAbility so the AI rotates tired stars out — but only when a fresh sub
+// is really in striking distance. Match-time strength still uses effectiveAbility.
+//
+// Curve: 99 → 1.00, 80 → 0.91, 60 → 0.82, 40 → 0.73, 20 → 0.64
+// A 90-CA star at ~50 stamina still beats a fresh 65-CA sub. Below ~30 stamina
+// the sub wins, which is the right rest window.
 const selectionScore = (player: Player, slotPos: Position): number => {
   const stam = player.stamina ?? 99;
-  // Curve: 99 → 1.00, 80 → 0.87, 60 → 0.72, 40 → 0.58, 20 → 0.44
-  const stamFactor = 0.3 + 0.7 * (stam / 99);
+  const stamFactor = 0.55 + 0.45 * (stam / 99);
   const ca = player.current_ability ?? (player.media ?? 50) * 2;
   return ca * positionLevelFactor(player, slotPos) * stamFactor;
 };

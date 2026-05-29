@@ -1651,6 +1651,27 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
       const sentOff = isHome ? next.homeSentOff : next.awaySentOff;
       const injured = isHome ? next.homeInjuredInMatch : next.awayInjuredInMatch;
       const stamMap = isHome ? next.homeStamina : next.awayStamina;
+      const ownScore = isHome ? next.homeScore : next.awayScore;
+      const oppScore = isHome ? next.awayScore : next.homeScore;
+      const scoreDiff = ownScore - oppScore;
+
+      // Threshold scales with match state:
+      // - Losing or drawing → only sub really exhausted players (<60 stam) and don't bench stars
+      // - Winning by 1 → mild rotation (<70 stam)
+      // - Winning by 2+ → comfortable lead, rest stars more aggressively (<80 stam)
+      // - Behind by 3+ → emergency, push fresh legs even at <85 stam (try to chase the game)
+      const stamThreshold =
+        scoreDiff >= 2 ? 80 :
+        scoreDiff >= 1 ? 70 :
+        scoreDiff <= -3 ? 85 :
+        60;
+      // When winning comfortably, allow swapping in slightly weaker subs to rest stars.
+      // When losing, refuse to swap in significantly weaker players.
+      const mediaTolerance =
+        scoreDiff >= 2 ? 12 :
+        scoreDiff >= 1 ? 8 :
+        scoreDiff <= -3 ? 10 :
+        5;
 
       const inLineup = new Set(team.lineup);
       const starters = team.lineup
@@ -1659,13 +1680,13 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
           const p = team.players.find(x => x.id === pid);
           return { pid, stam: stamMap[pid] ?? 99, media: p?.media ?? 0 };
         })
-        .filter(s => s.stam < 70) // Only consider subbing if below 70 stamina at halftime
+        .filter(s => s.stam < stamThreshold)
         .sort((a, b) => a.stam - b.stam);
 
       const bench = team.players
         .filter(p => !inLineup.has(p.id) && !injured.includes(p.id) && !sentOff.includes(p.id) && (p.injuryWeeksRemaining ?? 0) === 0 && p.suspensionMatches === 0)
         .map(p => ({ p, stam: stamMap[p.id] ?? (p.stamina ?? 99) }))
-        .filter(b => b.stam > 90) // Only sub in fresh players
+        .filter(b => b.stam > 85)
         .sort((a, b) => b.p.media - a.p.media);
 
       const toMake = Math.min(3 - subsUsed, starters.length, bench.length);
@@ -1674,9 +1695,12 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
       const newStamMap = { ...stamMap };
 
       for (let i = 0; i < toMake; i++) {
-        // Only sub if bench player is not significantly worse than the tired starter (max 5 points difference)
-        if (bench[i].p.media < starters[i].media - 5) continue;
-        
+        // Refuse to sub a clearly better starter for a weaker bench player —
+        // unless the team is comfortably winning and the swap rests a star.
+        if (bench[i].p.media < starters[i].media - mediaTolerance) continue;
+        // Never bench a star (CA-equivalent media ≥ 80) unless they're truly gassed (<50 stam).
+        if (starters[i].media >= 80 && starters[i].stam >= 50) continue;
+
         newLineup = newLineup.map(id => id === starters[i].pid ? bench[i].p.id : id);
         newStamMap[bench[i].p.id] = bench[i].stam;
         newSubsUsed++;
