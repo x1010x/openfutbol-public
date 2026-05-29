@@ -2,7 +2,7 @@ import type { PlayerId, TeamSide, Vec2, Cell, TimelineEvent } from '../types/mat
 import type { EnginePlayer } from './zoneEngine';
 import type { GkPressStrategy, PendingImpulse } from './phases';
 
-export type MatchPhase = 'live' | 'freeze' | 'transition' | 'celebration' | 'gk_holding' | 'gk_release' | 'kickoff_setup' | 'throw_in_setup' | 'throw_in_holding' | 'throw_in_release' | 'goal_kick_setup' | 'goal_kick_holding' | 'goal_kick_release' | 'corner_setup' | 'corner_holding' | 'corner_release' | 'foul_setup' | 'foul_holding' | 'foul_release' | 'expulsion_hold' | 'expulsion_walk' | 'expulsion_walkout' | 'halftime_walkout' | 'fulltime_walkout';
+export type MatchPhase = 'live' | 'freeze' | 'transition' | 'celebration' | 'gk_holding' | 'gk_release' | 'kickoff_setup' | 'throw_in_setup' | 'throw_in_holding' | 'throw_in_release' | 'goal_kick_setup' | 'goal_kick_holding' | 'goal_kick_release' | 'corner_setup' | 'corner_holding' | 'corner_release' | 'foul_setup' | 'foul_holding' | 'foul_release' | 'expulsion_hold' | 'expulsion_walk' | 'expulsion_walkout' | 'halftime_walkout' | 'fulltime_walkout' | 'sub_walkout';
 
 // Free-kick variant. Decides the shape of the choreography (wall or not),
 // where teammates run, and whether the kicker shoots, crosses, or passes.
@@ -152,4 +152,22 @@ export interface MatchState {
     // walker integrate forces from applyPhaseForces.
     expelledId: PlayerId;
   } | null;
+
+  // Live substitutions (Bloque 8). Ordered changes wait in `pendingSubs` until
+  // the next natural stoppage (a *_holding set-piece or a goal celebration),
+  // then ALL the changes pending at that stoppage play together as one
+  // `sub_walkout` phase (`subBatch`): every outgoing player walks off through
+  // the top-centre tunnel (the expulsion walk-off motion) at once and every
+  // incoming jogs on from the centre at once — so two changes ordered together
+  // are a single sequence, not two consecutive ones. While in sub_walkout we
+  // stash the interrupted phase in `subResumePhase`/`subResumePhaseTicks` so the
+  // set-piece resumes afterwards, and record [start,end] of the walk-off in
+  // `clockFrozenSpans` so the match clock holds across it (Bloque 9 — only
+  // substitutions stop the clock).
+  pendingSubs: { outId: PlayerId; incoming: EnginePlayer; log?: string }[];
+  subBatch: { outId: PlayerId; incoming: EnginePlayer; log?: string }[];
+  subResumePhase: MatchPhase | null;
+  subResumePhaseTicks: number;
+  subWalkoutStartMs: number;
+  clockFrozenSpans: [number, number][];
 }

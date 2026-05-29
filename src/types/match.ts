@@ -72,6 +72,20 @@ export interface MatchTimeline {
   // kickoffs). entranceLiveMs[0] = first half, [1] = second half. The viewer
   // holds the clock at 0'/45' until these instants (B2). Unset by sandbox clips.
   entranceLiveMs?: number[];
+  // Engine `t` [start,end] spans during which the match clock is held: each is
+  // a live-substitution walk-off (Bloque 9 — only subs stop the clock). The
+  // viewer's toClockMs subtracts these so the minute pauses across the change.
+  clockFrozenSpans?: [number, number][];
+  // Engine `t` of the full-time whistle. The whistle fires a few engine ticks
+  // before `durationMs` (the reserved walk-off window); the clock maps the
+  // second half onto this instant — not `durationMs` — so it reads exactly the
+  // regulation+stoppage end at the whistle instead of stopping short (Bloque 9).
+  fullTimeMs?: number;
+  // Added ("stoppage") minutes shown per half: the clock plays the last
+  // stoppageN minutes of each half as "45+X'" / "90+X'". Heuristic from the
+  // half's significant delays (goals/subs/injuries/reds). Unset by sandbox.
+  stoppage1Min?: number;
+  stoppage2Min?: number;
   events: TimelineEvent[];
   keyframes: Keyframe[];
   finalScore: { home: number; away: number };

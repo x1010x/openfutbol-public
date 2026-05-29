@@ -14,6 +14,8 @@ import { tickPhase, resetKickoff, HALFTIME_WALKOUT_TICKS, FULLTIME_WALKOUT_TICKS
 import { decideAll, decideCarrierAction } from './decide';
 import { moveAll } from './move';
 import { checkTackle, checkOffBallAggression, resolvePass, resolveShot, type EffectorDeps } from './effectors';
+import { applyFatigue } from './fatigue';
+import { tryStartPendingSub } from './phases/subWalkout';
 import { tickSetupAndBallPhysics } from './loop/ballPickup';
 import { tickKickoffRoutine } from './loop/kickoffRoutine';
 
@@ -45,6 +47,18 @@ export interface EnginePlayer {
   yellowCount: number;
   redCard: boolean;
   injured: boolean;
+  // In-match fatigue decay (Bloque 2, engine/fatigue.ts). The decay RATE is
+  // driven by endurance = the player's físico (enduranceBase, the raw permanent
+  // stat) modulated by the day's freshness (stamina, the current condition the
+  // player arrives with). Both 0–99; optional (sandbox players omit them → no
+  // decay there). baseSpeed/basePhysical/enteredTick are runtime fields the
+  // fatigue model self-populates the first tick it sees a player; do not set
+  // them by hand.
+  stamina?: number;
+  enduranceBase?: number;
+  baseSpeed?: number;
+  basePhysical?: number;
+  enteredTick?: number;
 }
 
 export const TICK_MS = 250;
@@ -69,7 +83,7 @@ export function simulateFromState(
   state: MatchState,
   durationMs: number,
   seed: number,
-  opts?: { emitHalfTime?: boolean; subs?: SubInjection[] },
+  opts?: { emitHalfTime?: boolean; subs?: SubInjection[]; fatigue?: boolean },
 ): MatchTimeline {
   const TOTAL_TICKS = Math.floor(durationMs / TICK_MS);
   // Full matches always get a half-time at the true midpoint regardless of how
@@ -97,6 +111,11 @@ export function simulateFromState(
     resetCarry: (p) => resetCarry(state, p),
   };
 
+  // Engine `t` of the full-time whistle. Defaults to the run length; the
+  // walk-off branch overwrites it with the (earlier) trigger-tick instant so
+  // the clock maps the second half onto the whistle, not the padded end.
+  let fullTimeMs = durationMs;
+
   for (let tick = 1; tick < TOTAL_TICKS; tick++) {
     const t = tick * TICK_MS;
 
@@ -104,6 +123,18 @@ export function simulateFromState(
     // decisions/movement run, so the new player is in place from here on.
     const due = subsByTick.get(tick);
     if (due) for (const s of due) s.apply(state, t);
+
+    // In-match stamina decay (Bloque 2): scale each player's effective speed/
+    // physical by how long they've been on the pitch and their stamina. Run
+    // after subs so a freshly-introduced player tires from their own clock.
+    // Gated to full-match mode (generateTimeline) so sandbox clips that call
+    // simulateFromState directly stay byte-for-byte unchanged.
+    if (opts?.fatigue) applyFatigue(state, tick, TOTAL_TICKS);
+
+    // Live substitutions (Bloque 8): a queued change waits for the next clean
+    // stoppage, then plays through the sub_walkout phase. Checked before the
+    // phase countdown so starting it this tick takes effect immediately.
+    tryStartPendingSub(state, t, (tt) => stateSnap(state, tt));
 
     // Time-based wall release: the foul_release branch keeps wallIds populated
     // through the ball's flight (so the formation holds visually and the
@@ -203,6 +234,7 @@ export function simulateFromState(
       // ticks and returns). Snap so the keyframe immediately after the whistle
       // captures everyone frozen at their current spot before the walk starts.
       stateEmit(state, t, 'full_time', state.possession, undefined, undefined, '¡Pitido final!');
+      fullTimeMs = t;
       state.phase = 'fulltime_walkout';
       state.phaseTicks = FULLTIME_WALKOUT_TICKS;
       stateSnap(state, t);
@@ -261,6 +293,8 @@ export function simulateFromState(
     awayLineup: state.awayPlayers.map(p => p.id),
     durationMs,
     entranceLiveMs: state.entranceLiveMs,
+    clockFrozenSpans: state.clockFrozenSpans,
+    fullTimeMs,
     events: state.events,
     keyframes: state.keyframes,
     finalScore: state.score,
@@ -290,9 +324,34 @@ export function generateTimeline(cfg: {
   stateEmit(state, 0, 'kickoff', 'home', state.kickerId!, undefined, '¡Saque inicial!');
   stateSnap(state, 0);
 
-  const tl = simulateFromState(state, durationMs, seed, { emitHalfTime: true, subs: cfg.subs });
+  const tl = simulateFromState(state, durationMs, seed, { emitHalfTime: true, subs: cfg.subs, fatigue: true });
   // A full match is always shown as 0–90' regardless of how compressed the
   // timeline is; the log/stats remap each event's `t` accordingly.
   tl.nominalMatchMs = DURATION_MS;
+  // Stoppage (added) minutes per half, played out as "45+X'"/"90+X'" by the
+  // viewer's clock. Same heuristic as the text sim / bridge (calcStoppage) but
+  // computed on the raw engine events split by the half-time instant.
+  const halfTimeMs = tl.events.find(e => e.kind === 'half_time')?.t ?? durationMs / 2;
+  tl.stoppage1Min = calcStoppageMin(tl.events, true, halfTimeMs);
+  tl.stoppage2Min = calcStoppageMin(tl.events, false, halfTimeMs);
   return tl;
+}
+
+// Added minutes for one half from its significant in-play delays. Mirrors the
+// bridge's calcStoppage (and the text sim) so the on-screen clock and the
+// recorded MatchState.stoppageTime agree. `firstHalf` splits events by the
+// half-time instant; reds are cards flagged red / second_yellow.
+function calcStoppageMin(events: MatchTimeline['events'], firstHalf: boolean, halfTimeMs: number): number {
+  const inHalf = (t: number) => (firstHalf ? t <= halfTimeMs : t > halfTimeMs);
+  let goals = 0, subs = 0, injuries = 0, reds = 0;
+  for (const ev of events) {
+    if (!inHalf(ev.t)) continue;
+    if (ev.kind === 'goal') goals++;
+    else if (ev.kind === 'sub') subs++;
+    else if (ev.kind === 'injury') injuries++;
+    else if (ev.kind === 'card' && (ev.detail === 'red' || ev.detail === 'second_yellow')) reds++;
+  }
+  const base = firstHalf ? 1 : 3;
+  const raw = base + goals * 0.5 + subs * 0.3 + injuries * 0.5 + reds * 0.3;
+  return Math.round(Math.min(firstHalf ? 3 : 7, Math.max(base, raw)));
 }

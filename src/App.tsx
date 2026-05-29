@@ -17,7 +17,8 @@ import { resolveAwayKit } from './match2d/kit';
 import { BASE_SPEED_FACTOR, engineDurationMs } from './match2d/layout';
 import { generateTimeline, TICK_MS, type EnginePlayer, type SubInjection } from './engine/zoneEngine';
 import { teamToEnginePlayers, timelineToMatchResult, engineStatsFromPlayer } from './engine/managerBridge';
-import { applySubstitution, applyFormationChange } from './engine/substitution';
+import { applyFormationChange } from './engine/substitution';
+import { queueSubstitution } from './engine/phases/subWalkout';
 import type { MatchTimeline } from './types/match';
 import { LeagueTable } from './components/LeagueTable';
 import { StatusBar } from './components/StatusBar';
@@ -1167,7 +1168,10 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
     const subInjections: SubInjection[] = [
       ...inp.subs.map(s => ({
         atTick: s.atTick,
-        apply: (st, t) => applySubstitution(st, t, s.outId, s.incoming, s.log),
+        // Queue the change at the order tick; the engine executes it at the
+        // next natural stoppage (the outgoing walks off, the bench player jogs
+        // on) — see engine/phases/subWalkout.ts.
+        apply: (st) => queueSubstitution(st, s.outId, s.incoming, s.log),
       } as SubInjection)),
       ...inp.tacticalChanges.map(c => ({
         atTick: c.atTick,

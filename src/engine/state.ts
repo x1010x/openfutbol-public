@@ -14,8 +14,24 @@ export function createInitialState(cfg: {
   const seed = cfg.seed ?? 0xdeadbeef;
   const rng = mulberry32(seed);
 
-  const allPlayers = [...cfg.homePlayers, ...cfg.awayPlayers];
-  const homeSet = new Set(cfg.homePlayers.map(p => p.id));
+  // Clone the incoming players so the simulation never mutates the caller's
+  // arrays. The per-tick loops mutate player fields in place (foulsCommitted,
+  // yellowCount, redCard, injured) and live changes reassign slot/role/tag and
+  // swap array entries (applySubstitution/applyFormationChange). If we kept the
+  // caller's references, re-running generateTimeline with the same inputs (the
+  // Bloque 8 deterministic replay: initial watch, then each "continue") would
+  // start from dirty players and the replayed head would diverge from what was
+  // already shown. Cloning keeps every run reproducible from pristine inputs.
+  const clone = (p: EnginePlayer): EnginePlayer => ({
+    ...p,
+    slot: { ...p.slot },
+    slotOffset: p.slotOffset ? { ...p.slotOffset } : undefined,
+  });
+  const homePlayers = cfg.homePlayers.map(clone);
+  const awayPlayers = cfg.awayPlayers.map(clone);
+
+  const allPlayers = [...homePlayers, ...awayPlayers];
+  const homeSet = new Set(homePlayers.map(p => p.id));
   const playerMap = new Map<PlayerId, EnginePlayer>();
   for (const p of allPlayers) playerMap.set(p.id, p);
 
@@ -35,7 +51,7 @@ export function createInitialState(cfg: {
     });
   }
 
-  const carrierId = cfg.homePlayers[9]?.id ?? cfg.homePlayers[0].id;
+  const carrierId = homePlayers[9]?.id ?? homePlayers[0].id;
 
   return {
     rng,
@@ -44,8 +60,8 @@ export function createInitialState(cfg: {
 
     homeTeamId: cfg.homeTeamId,
     awayTeamId: cfg.awayTeamId,
-    homePlayers: cfg.homePlayers,
-    awayPlayers: cfg.awayPlayers,
+    homePlayers,
+    awayPlayers,
     allPlayers,
     homeSet,
     playerMap,
@@ -104,6 +120,13 @@ export function createInitialState(cfg: {
     injuredIds: new Set(),
     aggressionWindowUntil: new Map(),
     pendingFoul: null,
+
+    pendingSubs: [],
+    subBatch: [],
+    subResumePhase: null,
+    subResumePhaseTicks: 0,
+    subWalkoutStartMs: 0,
+    clockFrozenSpans: [],
   };
 }
 
@@ -203,7 +226,8 @@ export function isGamePaused(state: MatchState): boolean {
       || state.phase === 'foul_holding'
       || state.phase === 'foul_release'
       || state.phase === 'halftime_walkout'
-      || state.phase === 'fulltime_walkout';
+      || state.phase === 'fulltime_walkout'
+      || state.phase === 'sub_walkout';
 }
 
 // Carry budget — how many ticks a carrier holds the ball before the decision

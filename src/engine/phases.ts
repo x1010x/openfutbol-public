@@ -21,6 +21,7 @@ import { applyCornerForces, tickCornerSetup, tickCornerHolding, tickCornerReleas
 import { applyFoulForces, applyExpulsionForces, tickFoulSetup, tickFoulHolding, tickFoulRelease, tickExpulsionHold, tickExpulsionWalk, tickExpulsionWalkout } from './phases/foul';
 import { applyGkHoldForces, tickGkHolding, tickGkRelease } from './phases/gkHold';
 import { applyKickoffForces, tickPostGoal, tickKickoffSetup, applyHalftimeWalkoutForces, tickHalftimeWalkout, tickFulltimeWalkout } from './phases/kickoff';
+import { applySubWalkoutForces, tickSubWalkout } from './phases/subWalkout';
 
 // ── Public surface ─────────────────────────────────────────────────────────
 export * from './phases/shared';
@@ -66,6 +67,8 @@ export function applyPhaseForces(
     return applyKickoffForces(p, isGK, pSide, role, base, ppos, pvel, force, ctx);
   if (phase === 'halftime_walkout' || phase === 'fulltime_walkout')
     return applyHalftimeWalkoutForces(p, isGK, pSide, role, base, ppos, pvel, force, ctx);
+  if (phase === 'sub_walkout')
+    return applySubWalkoutForces(p, isGK, pSide, role, base, ppos, pvel, force, ctx);
   if (phase === 'gk_holding' || phase === 'gk_release')
     return applyGkHoldForces(p, isGK, pSide, role, base, ppos, pvel, force, ctx);
   return false;
@@ -115,6 +118,8 @@ export function tickPhase(state: MatchState, t: number, callbacks: PhaseCallback
     tickExpulsionWalk(state, t, callbacks);
   } else if (p === 'expulsion_walkout') {
     tickExpulsionWalkout(state, t, callbacks);
+  } else if (p === 'sub_walkout') {
+    tickSubWalkout(state, t, callbacks);
   } else if (p === 'halftime_walkout') {
     tickHalftimeWalkout(state, t, callbacks);
   } else if (p === 'fulltime_walkout') {

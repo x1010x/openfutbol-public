@@ -422,11 +422,21 @@ export function updateScene(scene: Scene, ticker: Ticker, ctx: AnimatorCtx): voi
     scoreRef.current.textContent = `${rt.homeScore} - ${rt.awayScore}`;
   }
 
-  // Minute display — remap the compressed timeline time to a 0–90' match minute.
+  // Minute display — remap the compressed timeline time to a 0–90' match minute,
+  // showing stoppage as "45+X'" / "90+X'" once play passes the regulation mark
+  // of the current half.
   if (minuteRef.current) {
     const dispT = toClockMs(gt, timeline, scene.halfTimeMs);
-    const cap = timeline.nominalMatchMs ? timeline.nominalMatchMs / 60000 : Infinity;
-    const min = Math.min(cap, Math.floor(dispT / 60000));
-    minuteRef.current.textContent = `${min}'`;
+    const min = Math.floor(dispT / 60000);
+    const inFirstHalf = scene.halfTimeMs === null || gt < scene.halfTimeMs;
+    let label: string;
+    if (timeline.nominalMatchMs && inFirstHalf && min > 45) {
+      label = `45+${min - 45}'`;
+    } else if (timeline.nominalMatchMs && !inFirstHalf && min > 90) {
+      label = `90+${min - 90}'`;
+    } else {
+      label = `${min}'`;
+    }
+    minuteRef.current.textContent = label;
   }
 }

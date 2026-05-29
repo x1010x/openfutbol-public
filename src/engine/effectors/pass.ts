@@ -66,6 +66,17 @@ export function findBestPassTarget(state: MatchState, hintTargetId?: PlayerId): 
         const inAttackingThird = carrierProgressX > 0.66;
         const carrierPressed = opps.some(o => Math.hypot(state.pos[o.id].x - cpos.x, state.pos[o.id].y - cpos.y) < 0.16);
 
+        // Through-ball test: where a forward-running teammate will be a moment
+        // later, and whether the lane to THAT space is clear even if a defender
+        // sits on the direct line. This is what bends the ball around the lone
+        // covering defender in a 2v1 instead of firing it straight at them.
+        const tvel = state.vel[tm.id];
+        const leadPt = { x: tpos.x + tvel.x * 5.0, y: tpos.y + tvel.y * 5.0 };
+        const leadLineThreat = opps.reduce((m, o) =>
+          Math.min(m, distToSegment(state.pos[o.id], cpos, leadPt)), Infinity);
+        const runningForward = cSide === 'home' ? tvel.x > 0.002 : tvel.x < -0.002;
+        const throughBall = runningForward && progress > -0.02 && leadLineThreat > 0.08;
+
         if (progress >= 0.05) {
           let baseForward = 6.0 + progress * 14.0;
           if (inAttackingHalf)  baseForward += 2.0;
@@ -86,8 +97,28 @@ export function findBestPassTarget(state: MatchState, hintTargetId?: PlayerId): 
         }
 
         const safetyFactor = clamp(1 - 3.5 * Math.max(0, 0.10 - minOppDist), 0.40, 1.0);
-        const lineFactor   = clamp(1 - 4.0 * Math.max(0, 0.08 - lineThreat.dist), 0.40, 1.0);
+        // A defender on the DIRECT line to the receiver heavily devalues a
+        // straight pass (the "pass through the covering defender" glitch) — far
+        // steeper than the old gentle multiplier. A genuine through ball into
+        // open space is exempt (its real lane, to the lead point, is clear).
+        let lineFactor: number;
+        if (throughBall)                  lineFactor = 1.0;
+        else if (lineThreat.dist < 0.035) lineFactor = 0.15;
+        else if (lineThreat.dist < 0.07)  lineFactor = 0.45;
+        else if (lineThreat.dist < 0.11)  lineFactor = 0.80;
+        else                              lineFactor = 1.0;
         if (score > 0) score *= safetyFactor * lineFactor;
+
+        // Actively prefer the clever ball into space when the direct line is
+        // blocked but the run is on.
+        if (throughBall && lineThreat.dist < 0.07) score += 5.0;
+
+        // Switch of play: hemmed in centrally → a clear long ball to a genuinely
+        // free teammate (typically wide) is worth playing even if it's lateral,
+        // to escape the press rather than forcing it through the middle.
+        if (carrierPressed && free && minOppDist > 0.14 && lineThreat.dist > 0.09 && dist > 0.25) {
+          score += 4.0;
+        }
 
         if (free) score += 1.5;
 
@@ -317,7 +348,11 @@ export function resolvePass(state: MatchState, t: number, deps: EffectorDeps, hi
 
   const targetVel = state.vel[chosenId];
   const isDelayed = isThrowIn || isGKDistribute || isGoalKickPass || isCornerPass || isFoulPass;
-  const leadFactor = isDelayed ? 0.0 : 3.0;
+  // Lead the pass further when slotting a forward-running teammate in behind, so
+  // the ball is played into the space ahead of them (bending around a covering
+  // defender) rather than to their feet. Set pieces are never led.
+  const receiverRunningForward = cSide === 'home' ? targetVel.x > 0.003 : targetVel.x < -0.003;
+  const leadFactor = isDelayed ? 0.0 : (strictAhead && receiverRunningForward ? 6.5 : 3.0);
   const aimX = tpos.x + targetVel.x * leadFactor;
   const aimY = tpos.y + targetVel.y * leadFactor;
 

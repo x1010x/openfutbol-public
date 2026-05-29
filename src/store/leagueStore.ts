@@ -3,7 +3,7 @@ import type { BoardObjective } from '../engine/florentinometro';
 import { engineSettings } from '../engine/engineSettings';
 import { getTeamsForYearWithOverflow, getFreeAgents, getEligibleFreeAgents, advancePlayerToYear, extractDbId } from '../data/mockTeams';
 import { generateSchedule } from '../engine/calendar';
-import { pickBestFormation, computePositionWeightedMedia } from '../engine/formations';
+import { pickBestFormation, computePositionWeightedMedia, fillLineupGaps } from '../engine/formations';
 import type { Jornada } from '../engine/calendar';
 import { computeAttendance, computePrice, teamWeeklySalary } from '../data/economy';
 
@@ -491,11 +491,14 @@ export const updateLeagueStats = (
     });
   });
 
-  // Sacar de la alineación a quienes han visto la roja
+  // Sacar de la alineación a quienes han visto la roja y, en vez de dejar el
+  // hueco (que haría arrancar el siguiente partido con 10 jugadores), cubrir su
+  // slot con el mejor suplente disponible para esa posición. El expulsado queda
+  // con suspensionMatches>0, así que fillLineupGaps no lo vuelve a meter.
   if (redCardedThisMatch.size > 0) {
     for (let i = 0; i < newTeams.length; i++) {
       if (newTeams[i].lineup.some(id => redCardedThisMatch.has(id))) {
-        newTeams[i] = { ...newTeams[i], lineup: newTeams[i].lineup.filter(id => !redCardedThisMatch.has(id)) };
+        newTeams[i] = { ...newTeams[i], lineup: fillLineupGaps(newTeams[i], redCardedThisMatch) };
       }
     }
   }

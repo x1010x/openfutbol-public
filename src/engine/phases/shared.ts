@@ -30,7 +30,8 @@ export type MatchPhase =
   | 'expulsion_walk'
   | 'expulsion_walkout'
   | 'halftime_walkout'
-  | 'fulltime_walkout';
+  | 'fulltime_walkout'
+  | 'sub_walkout';
 
 export type GkPressStrategy = 'full' | 'partial' | 'drop';
 

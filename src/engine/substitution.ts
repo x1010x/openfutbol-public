@@ -61,14 +61,16 @@ export function applySubstitution(
   if (side === 'home') { state.homeSet.delete(outId); state.homeSet.add(replacement.id); }
 
   // Per-player runtime state: drop the outgoing player's entries and seed the
-  // incoming one. Spawn just off the NORTH touchline at the slot's x (B3:
-  // substitutes enter from the same side as the team entrance, not the nearest
-  // band); the live-play clamp brings them to the touchline and the off-ball
-  // forces jog them onto the pitch toward their slot.
+  // incoming one. Spawn just off the NORTH touchline near the centre tunnel
+  // (where the player walks on "from the locker room"), with a small per-slot
+  // lateral spread so a batch of incomings doesn't stack on one point; the
+  // live-play clamp holds them at the touchline and the off-ball forces jog
+  // them onto the pitch toward their slot.
   const offY = -0.12;
+  const spawnX = 0.5 + (replacement.slotIndex - 5) * 0.015;
   delete state.pos[outId];
   delete state.vel[outId];
-  state.pos[replacement.id] = { x: replacement.slot.x, y: offY };
+  state.pos[replacement.id] = { x: spawnX, y: offY };
   state.vel[replacement.id] = { x: 0, y: 0 };
   state.wander.delete(outId);
   state.wander.set(replacement.id, {

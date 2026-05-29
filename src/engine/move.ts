@@ -75,7 +75,16 @@ export function moveAll(state: MatchState, intents: Map<PlayerId, Intent>, t: nu
   const inExpulsionPhase = state.phase === 'expulsion_hold'
                         || state.phase === 'expulsion_walk'
                         || state.phase === 'expulsion_walkout';
-  const walkerId = state.pendingFoul?.expelledId ?? null;
+  // A live substitution plays the same "everyone freezes but the walker(s)"
+  // choreography (Bloque 8): the outgoing player(s) walk off while the rest
+  // hold. A batch of changes ordered together walk off at once, so the walker
+  // is a set here rather than a single id.
+  const inSubWalkout = state.phase === 'sub_walkout';
+  const inWalkoffPhase = inExpulsionPhase || inSubWalkout;
+  const subWalkerSet = inSubWalkout ? new Set(state.subBatch.map(j => j.outId)) : null;
+  const expulsionWalkerId = state.pendingFoul?.expelledId ?? null;
+  const isWalker = (id: PlayerId): boolean =>
+    inSubWalkout ? subWalkerSet!.has(id) : id === expulsionWalkerId;
 
   for (const p of state.allPlayers) {
     // During the walk-off sequence everyone except the current walker freezes
@@ -84,8 +93,8 @@ export function moveAll(state: MatchState, intents: Map<PlayerId, Intent>, t: nu
     // in tickPhase('expulsion_walkout'). Previously-expelled players (a
     // second sending-off in the same match, say) stay frozen wherever they
     // last were.
-    if (inExpulsionPhase) {
-      if (p.id !== walkerId) {
+    if (inWalkoffPhase) {
+      if (!isWalker(p.id)) {
         state.vel[p.id] = { x: 0, y: 0 };
         continue;
       }
@@ -196,6 +205,11 @@ export function moveAll(state: MatchState, intents: Map<PlayerId, Intent>, t: nu
       // can still cross the diagonal and exit the frame within the walkout
       // window before kickoff (or the loop) takes over.
       MAX_SPEED = 0.045 * globalFactor;
+    } else if (inSubWalkout) {
+      // Outgoing player(s) jog briskly to the top-centre tunnel within the
+      // SUB_WALKOUT_TICKS window. Only batch walkers reach here; the rest are
+      // frozen above.
+      MAX_SPEED = 0.05 * globalFactor;
     }
 
     // Special speeds for Goal Kick
@@ -299,11 +313,14 @@ export function moveAll(state: MatchState, intents: Map<PlayerId, Intent>, t: nu
     // Expulsion walker needs to cross the touchline and disappear above the
     // camera — well past the canvas top. Same player is filtered out of all
     // other loops via expelledIds so loosening the bound only affects them.
-    if (inExpulsionPhase && p.id === walkerId) { yMin = -0.30; }
+    if (inExpulsionPhase && isWalker(p.id)) { yMin = -0.30; }
     // Half-time / full-time walk-off: every player leaves through the top
     // tunnel and disappears above the camera. Only the top bound needs to
     // open up — nobody exits south anymore.
     if (state.phase === 'halftime_walkout' || state.phase === 'fulltime_walkout') { yMin = -0.40; }
+    // Substitution walk-off: the outgoing player(s) leave through the top-centre
+    // tunnel (north, like an expulsion), so only the top bound needs opening.
+    if (inSubWalkout && isWalker(p.id)) { yMin = -0.40; }
     // Tunnel entrance: the 22 spawn queued well above the touchline
     // (slot-stacked at y as low as -0.55), so loosen the top clamp until the
     // force field walks them onto the pitch.

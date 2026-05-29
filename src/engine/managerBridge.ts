@@ -11,7 +11,7 @@ import { buildLineupLayout } from './lineup';
 // and the live-substitution path so a bench player who comes on is scaled the
 // same way. See teamToEnginePlayers for the fatigue rationale.
 export function engineStatsFromPlayer(p: Player): Pick<EnginePlayer,
-  'speed' | 'dribbling' | 'passing' | 'shooting' | 'defending' | 'physical' | 'goalkeeping'> {
+  'speed' | 'dribbling' | 'passing' | 'shooting' | 'defending' | 'physical' | 'goalkeeping' | 'stamina' | 'enduranceBase'> {
   const stamina = Number.isFinite(p.stamina) ? Math.max(0, Math.min(99, p.stamina)) : 99;
   const fitness = 0.85 + 0.15 * (stamina / 99);
   return {
@@ -22,6 +22,13 @@ export function engineStatsFromPlayer(p: Player): Pick<EnginePlayer,
     defending: p.stats.defending,
     physical: p.stats.physical * fitness,
     goalkeeping: p.stats.goalkeeping,
+    // Inputs for the engine's in-match fatigue model (engine/fatigue.ts): the
+    // decay RATE combines the físico (enduranceBase = raw permanent stat, how
+    // well they last 90') with the day's freshness (stamina = current
+    // condition). The scaled speed/physical above are arrival form, a separate
+    // concern (a tired player both starts and tires worse).
+    stamina,
+    enduranceBase: p.stats.physical,
   };
 }
 
@@ -213,7 +220,10 @@ export function timelineToMatchResult(
     homeShotsOnTarget, awayShotsOnTarget,
     homePossession, awayPossession,
     homeSubsUsed, awaySubsUsed,
-    stoppageTime1: calcStoppage(events, 0, 45),
-    stoppageTime2: calcStoppage(events, 45, 90),
+    // Prefer the figures the engine already attached to the timeline (what the
+    // on-screen clock showed as "45+X'/90+X'"); fall back to recomputing from
+    // the remapped events for timelines that don't carry them (older sims).
+    stoppageTime1: timeline.stoppage1Min ?? calcStoppage(events, 0, 45),
+    stoppageTime2: timeline.stoppage2Min ?? calcStoppage(events, 45, 90),
   };
 }
