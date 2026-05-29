@@ -144,8 +144,10 @@ export const teamsOfferingJobs = (
   allTeams: Team[],
   excludeTeamId: string,
   reputation: number,
+  firedByTeamIds: string[] = [],
 ): Team[] => {
-  const candidates = allTeams.filter(t => t.id !== excludeTeamId);
+  const blacklist = new Set([excludeTeamId, ...firedByTeamIds]);
+  const candidates = allTeams.filter(t => !blacklist.has(t.id));
   if (candidates.length === 0) return [];
 
   const sorted = [...candidates].sort((a, b) => avgCA(a) - avgCA(b)); // weakest first
@@ -250,7 +252,9 @@ export const computeMatchReputationDelta = (params: {
     if (oppGoals - userGoals >= 4) delta -= 0.25;                // thrashing
   }
 
-  return delta;
+  return delta >= 0
+    ? delta * engineSettings.reputationGainMult
+    : delta * engineSettings.reputationLossMult;
 };
 
 // Season-end reputation adjustment after a completed stint.
@@ -284,5 +288,7 @@ export const computeSeasonReputationDelta = (params: {
   if (params.squadValueChangePct > 0.25) delta += 2;
   else if (params.squadValueChangePct < -0.25) delta -= 2;
 
-  return delta;
+  return delta >= 0
+    ? delta * engineSettings.reputationGainMult
+    : delta * engineSettings.reputationLossMult;
 };

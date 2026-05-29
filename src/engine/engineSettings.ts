@@ -31,6 +31,23 @@ export interface EngineSettings {
   aiClausulazoProb: number;
   aiTradeProb: number;
   aiSigningProb: number;
+  // Negotiations
+  offerInsultThreshold: number;
+  offerInsultBlockProb: number;
+  offerInstantAcceptMult: number;
+  offerRejectBlockProb: number;
+  offerNegotiationRange: number;
+  clausulazoMult: number;
+  // Economy
+  transferPriceMult: number;
+  salaryMult: number;
+  ticketRevenueMult: number;
+  agePeakBonusMult: number;
+  // Reputation (Pro Manager)
+  reputationGainMult: number;
+  reputationLossMult: number;
+  // Match
+  homeAdvantageMult: number;
   // UI
   matchScreenMaxWidthPx: number;
 }
@@ -62,6 +79,19 @@ export const DEFAULT_ENGINE_SETTINGS: Readonly<EngineSettings> = {
   aiClausulazoProb: 0.05,
   aiTradeProb: 0.45,
   aiSigningProb: 0.28,
+  offerInsultThreshold: 0.7,
+  offerInsultBlockProb: 0.7,
+  offerInstantAcceptMult: 2.0,
+  offerRejectBlockProb: 0.3,
+  offerNegotiationRange: 1.3,
+  clausulazoMult: 2.0,
+  transferPriceMult: 1.0,
+  salaryMult: 1.0,
+  ticketRevenueMult: 1.0,
+  agePeakBonusMult: 1.2,
+  reputationGainMult: 1.0,
+  reputationLossMult: 1.0,
+  homeAdvantageMult: 1.0,
   matchScreenMaxWidthPx: 2400,
 };
 

@@ -235,6 +235,9 @@ export interface LeagueState {
   seasonTransferSpent?: number;
   seasonTransferEarned?: number;
   managerCareer?: ManagerSeasonRecord[];
+  // ProManager: clubs that have already fired the user. They will never offer
+  // a new job. If every other club is on this list, it's game over.
+  firedByTeamIds?: string[];
   boardRewardThreshold?: number; // 0 = none, 7 = praise given, 9 = marbella given
   managerStartJornada?: number;  // jornada when current manager took over (for grace period)
   managerWins?: number;          // wins since current manager took over (not full team season)
@@ -1324,7 +1327,7 @@ export const simulateAiClausulazos = (state: LeagueState): LeagueState => {
     if (state.blockedSignings.includes(transferredKey(player.id))) continue;
 
     const price = computePrice(player, state.year);
-    const clausulaPrice = price * 2;
+    const clausulaPrice = Math.round(price * engineSettings.clausulazoMult / 100_000) * 100_000;
     const group = groupFor(player.position);
 
     for (const rival of shuffledAi) {

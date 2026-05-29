@@ -79,9 +79,16 @@ const ContentES = ({ onColaborar, changelogRef, engineRef }: {
         Los primeros 5 partidos tras llegar a un club son de gracia — la junta espera a ver cómo respondes.
       </p>
       <p>
+        <span className="text-vga-light-red font-bold">Memoria de los clubes:</span> los clubes
+        que te despiden no te volverán a ofrecer trabajo. Cada despido reduce tu lista de
+        opciones futuras. Si ningún club quiere ya saber de ti, la carrera termina ahí y solo
+        queda retirarte.
+      </p>
+      <p>
         Los mensajes de la junta aparecen después del resultado del partido.
         Puedes releerlos pinchando en el icono de advertencia ⚠ en la barra de estado.
-        Tu nombre de entrenador en la barra también es un acceso directo a tu carrera.
+        Tu nombre de entrenador en la barra también es un acceso directo a tu carrera, donde
+        verás cada temporada con su posición, W/D/L, puntos, Florentinómetro y balance de fichajes.
       </p>
     </Section>
 
@@ -219,10 +226,16 @@ const ContentES = ({ onColaborar, changelogRef, engineRef }: {
         Los jóvenes con proyección valen más que un veterano de la misma media.
       </p>
       <p>
-        Los rivales mandan ofertas por tus jugadores y pueden aceptar o rechazar
-        las tuyas. Las ofertas se agrupan por jugador en PLANTILLA — ábrelas para
-        ver todos los clubes interesados. La bolsa de fichajes rota cada jornada
-        con libres y jugadores en venta.
+        <span className="text-vga-cyan font-bold">MERCADO DE FICHAJES:</span> la pantalla muestra
+        una tabla ordenable con todos los jugadores disponibles (en venta y libres). Filtra por
+        tipo o posición, busca por nombre y ordena por edad, OVR, club o precio. Al pinchar
+        una fila se abre la ficha del jugador en el panel lateral con foto, estadísticas y
+        botones de acción. A su lado tienes el feed de ACTIVIDAD DEL MERCADO con todos los
+        movimientos de la temporada (fichajes, clausulazos y retiros).
+      </p>
+      <p>
+        Las ofertas entrantes por tus jugadores se gestionan desde PLANTILLA. Ábrelas para
+        ver todos los clubes interesados.
       </p>
       <p>
         <span className="text-vga-yellow">Oferta normal</span> — jugadores en venta o agentes libres.
@@ -230,9 +243,62 @@ const ContentES = ({ onColaborar, changelogRef, engineRef }: {
       </p>
       <p>
         <span className="text-vga-light-red font-bold">CLAUSULAZO TEBAS</span> — si quieres fichar
-        a un jugador que no está en el mercado, puedes activar su cláusula de rescisión.
-        El coste es el doble de su valor base y el traspaso es inmediato sin negociación.
-        No aplica a jugadores en venta ni a agentes libres.
+        a un jugador que no está en el mercado, puedes activar su cláusula de rescisión desde
+        su ficha en PLANTILLA del rival. El coste es el doble de su valor base y el traspaso
+        es inmediato sin negociación.
+      </p>
+    </Section>
+
+    <Section title="PARTIDAS GUARDADAS">
+      <p>
+        Puedes tener varias carreras a la vez. En COPIA → pestaña PARTIDAS gestionas todas
+        tus partidas: cargar, renombrar, borrar y crear una nueva desde cero. La partida
+        activa se autoguarda mientras juegas, así que basta con cambiar de slot para volver
+        donde lo dejaste en otra carrera.
+      </p>
+      <p>
+        Para mayor seguridad, exporta tus partidas importantes a un archivo desde la pestaña
+        BACKUP. Las partidas se guardan en este navegador, así que un borrado de datos del
+        sitio o cambiar de máquina las hace desaparecer.
+      </p>
+    </Section>
+
+    <Section title="PACKS DE DATOS Y STATS">
+      <p>
+        OpenFutbol viene con un modelo propio de jugadores. También puedes importar packs
+        de datos externos disponibles públicamente (equipos, jugadores) y opcionalmente un
+        pack de stats para usar tu base de datos preferida. El motor está pensado para que
+        la simulación funcione con cualquier set compatible.
+      </p>
+      <p>
+        Cuando un jugador tiene stats de un pack importado, su año aparece como una pequeña
+        etiqueta en la esquina de la ficha.
+      </p>
+    </Section>
+
+    <Section title="FIN DE TEMPORADA Y RANKINGS">
+      <p>
+        Al cerrar la temporada se abre un resumen completo: campeón con escudo, Pichichi,
+        Zamora y MVP con fotos, clasificación final clicable (cada celda abre un drilldown
+        con los partidos que la generaron) y récords del año (goleada, ridículo, partido loco
+        y rachas).
+      </p>
+      <p>
+        Debajo hay paneles con datos curiosos de jugadores y equipos (más joven, más veterano,
+        Joaquín Award al goleador más mayor, juego limpio, molino de tarjetas, equipo más
+        valioso, etc.), un panel de mercado con el fichaje del año, y una lista de BAJAS con
+        los jugadores retirados esta temporada — los de campo se retiran sobre los 35–38 y
+        los porteros sobre los 38–42 con un poco de aleatoriedad determinista.
+      </p>
+      <p>
+        El drilldown de cada partido muestra los tiros, tarjetas, el MVP del encuentro
+        (calculado por goles + asistencias menos tarjetas) y un timeline cronológico con
+        autoría de gol y asistente. Pasa el ratón sobre cualquier jugador para ver su tarjeta.
+      </p>
+      <p>
+        ESTADÍSTICAS muestra el podio de máximos goleadores y asistentes con fotos, la tabla
+        completa del top 10, micro-rankings de mejor media, G+A, minutos jugados y porterías
+        a cero, además del ranking disciplinario con tarjetas de cada infractor.
       </p>
     </Section>
 
@@ -276,15 +342,20 @@ const ContentES = ({ onColaborar, changelogRef, engineRef }: {
       <Section title="CAMBIOS RECIENTES">
         <ul className="list-disc pl-5 space-y-1">
           <li>
-            <span className="text-vga-cyan">v1.7.0</span> — Partidas guardadas y fin de temporada arreglado.
-            Ahora puedes tener varias carreras a la vez: la pestaña PARTIDAS dentro de COPIA permite
-            cargar, renombrar, borrar y crear partidas independientes, y la actual se autoguarda
-            mientras juegas. Bug serio arreglado: los equipos ya no se vacían al pasar de temporada
-            — los jugadores de campo se retiran sobre los 35–38 y los porteros sobre los 38–42,
-            con un poco de aleatoriedad deterministica por jugador. Limpieza interna: las
-            referencias a la fuente externa de stats desaparecen del código y la interfaz; ahora se
-            habla simplemente de "pack de stats" y el año del pack se muestra como una etiqueta
-            pequeña junto al jugador.
+            <span className="text-vga-cyan">v1.7.0</span> — Gran actualización: partidas guardadas,
+            fin de temporada totalmente rediseñado, mercado nuevo, rankings con fotos y carrera
+            con detalle por temporada.
+            <ul className="list-disc pl-5 mt-1 space-y-1">
+              <li><span className="text-vga-yellow">Partidas guardadas:</span> varias carreras a la vez, con cargar/renombrar/borrar y autoguardado. Pestaña PARTIDAS dentro de COPIA.</li>
+              <li><span className="text-vga-yellow">Bug serio arreglado:</span> los equipos ya no se vacían al pasar de temporada. Los jugadores de campo se retiran entre los 35 y 38 años, los porteros entre 38 y 42, con un poco de aleatoriedad determinista por jugador.</li>
+              <li><span className="text-vga-yellow">Fin de temporada nuevo:</span> resumen a pantalla completa con campeón y escudo, podio de Pichichi/Zamora/MVP con fotos, clasificación final clicable con drilldown por celda, récords del año (goleada, ridículo, partido loco, rachas), datos curiosos de jugadores y equipos, mercado del año y lista de BAJAS por retiro.</li>
+              <li><span className="text-vga-yellow">Drilldown de partido:</span> al pinchar en una celda de la clasificación se abre la lista de partidos. Cada uno muestra tiros, tarjetas, MVP del encuentro (calculado por goles + asistencias menos tarjetas) y un timeline cronológico con autor del gol y asistente. Hover sobre cualquier jugador para ver su tarjeta.</li>
+              <li><span className="text-vga-yellow">Mercado de fichajes rediseñado:</span> tabla ordenable con filtros por tipo y posición, búsqueda, badges CHOLLO/★, ficha del jugador con foto en el panel lateral con OFERTAR y feed de ACTIVIDAD DEL MERCADO al lado (todos los movimientos: fichajes, clausulazos, retiros).</li>
+              <li><span className="text-vga-yellow">Estadísticas rediseñadas:</span> podio top 3 de goleadores y asistentes con fotos, tabla completa del top 10, micro-rankings de mejor media, G+A, minutos y porterías a cero, ranking disciplinario con glifos de tarjetas.</li>
+              <li><span className="text-vga-yellow">Carrera como entrenador:</span> nueva vista detallada por temporada (posición con barra visual, W/D/L con barra, puntos y % victorias, Florentinómetro con rango min→peak, balance fichajes), tarjetas de campeón/despido/descenso, mejor y peor temporada destacadas.</li>
+              <li><span className="text-vga-yellow">Pro Manager:</span> los clubes que te despiden no vuelven a ofrecerte trabajo. Si todos te han descartado, la carrera termina y solo queda retirarte.</li>
+              <li><span className="text-vga-yellow">Packs de stats:</span> OpenFutbol acepta packs de datos públicos de terceros para usar tu base de datos preferida. El año del pack aparece como etiqueta junto al jugador.</li>
+            </ul>
           </li>
           <li>
             <span className="text-vga-cyan">v1.5.1</span> — Reglas Tebas y carrera en tiempo real.
@@ -407,9 +478,15 @@ const ContentEN = ({ onColaborar, changelogRef, engineRef }: {
         Your first 5 matches at a new club are a grace period — the board waits to see how you respond.
       </p>
       <p>
+        <span className="text-vga-light-red font-bold">Clubs remember:</span> any club that fires
+        you will never offer you a job again. Each firing shrinks your future options. If no club
+        wants you anymore, your career ends and you can only retire.
+      </p>
+      <p>
         Board messages appear after the match result screen.
         You can re-read them by tapping the ⚠ warning icon in the status bar.
-        Your manager name in the status bar is also a shortcut to your career stats.
+        Your manager name in the status bar is also a shortcut to your career stats, where every
+        season is broken down by position, W/D/L, points, Florentinometer and transfer balance.
       </p>
     </Section>
 
@@ -540,9 +617,15 @@ const ContentEN = ({ onColaborar, changelogRef, engineRef }: {
         Young players with potential are worth more than an older player at the same rating.
       </p>
       <p>
-        Rivals will send offers for your players, and they can accept or reject yours.
-        Offers are grouped by player in SQUAD — open them to see all interested clubs.
-        The transfer market rotates each round with free agents and listed players.
+        <span className="text-vga-cyan font-bold">TRANSFER MARKET:</span> a sortable table of every
+        available player (listed and free agents). Filter by type or position, search by name, and
+        sort by age, OVR, club or price. Click a row to open the player file in the side inspector
+        with photo, season stats and action buttons. Next to it, a live MARKET ACTIVITY feed lists
+        every move of the season — signings, buyouts and retirements.
+      </p>
+      <p>
+        Incoming offers for your players are managed from SQUAD. Open a player to see all
+        interested clubs grouped together.
       </p>
       <p>
         <span className="text-vga-yellow">Standard offer</span> — for listed players or free agents.
@@ -550,8 +633,57 @@ const ContentEN = ({ onColaborar, changelogRef, engineRef }: {
       </p>
       <p>
         <span className="text-vga-light-red font-bold">BUYOUT CLAUSE</span> — if you want a player
-        who isn't on the market, you can trigger their release clause. The cost is double their base
-        value and the transfer is instant — no negotiation. Doesn't apply to listed players or free agents.
+        who isn't on the market, trigger their release clause from their card on the rival's SQUAD
+        view. The cost is double their base value and the transfer is instant — no negotiation.
+      </p>
+    </Section>
+
+    <Section title="SAVE SLOTS">
+      <p>
+        You can keep several careers at once. In BACKUP → PARTIDAS tab you can load, rename,
+        delete and create new save slots. The active save autosaves while you play, so switching
+        slots takes you straight back where you left off in another career.
+      </p>
+      <p>
+        For safety, export important saves to a file from the BACKUP tab. Saves live in this
+        browser, so clearing site data or moving machine will lose them.
+      </p>
+    </Section>
+
+    <Section title="DATA & STATS PACKS">
+      <p>
+        OpenFutbol ships with its own player model. You can also import external, publicly
+        available data packs (teams, players) and optionally a stats pack to use your preferred
+        database. The engine is designed to run the simulation on any compatible dataset.
+      </p>
+      <p>
+        When a player has stats from an imported pack, the pack year shows as a small badge
+        in the corner of their file.
+      </p>
+    </Section>
+
+    <Section title="END OF SEASON & RANKINGS">
+      <p>
+        Closing a season opens a full summary: champion with crest, Pichichi, Zamora and MVP
+        with photos, clickable final standings (each cell opens a drilldown of the matches it
+        came from) and the year's records (biggest win, heaviest defeat, craziest match,
+        unbeaten and winning runs).
+      </p>
+      <p>
+        Below that, player and team curiosities (youngest, oldest, Joaquín Award for the oldest
+        scorer, fair play, card mill, richest squad, etc.), a transfer-of-the-year panel, and a
+        RETIROS list with every player who retired this season — outfielders retire between 35
+        and 38, goalkeepers between 38 and 42, with a small deterministic random band.
+      </p>
+      <p>
+        The per-match drilldown shows shots, cards, the match MVP (computed from goals +
+        assists minus cards) and a chronological timeline with goal scorer and assist provider.
+        Hover any player to pop their card.
+      </p>
+      <p>
+        RANKINGS shows a top-3 podium for scorers and assisters with photos, the full top-10
+        table, micro-rankings for best average rating, G+A, minutes and clean sheets, plus a
+        disciplinary ranking with card glyphs for each offender.
       </p>
     </Section>
 
@@ -593,14 +725,20 @@ const ContentEN = ({ onColaborar, changelogRef, engineRef }: {
       <Section title="RECENT CHANGES">
         <ul className="list-disc pl-5 space-y-1">
           <li>
-            <span className="text-vga-cyan">v1.7.0</span> — Save slots and an end-of-season fix.
-            You can now keep several careers at once: the PARTIDAS tab inside COPIA lets you
-            load, rename, delete and create independent saves, and the current one autosaves
-            while you play. Serious bug fix: teams no longer empty out at season's end —
-            outfielders retire around 35–38 and goalkeepers around 38–42, with a small
-            deterministic random band per player. Internal cleanup: every reference to the
-            external stats source has been stripped from the code and UI; the app now just
-            says "stats pack" and the year shows as a small badge next to a player.
+            <span className="text-vga-cyan">v1.7.0</span> — Massive update: save slots,
+            end-of-season fully redesigned, new market, rankings with photos and a detailed
+            per-season manager career.
+            <ul className="list-disc pl-5 mt-1 space-y-1">
+              <li><span className="text-vga-yellow">Save slots:</span> keep several careers at once with load/rename/delete and autosave. PARTIDAS tab inside BACKUP.</li>
+              <li><span className="text-vga-yellow">Critical bug fix:</span> teams no longer empty out at season's end. Outfielders retire between 35 and 38, goalkeepers between 38 and 42, with a small deterministic random band per player.</li>
+              <li><span className="text-vga-yellow">New end-of-season screen:</span> full-width summary with champion + crest, Pichichi/Zamora/MVP podium with photos, clickable final standings with per-cell drilldown, year records (biggest win, heaviest defeat, craziest match, runs), player and team curiosities, a market panel and a RETIROS list.</li>
+              <li><span className="text-vga-yellow">Match drilldown:</span> clicking any cell of the standings opens its match list. Each one shows shots, cards, the match MVP (computed from goals + assists minus cards) and a chronological timeline with goal scorer and assist provider. Hover any name for the player card.</li>
+              <li><span className="text-vga-yellow">Redesigned transfer market:</span> sortable table with type and position filters, search, CHOLLO/★ badges, side-panel player file with photo and OFERTAR, and a live MARKET ACTIVITY feed (every signing, buyout and retirement).</li>
+              <li><span className="text-vga-yellow">Redesigned rankings:</span> top-3 podium for scorers and assisters with photos, full top-10 table, micro-rankings for best avg rating, G+A, minutes and clean sheets, disciplinary ranking with card glyphs.</li>
+              <li><span className="text-vga-yellow">Manager career view:</span> new detailed per-season view (position with visual bar, W/D/L bar, points and win %, Florentinometer range min→peak, transfer balance), champion/fired/relegation chips, best and worst season highlighted.</li>
+              <li><span className="text-vga-yellow">Pro Manager:</span> clubs that fire you never offer you another job. If every club has dropped you, your career ends and you can only retire.</li>
+              <li><span className="text-vga-yellow">Stats packs:</span> OpenFutbol supports publicly available third-party data packs so you can use your preferred database. The pack year shows as a small badge next to a player.</li>
+            </ul>
           </li>
           <li>
             <span className="text-vga-cyan">v1.5.1</span> — Tebas rules and live career screen.

@@ -12,7 +12,7 @@ interface SettingDef {
   max: number;
   step: number;
   format: (v: number) => string;
-  group: 'board' | 'match' | 'tactics' | 'transfer' | 'ui';
+  group: 'board' | 'match' | 'tactics' | 'transfer' | 'negotiation' | 'economy' | 'reputation' | 'ui';
 }
 
 const pct  = (v: number) => `${(v * 100).toFixed(0)}%`;
@@ -57,11 +57,32 @@ const SETTINGS: SettingDef[] = [
   { key: 'aiTradeProb',             labelKey: 'engine.aiTradeProb.label',             descKey: 'engine.aiTradeProb.desc',             tipKey: 'engine.aiTradeProb.tip',             min: 0,    max: 1,    step: 0.05, format: pct,                                         group: 'transfer' },
   { key: 'aiSigningProb',           labelKey: 'engine.aiSigningProb.label',           descKey: 'engine.aiSigningProb.desc',           tipKey: 'engine.aiSigningProb.tip',           min: 0,    max: 1,    step: 0.05, format: pct,                                         group: 'transfer' },
 
+  // Negotiations
+  { key: 'offerInsultThreshold',    labelKey: 'engine.offerInsultThreshold.label',    descKey: 'engine.offerInsultThreshold.desc',    tipKey: 'engine.offerInsultThreshold.tip',    min: 0.3,  max: 1,    step: 0.05, format: pct,                                         group: 'negotiation' },
+  { key: 'offerInsultBlockProb',    labelKey: 'engine.offerInsultBlockProb.label',    descKey: 'engine.offerInsultBlockProb.desc',    tipKey: 'engine.offerInsultBlockProb.tip',    min: 0,    max: 1,    step: 0.05, format: pct,                                         group: 'negotiation' },
+  { key: 'offerInstantAcceptMult',  labelKey: 'engine.offerInstantAcceptMult.label',  descKey: 'engine.offerInstantAcceptMult.desc',  tipKey: 'engine.offerInstantAcceptMult.tip',  min: 1.2,  max: 3,    step: 0.1,  format: mult,                                        group: 'negotiation' },
+  { key: 'offerRejectBlockProb',    labelKey: 'engine.offerRejectBlockProb.label',    descKey: 'engine.offerRejectBlockProb.desc',    tipKey: 'engine.offerRejectBlockProb.tip',    min: 0,    max: 1,    step: 0.05, format: pct,                                         group: 'negotiation' },
+  { key: 'offerNegotiationRange',   labelKey: 'engine.offerNegotiationRange.label',   descKey: 'engine.offerNegotiationRange.desc',   tipKey: 'engine.offerNegotiationRange.tip',   min: 0.2,  max: 2,    step: 0.1,  format: mult,                                        group: 'negotiation' },
+  { key: 'clausulazoMult',          labelKey: 'engine.clausulazoMult.label',          descKey: 'engine.clausulazoMult.desc',          tipKey: 'engine.clausulazoMult.tip',          min: 1,    max: 5,    step: 0.25, format: mult,                                        group: 'negotiation' },
+
+  // Economy
+  { key: 'transferPriceMult',       labelKey: 'engine.transferPriceMult.label',       descKey: 'engine.transferPriceMult.desc',       tipKey: 'engine.transferPriceMult.tip',       min: 0.3,  max: 3,    step: 0.1,  format: mult,                                        group: 'economy' },
+  { key: 'salaryMult',              labelKey: 'engine.salaryMult.label',              descKey: 'engine.salaryMult.desc',              tipKey: 'engine.salaryMult.tip',              min: 0.3,  max: 3,    step: 0.1,  format: mult,                                        group: 'economy' },
+  { key: 'ticketRevenueMult',       labelKey: 'engine.ticketRevenueMult.label',       descKey: 'engine.ticketRevenueMult.desc',       tipKey: 'engine.ticketRevenueMult.tip',       min: 0.3,  max: 3,    step: 0.1,  format: mult,                                        group: 'economy' },
+  { key: 'agePeakBonusMult',        labelKey: 'engine.agePeakBonusMult.label',        descKey: 'engine.agePeakBonusMult.desc',        tipKey: 'engine.agePeakBonusMult.tip',        min: 1,    max: 2,    step: 0.05, format: mult,                                        group: 'economy' },
+
+  // Reputation
+  { key: 'reputationGainMult',      labelKey: 'engine.reputationGainMult.label',      descKey: 'engine.reputationGainMult.desc',      tipKey: 'engine.reputationGainMult.tip',      min: 0,    max: 3,    step: 0.1,  format: mult,                                        group: 'reputation' },
+  { key: 'reputationLossMult',      labelKey: 'engine.reputationLossMult.label',      descKey: 'engine.reputationLossMult.desc',      tipKey: 'engine.reputationLossMult.tip',      min: 0,    max: 3,    step: 0.1,  format: mult,                                        group: 'reputation' },
+
+  // Match (additional)
+  { key: 'homeAdvantageMult',       labelKey: 'engine.homeAdvantageMult.label',       descKey: 'engine.homeAdvantageMult.desc',       tipKey: 'engine.homeAdvantageMult.tip',       min: 0,    max: 2,    step: 0.1,  format: mult,                                        group: 'match' },
+
   // UI
   { key: 'matchScreenMaxWidthPx',   labelKey: 'engine.matchScreenMaxWidthPx.label',   descKey: 'engine.matchScreenMaxWidthPx.desc',                                                  min: 900,  max: 3200, step: 50,   format: v => `${int(v)} px`,                         group: 'ui' },
 ];
 
-const GROUPS = ['board', 'match', 'tactics', 'transfer', 'ui'] as const;
+const GROUPS = ['board', 'reputation', 'match', 'tactics', 'transfer', 'negotiation', 'economy', 'ui'] as const;
 
 export const EngineSettingsView = () => {
   const t = useT();

@@ -140,23 +140,53 @@ export const MatchDetails = ({ match, teams }: { match: MatchInfo; teams: Team[]
 
   return (
     <div className="border-t border-vga-gray px-3 py-1.5 text-[8px] bg-vga-black/60 space-y-1">
-      {/* Compact stat + MVP row */}
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 leading-tight">
-        <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-x-2 tabular-nums">
-          <div className="flex items-center justify-end gap-2">
-            <span><span className="text-vga-light-green font-bold">{homeShots}</span>{' '}<span className="text-vga-gray">tiros</span></span>
-            <span><span className="text-vga-yellow font-bold">{homeYellows.length}</span>{' '}<span className="text-vga-gray">TA</span></span>
-            {homeReds.length > 0 && <span><span className="text-vga-light-red font-bold">{homeReds.length}</span>{' '}<span className="text-vga-gray">TR</span></span>}
-          </div>
-          <span className="text-vga-gray px-1">|</span>
-          <div className="flex items-center justify-start gap-2">
-            {awayReds.length > 0 && <span><span className="text-vga-light-red font-bold">{awayReds.length}</span>{' '}<span className="text-vga-gray">TR</span></span>}
-            <span><span className="text-vga-yellow font-bold">{awayYellows.length}</span>{' '}<span className="text-vga-gray">TA</span></span>
-            <span><span className="text-vga-light-green font-bold">{awayShots}</span>{' '}<span className="text-vga-gray">tiros</span></span>
-          </div>
+      {/* Stats stripe + team headers in one grid so columns align */}
+      <div className="grid grid-cols-[1fr_auto_1fr] gap-x-2 leading-snug">
+        {/* Row 1: per-team stat groups */}
+        <div className="flex items-center justify-end gap-2 tabular-nums">
+          <span><span className="text-vga-light-green font-bold">{homeShots}</span>{' '}<span className="text-vga-gray">tiros</span></span>
+          <span><span className="text-vga-yellow font-bold">{homeYellows.length}</span>{' '}<span className="text-vga-gray">TA</span></span>
+          {homeReds.length > 0 && <span><span className="text-vga-light-red font-bold">{homeReds.length}</span>{' '}<span className="text-vga-gray">TR</span></span>}
         </div>
-        {mvp && (
-          <div className="flex items-center gap-1 truncate ml-auto">
+        <span className="text-vga-gray px-1 self-center">|</span>
+        <div className="flex items-center justify-start gap-2 tabular-nums">
+          {awayReds.length > 0 && <span><span className="text-vga-light-red font-bold">{awayReds.length}</span>{' '}<span className="text-vga-gray">TR</span></span>}
+          <span><span className="text-vga-yellow font-bold">{awayYellows.length}</span>{' '}<span className="text-vga-gray">TA</span></span>
+          <span><span className="text-vga-light-green font-bold">{awayShots}</span>{' '}<span className="text-vga-gray">tiros</span></span>
+        </div>
+
+        {/* Row 2: team-name headers */}
+        <div className="text-right text-vga-cyan text-[7px] uppercase tracking-widest truncate border-b border-vga-gray pb-0.5">{homeTeam?.name ?? 'CASA'}</div>
+        <div className="text-vga-gray text-[7px] text-center border-b border-vga-gray pb-0.5">'</div>
+        <div className="text-left text-vga-cyan text-[7px] uppercase tracking-widest truncate border-b border-vga-gray pb-0.5">{awayTeam?.name ?? 'FUERA'}</div>
+
+        {/* Rows 3..N: chronological event timeline */}
+        {timeline.map((te, i) => {
+          const min = `${te.e.minute}'`;
+          const player = findPlayer(teams, te.e.playerId);
+          const assist = te.e.assistantId ? findPlayer(teams, te.e.assistantId) : null;
+          const color = te.e.type === 'goal' ? 'text-vga-light-green' : te.e.type === 'yellow' ? 'text-vga-yellow' : 'text-vga-light-red';
+          const cell = (
+            <span className={`${color} truncate inline-flex items-center gap-1`}>
+              {eventGlyph(te.e.type)}
+              {player ? <PlayerName player={player} useShirt /> : <span>—</span>}
+              {assist && <><span className="text-vga-cyan">· ast.</span><PlayerName player={assist} useShirt className="text-vga-cyan" /></>}
+            </span>
+          );
+          return (
+            <div key={i} className="contents">
+              {te.side === 'home' ? <div className="text-right truncate">{cell}</div> : <div />}
+              <div className="text-vga-gray tabular-nums text-center">{min}</div>
+              {te.side === 'away' ? <div className="text-left truncate">{cell}</div> : <div />}
+            </div>
+          );
+        })}
+      </div>
+
+      {/* MVP centered at the bottom */}
+      {mvp && (
+        <div className="flex justify-center pt-1 border-t border-vga-gray">
+          <div className="flex items-center gap-1 truncate">
             <span className="text-vga-magenta text-[7px] uppercase tracking-widest">MVP</span>
             {(() => {
               const p = findPlayer(teams, mvp.playerId);
@@ -170,35 +200,6 @@ export const MatchDetails = ({ match, teams }: { match: MatchInfo; teams: Team[]
               {mvp.reds > 0 && <span className="text-vga-light-red"> {mvp.reds}TR</span>}
             </span>
           </div>
-        )}
-      </div>
-
-      {/* Chronological timeline with team-name headers */}
-      {timeline.length > 0 && (
-        <div className="grid grid-cols-[1fr_auto_1fr] gap-x-2 leading-snug">
-          <div className="text-right text-vga-cyan text-[7px] uppercase tracking-widest truncate border-b border-vga-gray pb-0.5">{homeTeam?.name ?? 'CASA'}</div>
-          <div className="text-vga-gray text-[7px] text-center border-b border-vga-gray pb-0.5">'</div>
-          <div className="text-left text-vga-cyan text-[7px] uppercase tracking-widest truncate border-b border-vga-gray pb-0.5">{awayTeam?.name ?? 'FUERA'}</div>
-          {timeline.map((te, i) => {
-            const min = `${te.e.minute}'`;
-            const player = findPlayer(teams, te.e.playerId);
-            const assist = te.e.assistantId ? findPlayer(teams, te.e.assistantId) : null;
-            const color = te.e.type === 'goal' ? 'text-vga-light-green' : te.e.type === 'yellow' ? 'text-vga-yellow' : 'text-vga-light-red';
-            const cell = (
-              <span className={`${color} truncate inline-flex items-center gap-1`}>
-                {eventGlyph(te.e.type)}
-                {player ? <PlayerName player={player} useShirt /> : <span>—</span>}
-                {assist && <><span className="text-vga-cyan">· ast.</span><PlayerName player={assist} useShirt className="text-vga-cyan" /></>}
-              </span>
-            );
-            return (
-              <div key={i} className="contents">
-                {te.side === 'home' ? <div className="text-right truncate">{cell}</div> : <div />}
-                <div className="text-vga-gray tabular-nums text-center">{min}</div>
-                {te.side === 'away' ? <div className="text-left truncate">{cell}</div> : <div />}
-              </div>
-            );
-          })}
         </div>
       )}
     </div>

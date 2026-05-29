@@ -48,7 +48,7 @@ import { FantasyDraftView } from './components/FantasyDraftView';
 import type { StatKey } from './components/StatDrillDown';
 import { extractDbId } from './data/mockTeams';
 import { startAmbiance, stopAmbiance, fadeOutAmbiance, setAmbianceMuted, playGoalSignal, playGoalWithCelebration, playMissed, playWhistle, playWhistleEnd } from './sfx';
-import { computePrice, evaluateOffer, formatEuros } from './data/economy';
+import { computePrice, evaluateOffer, formatEuros, computeClausulazoPrice } from './data/economy';
 import { PlayerTooltipProvider } from './contexts/PlayerTooltipContext';
 import { formatJornadaDate } from './engine/calendar';
 import type { OfferResult } from './data/economy';
@@ -682,7 +682,7 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
     const buyer = league.teams.find(t => t.id === league.userTeamId);
     if (!seller || !player || !buyer) return { accepted: false, message: 'Operación inválida.' };
     const price = computePrice(player, league.year);
-    const clausulaCost = price * 2;
+    const clausulaCost = computeClausulazoPrice(price);
     if (buyer.budget < clausulaCost) return { accepted: false, message: 'No tienes presupuesto suficiente para la cláusula.' };
 
     setLeague(prev => {
@@ -1048,7 +1048,7 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
       awayShotsOnTarget: 0,
       homeFouls: 0,
       awayFouls: 0,
-      homeBoost: 1.05 + Math.random() * 0.15,
+      homeBoost: 1 + ((0.05 + Math.random() * 0.15) * engineSettings.homeAdvantageMult),
       homeStamina: Object.fromEntries(homeTeam.players.map(p => [p.id, p.stamina ?? 99])),
       awayStamina: Object.fromEntries(awayTeam.players.map(p => [p.id, p.stamina ?? 99])),
       homeSubsUsed: 0,
@@ -1093,7 +1093,7 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
       if (m.homeId === userTeamId || m.awayId === userTeamId) return;
       const hTeam = applyMoodToTeam(league.teams.find(t => t.id === m.homeId)!);
       const aTeam = applyMoodToTeam(league.teams.find(t => t.id === m.awayId)!);
-      const homeBoost = 1.05 + Math.random() * 0.15;
+      const homeBoost = 1 + ((0.05 + Math.random() * 0.15) * engineSettings.homeAdvantageMult);
       const hStr = calculateTeamStrength(hTeam) * homeBoost;
       const aStr = calculateTeamStrength(aTeam);
 
@@ -1218,7 +1218,8 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
         if (chance > 0 && Math.random() < chance) {
           const warnings = (newLeague.boardWarnings ?? 0) + 1;
           if (warnings >= FIRE_THRESHOLD) {
-            newLeague = { ...newLeague, boardFired: true, boardWarnings: warnings, seasonFinished: true };
+            const firedTeams = Array.from(new Set([...(newLeague.firedByTeamIds ?? []), newLeague.userTeamId]));
+            newLeague = { ...newLeague, boardFired: true, boardWarnings: warnings, seasonFinished: true, firedByTeamIds: firedTeams };
             const firedIdx = Math.floor(Math.random() * 4);
             const firedMsg = { title: t('florentino.fired'), body: t(`florentino.firedBody.${firedIdx}`), tone: 'danger' as const };
             setTimeout(() => { setBoardAlert(firedMsg); setLastBoardAlert(firedMsg); }, 100);
@@ -2005,6 +2006,7 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
               boardObjective={league.boardObjective ?? 'avoid_relegation'}
               managerReputation={league.managerReputation ?? 50}
               year={league.year}
+              firedByTeamIds={league.firedByTeamIds}
               onPickTeam={handleProManagerPickTeam}
               onRetire={handleProManagerRetire}
             />

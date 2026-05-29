@@ -323,7 +323,9 @@ export const TransfersView = ({
 
   const filtered = marketEntries
     .filter(e => {
-      if (typeFilter === 'all') return true;
+      // 'all' shows only actually-available players (en venta + libres). Rivals
+      // not for sale are clausulazo candidates and only show under that tab.
+      if (typeFilter === 'all') return e.isFreeAgent || e.player.forSale;
       if (typeFilter === 'free') return e.isFreeAgent;
       if (typeFilter === 'listed') return !e.isFreeAgent && e.player.forSale;
       if (typeFilter === 'rival') return !e.isFreeAgent && !e.player.forSale;
@@ -387,15 +389,15 @@ export const TransfersView = ({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-3">
+      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_480px] gap-3">
         {/* Left column: filters + table */}
         <div className="flex flex-col gap-2 min-w-0">
           {/* Filters bar */}
           <div className="bg-vga-black border border-vga-blue flex flex-wrap items-center gap-1 p-2">
-            {(['all', 'listed', 'free', 'rival'] as const).map(type => (
+            {(['all', 'listed', 'free'] as const).map(type => (
               <button key={type} onClick={() => setTypeFilter(type)}
                 className={`text-[8px] px-2 py-0.5 border font-bold uppercase ${typeFilter === type ? 'bg-vga-yellow text-vga-black border-vga-yellow' : 'text-vga-gray border-vga-gray hover:text-vga-bright-white hover:border-vga-bright-white'}`}>
-                {type === 'all' ? 'Todo' : type === 'listed' ? 'En venta' : type === 'free' ? 'Libres' : 'Cláusula'}
+                {type === 'all' ? 'Todo' : type === 'listed' ? 'En venta' : 'Libres'}
               </button>
             ))}
             <span className="text-vga-gray text-[7px] mx-1">|</span>
@@ -536,24 +538,45 @@ export const TransfersView = ({
           {/* Market activity feed */}
           <div className="bg-vga-black border border-vga-blue flex flex-col flex-1 min-h-0">
             <PanelTitle title={`Actividad del mercado · ${seasonTransfers.length}`} />
-            <div className="overflow-y-auto max-h-[40vh] p-1 flex flex-col gap-0.5">
+            <div className="overflow-y-auto max-h-[50vh] p-2 flex flex-col gap-0.5">
               {seasonTransfers.length === 0 ? (
-                <div className="text-vga-gray text-[8px] p-3 text-center">Aún no hay movimientos esta temporada.</div>
+                <div className="text-vga-gray text-[9px] p-3 text-center">Aún no hay movimientos esta temporada.</div>
               ) : seasonTransfers.map(r => {
                 const isUserIn = r.toTeamName === userTeam.name;
                 const isUserOut = r.fromTeamName === userTeam.name;
-                const color = r.kind === 'retirement' ? 'text-vga-gray'
+                const nameColor = r.kind === 'retirement' ? 'text-vga-gray'
                   : isUserIn ? 'text-vga-light-green'
                   : isUserOut ? 'text-vga-light-cyan'
                   : 'text-vga-bright-white';
-                const label = r.kind === 'retirement'
-                  ? `Retiro · ${r.playerName}${r.retirementAge ? ` (${r.retirementAge}a)` : ''} · ${r.fromTeamName ?? ''}`
-                  : `${r.playerName} · ${r.fromTeamName ?? 'Libre'} → ${r.toTeamName}`;
+                const isRetire = r.kind === 'retirement';
                 return (
-                  <div key={r.id} className="px-2 py-0.5 text-[8px] flex items-center gap-1 border-b border-vga-blue/30 last:border-b-0">
-                    <span className="text-vga-magenta text-[7px] w-7 shrink-0">J{r.jornada}</span>
-                    <span className={`flex-1 truncate ${color}`}>{label}</span>
-                    {r.amount > 0 && <span className="text-vga-light-green text-[7px] tabular-nums shrink-0">{formatEuros(r.amount)}</span>}
+                  <div key={r.id} className="px-2 py-1.5 border-b border-vga-blue/30 last:border-b-0">
+                    <div className="flex items-center gap-2">
+                      <span className="text-vga-magenta text-[9px] w-8 shrink-0 font-bold">J{r.jornada}</span>
+                      <span className={`flex-1 truncate text-[11px] font-bold ${nameColor}`}>
+                        {r.playerName}
+                        {isRetire && r.retirementAge ? <span className="text-vga-gray text-[8px] font-normal"> · {r.retirementAge}a</span> : null}
+                      </span>
+                      {r.amount > 0 && <span className="text-vga-light-green text-[10px] tabular-nums shrink-0 font-bold">{formatEuros(r.amount)}</span>}
+                    </div>
+                    <div className="pl-10 flex flex-col gap-0.5 mt-0.5">
+                      {isRetire ? (
+                        <div className="text-[9px] text-vga-gray truncate">
+                          <span className="text-vga-magenta text-[7px] uppercase mr-1">Retiro</span>{r.fromTeamName ?? '—'}
+                        </div>
+                      ) : (
+                        <>
+                          <div className="text-[9px] truncate">
+                            <span className="text-vga-magenta text-[7px] uppercase mr-1">de</span>
+                            <span className="text-vga-light-cyan">{r.fromTeamName ?? 'Libre'}</span>
+                          </div>
+                          <div className="text-[9px] truncate">
+                            <span className="text-vga-magenta text-[7px] uppercase mr-1">a</span>
+                            <span className="text-vga-light-green">{r.toTeamName}</span>
+                          </div>
+                        </>
+                      )}
+                    </div>
                   </div>
                 );
               })}
