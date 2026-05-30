@@ -45,7 +45,8 @@ import { TournamentSetupView } from './components/TournamentSetupView';
 import { BracketView } from './components/BracketView';
 import { TournamentRoundResultsModal } from './components/TournamentRoundResultsModal';
 import { TournamentMatchPreview } from './components/TournamentMatchPreview';
-import { createTournament, advanceCurrentStage, saveTournament, loadTournament, userNextAction, recordUserLigaMatch, recordUserKoLeg } from './store/tournamentStore';
+import { SeasonStatsTable } from './components/SeasonStatsTable';
+import { createTournament, advanceCurrentStage, saveTournament, loadTournament, userNextAction, spectatorNextMatch, recordUserLigaMatch, recordUserKoLeg } from './store/tournamentStore';
 import type { TournamentState, UserNextAction } from './store/tournamentStore';
 import { BoardAlertModal } from './components/BoardAlertModal';
 import { DisclaimerView } from './components/DisclaimerView';
@@ -155,7 +156,7 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
   const [tournament, setTournament] = useState<TournamentState | null>(() => loadTournament());
   const [tournamentRoundRecap, setTournamentRoundRecap] = useState<number | null>(null);
   const [tournamentMatchCtx, setTournamentMatchCtx] = useState<UserNextAction | null>(null);
-  const [tournamentSubView, setTournamentSubView] = useState<null | 'ALIGNMENT' | 'SQUAD'>(null);
+  const [tournamentSubView, setTournamentSubView] = useState<null | 'ALIGNMENT' | 'SQUAD' | 'STATS'>(null);
   const [tournamentPendingAction, setTournamentPendingAction] = useState<UserNextAction | null>(null);
   const [showInstructions, setShowInstructions] = useState(false);
   const [showColaborar, setShowColaborar] = useState(false);
@@ -1352,10 +1353,11 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
   // hand off to the existing match loop. The tournamentMatchCtx flag tells
   // finalizeMatch which post-match path to take.
   // Live-play whatever match the user has next in the tournament: a liga
-  // group match, or a single leg of their KO tie.
+  // group match, or a single leg of their KO tie. In spectator mode (no
+  // user team) this falls back to the next unplayed match of the stage.
   const startTournamentMatch = () => {
     if (!tournament) return;
-    const action = userNextAction(tournament);
+    const action = userNextAction(tournament) ?? spectatorNextMatch(tournament);
     if (!action) return;
     const home = tournament.teams.find(t => t.id === action.homeTeamId);
     const away = tournament.teams.find(t => t.id === action.awayTeamId);
@@ -1955,9 +1957,28 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
           />
         );
       }
+      if (tournamentSubView === 'STATS') {
+        return (
+          <div className="w-full max-w-5xl flex flex-col gap-2 animate-in fade-in duration-300">
+            <div className="bg-vga-blue p-2 border-2 border-vga-white flex justify-between items-center vga-panel">
+              <h2 className="text-vga-yellow text-xs uppercase font-bold">Estadísticas del torneo</h2>
+              <button onClick={() => setTournamentSubView(null)} className="bg-vga-red text-vga-bright-white px-3 py-1 text-[8px] uppercase font-bold border border-vga-black hover:bg-vga-light-red">
+                Volver
+              </button>
+            </div>
+            <div className="bg-vga-black border-4 border-vga-blue p-3 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+              <SeasonStatsTable
+                teams={tournament.teams}
+                seasonYear={new Date().getFullYear()}
+              />
+            </div>
+          </div>
+        );
+      }
       // Pre-match preview: lets the user check lineups, auto-fix XI, pick
-      // match duration, then kicks off the live match.
-      if (tournamentPendingAction && userTournamentTeam) {
+      // match duration, then kicks off the live match. Spectator path goes
+      // through the same preview but with the lineup controls hidden.
+      if (tournamentPendingAction) {
         const home = tournament.teams.find(t => t.id === tournamentPendingAction.homeTeamId);
         const away = tournament.teams.find(t => t.id === tournamentPendingAction.awayTeamId);
         if (home && away) {
@@ -1970,14 +1991,14 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
               contextLabel={ctxLabel}
               homeTeam={home}
               awayTeam={away}
-              userTeamId={tournament.userTeamId!}
+              userTeamId={tournament.userTeamId}
               matchDuration={matchDuration}
               onChangeDuration={setMatchDuration}
-              onAutoFixUserXI={() => {
+              onAutoFixUserXI={userTournamentTeam ? () => {
                 const { lineup } = pickBestXI(userTournamentTeam.players, userTournamentTeam.formation, new Set(), userTournamentTeam.tacticalDiscipline ?? true);
                 updateTournamentUserTeam({ lineup });
-              }}
-              onAdjustLineup={() => setTournamentSubView('ALIGNMENT')}
+              } : undefined}
+              onAdjustLineup={userTournamentTeam ? () => setTournamentSubView('ALIGNMENT') : undefined}
               onPlay={() => {
                 setTournamentPendingAction(null);
                 startTournamentMatch();
@@ -1997,13 +2018,15 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
           }}
           onPlayUserMatch={() => {
             const action = userNextAction(tournament);
-            if (!action) return;
-            // Spectator path or no user team — skip preview and play immediately.
-            if (!tournament.userTeamId) startTournamentMatch();
-            else setTournamentPendingAction(action);
+            if (action) setTournamentPendingAction(action);
+          }}
+          onPlaySpectatorMatch={() => {
+            const action = spectatorNextMatch(tournament);
+            if (action) setTournamentPendingAction(action);
           }}
           onOpenAlignment={() => setTournamentSubView('ALIGNMENT')}
           onOpenSquad={() => setTournamentSubView('SQUAD')}
+          onOpenStats={() => setTournamentSubView('STATS')}
           onExit={() => {
             setTournament(null); setShowTournamentFlow(false);
             setTournamentRoundRecap(null); setTournamentSubView(null);

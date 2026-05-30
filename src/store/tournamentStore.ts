@@ -471,6 +471,39 @@ export type UserNextAction =
   | { type: 'liga'; groupId: string; matchIdx: number; jornada: number; homeTeamId: string; awayTeamId: string }
   | { type: 'ko'; tieId: string; legIdx: number; homeTeamId: string; awayTeamId: string };
 
+// Spectator equivalent of userNextAction: returns the first unplayed match of
+// the current stage regardless of who plays in it. Used when there's no user
+// team (or the user is eliminated) so a watcher can step through every match.
+export const spectatorNextMatch = (state: TournamentState): UserNextAction | null => {
+  if (state.champion) return null;
+  const stage = state.stages[state.currentStageIdx];
+  if (!stage) return null;
+  if (stage.config.kind === 'liga' && stage.groups) {
+    for (const g of stage.groups) {
+      const idx = g.matches.findIndex(m => !m.played);
+      if (idx >= 0) {
+        const m = g.matches[idx];
+        return { type: 'liga', groupId: g.id, matchIdx: idx, jornada: m.jornada, homeTeamId: m.homeTeamId, awayTeamId: m.awayTeamId };
+      }
+    }
+    return null;
+  }
+  if (stage.config.kind === 'ko' && stage.ties) {
+    // Walk legs in index order so spectators see all idas before all vueltas.
+    const legCount = (stage.config as KoStageConfig).legs;
+    for (let li = 0; li < legCount; li++) {
+      for (const tie of stage.ties) {
+        const leg = tie.legs[li];
+        if (leg && !leg.played) {
+          return { type: 'ko', tieId: tie.id, legIdx: li, homeTeamId: leg.homeTeamId, awayTeamId: leg.awayTeamId };
+        }
+      }
+    }
+    return null;
+  }
+  return null;
+};
+
 export const userNextAction = (state: TournamentState): UserNextAction | null => {
   if (!state.userTeamId || state.champion) return null;
   const stage = state.stages[state.currentStageIdx];

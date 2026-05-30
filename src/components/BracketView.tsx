@@ -1,17 +1,19 @@
 import type { TournamentState, TournamentStage, TournamentTie, KoStageConfig, LigaStageConfig } from '../store/tournamentStore';
-import { groupStandings, userNextAction } from '../store/tournamentStore';
+import { groupStandings, userNextAction, spectatorNextMatch } from '../store/tournamentStore';
 import { TeamCrest } from './TeamCrest';
 
 interface Props {
   state: TournamentState;
   onAdvanceStage: () => void;
   onPlayUserMatch?: () => void;
+  onPlaySpectatorMatch?: () => void;
   onOpenAlignment: () => void;
   onOpenSquad: () => void;
+  onOpenStats: () => void;
   onExit: () => void;
 }
 
-export const BracketView = ({ state, onAdvanceStage, onPlayUserMatch, onOpenAlignment, onOpenSquad, onExit }: Props) => {
+export const BracketView = ({ state, onAdvanceStage, onPlayUserMatch, onPlaySpectatorMatch, onOpenAlignment, onOpenSquad, onOpenStats, onExit }: Props) => {
   const teamById = (id: string | null) => id ? state.teams.find(t => t.id === id) : null;
   const champion = state.champion ? teamById(state.champion) : null;
   const userTeam = state.userTeamId ? teamById(state.userTeamId) : null;
@@ -22,12 +24,14 @@ export const BracketView = ({ state, onAdvanceStage, onPlayUserMatch, onOpenAlig
   const userOut = userTeam && stage.inputTeamIds && !stage.inputTeamIds.includes(state.userTeamId!);
 
   const nextAction = userNextAction(state);
-  const userMatchLabel = nextAction
+  const spectatorAction = nextAction ? null : spectatorNextMatch(state);
+  const watchedAction = nextAction ?? spectatorAction;
+  const watchedLabel = watchedAction
     ? (() => {
-        const h = teamById(nextAction.homeTeamId)?.name ?? '?';
-        const a = teamById(nextAction.awayTeamId)?.name ?? '?';
-        if (nextAction.type === 'liga') return `Jornada ${nextAction.jornada} · ${h} vs ${a}`;
-        const legLabel = nextAction.legIdx === 0 ? 'Ida' : nextAction.legIdx === 1 ? 'Vuelta' : `Partido ${nextAction.legIdx + 1}`;
+        const h = teamById(watchedAction.homeTeamId)?.name ?? '?';
+        const a = teamById(watchedAction.awayTeamId)?.name ?? '?';
+        if (watchedAction.type === 'liga') return `Jornada ${watchedAction.jornada} · ${h} vs ${a}`;
+        const legLabel = watchedAction.legIdx === 0 ? 'Ida' : watchedAction.legIdx === 1 ? 'Vuelta' : `Partido ${watchedAction.legIdx + 1}`;
         return `${legLabel} · ${h} vs ${a}`;
       })()
     : null;
@@ -47,7 +51,7 @@ export const BracketView = ({ state, onAdvanceStage, onPlayUserMatch, onOpenAlig
             <span className="text-vga-gray text-[9px] uppercase">· modo espectador</span>
           )}
         </div>
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1 flex-wrap">
           {userTeam && (
             <>
               <button onClick={onOpenAlignment} className="bg-vga-green text-vga-bright-white px-3 py-1 text-[8px] uppercase font-bold border border-vga-black hover:bg-vga-light-green">
@@ -58,6 +62,9 @@ export const BracketView = ({ state, onAdvanceStage, onPlayUserMatch, onOpenAlig
               </button>
             </>
           )}
+          <button onClick={onOpenStats} className="bg-vga-cyan text-vga-black px-3 py-1 text-[8px] uppercase font-bold border border-vga-black hover:bg-vga-light-cyan">
+            Stats
+          </button>
           <button onClick={onExit} className="bg-vga-red text-vga-bright-white px-3 py-1 text-[8px] uppercase font-bold border border-vga-black hover:bg-vga-light-red">
             Salir
           </button>
@@ -108,7 +115,7 @@ export const BracketView = ({ state, onAdvanceStage, onPlayUserMatch, onOpenAlig
       {!champion && (
         <div className="flex justify-between items-center gap-2 flex-wrap">
           <div className="text-vga-cyan text-[9px] uppercase">
-            {userMatchLabel ? `Próximo: ${userMatchLabel}` : ''}
+            {watchedLabel ? `Próximo: ${watchedLabel}` : ''}
           </div>
           <div className="flex gap-2">
             {nextAction && onPlayUserMatch && (
@@ -119,11 +126,19 @@ export const BracketView = ({ state, onAdvanceStage, onPlayUserMatch, onOpenAlig
                 Jugar tu partido
               </button>
             )}
+            {!nextAction && spectatorAction && onPlaySpectatorMatch && (
+              <button
+                onClick={onPlaySpectatorMatch}
+                className="bg-vga-cyan text-vga-black text-[11px] uppercase font-bold border-2 border-vga-bright-white px-4 py-2 hover:bg-vga-light-cyan tracking-wider"
+              >
+                Ver siguiente partido
+              </button>
+            )}
             <button
               onClick={onAdvanceStage}
               className="bg-vga-light-green text-vga-black text-[11px] uppercase font-bold border-2 border-vga-bright-white px-4 py-2 hover:bg-vga-bright-white tracking-wider"
             >
-              {nextAction ? 'Auto-sim fase' : 'Jugar fase'}
+              {watchedAction ? 'Auto-sim fase' : 'Jugar fase'}
             </button>
           </div>
         </div>
