@@ -218,11 +218,15 @@ export const TournamentSetupView = ({ onConfirm, onBack }: Props) => {
               {advStages.map((s, idx) => {
                 const stage = io[idx];
                 const isLast = idx === advStages.length - 1;
+                const isFinal = stage?.output === 1;
+                const isSemi = stage?.output === 2;
+                const kindLabel = isFinal ? 'Final' : s.kind === 'liga' ? 'Liga / grupos' : 'Eliminatoria';
+                const roundLabel = isFinal ? 'Final' : isSemi ? 'Semifinales' : `Ronda ${idx + 1}`;
                 return (
-                  <div key={idx} className={`border-2 ${stage?.ok ? 'border-vga-blue' : 'border-vga-light-red'} bg-vga-black p-2`}>
+                  <div key={idx} className={`border-2 ${isFinal ? 'border-vga-yellow' : stage?.ok ? 'border-vga-blue' : 'border-vga-light-red'} bg-vga-black p-2`}>
                     <div className="flex items-center justify-between gap-2">
                       <span className="text-vga-yellow text-[10px] uppercase font-bold">
-                        Ronda {idx + 1} · {s.kind === 'liga' ? 'Liga / grupos' : 'Eliminatoria'}
+                        {roundLabel}{isFinal ? '' : ` · ${kindLabel}`}
                       </span>
                       {isLast && (
                         <button onClick={() => setAdvStages(prev => prev.slice(0, -1))}
@@ -232,7 +236,7 @@ export const TournamentSetupView = ({ onConfirm, onBack }: Props) => {
                       )}
                     </div>
                     <div className="text-[8px] text-vga-gray uppercase mt-1">
-                      {stage ? `${stage.input} equipos → ${stage.output}` : '—'}
+                      {stage ? `${stage.input} equipos → ${stage.output}${isFinal ? ' campeón' : ''}` : '—'}
                       {!stage?.ok && stage?.reason ? ` · ${stage.reason}` : ''}
                     </div>
                   </div>
@@ -325,6 +329,9 @@ export const TournamentSetupView = ({ onConfirm, onBack }: Props) => {
 
 // ── Next round configurator (advanced mode) ─────────────────────────────
 const NextRoundCard = ({ input, onAdd }: { input: number; onAdd: (d: StageDraft) => void }) => {
+  // The "Final" is the special case of input = 2 — it's always a KO tie, just
+  // configure the leg count + away-goals rule.
+  const isFinal = input === 2;
   const [kind, setKind] = useState<'liga' | 'ko'>(input % 2 === 0 ? 'ko' : 'liga');
   const divisors = divisorsForGroup(input);
   const [groupSize, setGroupSize] = useState<number>(divisors[0] ?? 2);
@@ -336,34 +343,37 @@ const NextRoundCard = ({ input, onAdd }: { input: number; onAdd: (d: StageDraft)
   const safeGs = divisors.includes(groupSize) ? groupSize : (divisors[0] ?? 2);
   const safeAdv = Math.min(Math.max(1, advPerGroup), Math.max(1, safeGs - 1));
 
-  const projOut = kind === 'liga'
-    ? (input / safeGs) * safeAdv
-    : input / 2;
+  const projOut = isFinal ? 1 : (kind === 'liga' ? (input / safeGs) * safeAdv : input / 2);
 
   const canKo = input % 2 === 0;
-  const canLiga = divisors.length > 0;
+  const canLiga = !isFinal && divisors.length > 0;
+  const effectiveKind: 'liga' | 'ko' = isFinal ? 'ko' : kind;
 
   const submit = () => {
-    if (kind === 'liga') onAdd({ kind: 'liga', groupSize: safeGs, advancePerGroup: safeAdv });
+    if (effectiveKind === 'liga') onAdd({ kind: 'liga', groupSize: safeGs, advancePerGroup: safeAdv });
     else onAdd({ kind: 'ko', legs, awayGoalsRule: legs >= 2 ? awayGoals : undefined });
   };
 
   return (
-    <div className="border-2 border-vga-yellow bg-vga-blue/10 p-3 flex flex-col gap-2">
-      <div className="text-vga-yellow text-[10px] uppercase font-bold">Siguiente ronda · {input} equipos disponibles</div>
-
-      <div className="flex gap-2">
-        <button disabled={!canLiga} onClick={() => setKind('liga')}
-          className={`px-3 py-1.5 text-[10px] uppercase font-bold border-2 ${kind === 'liga' && canLiga ? 'bg-vga-yellow text-vga-black border-vga-bright-white' : 'bg-vga-black text-vga-cyan border-vga-blue hover:border-vga-yellow'} ${!canLiga ? 'opacity-40' : ''}`}>
-          Liga / grupos
-        </button>
-        <button disabled={!canKo} onClick={() => setKind('ko')}
-          className={`px-3 py-1.5 text-[10px] uppercase font-bold border-2 ${kind === 'ko' && canKo ? 'bg-vga-yellow text-vga-black border-vga-bright-white' : 'bg-vga-black text-vga-cyan border-vga-blue hover:border-vga-yellow'} ${!canKo ? 'opacity-40' : ''}`}>
-          Eliminatoria
-        </button>
+    <div className={`border-2 ${isFinal ? 'border-vga-yellow shadow-[3px_3px_0px_0px_rgba(255,255,85,0.4)]' : 'border-vga-yellow'} bg-vga-blue/10 p-3 flex flex-col gap-2`}>
+      <div className="text-vga-yellow text-[10px] uppercase font-bold">
+        {isFinal ? 'Final · 2 equipos disponibles' : `Siguiente ronda · ${input} equipos disponibles`}
       </div>
 
-      {kind === 'liga' && canLiga && (
+      {!isFinal && (
+        <div className="flex gap-2">
+          <button disabled={!canLiga} onClick={() => setKind('liga')}
+            className={`px-3 py-1.5 text-[10px] uppercase font-bold border-2 ${kind === 'liga' && canLiga ? 'bg-vga-yellow text-vga-black border-vga-bright-white' : 'bg-vga-black text-vga-cyan border-vga-blue hover:border-vga-yellow'} ${!canLiga ? 'opacity-40' : ''}`}>
+            Liga / grupos
+          </button>
+          <button disabled={!canKo} onClick={() => setKind('ko')}
+            className={`px-3 py-1.5 text-[10px] uppercase font-bold border-2 ${kind === 'ko' && canKo ? 'bg-vga-yellow text-vga-black border-vga-bright-white' : 'bg-vga-black text-vga-cyan border-vga-blue hover:border-vga-yellow'} ${!canKo ? 'opacity-40' : ''}`}>
+            Eliminatoria
+          </button>
+        </div>
+      )}
+
+      {effectiveKind === 'liga' && canLiga && (
         <div className="grid grid-cols-2 gap-3">
           <div className="flex flex-col gap-1">
             <span className="text-vga-gray text-[7px] uppercase tracking-widest">Tamaño grupo</span>
@@ -388,10 +398,10 @@ const NextRoundCard = ({ input, onAdd }: { input: number; onAdd: (d: StageDraft)
         </div>
       )}
 
-      {kind === 'ko' && canKo && (
+      {effectiveKind === 'ko' && canKo && (
         <div className="grid grid-cols-2 gap-3 items-end">
           <div className="flex flex-col gap-1">
-            <span className="text-vga-gray text-[7px] uppercase tracking-widest">Partidos por eliminatoria</span>
+            <span className="text-vga-gray text-[7px] uppercase tracking-widest">{isFinal ? 'Partidos de la final' : 'Partidos por eliminatoria'}</span>
             <div className="flex gap-1">
               {[1, 2, 3, 4].map(n => (
                 <button key={n} onClick={() => setLegs(n as 1 | 2 | 3 | 4)}
@@ -411,10 +421,12 @@ const NextRoundCard = ({ input, onAdd }: { input: number; onAdd: (d: StageDraft)
       )}
 
       <div className="flex items-center justify-between gap-2 border-t border-vga-blue pt-2 mt-1">
-        <span className="text-vga-cyan text-[9px] uppercase">Pasan {projOut} equipo{projOut === 1 ? '' : 's'}</span>
+        <span className="text-vga-cyan text-[9px] uppercase">
+          {isFinal ? 'El ganador es el campeón' : `Pasan ${projOut} equipo${projOut === 1 ? '' : 's'}`}
+        </span>
         <button onClick={submit}
           className="bg-vga-light-green text-vga-black px-3 py-1.5 text-[10px] uppercase font-bold border-2 border-vga-bright-white hover:bg-vga-bright-white">
-          + Añadir ronda
+          {isFinal ? 'Configurar final' : '+ Añadir ronda'}
         </button>
       </div>
     </div>
