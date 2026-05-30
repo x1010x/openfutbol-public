@@ -6,6 +6,7 @@ import { PlayerName } from './PlayerName';
 import { PlayerPhoto } from './PlayerPhoto';
 import { TeamCrest } from './TeamCrest';
 import { LeagueTable } from './LeagueTable';
+import { SeasonStatsTable } from './SeasonStatsTable';
 import type { StatKey } from './StatDrillDown';
 import { useT } from '../i18n';
 
@@ -560,6 +561,15 @@ export const EndOfSeasonView = ({ league, onContinueSameTeam, onAdvanceAndChange
           )}
         </Panel>
       </div>
+
+      {/* Full sortable season stats table */}
+      <Panel title="Estadísticas completas">
+        <SeasonStatsTable
+          teams={teams}
+          seasonYear={league.year}
+          onPlayerClick={onPlayerClick}
+        />
+      </Panel>
 
       {/* Pro Manager flavour */}
       {gameMode === 'promanager' && !hideActions && (
