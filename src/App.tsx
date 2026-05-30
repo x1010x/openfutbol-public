@@ -43,6 +43,7 @@ import { MessageModal } from './components/MessageModal';
 import { PlayerNegotiationModal } from './components/PlayerNegotiationModal';
 import { TournamentSetupView } from './components/TournamentSetupView';
 import { BracketView } from './components/BracketView';
+import { TournamentRoundResultsModal } from './components/TournamentRoundResultsModal';
 import { createCopaTournament, advanceRound, saveTournament, loadTournament } from './store/tournamentStore';
 import type { TournamentState } from './store/tournamentStore';
 import { BoardAlertModal } from './components/BoardAlertModal';
@@ -151,6 +152,7 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
   const [showPlayFlow, setShowPlayFlow] = useState(false);
   const [showTournamentFlow, setShowTournamentFlow] = useState(false);
   const [tournament, setTournament] = useState<TournamentState | null>(() => loadTournament());
+  const [tournamentRoundRecap, setTournamentRoundRecap] = useState<number | null>(null);
   const [showInstructions, setShowInstructions] = useState(false);
   const [showColaborar, setShowColaborar] = useState(false);
   const [instructionsScroll, setInstructionsScroll] = useState<'changelog' | 'engine' | undefined>(undefined);
@@ -1844,8 +1846,12 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
       return (
         <BracketView
           state={tournament}
-          onAdvanceRound={() => setTournament(prev => prev ? advanceRound(prev) : null)}
-          onExit={() => { setTournament(null); setShowTournamentFlow(false); }}
+          onAdvanceRound={() => {
+            const playedRound = tournament.currentRound;
+            setTournament(prev => prev ? advanceRound(prev) : null);
+            setTournamentRoundRecap(playedRound);
+          }}
+          onExit={() => { setTournament(null); setShowTournamentFlow(false); setTournamentRoundRecap(null); }}
         />
       );
     }
@@ -2828,6 +2834,14 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
         <ProManagerTutorialModal
           managerName={league.managerName ?? ''}
           onClose={() => setShowProManagerTutorial(false)}
+        />
+      )}
+
+      {tournament && tournamentRoundRecap !== null && (
+        <TournamentRoundResultsModal
+          state={tournament}
+          justPlayedRound={tournamentRoundRecap}
+          onClose={() => setTournamentRoundRecap(null)}
         />
       )}
 
