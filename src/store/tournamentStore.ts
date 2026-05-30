@@ -9,7 +9,7 @@ import type { Team } from '../types/game.d.ts';
 import { calculateTeamStrength } from '../engine/simEngine';
 import { engineSettings } from '../engine/engineSettings';
 
-export const MAX_TEAMS = 64;
+export const MAX_TEAMS = 128;
 export const MAX_GROUP_SIZE = 16;
 export const MAX_LEGS = 4;
 
