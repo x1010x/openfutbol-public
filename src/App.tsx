@@ -41,6 +41,10 @@ import { PitchDiagram } from './components/PitchDiagram';
 import { StatDrillDown } from './components/StatDrillDown';
 import { MessageModal } from './components/MessageModal';
 import { PlayerNegotiationModal } from './components/PlayerNegotiationModal';
+import { TournamentSetupView } from './components/TournamentSetupView';
+import { BracketView } from './components/BracketView';
+import { createCopaTournament, advanceRound, saveTournament, loadTournament } from './store/tournamentStore';
+import type { TournamentState } from './store/tournamentStore';
 import { BoardAlertModal } from './components/BoardAlertModal';
 import { DisclaimerView } from './components/DisclaimerView';
 import { SwapModal } from './components/SwapModal';
@@ -145,6 +149,8 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
   const [showPreview, setShowPreview] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [showPlayFlow, setShowPlayFlow] = useState(false);
+  const [showTournamentFlow, setShowTournamentFlow] = useState(false);
+  const [tournament, setTournament] = useState<TournamentState | null>(() => loadTournament());
   const [showInstructions, setShowInstructions] = useState(false);
   const [showColaborar, setShowColaborar] = useState(false);
   const [instructionsScroll, setInstructionsScroll] = useState<'changelog' | 'engine' | undefined>(undefined);
@@ -257,6 +263,9 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
       delete document.body.dataset.theme;
     }
   }, [theme]);
+
+  // Persist tournament state to its own localStorage key.
+  useEffect(() => { saveTournament(tournament); }, [tournament]);
 
 
   const showPlayerDetail = (playerId: string) => {
@@ -1829,6 +1838,35 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
       return <PackLoaderView onBack={() => setView('BACKUP')} />;
     }
 
+    // Tournament flow: a live tournament always takes priority over league
+    // setup/menu views. Setup view only when explicitly opened.
+    if (tournament) {
+      return (
+        <BracketView
+          state={tournament}
+          onAdvanceRound={() => setTournament(prev => prev ? advanceRound(prev) : null)}
+          onExit={() => { setTournament(null); setShowTournamentFlow(false); }}
+        />
+      );
+    }
+    if (showTournamentFlow) {
+      return (
+        <TournamentSetupView
+          onBack={() => setShowTournamentFlow(false)}
+          onConfirm={(name, clubIds, userClubId) => {
+            if (!pack) return;
+            const teams = clubIds
+              .map(id => pack.clubs.find(c => c.id === id))
+              .filter((c): c is NonNullable<typeof c> => Boolean(c))
+              .map(c => buildTeamFromPackClub(c, pack, new Date().getFullYear()));
+            if (teams.length !== clubIds.length) return;
+            setTournament(createCopaTournament(name, teams, userClubId));
+            setShowTournamentFlow(false);
+          }}
+        />
+      );
+    }
+
     if (showInstructions) {
       return <InstructionsView onBack={() => { setShowInstructions(false); setInstructionsScroll(undefined); }} onColaborar={() => { setShowInstructions(false); setShowColaborar(true); }} scrollTo={instructionsScroll} />;
     }
@@ -1999,6 +2037,12 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
               className="w-full bg-vga-magenta text-vga-bright-white py-4 text-sm border-b-4 border-r-4 border-vga-black font-bold uppercase tracking-widest hover:opacity-90"
             >
               {t('btn.proManager')}
+            </button>
+            <button
+              onClick={() => setShowTournamentFlow(true)}
+              className="w-full bg-vga-cyan text-vga-black py-4 text-sm border-b-4 border-r-4 border-vga-black font-bold uppercase tracking-widest hover:opacity-90"
+            >
+              Torneo
             </button>
             {(league.managerCareer?.length ?? 0) > 0 && (
               <button
