@@ -1,7 +1,7 @@
 import type { Player } from '../types/game.d.ts';
 import type { LeagueState, TeamRecords, TransferRecord } from '../store/leagueStore';
 import { MAX_SEASON_YEAR } from '../store/leagueStore';
-import { playerAge } from '../data/economy';
+import { playerAge, computeSeasonPrizes, formatEuros } from '../data/economy';
 import { PlayerName } from './PlayerName';
 import { PlayerPhoto } from './PlayerPhoto';
 import { TeamCrest } from './TeamCrest';
@@ -83,6 +83,9 @@ export const EndOfSeasonView = ({ league, onContinueSameTeam, onAdvanceAndChange
   const champion = sortedStats[0];
   const championTeam = teams.find(t => t.id === champion?.teamId) ?? null;
   const userIsChampion = champion?.teamId === userTeamId;
+
+  // Season prize distribution (100M pool — 30M/20M/prorated).
+  const prizeMap = computeSeasonPrizes(sortedStats.map(s => s.teamId));
 
   // ── Player pools ─────────────────────────────────────────────────────────
   type EnrichedPlayer = Player & { teamName: string; teamId: string };
@@ -323,6 +326,31 @@ export const EndOfSeasonView = ({ league, onContinueSameTeam, onAdvanceAndChange
             onCellClick={onCellClick}
             onTeamClick={onTeamClick}
           />
+        </Panel>
+
+        <Panel title="Premios temporada">
+          <div className="text-vga-cyan text-[7px] uppercase tracking-widest mb-1">
+            Reparto 100M €
+          </div>
+          <div className="flex flex-col gap-0.5 text-[8px] font-mono max-h-72 overflow-y-auto pr-1">
+            {sortedStats.map((s, i) => {
+              const prize = prizeMap[s.teamId] ?? 0;
+              const tm = teams.find(t => t.id === s.teamId);
+              const isUser = s.teamId === userTeamId;
+              const posColor = i === 0 ? 'text-vga-yellow' : i === 1 ? 'text-vga-bright-white' : i === 2 ? 'text-vga-light-cyan' : 'text-vga-gray';
+              return (
+                <div
+                  key={s.teamId}
+                  onClick={onTeamClick ? () => onTeamClick(s.teamId) : undefined}
+                  className={`grid grid-cols-[20px_1fr_auto] items-center gap-1 px-1 py-0.5 ${isUser ? 'bg-vga-blue/30 border-l-2 border-vga-yellow' : ''} ${onTeamClick ? 'cursor-pointer hover:bg-vga-blue/20' : ''}`}
+                >
+                  <span className={`font-bold ${posColor}`}>{i + 1}.</span>
+                  <span className="text-vga-bright-white uppercase truncate">{tm?.name ?? s.name}</span>
+                  <span className="text-vga-light-green font-bold">{formatEuros(prize)}</span>
+                </div>
+              );
+            })}
+          </div>
         </Panel>
 
         <Panel title="Récords">

@@ -5,7 +5,7 @@ import { getTeamsForYearWithOverflow, getFreeAgents, getEligibleFreeAgents, adva
 import { generateSchedule } from '../engine/calendar';
 import { pickBestFormation, computePositionWeightedMedia } from '../engine/formations';
 import type { Jornada } from '../engine/calendar';
-import { computeAttendance, computePrice, teamWeeklySalary } from '../data/economy';
+import { computeAttendance, computePrice, teamWeeklySalary, computeSeasonPrizes } from '../data/economy';
 
 export type PosGroup = 'POR' | 'DEF' | 'MED' | 'DEL';
 
@@ -181,6 +181,7 @@ export interface SeasonHistoryEntry {
   pichichi: SeasonAward | null;
   zamora: SeasonAward | null;
   mejorPorEquipo: Record<string, { playerName: string; ratingSum: number }>;
+  prizes?: Record<string, number>;
 }
 
 export interface ManagerSeasonRecord {
@@ -1017,6 +1018,16 @@ export const advanceSeason = (state: LeagueState): LeagueState => {
       formation,
     };
   });
+
+  // Apply season prize money (100M pool: 30M champion, 20M runner-up,
+  // remaining 50M prorated 3rd-down-to-last).
+  const standingOrder = finalStandings.map(s => s.teamId);
+  const prizes = computeSeasonPrizes(standingOrder);
+  for (let i = 0; i < newTeams.length; i++) {
+    const prize = prizes[newTeams[i].id] ?? 0;
+    if (prize > 0) newTeams[i] = { ...newTeams[i], budget: newTeams[i].budget + prize };
+  }
+  historyEntry.prizes = prizes;
 
   const rosteredDbIds = new Set<string>();
   for (const team of newTeams) {

@@ -116,3 +116,29 @@ export const computeAttendance = (homeTeam: Team, awayTeam: Team): AttendanceRes
 export const teamWeeklySalary = (team: Team, seasonYear: number): number => {
   return team.players.reduce((sum, p) => sum + playerWeeklySalary(p, seasonYear), 0);
 };
+
+// End-of-season prize money. Fixed pot of 100M split: 30M to the champion,
+// 20M to the runner-up, and the remaining 50M prorated linearly from 3rd
+// down to last (3rd gets the most, last gets the least).
+// Returns euros (rounded to 100k for tidy numbers in the UI).
+export const SEASON_PRIZE_POOL = 100_000_000;
+export const SEASON_PRIZE_FIRST = 30_000_000;
+export const SEASON_PRIZE_SECOND = 20_000_000;
+export const computeSeasonPrizes = (teamIdsByStanding: string[]): Record<string, number> => {
+  const out: Record<string, number> = {};
+  const n = teamIdsByStanding.length;
+  if (n === 0) return out;
+  if (n >= 1) out[teamIdsByStanding[0]] = SEASON_PRIZE_FIRST;
+  if (n >= 2) out[teamIdsByStanding[1]] = SEASON_PRIZE_SECOND;
+  const rest = teamIdsByStanding.slice(2);
+  if (rest.length === 0) return out;
+  const remaining = SEASON_PRIZE_POOL - SEASON_PRIZE_FIRST - (n >= 2 ? SEASON_PRIZE_SECOND : 0);
+  const k = rest.length;
+  // Linear weights k, k-1, ..., 1 — top of the rest takes the largest share.
+  const sumWeights = (k * (k + 1)) / 2;
+  rest.forEach((id, i) => {
+    const w = k - i;
+    out[id] = Math.round((remaining * (w / sumWeights)) / 100_000) * 100_000;
+  });
+  return out;
+};
