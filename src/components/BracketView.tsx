@@ -1,4 +1,4 @@
-import type { TournamentState } from '../store/tournamentStore';
+import type { TournamentState, TournamentTie } from '../store/tournamentStore';
 import { roundLabel } from '../store/tournamentStore';
 import { TeamCrest } from './TeamCrest';
 
@@ -10,22 +10,49 @@ interface Props {
 
 export const BracketView = ({ state, onAdvanceRound, onExit }: Props) => {
   const teamById = (id: string | null) => id ? state.teams.find(t => t.id === id) : null;
-  const rounds: number[] = [];
-  for (let r = 0; r < state.totalRounds; r++) rounds.push(r);
-
   const champion = state.champion ? teamById(state.champion) : null;
   const userTeam = teamById(state.userTeamId);
   const userIsChampion = state.champion === state.userTeamId;
 
-  // User still alive? (No tie this round where user lost.)
   const userOut = state.ties.some(t => t.played && t.winnerTeamId && t.winnerTeamId !== state.userTeamId
     && (t.homeTeamId === state.userTeamId || t.awayTeamId === state.userTeamId));
+
+  // Split each round's ties into a left half and right half. The final lives
+  // alone in the center column. For an N-round tournament:
+  //   - non-final rounds (0..N-2): first half of slots → left, second → right
+  //   - final round (N-1): single tie → center
+  const nonFinalRounds: number[] = [];
+  for (let r = 0; r < state.totalRounds - 1; r++) nonFinalRounds.push(r);
+  const finalRound = state.totalRounds - 1;
+  const finalTie = state.ties.find(t => t.round === finalRound) ?? null;
+
+  const tiesInRound = (r: number) => state.ties.filter(t => t.round === r).sort((a, b) => a.slot - b.slot);
+
+  // For each round, left half = first N/2 ties, right half = last N/2 ties.
+  // We render left rounds in ascending order (Octavos → Cuartos → SF) and
+  // right rounds in DESCENDING order (SF → Cuartos → Octavos) so the bracket
+  // flows toward the centre Final.
+  const leftRounds = nonFinalRounds.map(r => {
+    const ties = tiesInRound(r);
+    return ties.slice(0, Math.ceil(ties.length / 2));
+  });
+  const rightRoundsAsc = nonFinalRounds.map(r => {
+    const ties = tiesInRound(r);
+    return ties.slice(Math.ceil(ties.length / 2));
+  });
+  // Right side renders in reverse: outermost (R1) on the far right.
+  const rightRoundsRev = [...rightRoundsAsc].reverse();
+  const rightRoundLabelsRev = [...nonFinalRounds].reverse();
+
+  // The bracket lives in a CSS grid. Total columns = leftRounds.length + 1
+  // (final) + rightRounds.length. For 16 teams: 3 left + 1 final + 3 right = 7.
+  const columns = leftRounds.length + 1 + rightRoundsRev.length;
 
   return (
     <div className="w-full flex flex-col gap-3 animate-in fade-in duration-300">
       {/* Header */}
       <div className="bg-vga-blue p-2 border-2 border-vga-white flex justify-between items-center vga-panel">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-wrap">
           <h2 className="text-vga-yellow text-xs uppercase font-bold">{state.name}</h2>
           <span className="text-vga-bright-white text-[9px] uppercase">{state.teams.length} equipos</span>
           {userTeam && (
@@ -60,48 +87,63 @@ export const BracketView = ({ state, onAdvanceRound, onExit }: Props) => {
         </div>
       )}
 
-      {/* Bracket */}
+      {/* Two-sided bracket */}
       <div className="bg-vga-black border-4 border-vga-blue p-3 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] overflow-x-auto">
-        <div className="flex gap-3 min-w-fit">
-          {rounds.map(r => {
-            const ties = state.ties.filter(t => t.round === r).sort((a, b) => a.slot - b.slot);
-            const isCurrent = r === state.currentRound;
-            return (
-              <div key={r} className="flex flex-col gap-2 min-w-[180px]">
-                <div className={`text-center text-[9px] uppercase tracking-widest py-1 border-2 ${isCurrent ? 'border-vga-yellow text-vga-yellow' : 'border-vga-blue text-vga-cyan'}`}>
-                  {roundLabel(state.totalRounds, r)}
-                </div>
-                <div className="flex flex-col gap-2">
-                  {ties.map(tie => {
-                    const home = teamById(tie.homeTeamId);
-                    const away = teamById(tie.awayTeamId);
-                    const userInTie = tie.homeTeamId === state.userTeamId || tie.awayTeamId === state.userTeamId;
-                    const winnerIsHome = tie.winnerTeamId && tie.winnerTeamId === tie.homeTeamId;
-                    const winnerIsAway = tie.winnerTeamId && tie.winnerTeamId === tie.awayTeamId;
-                    return (
-                      <div
-                        key={tie.id}
-                        className={`border-2 ${userInTie ? 'border-vga-yellow' : tie.played ? 'border-vga-blue' : 'border-vga-gray'} bg-vga-black`}
-                      >
-                        <Row
-                          team={home}
-                          score={tie.homeScore}
-                          loser={tie.played && !winnerIsHome}
-                          winner={!!winnerIsHome}
-                        />
-                        <Row
-                          team={away}
-                          score={tie.awayScore}
-                          loser={tie.played && !winnerIsAway}
-                          winner={!!winnerIsAway}
-                        />
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            );
-          })}
+        <div
+          className="grid gap-3 min-w-fit"
+          style={{ gridTemplateColumns: `repeat(${columns}, minmax(180px, 1fr))` }}
+        >
+          {/* Headers row */}
+          {nonFinalRounds.map(r => (
+            <RoundHeader
+              key={`hl-${r}`}
+              label={roundLabel(state.totalRounds, r)}
+              current={r === state.currentRound}
+            />
+          ))}
+          <RoundHeader
+            label={roundLabel(state.totalRounds, finalRound)}
+            current={finalRound === state.currentRound}
+            golden
+          />
+          {rightRoundLabelsRev.map(r => (
+            <RoundHeader
+              key={`hr-${r}`}
+              label={roundLabel(state.totalRounds, r)}
+              current={r === state.currentRound}
+            />
+          ))}
+
+          {/* Bracket body row */}
+          {leftRounds.map((ties, idx) => (
+            <Column
+              key={`l-${idx}`}
+              ties={ties}
+              teamById={teamById}
+              userTeamId={state.userTeamId}
+              align="left"
+            />
+          ))}
+          {/* Final column (vertically centered) */}
+          <div className="flex items-center justify-center">
+            {finalTie && (
+              <TieCard
+                tie={finalTie}
+                teamById={teamById}
+                userTeamId={state.userTeamId}
+                emphasis
+              />
+            )}
+          </div>
+          {rightRoundsRev.map((ties, idx) => (
+            <Column
+              key={`r-${idx}`}
+              ties={ties}
+              teamById={teamById}
+              userTeamId={state.userTeamId}
+              align="right"
+            />
+          ))}
         </div>
       </div>
 
@@ -116,6 +158,52 @@ export const BracketView = ({ state, onAdvanceRound, onExit }: Props) => {
           </button>
         </div>
       )}
+    </div>
+  );
+};
+
+const RoundHeader = ({ label, current, golden }: { label: string; current: boolean; golden?: boolean }) => (
+  <div className={`text-center text-[9px] uppercase tracking-widest py-1 border-2 ${
+    golden ? 'border-vga-yellow text-vga-yellow bg-vga-blue/30 font-bold'
+      : current ? 'border-vga-yellow text-vga-yellow'
+      : 'border-vga-blue text-vga-cyan'
+  }`}>
+    {label}
+  </div>
+);
+
+const Column = ({ ties, teamById, userTeamId, align }: {
+  ties: TournamentTie[];
+  teamById: (id: string | null) => { id: string; name: string; colors?: string[] } | null | undefined;
+  userTeamId: string;
+  align: 'left' | 'right';
+}) => (
+  // Evenly distribute ties vertically so later rounds line up between pairs
+  // from the previous round.
+  <div className={`flex flex-col justify-around gap-2 ${align === 'right' ? 'items-end' : 'items-start'}`}>
+    {ties.map(tie => (
+      <TieCard key={tie.id} tie={tie} teamById={teamById} userTeamId={userTeamId} />
+    ))}
+  </div>
+);
+
+const TieCard = ({ tie, teamById, userTeamId, emphasis }: {
+  tie: TournamentTie;
+  teamById: (id: string | null) => { id: string; name: string; colors?: string[] } | null | undefined;
+  userTeamId: string;
+  emphasis?: boolean;
+}) => {
+  const home = teamById(tie.homeTeamId);
+  const away = teamById(tie.awayTeamId);
+  const userInTie = tie.homeTeamId === userTeamId || tie.awayTeamId === userTeamId;
+  const winnerIsHome = tie.winnerTeamId && tie.winnerTeamId === tie.homeTeamId;
+  const winnerIsAway = tie.winnerTeamId && tie.winnerTeamId === tie.awayTeamId;
+  return (
+    <div
+      className={`w-full border-2 ${userInTie ? 'border-vga-yellow' : tie.played ? 'border-vga-blue' : 'border-vga-gray'} bg-vga-black ${emphasis ? 'shadow-[3px_3px_0px_0px_rgba(255,255,85,0.5)]' : ''}`}
+    >
+      <Row team={home} score={tie.homeScore} loser={tie.played && !winnerIsHome} winner={!!winnerIsHome} />
+      <Row team={away} score={tie.awayScore} loser={tie.played && !winnerIsAway} winner={!!winnerIsAway} />
     </div>
   );
 };
