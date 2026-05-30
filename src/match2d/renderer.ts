@@ -4,8 +4,8 @@
 // handle holding every sprite map, overlay ref and the mutable runtime cursors
 // the animator mutates each frame. Pure setup — no per-frame logic here.
 
-import { Application, Container, Sprite, AnimatedSprite, Texture, Rectangle } from 'pixi.js';
-import { remapWithPalette, loadAtlasWithPalette, type SpriteAtlas } from './sprites';
+import { Application, Container, Sprite, AnimatedSprite, Texture, Rectangle, Graphics } from 'pixi.js';
+import { remapWithPalette, loadAtlasWithPalette, loadImageTexture, type SpriteAtlas } from './sprites';
 import { BASE_PAL, KIT_MADRID, KIT_BARCA, KIT_GK, KIT_GK_AWAY } from './palette';
 import { buildKitPalette, spriteForStyle } from './kit';
 import type { KitStyle } from '../types/game.d.ts';
@@ -16,9 +16,12 @@ import {
 } from './states';
 import {
   FIELD_SCALE, PLAYER_SCALE, CANVAS_W, CANVAS_H, BASE, PLAY_X,
-  SCORE_BOX_HOME, SCORE_BOX_AWAY, SCORE_DIGIT_W, SCORE_DIGIT_SCALE,
+  SCORE_BOX_LEFT, SCORE_BOX_RIGHT, SCORE_DIGIT_W, SCORE_DIGIT_SCALE,
   HALF_INDICATOR_POS, SPR_2DO, SPR_CAMBIO,
   FONT2_CELL_W, font2Cell, MINUTE_POS, CARRIER_NAME_POS,
+  ENERGY_BAR_POS, SPR_ENERGY_LIGHT, SPR_ENERGY_DARK,
+  CREST_LEFT_POS, CREST_RIGHT_POS, CREST_SIZE,
+  BLUE_BAR_1, BLUE_BAR_2, SPR_BLACK_BAR,
   type SpriteEntry,
 } from './layout';
 
@@ -90,6 +93,18 @@ export interface Scene {
   minuteOverlay: Container;
   nameOverlay: Container;
   playerNames: Record<string, string>;
+  // ENERGIA bar: light-red fill whose width the animator scales to the current
+  // carrier's energy. `energyRate` = stamina lost per played minute (fraction of
+  // full) per id; `entryEngineMs` = the engine timestamp each subbed-on player
+  // came on (starters absent → 0) so their bar drains from their own clock.
+  // Engine ms (not the displayed clock) keeps the drain strictly monotonic
+  // across the half-time stoppage dip.
+  energyBarFill: Sprite;
+  energyRate: Record<string, number>;
+  entryEngineMs: Map<PlayerId, number>;
+  // Engine time each player got injured (earliest). Once past it, the carrier's
+  // ENERGIA bar is forced fully empty as a "sub him off" cue to the user.
+  injuryMs: Map<PlayerId, number>;
   rt: SceneRuntime;
 }
 
@@ -149,13 +164,67 @@ export interface SceneKits {
   away: { colors?: string[]; style?: KitStyle };
 }
 
+// Try the real team crest from assets/teams/<id>.<ext> (same extension cascade
+// as the manager's TeamCrest component). Returns null when none exists so the
+// caller draws a colour-jersey fallback instead.
+async function loadCrestTexture(teamId: string | undefined): Promise<Texture | null> {
+  if (!teamId) return null;
+  for (const ext of ['png', 'jpeg', 'jpg', 'ico']) {
+    try {
+      return await loadImageTexture(`${BASE}assets/teams/${teamId}.${ext}`);
+    } catch { /* try next extension */ }
+  }
+  return null;
+}
+
+// Crest display object centred at `pos`: the real crest scaled object-contain
+// into a CREST_SIZE square, or a simple two-tone jersey square from the kit
+// colours when no image exists.
+function buildCrest(tex: Texture | null, colors: string[] | undefined, pos: [number, number]): Container {
+  const c = new Container();
+  c.x = pos[0];
+  c.y = pos[1];
+  c.zIndex = 9000;
+  if (tex) {
+    const sp = new Sprite(tex);
+    sp.anchor.set(0.5);
+    sp.scale.set(CREST_SIZE / Math.max(tex.width, tex.height));
+    c.addChild(sp);
+  } else {
+    const hex = (s: string | undefined, d: number) => {
+      const v = parseInt((s ?? '').replace('#', ''), 16);
+      return Number.isFinite(v) && v >= 0 ? v : d;
+    };
+    const shirtL = hex(colors?.[0], 0x888888);
+    const shirtR = hex(colors?.[1] ?? colors?.[0], shirtL);
+    const s = CREST_SIZE;
+    const g = new Graphics();
+    g.rect(-s / 2, -s / 2, s / 2, s).fill(shirtL);
+    g.rect(0, -s / 2, s / 2, s).fill(shirtR);
+    g.rect(-s / 2, -s / 2, s, s).stroke({ width: 2, color: 0x000000 });
+    c.addChild(g);
+  }
+  return c;
+}
+
 export async function buildScene(
   app: Application,
   timeline: MatchTimeline,
   isAlive: () => boolean,
   kits?: SceneKits,
   playerNames?: Record<string, string>,
+  energyRate?: Record<string, number>,
+  // True when the user plays this match away: flips the home/away → board-side
+  // mapping so the user's team stays in the RIGHT box. See SCORE_BOX_* in layout.
+  flipScoreboard?: boolean,
 ): Promise<Scene | null> {
+  // Side each team's box + crest sits on. Default (user home): home RIGHT, away
+  // LEFT. When the user is the visitante, flip so the user (away) is on the RIGHT
+  // — and the away team, which kicks off on the right of the pitch, matches it.
+  const homeBoxPos   = flipScoreboard ? SCORE_BOX_LEFT  : SCORE_BOX_RIGHT;
+  const awayBoxPos   = flipScoreboard ? SCORE_BOX_RIGHT : SCORE_BOX_LEFT;
+  const homeCrestPos = flipScoreboard ? CREST_LEFT_POS  : CREST_RIGHT_POS;
+  const awayCrestPos = flipScoreboard ? CREST_RIGHT_POS : CREST_LEFT_POS;
   const spriteMap = new Map<PlayerId, SpriteEntry>();
   const animMap = new Map<PlayerId, PlayerAnim>();
   const gkAnimMap = new Map<PlayerId, GKAnim>();
@@ -430,17 +499,44 @@ export async function buildScene(
 
   const homeScoreBox = new Container();
   homeScoreBox.zIndex = 9000;
-  homeScoreBox.x = SCORE_BOX_HOME[0];
-  homeScoreBox.y = SCORE_BOX_HOME[1];
+  homeScoreBox.x = homeBoxPos[0];
+  homeScoreBox.y = homeBoxPos[1];
   renderScoreBox(homeScoreBox, 0, scoreDigitTex);
   app.stage.addChild(homeScoreBox);
 
   const awayScoreBox = new Container();
   awayScoreBox.zIndex = 9000;
-  awayScoreBox.x = SCORE_BOX_AWAY[0];
-  awayScoreBox.y = SCORE_BOX_AWAY[1];
+  awayScoreBox.x = awayBoxPos[0];
+  awayScoreBox.y = awayBoxPos[1];
   renderScoreBox(awayScoreBox, 0, scoreDigitTex);
   app.stage.addChild(awayScoreBox);
+
+  // Team crests beside the boxes: left = away (visitante), right = home (local).
+  // Real images from assets/teams, colour-jersey fallback otherwise.
+  const [homeCrestTex, awayCrestTex] = await Promise.all([
+    loadCrestTexture(timeline.homeTeamId),
+    loadCrestTexture(timeline.awayTeamId),
+  ]);
+  if (!isAlive()) return null;
+  app.stage.addChild(buildCrest(awayCrestTex, kits?.away.colors, awayCrestPos));
+  app.stage.addChild(buildCrest(homeCrestTex, kits?.home.colors, homeCrestPos));
+
+  // Mask the two baked-in dark-blue "interactive mode" bars with the GRAFICOS
+  // solid black bar, resized to each bar's exact 70×6 so only the blue is hidden
+  // (the black blends into the black banner).
+  const blackBarTex = new Texture({
+    source: graficosTex.source,
+    frame: new Rectangle(SPR_BLACK_BAR.x, SPR_BLACK_BAR.y, SPR_BLACK_BAR.w, SPR_BLACK_BAR.h),
+  });
+  for (const bar of [BLUE_BAR_1, BLUE_BAR_2]) {
+    const mask = new Sprite(blackBarTex);
+    mask.anchor.set(0, 0);
+    mask.x = bar.x * FIELD_SCALE;
+    mask.y = bar.y * FIELD_SCALE;
+    mask.scale.set((bar.w / SPR_BLACK_BAR.w) * FIELD_SCALE, (bar.h / SPR_BLACK_BAR.h) * FIELD_SCALE);
+    mask.zIndex = 8000;
+    app.stage.addChild(mask);
+  }
 
   // "2do" half indicator — covers the painted "1er" in the second half.
   const halfIndicator = new Sprite(new Texture({
@@ -482,6 +578,44 @@ export async function buildScene(
   nameOverlay.x = CARRIER_NAME_POS[0];
   nameOverlay.y = CARRIER_NAME_POS[1];
   app.stage.addChild(nameOverlay);
+
+  // ENERGIA bar over the CAMP placeholder: a dark-red track at full width, then
+  // a light-red fill the animator scales in X to the carrier's energy. Both
+  // anchored top-left at the placeholder so the fill grows from the left.
+  const energyTrack = new Sprite(new Texture({
+    source: graficosTex.source,
+    frame: new Rectangle(SPR_ENERGY_DARK.x, SPR_ENERGY_DARK.y, SPR_ENERGY_DARK.w, SPR_ENERGY_DARK.h),
+  }));
+  energyTrack.anchor.set(0, 0);
+  energyTrack.scale.set(FIELD_SCALE);
+  energyTrack.x = ENERGY_BAR_POS[0];
+  energyTrack.y = ENERGY_BAR_POS[1];
+  energyTrack.zIndex = 9000;
+  app.stage.addChild(energyTrack);
+
+  const energyBarFill = new Sprite(new Texture({
+    source: graficosTex.source,
+    frame: new Rectangle(SPR_ENERGY_LIGHT.x, SPR_ENERGY_LIGHT.y, SPR_ENERGY_LIGHT.w, SPR_ENERGY_LIGHT.h),
+  }));
+  energyBarFill.anchor.set(0, 0);
+  energyBarFill.scale.set(FIELD_SCALE); // scale.x overwritten per frame
+  energyBarFill.x = ENERGY_BAR_POS[0];
+  energyBarFill.y = ENERGY_BAR_POS[1];
+  energyBarFill.zIndex = 9001;
+  app.stage.addChild(energyBarFill);
+
+  // Engine timestamp each subbed-on player entered, so their energy drains from
+  // their own clock (starters absent → treated as 0). Derived from 'sub' events.
+  const entryEngineMs = new Map<PlayerId, number>();
+  for (const ev of timeline.events) {
+    if (ev.kind === 'sub' && ev.actor) entryEngineMs.set(ev.actor, ev.t);
+  }
+
+  // Injury timestamps (event actor = the injured player). Earliest wins.
+  const injuryMs = new Map<PlayerId, number>();
+  for (const ev of timeline.events) {
+    if (ev.kind === 'injury' && ev.actor && !injuryMs.has(ev.actor)) injuryMs.set(ev.actor, ev.t);
+  }
 
   // "CAMBIO" overlay — flashes centre-pitch when a substitution is made.
   const cambioOverlay = new Container();
@@ -554,6 +688,10 @@ export async function buildScene(
     minuteOverlay,
     nameOverlay,
     playerNames: playerNames ?? {},
+    energyBarFill,
+    energyRate: energyRate ?? {},
+    entryEngineMs,
+    injuryMs,
     rt: {
       goalIdx: 0,
       homeScore: 0,

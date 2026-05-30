@@ -26,6 +26,14 @@ const INJURY_CHANCE_PER_MIN = 0.00025;
 const STAMINA_DECAY_BASE = 0.25;
 const STAMINA_DECAY_FIS = 0.15;
 
+// Stamina points an on-pitch player loses per played minute. Físico is the only
+// per-player driver (high físico lasts longer): físico 99 → 0.25/min, físico 0
+// → 0.40/min, then scaled by the engine-setting multiplier. Single source of
+// truth so the text-sim writeback and the 2D ENERGIA bar deplete identically.
+export function staminaDecayPerMin(physical: number): number {
+  return (STAMINA_DECAY_BASE + (1 - physical / 99) * STAMINA_DECAY_FIS) * engineSettings.staminaDecayMult;
+}
+
 const calcStoppage = (events: MatchEvent[], fromMin: number, toMin: number): number => {
   const half = events.filter(e => e.minute > fromMin && e.minute <= toMin);
   const goals    = half.filter(e => e.type === 'goal').length;
@@ -327,15 +335,13 @@ export const simulateMinute = (state: MatchState, userTeamId?: string): MatchSta
     if (homeSentOff.includes(pid) || homeInjuredInMatch.includes(pid)) continue;
     const p = homeTeam.players.find(pp => pp.id === pid);
     if (!p || !homeTeam.lineup.includes(pid)) continue;
-    const rate = (STAMINA_DECAY_BASE + (1 - p.stats.physical / 99) * STAMINA_DECAY_FIS) * engineSettings.staminaDecayMult;
-    newHomeStamina[pid] = Math.max(1, stam - rate);
+    newHomeStamina[pid] = Math.max(1, stam - staminaDecayPerMin(p.stats.physical));
   }
   for (const [pid, stam] of Object.entries(newAwayStamina)) {
     if (awaySentOff.includes(pid) || awayInjuredInMatch.includes(pid)) continue;
     const p = awayTeam.players.find(pp => pp.id === pid);
     if (!p || !awayTeam.lineup.includes(pid)) continue;
-    const rate = (STAMINA_DECAY_BASE + (1 - p.stats.physical / 99) * STAMINA_DECAY_FIS) * engineSettings.staminaDecayMult;
-    newAwayStamina[pid] = Math.max(1, stam - rate);
+    newAwayStamina[pid] = Math.max(1, stam - staminaDecayPerMin(p.stats.physical));
   }
 
   // Sorteo de lesiones

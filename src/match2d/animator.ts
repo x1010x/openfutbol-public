@@ -14,7 +14,7 @@ import {
   dirFromDelta, MOVE_THRESHOLD,
   type Dir8,
 } from './states';
-import { lerp, toCanvasX, toCanvasY, ballHeightLevel, applyAnim, toClockMs, normalizeFontText } from './layout';
+import { lerp, toCanvasX, toCanvasY, ballHeightLevel, applyAnim, toClockMs, normalizeFontText, FIELD_SCALE, ENERGY_BAR_MIN_FRAC } from './layout';
 import { renderScoreBox, renderFont, type Scene } from './renderer';
 
 export interface AnimatorCtx {
@@ -471,5 +471,29 @@ export function updateScene(scene: Scene, ticker: Ticker, ctx: AnimatorCtx): voi
     rt.lastCarrierId = carrierId;
     const raw = scene.playerNames[carrierId] ?? '';
     renderFont(scene.nameOverlay, normalizeFontText(raw), scene.fontTex, 'center');
+  }
+
+  // ENERGIA bar — drain the current carrier's bar from full by the manager's
+  // per-minute stamina rate, counted from their entry minute (subs drain from
+  // their own clock). Full while nobody has touched the ball yet.
+  const energyCarrier = rt.lastCarrierId;
+  if (energyCarrier) {
+    const injuredAt = scene.injuryMs.get(energyCarrier);
+    let frac: number;
+    if (injuredAt !== undefined && gt >= injuredAt) {
+      // Injured carrier: force the bar fully empty (no min-floor) as a clear
+      // "you should sub him off" cue — the AI already subs its own injured men.
+      frac = 0;
+    } else {
+      const rate = scene.energyRate[energyCarrier] ?? 0;
+      const entryMs = scene.entryEngineMs.get(energyCarrier) ?? 0;
+      // Played minutes from monotonic engine time: a full match (0→durationMs)
+      // maps to the nominal 90' the per-minute rate is calibrated against.
+      const played = Math.max(0, (gt - entryMs) / timeline.durationMs) * 90;
+      frac = Math.max(ENERGY_BAR_MIN_FRAC, Math.min(1, 1 - rate * played));
+    }
+    scene.energyBarFill.scale.x = FIELD_SCALE * frac;
+  } else {
+    scene.energyBarFill.scale.x = FIELD_SCALE;
   }
 }

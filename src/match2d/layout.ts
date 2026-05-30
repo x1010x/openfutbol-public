@@ -119,13 +119,27 @@ export const CANVAS_H = 480 * FIELD_SCALE;
 export const BASE = import.meta.env.BASE_URL;
 
 // Scoreboard overlays painted onto the CAMP banner (bottom strip). Coordinates
-// are the CENTRES of the two empty boxes in CAMP_indexed.png (source px),
-// scaled to canvas. The home score sits in the bottom-left box, the away score
-// in the bottom-right box; both stay fixed regardless of the second-half side
-// switch (the scoreboard is not mirrored). Source box borders: left x[66,117],
-// right x[522,573], both y[442,467].
-export const SCORE_BOX_HOME: [number, number] = [91.5 * FIELD_SCALE, 454.5 * FIELD_SCALE];
-export const SCORE_BOX_AWAY: [number, number] = [547.5 * FIELD_SCALE, 454.5 * FIELD_SCALE];
+// are the CENTRES of the two empty boxes in CAMP_indexed.png (source px), scaled
+// to canvas. The renderer assigns each team to a side per match: the USER's team
+// sits in the RIGHT box (the "local" slot), the opponent in the LEFT — so when
+// the user plays away the home/away→side mapping flips (see `flipScoreboard`).
+// Fixed for the whole match (not mirrored at half-time). Source box borders:
+// left x[66,117], right x[522,573], both y[442,467].
+export const SCORE_BOX_LEFT: [number, number] = [91.5 * FIELD_SCALE, 454.5 * FIELD_SCALE];
+export const SCORE_BOX_RIGHT: [number, number] = [547.5 * FIELD_SCALE, 454.5 * FIELD_SCALE];
+
+// Team crests beside the score boxes (real images from assets/teams, with a
+// colour-jersey fallback), one per side matching the boxes.
+export const CREST_LEFT_POS: [number, number] = [44 * FIELD_SCALE, 454.5 * FIELD_SCALE];   // left of left box
+export const CREST_RIGHT_POS: [number, number] = [596 * FIELD_SCALE, 454.5 * FIELD_SCALE]; // right of right box
+export const CREST_SIZE = 28 * FIELD_SCALE; // target square box (canvas px), object-contain
+
+// Two dark-blue "interactive mode" bars baked into CAMP (source) that have no
+// use in spectator mode; masked with the GRAFICOS solid black bar (resized to
+// each bar's exact 70×6 so nothing else is covered).
+export const BLUE_BAR_1 = { x: 146, y: 442, w: 70, h: 6 } as const;
+export const BLUE_BAR_2 = { x: 424, y: 442, w: 70, h: 6 } as const;
+export const SPR_BLACK_BAR = { x: 2358, y: 44, w: 36, h: 16 } as const;
 // Score digits drawn from BIGNUM (16×16 per glyph) at field scale.
 export const SCORE_DIGIT_W = 16;
 export const SCORE_DIGIT_SCALE = FIELD_SCALE;
@@ -138,6 +152,17 @@ export const HALF_INDICATOR_POS: [number, number] = [186.5 * FIELD_SCALE, 456 * 
 export const SPR_2DO = { x: 776, y: 44, w: 32, h: 16 } as const;
 // Source rectangle of the "CAMBIO" sprite inside GRAFICOS_indexed.png.
 export const SPR_CAMBIO = { x: 1900, y: 44, w: 88, h: 15 } as const;
+
+// ENERGIA bar: a dark-red placeholder (96×8) painted in CAMP at source
+// x[298,393] y[464,471], to the right of the "ENERGIA" label. The dynamic bar
+// is drawn over it from two GRAFICOS strips (same 96×8 size): a dark-red track
+// (full width) + a light-red fill resized in X to the carrier's energy.
+export const ENERGY_BAR_POS: [number, number] = [298 * FIELD_SCALE, 464 * FIELD_SCALE]; // top-left
+export const ENERGY_BAR_W = 96;
+export const SPR_ENERGY_LIGHT = { x: 1032, y: 52, w: 96, h: 8 } as const;
+export const SPR_ENERGY_DARK = { x: 1176, y: 52, w: 96, h: 8 } as const;
+// Never shrink the fill fully to zero so a sliver always reads as "the bar".
+export const ENERGY_BAR_MIN_FRAC = 0.05;
 
 // FUENTE2 bitmap font (8×8 cells, black bg index 12 + white glyphs index 15,
 // 59 cells). Layout: cell 15='N', cells 16-25='0'..'9', cells 33-58='A'..'Z'.

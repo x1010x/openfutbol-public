@@ -30,10 +30,16 @@ interface Match2DProps {
   // Player id → display name, for the on-pitch ball-carrier label. Covers both
   // teams' full rosters (starters + bench) so substitutes are named too.
   playerNames?: Record<string, string>;
+  // Player id → stamina lost per played minute (fraction of full). Drives the
+  // ENERGIA bar drain for the current carrier, matching the manager's writeback.
+  playerEnergyRate?: Record<string, number>;
+  // True when the user plays this match away — keeps the user's team in the
+  // RIGHT scoreboard box (and its crest) by flipping the home/away → side map.
+  flipScoreboard?: boolean;
   onClose: () => void;
 }
 
-export function Match2D({ timeline, homeTeamName = 'Real Madrid', awayTeamName = 'Barcelona', homeColors, awayColors, homeKitStyle, awayKitStyle, initialSpeed, onRequestChanges, resumeAtMs, playerNames, onClose }: Match2DProps) {
+export function Match2D({ timeline, homeTeamName = 'Real Madrid', awayTeamName = 'Barcelona', homeColors, awayColors, homeKitStyle, awayKitStyle, initialSpeed, onRequestChanges, resumeAtMs, playerNames, playerEnergyRate, flipScoreboard, onClose }: Match2DProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const scoreRef = useRef<HTMLSpanElement>(null);
   const minuteRef = useRef<HTMLSpanElement>(null);
@@ -126,7 +132,7 @@ export function Match2D({ timeline, homeTeamName = 'Real Madrid', awayTeamName =
               away: { colors: awayColors, style: awayKitStyle },
             }
           : undefined;
-        const scene = await buildScene(app, timeline, () => alive, kits, playerNames);
+        const scene = await buildScene(app, timeline, () => alive, kits, playerNames, playerEnergyRate, flipScoreboard);
         if (!scene || !alive) return;
         sceneRef.current = scene;
 
@@ -151,15 +157,10 @@ export function Match2D({ timeline, homeTeamName = 'Real Madrid', awayTeamName =
 
   return (
     <div className="fixed inset-0 bg-black flex flex-col items-center z-50 overflow-auto p-2 gap-2">
-      {/* Cabecera con los equipos. El marcador y el minuto se pintan ahora sobre
-          el propio sprite del campo (banner inferior), así que aquí solo van los
-          nombres. scoreRef/minuteRef se conservan (sin nodo) para el ctx del
-          animator, que los ignora cuando son null. */}
-      <div className="bg-vga-blue border-2 border-vga-white px-6 py-1 flex items-center gap-4 shrink-0">
-        <span className="text-vga-light-red text-[10px] w-28 text-right">{homeTeamName}</span>
-        <span className="text-vga-white text-[8px]">vs</span>
-        <span className="text-vga-light-cyan text-[10px] w-28 text-left">{awayTeamName}</span>
-      </div>
+      {/* La cabecera HTML con los nombres se ha quitado: el marcador, el minuto,
+          los escudos y los nombres ya viven sobre el propio sprite del campo
+          (banner inferior). scoreRef/minuteRef se conservan (sin nodo DOM) para
+          el ctx del animator, que los ignora cuando son null. */}
 
       {/* Campo + controles compactos al lateral. El campo se escala al alto del
           viewport para que nunca se recorten los porteros en monitores bajos. */}

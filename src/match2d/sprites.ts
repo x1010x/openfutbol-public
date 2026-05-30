@@ -53,6 +53,26 @@ export async function remapWithPalette(
   return tex;
 }
 
+// Loads an arbitrary image URL (team crest — a real PNG/JPG, not an indexed
+// sprite) into a Texture via a canvas. Rejects on 404/load error so callers can
+// fall back (try another extension, or a drawn jersey). Linear scaling looks
+// better than nearest for photographic/AA crests downscaled into the banner.
+export function loadImageTexture(url: string): Promise<Texture> {
+  return new Promise<Texture>((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width;
+      canvas.height = img.height;
+      const ctx = canvas.getContext('2d')!;
+      ctx.drawImage(img, 0, 0);
+      resolve(getCanvasTexture(canvas, { scaleMode: 'linear' }));
+    };
+    img.onerror = reject;
+    img.src = url;
+  });
+}
+
 // Loads an indexed PNG + atlas JSON, applies the palette on CPU, then slices
 // into per-frame Textures and named animation sequences.
 export async function loadAtlasWithPalette(

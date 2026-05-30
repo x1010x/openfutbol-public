@@ -4,7 +4,7 @@ import { t, useT, getLang, setLang, getSupportedLangs } from './i18n';
 import { getAvailableYears, getAvailableYearsWithStats, getTeamColorsForYear, migrateTeam, buildFreeAgentFromDB, buildTeamFromSeason, getTeamTemplatesForYear, getFantasyPool, buildFantasyTeam } from './data/mockTeams';
 import type { FormationId, MatchEvent, MatchState, Team } from './types/game.d.ts';
 import { applyMoodToTeam } from './engine/playerMood';
-import { simulateMinute, calculateTeamStrength } from './engine/simEngine';
+import { simulateMinute, calculateTeamStrength, staminaDecayPerMin } from './engine/simEngine';
 import { FORMATIONS } from './engine/formations';
 import { getInitialLeagueState, getFantasyLeagueState, updateLeagueStats, deductWeeklySalaries, generateIncomingOffers, autoListAiPlayers, simulateAiMarketSignings, advanceSeason, simulateAiTrades, simulateAiFreeAgentSignings, simulateAiClausulazos, appendTransfer, decrementSuspensions, signingBlockKey, transferredKey, squadNeeds, groupFor, repickAiFormations, writebackMatchStamina, decayTeamStaminaAfterMatch, decrementInjuries, applyStaminaRecovery, computeTvBonus, applyTvBonus, isTransferWindowOpen, windowJornadasLeft, jornadasUntilWindowOpen } from './store/leagueStore';
 import type { TransferRecord, ManagerSeasonRecord } from './store/leagueStore';
@@ -2513,6 +2513,15 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
         const playerNames: Record<string, string> = {};
         for (const p of homeTeam?.players ?? []) playerNames[p.id] = p.name;
         for (const p of awayTeam?.players ?? []) playerNames[p.id] = p.name;
+        // id → stamina lost per PLAYED minute as a fraction of full (99). Same
+        // per-físico rate the text-sim writes back to the league, so the 2D
+        // ENERGIA bar drains in step with the player's persisted stamina.
+        const playerEnergyRate: Record<string, number> = {};
+        for (const p of homeTeam?.players ?? []) playerEnergyRate[p.id] = staminaDecayPerMin(p.stats.physical) / 99;
+        for (const p of awayTeam?.players ?? []) playerEnergyRate[p.id] = staminaDecayPerMin(p.stats.physical) / 99;
+        // Keep the user's team in the RIGHT scoreboard box: flip the board when
+        // the user plays this match away (their team kicks off on the right).
+        const userIsAway = awayTeam?.id === league.userTeamId;
         return (
           <Match2D
             timeline={timeline2d}
@@ -2526,6 +2535,8 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
             onRequestChanges={handleRequest2DChanges}
             resumeAtMs={resume2dMs}
             playerNames={playerNames}
+            playerEnergyRate={playerEnergyRate}
+            flipScoreboard={userIsAway}
             onClose={handleClose2D}
           />
         );
