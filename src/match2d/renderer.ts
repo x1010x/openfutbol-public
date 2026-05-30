@@ -16,6 +16,9 @@ import {
 } from './states';
 import {
   FIELD_SCALE, PLAYER_SCALE, CANVAS_W, CANVAS_H, BASE, PLAY_X,
+  SCORE_BOX_HOME, SCORE_BOX_AWAY, SCORE_DIGIT_W, SCORE_DIGIT_SCALE,
+  HALF_INDICATOR_POS, SPR_2DO, SPR_CAMBIO,
+  FONT2_CELL_W, font2Cell, MINUTE_POS, CARRIER_NAME_POS,
   type SpriteEntry,
 } from './layout';
 
@@ -31,6 +34,11 @@ export interface SceneRuntime {
   foulTimer: number;
   penaltyTimer: number;
   cardTimer: number;
+  cambioTimer: number;
+  // Last values painted to the banner font overlays, so the animator only
+  // rebuilds the glyph sprites when the displayed minute / carrier changes.
+  lastMinute: number;
+  lastCarrierId: PlayerId | null;
   gameTime: number;
   kfPointer: number;
   evtPtr: number;
@@ -67,7 +75,68 @@ export interface Scene {
   cardYRight: Sprite;
   cardRed: Sprite;
   cardSpacing: number;
+  // Scoreboard overlays painted on the CAMP banner. The two score boxes hold
+  // the live home/away score (BIGNUM digits); halfIndicator covers the painted
+  // "1er" with "2do" in the second half; cambioOverlay flashes "CAMBIO" centre-
+  // pitch on a substitution.
+  homeScoreBox: Container;
+  awayScoreBox: Container;
+  scoreDigitTex: Texture[];
+  halfIndicator: Sprite;
+  cambioOverlay: Container;
+  // FUENTE2 font overlays painted on the CAMP banner: the live minute (next to
+  // "min.") and the current ball-carrier's name (above the ENERGIA box).
+  fontTex: Texture[];
+  minuteOverlay: Container;
+  nameOverlay: Container;
+  playerNames: Record<string, string>;
   rt: SceneRuntime;
+}
+
+// Lay out a score value (0–99) as centered BIGNUM digit sprites inside a score
+// box container. Clears any previous digits first. Called at build, on every
+// goal, and on resume so the box always matches the running score.
+export function renderScoreBox(box: Container, value: number, digitTex: Texture[]): void {
+  for (const c of box.removeChildren()) c.destroy();
+  const str = String(Math.max(0, Math.min(99, value)));
+  const stepW = SCORE_DIGIT_W * SCORE_DIGIT_SCALE;
+  const totalW = str.length * stepW;
+  let x = -totalW / 2;
+  for (const ch of str) {
+    const d = ch.charCodeAt(0) - 48;
+    const sp = new Sprite(digitTex[d] ?? digitTex[0]);
+    sp.scale.set(SCORE_DIGIT_SCALE);
+    sp.anchor.set(0, 0.5);
+    sp.x = x;
+    sp.y = 0;
+    box.addChild(sp);
+    x += stepW;
+  }
+}
+
+// Lay out a string with the FUENTE2 bitmap font into a container. `align`
+// 'center' centres on x=0, 'right' ends at x=0 (digits butt against "min."),
+// 'left' starts at x=0. Clears previous glyphs first. Empty string → nothing.
+export function renderFont(
+  box: Container,
+  text: string,
+  fontTex: Texture[],
+  align: 'center' | 'right' | 'left',
+): void {
+  for (const c of box.removeChildren()) c.destroy();
+  if (!text) return;
+  const stepW = FONT2_CELL_W * FIELD_SCALE;
+  const totalW = text.length * stepW;
+  let x = align === 'center' ? -totalW / 2 : align === 'right' ? -totalW : 0;
+  for (const ch of text) {
+    const sp = new Sprite(fontTex[font2Cell(ch)] ?? fontTex[0]);
+    sp.scale.set(FIELD_SCALE);
+    sp.anchor.set(0, 0.5);
+    sp.x = x;
+    sp.y = 0;
+    box.addChild(sp);
+    x += stepW;
+  }
 }
 
 // `isAlive` lets the caller cancel an in-flight build (React 19 double-mount /
@@ -85,6 +154,7 @@ export async function buildScene(
   timeline: MatchTimeline,
   isAlive: () => boolean,
   kits?: SceneKits,
+  playerNames?: Record<string, string>,
 ): Promise<Scene | null> {
   const spriteMap = new Map<PlayerId, SpriteEntry>();
   const animMap = new Map<PlayerId, PlayerAnim>();
@@ -342,6 +412,92 @@ export async function buildScene(
   if (!isAlive()) return null;
   const cardYellowTex = new Texture({ source: graficosTex.source,    frame: new Rectangle(CARD_FRAME_X, CARD_FRAME_Y, CARD_W, CARD_H) });
   const cardRedTex    = new Texture({ source: graficosRedTex.source, frame: new Rectangle(CARD_FRAME_X, CARD_FRAME_Y, CARD_W, CARD_H) });
+  // ── Scoreboard overlays ────────────────────────────────────────────────
+  // BIGNUM digit font (16×16 per glyph, 0-9) for the two score boxes, remapped
+  // through the base palette (the glyphs are near-white, index 14/15).
+  const bignumTex = await remapWithPalette(
+    `${BASE}assets/match2d/base_sprites/BIGNUM_indexed.png`,
+    BASE_PAL,
+  );
+  if (!isAlive()) return null;
+  const scoreDigitTex: Texture[] = [];
+  for (let d = 0; d < 10; d++) {
+    scoreDigitTex.push(new Texture({
+      source: bignumTex.source,
+      frame: new Rectangle(d * SCORE_DIGIT_W, 0, SCORE_DIGIT_W, bignumTex.height),
+    }));
+  }
+
+  const homeScoreBox = new Container();
+  homeScoreBox.zIndex = 9000;
+  homeScoreBox.x = SCORE_BOX_HOME[0];
+  homeScoreBox.y = SCORE_BOX_HOME[1];
+  renderScoreBox(homeScoreBox, 0, scoreDigitTex);
+  app.stage.addChild(homeScoreBox);
+
+  const awayScoreBox = new Container();
+  awayScoreBox.zIndex = 9000;
+  awayScoreBox.x = SCORE_BOX_AWAY[0];
+  awayScoreBox.y = SCORE_BOX_AWAY[1];
+  renderScoreBox(awayScoreBox, 0, scoreDigitTex);
+  app.stage.addChild(awayScoreBox);
+
+  // "2do" half indicator — covers the painted "1er" in the second half.
+  const halfIndicator = new Sprite(new Texture({
+    source: graficosTex.source,
+    frame: new Rectangle(SPR_2DO.x, SPR_2DO.y, SPR_2DO.w, SPR_2DO.h),
+  }));
+  halfIndicator.scale.set(FIELD_SCALE);
+  halfIndicator.anchor.set(0.5);
+  halfIndicator.x = HALF_INDICATOR_POS[0];
+  halfIndicator.y = HALF_INDICATOR_POS[1];
+  halfIndicator.zIndex = 9000;
+  halfIndicator.visible = false;
+  app.stage.addChild(halfIndicator);
+
+  // FUENTE2 bitmap font (8×8 cells) for the live minute + carrier name on the
+  // banner. Black cell background blends into the black banner.
+  const fuente2Tex = await remapWithPalette(
+    `${BASE}assets/match2d/base_sprites/FUENTE2_indexed.png`,
+    BASE_PAL,
+  );
+  if (!isAlive()) return null;
+  const fontCells = Math.floor(fuente2Tex.width / FONT2_CELL_W);
+  const fontTex: Texture[] = [];
+  for (let c = 0; c < fontCells; c++) {
+    fontTex.push(new Texture({
+      source: fuente2Tex.source,
+      frame: new Rectangle(c * FONT2_CELL_W, 0, FONT2_CELL_W, fuente2Tex.height),
+    }));
+  }
+
+  const minuteOverlay = new Container();
+  minuteOverlay.zIndex = 9000;
+  minuteOverlay.x = MINUTE_POS[0];
+  minuteOverlay.y = MINUTE_POS[1];
+  app.stage.addChild(minuteOverlay);
+
+  const nameOverlay = new Container();
+  nameOverlay.zIndex = 9000;
+  nameOverlay.x = CARRIER_NAME_POS[0];
+  nameOverlay.y = CARRIER_NAME_POS[1];
+  app.stage.addChild(nameOverlay);
+
+  // "CAMBIO" overlay — flashes centre-pitch when a substitution is made.
+  const cambioOverlay = new Container();
+  cambioOverlay.zIndex = 10000;
+  cambioOverlay.visible = false;
+  const cambioSp = new Sprite(new Texture({
+    source: graficosTex.source,
+    frame: new Rectangle(SPR_CAMBIO.x, SPR_CAMBIO.y, SPR_CAMBIO.w, SPR_CAMBIO.h),
+  }));
+  cambioSp.scale.set(PLAYER_SCALE * 2);
+  cambioSp.anchor.set(0.5);
+  cambioOverlay.addChild(cambioSp);
+  cambioOverlay.x = CANVAS_W / 2;
+  cambioOverlay.y = CANVAS_H / 2;
+  app.stage.addChild(cambioOverlay);
+
   const cardOverlay = new Container();
   cardOverlay.zIndex = 10001;
   cardOverlay.visible = false;
@@ -389,6 +545,15 @@ export async function buildScene(
     cardYRight,
     cardRed,
     cardSpacing,
+    homeScoreBox,
+    awayScoreBox,
+    scoreDigitTex,
+    halfIndicator,
+    cambioOverlay,
+    fontTex,
+    minuteOverlay,
+    nameOverlay,
+    playerNames: playerNames ?? {},
     rt: {
       goalIdx: 0,
       homeScore: 0,
@@ -399,6 +564,9 @@ export async function buildScene(
       foulTimer: 0,
       penaltyTimer: 0,
       cardTimer: 0,
+      cambioTimer: 0,
+      lastMinute: -1,
+      lastCarrierId: null,
       gameTime: 0,
       kfPointer: 0,
       evtPtr: 0,

@@ -2508,6 +2508,11 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
         // Away anti-clash: swap only the away props when the away shirt would
         // be indistinguishable from the home shirt. Team data is left untouched.
         const awayKit = resolveAwayKit(homeTeam?.colors, awayTeam?.colors, awayTeam?.kitStyle);
+        // id → display name for both full rosters (starters + bench) so the
+        // on-pitch carrier label can name substitutes too.
+        const playerNames: Record<string, string> = {};
+        for (const p of homeTeam?.players ?? []) playerNames[p.id] = p.name;
+        for (const p of awayTeam?.players ?? []) playerNames[p.id] = p.name;
         return (
           <Match2D
             timeline={timeline2d}
@@ -2520,6 +2525,7 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
             initialSpeed={BASE_SPEED_FACTOR}
             onRequestChanges={handleRequest2DChanges}
             resumeAtMs={resume2dMs}
+            playerNames={playerNames}
             onClose={handleClose2D}
           />
         );

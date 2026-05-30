@@ -12,10 +12,38 @@
 
 import type { MatchState } from './types';
 import type { EnginePlayer } from './zoneEngine';
-import type { PlayerId, TeamSide } from '../types/match';
+import type { PlayerId, TeamSide, Vec2 } from '../types/match';
 import type { FormationId } from '../types/game.d.ts';
 import { emit } from './state';
 import { buildLineupLayout } from './lineup';
+
+// Pick a replacement set-piece taker on `side` when the original taker is being
+// subbed off mid-restart. For a goal kick the keeper (slot 0) takes it; for any
+// other set-piece the closest outfield teammate to the spot steps up (keeper
+// excluded). Expelled players and the outgoing player are skipped.
+function pickSetPieceKicker(
+  state: MatchState,
+  side: TeamSide,
+  outId: PlayerId,
+  spot: Vec2,
+  preferGK: boolean,
+): PlayerId | null {
+  const team = side === 'home' ? state.homePlayers : state.awayPlayers;
+  if (preferGK) {
+    const gk = team.find(p => p.slotIndex === 0 && p.id !== outId && !state.expelledIds.has(p.id));
+    if (gk) return gk.id;
+  }
+  let best: PlayerId | null = null;
+  let bestD = Infinity;
+  for (const p of team) {
+    if (p.id === outId || p.slotIndex === 0 || state.expelledIds.has(p.id)) continue;
+    const pp = state.pos[p.id];
+    if (!pp) continue;
+    const d = Math.hypot(pp.x - spot.x, pp.y - spot.y);
+    if (d < bestD) { bestD = d; best = p.id; }
+  }
+  return best;
+}
 
 // Replace `outId` (on the pitch) with `incoming` (from the bench). `incoming`
 // supplies the new player's id + stats; its slotIndex/slot/role/tag are
@@ -84,13 +112,38 @@ export function applySubstitution(
   state.aggressionWindowUntil.delete(outId);
   delete state.gkDive[outId];
 
+  // If the outgoing player was the designated taker of an interrupted set-piece
+  // (free kick, throw-in, corner, goal kick), DON'T just drop the ball loose —
+  // otherwise the restart after the change never executes and play resumes from
+  // a loose ball (the bug: "alguien cogió el balón y siguió sin sacar la
+  // falta"). Re-pick a teammate on the same side, snap them onto the spot and
+  // give them the ball so the resumed holding phase fires the kick cleanly.
+  if (state.kickerId === outId) {
+    const spot = state.foulSpot ?? state.throwInSpot ?? state.cornerSpot ?? state.goalKickSpot ?? state.ball;
+    // Goal kicks are taken by the keeper; everything else by an outfield player.
+    const newKicker = pickSetPieceKicker(state, side, outId, spot, state.goalKickSpot != null);
+    if (newKicker) {
+      state.kickerId = newKicker;
+      state.pos[newKicker] = { x: spot.x, y: spot.y };
+      state.vel[newKicker] = { x: 0, y: 0 };
+      state.ball = { x: spot.x, y: spot.y };
+      state.ballVel = { x: 0, y: 0 };
+      state.ballHeight = 0;
+      state.ballHeightVel = 0;
+      state.ballOwner = newKicker;
+      state.carrierId = newKicker;
+      state.intendedReceiver = null;
+    } else {
+      state.kickerId = null;
+    }
+  }
+
   // If the outgoing player held the ball or any set-piece role at the pause
   // instant, hand it off cleanly: drop the ball loose (the tail sim's pickup
   // logic reassigns it to the nearest player) and clear stale references rather
   // than gluing the ball to a player who is jogging on from off-pitch.
   if (state.ballOwner === outId) { state.ballOwner = null; state.intendedReceiver = null; }
   if (state.carrierId === outId) state.carrierId = replacement.id;
-  if (state.kickerId === outId) state.kickerId = null;
   if (state.partnerId === outId) state.partnerId = null;
   if (state.intendedReceiver === outId) state.intendedReceiver = null;
   if (state.ballLastKicker === outId) { state.ballLastKicker = null; state.ballLastKickerSide = null; }

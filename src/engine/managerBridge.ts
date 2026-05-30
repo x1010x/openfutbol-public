@@ -141,9 +141,12 @@ function calcStoppage(events: MatchEvent[], fromMin: number, toMin: number): num
   const injuries = half.filter(e => e.type === 'injury').length;
   const reds     = half.filter(e => e.type === 'red').length;
   const isFirst  = fromMin === 0;
-  const base = isFirst ? 1 : 3;
-  const raw  = base + goals * 0.5 + subs * 0.3 + injuries * 0.5 + reds * 0.3;
-  return Math.round(Math.min(isFirst ? 3 : 7, Math.max(isFirst ? 1 : 3, raw)));
+  // Mirror zoneEngine.calcStoppageMin (text-sim fallback; MatchEvents carry no
+  // 'foul' kind, so the foul term is omitted here — the timeline value wins
+  // whenever a 2D run produced it).
+  const base = isFirst ? 1 : 2;
+  const raw  = base + goals * 0.4 + subs * 0.4 + injuries * 0.6 + reds * 1.5;
+  return Math.round(Math.max(base, Math.min(isFirst ? 5 : 8, raw)));
 }
 
 // Distil a finished timeline into the manager's result shape: the MatchEvent[]

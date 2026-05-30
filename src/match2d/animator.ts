@@ -14,8 +14,8 @@ import {
   dirFromDelta, MOVE_THRESHOLD,
   type Dir8,
 } from './states';
-import { lerp, toCanvasX, toCanvasY, ballHeightLevel, applyAnim, toClockMs } from './layout';
-import type { Scene } from './renderer';
+import { lerp, toCanvasX, toCanvasY, ballHeightLevel, applyAnim, toClockMs, normalizeFontText } from './layout';
+import { renderScoreBox, renderFont, type Scene } from './renderer';
 
 export interface AnimatorCtx {
   speedRef: { current: number };
@@ -40,6 +40,9 @@ export function primeResume(scene: Scene, toMs: number): void {
     if (goalEvents[rt.goalIdx].side === 'home') rt.homeScore++; else rt.awayScore++;
     rt.goalIdx++;
   }
+  // Repaint the on-pitch score boxes so a resumed run shows the correct score.
+  renderScoreBox(scene.homeScoreBox, rt.homeScore, scene.scoreDigitTex);
+  renderScoreBox(scene.awayScoreBox, rt.awayScore, scene.scoreDigitTex);
   while (rt.kfPointer < timeline.keyframes.length - 2 && timeline.keyframes[rt.kfPointer + 1].t <= toMs) rt.kfPointer++;
 }
 
@@ -60,6 +63,10 @@ export function updateScene(scene: Scene, ticker: Ticker, ctx: AnimatorCtx): voi
   const flipped = scene.halfTimeMs !== null && gt >= scene.halfTimeMs;
   const mir = (x: number) => (flipped ? 1 - x : x);
   const mdx = (dx: number) => (flipped ? -dx : dx);
+
+  // Second-half indicator: cover the painted "1er" with "2do" once the teams
+  // have switched ends. Cheap to set every frame; toggles with the half.
+  scene.halfIndicator.visible = flipped;
 
   // Advance keyframe pointer
   while (rt.kfPointer < kfs.length - 2 && kfs[rt.kfPointer + 1].t <= gt) rt.kfPointer++;
@@ -196,6 +203,10 @@ export function updateScene(scene: Scene, ticker: Ticker, ctx: AnimatorCtx): voi
       scene.foulOverlay.visible = true;
       rt.foulTimer = 180;
     }
+    if (ev.kind === 'sub') {
+      scene.cambioOverlay.visible = true;
+      rt.cambioTimer = 180;
+    }
     if (ev.kind === 'penalty') {
       scene.penaltyOverlay.visible = true;
       rt.penaltyTimer = 180;
@@ -257,6 +268,10 @@ export function updateScene(scene: Scene, ticker: Ticker, ctx: AnimatorCtx): voi
   if (rt.cardTimer > 0) {
     rt.cardTimer -= ticker.deltaTime;
     if (rt.cardTimer <= 0) scene.cardOverlay.visible = false;
+  }
+  if (rt.cambioTimer > 0) {
+    rt.cambioTimer -= ticker.deltaTime;
+    if (rt.cambioTimer <= 0) scene.cambioOverlay.visible = false;
   }
 
   // Update player sprites
@@ -418,25 +433,43 @@ export function updateScene(scene: Scene, ticker: Ticker, ctx: AnimatorCtx): voi
     rt.goalIdx++;
     scoreChanged = true;
   }
-  if (scoreChanged && scoreRef.current) {
-    scoreRef.current.textContent = `${rt.homeScore} - ${rt.awayScore}`;
+  if (scoreChanged) {
+    if (scoreRef.current) scoreRef.current.textContent = `${rt.homeScore} - ${rt.awayScore}`;
+    // Repaint the on-pitch score boxes (BIGNUM digits in the CAMP banner).
+    renderScoreBox(scene.homeScoreBox, rt.homeScore, scene.scoreDigitTex);
+    renderScoreBox(scene.awayScoreBox, rt.awayScore, scene.scoreDigitTex);
   }
 
   // Minute display — remap the compressed timeline time to a 0–90' match minute,
   // showing stoppage as "45+X'" / "90+X'" once play passes the regulation mark
   // of the current half.
-  if (minuteRef.current) {
-    const dispT = toClockMs(gt, timeline, scene.halfTimeMs);
-    const min = Math.floor(dispT / 60000);
-    const inFirstHalf = scene.halfTimeMs === null || gt < scene.halfTimeMs;
-    let label: string;
-    if (timeline.nominalMatchMs && inFirstHalf && min > 45) {
-      label = `45+${min - 45}'`;
-    } else if (timeline.nominalMatchMs && !inFirstHalf && min > 90) {
-      label = `90+${min - 90}'`;
-    } else {
-      label = `${min}'`;
-    }
-    minuteRef.current.textContent = label;
+  const dispT = toClockMs(gt, timeline, scene.halfTimeMs);
+  const min = Math.floor(dispT / 60000);
+  const inFirstHalf = scene.halfTimeMs === null || gt < scene.halfTimeMs;
+  let label: string;
+  if (timeline.nominalMatchMs && inFirstHalf && min > 45) {
+    label = `45+${min - 45}'`;
+  } else if (timeline.nominalMatchMs && !inFirstHalf && min > 90) {
+    label = `90+${min - 90}'`;
+  } else {
+    label = `${min}'`;
+  }
+  if (minuteRef.current) minuteRef.current.textContent = label;
+
+  // Field minute overlay (FUENTE2, left-aligned just after the painted "min.").
+  // Shows the raw running minute integer; rebuilt only when it ticks over.
+  if (min !== rt.lastMinute) {
+    rt.lastMinute = min;
+    renderFont(scene.minuteOverlay, String(min), scene.fontTex, 'left');
+  }
+
+  // Ball-carrier name above the ENERGIA box. Keep the last possessor's name
+  // while the ball is loose/in flight (ballOwner null) so it doesn't flicker
+  // off on every pass; update when a new player takes possession.
+  const carrierId = kfA.ballOwner;
+  if (carrierId && carrierId !== rt.lastCarrierId) {
+    rt.lastCarrierId = carrierId;
+    const raw = scene.playerNames[carrierId] ?? '';
+    renderFont(scene.nameOverlay, normalizeFontText(raw), scene.fontTex, 'center');
   }
 }

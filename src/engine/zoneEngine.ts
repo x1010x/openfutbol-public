@@ -353,15 +353,23 @@ export function generateTimeline(cfg: {
 // half-time instant; reds are cards flagged red / second_yellow.
 function calcStoppageMin(events: MatchTimeline['events'], firstHalf: boolean, halfTimeMs: number): number {
   const inHalf = (t: number) => (firstHalf ? t <= halfTimeMs : t > halfTimeMs);
-  let goals = 0, subs = 0, injuries = 0, reds = 0;
+  let goals = 0, subs = 0, injuries = 0, reds = 0, fouls = 0;
   for (const ev of events) {
     if (!inHalf(ev.t)) continue;
     if (ev.kind === 'goal') goals++;
     else if (ev.kind === 'sub') subs++;
     else if (ev.kind === 'injury') injuries++;
     else if (ev.kind === 'card' && (ev.detail === 'red' || ev.detail === 'second_yellow')) reds++;
+    else if (ev.kind === 'foul' || ev.kind === 'penalty') fouls++;
   }
-  const base = firstHalf ? 1 : 3;
-  const raw = base + goals * 0.5 + subs * 0.3 + injuries * 0.5 + reds * 0.3;
-  return Math.round(Math.min(firstHalf ? 3 : 7, Math.max(base, raw)));
+  // Per-half added time driven by the half's own delays. Less lopsided base
+  // than before (was 1 vs 3) and event-weighted so an expulsion/injury visibly
+  // adds time — a first half with a red card no longer ends at "45 clavado".
+  // A sending-off costs the most (the walk-off eats real time). Fouls only nudge
+  // the total and are capped so a scrappy, foul-heavy half can't run the clock
+  // to the cap on its own.
+  const base = firstHalf ? 1 : 2;
+  const foulTerm = Math.min(1, fouls * 0.06);
+  const raw = base + goals * 0.4 + subs * 0.4 + injuries * 0.6 + reds * 1.5 + foulTerm;
+  return Math.round(Math.max(base, Math.min(firstHalf ? 5 : 8, raw)));
 }
