@@ -444,6 +444,21 @@ export const AlignmentView = ({ team, onUpdate, onBack, onToggleDiscipline, inga
                 {titularCount}/11
               </div>
             )}
+            {ingame && pendingSubCount > 0 && (
+              <button
+                onClick={() => {
+                  const arr: string[] = [];
+                  for (let i = 0; i < slots.length; i++) arr.push(team.lineup[i] ?? '');
+                  setStagedLineup(arr);
+                  setSelectedSlot(null);
+                }}
+                style={{ background: '#aa0000', color: '#ffffff', border: '2px solid #aaaaaa', padding: '3px 10px', fontSize: 13, fontWeight: 'bold', textTransform: 'uppercase', cursor: 'pointer', boxShadow: 'inset 1px 1px 0 #ff5555, inset -1px -1px 0 #550000' }}
+                onMouseEnter={e => { (e.target as HTMLElement).style.background = '#ff5555'; }}
+                onMouseLeave={e => { (e.target as HTMLElement).style.background = '#aa0000'; }}
+              >
+                CANCELAR
+              </button>
+            )}
             <button
               onClick={ingame ? () => ingame.onCommit(stagedLineup, pendingSubs) : onBack}
               style={{ background: ingame ? '#0000aa' : '#aa0000', color: '#ffffff', border: '2px solid #aaaaaa', padding: '3px 10px', fontSize: 13, fontWeight: 'bold', textTransform: 'uppercase', cursor: 'pointer', boxShadow: ingame ? 'inset 1px 1px 0 #5555ff, inset -1px -1px 0 #000055' : 'inset 1px 1px 0 #ff5555, inset -1px -1px 0 #550000' }}
@@ -522,6 +537,7 @@ export const AlignmentView = ({ team, onUpdate, onBack, onToggleDiscipline, inga
             <PitchDiagram
               team={ingame ? { ...team, lineup: stagedLineup } : team}
               selectedSlot={selectedSlot}
+              highlightIds={ingame ? pendingSubs.map(p => p.inId).filter(Boolean) : undefined}
               onSlotClick={(idx) => {
                 if (ingame && effectiveSubsUsed >= ingame.maxSubs && !stagedLineup[idx]) return;
                 setSelectedSlot(idx === selectedSlot ? null : idx);

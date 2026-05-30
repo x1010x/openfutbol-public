@@ -2,12 +2,12 @@ import { useState, useEffect, useRef } from 'react';
 import { t, useT, getLang, setLang, getSupportedLangs } from './i18n';
 
 import { getAvailableYears, getAvailableYearsWithStats, getTeamColorsForYear, migrateTeam, buildFreeAgentFromDB, buildTeamFromSeason, getTeamTemplatesForYear, getFantasyPool, buildFantasyTeam } from './data/mockTeams';
-import type { FormationId, MatchEvent, MatchState, Team } from './types/game.d.ts';
+import type { FormationId, MatchEvent, MatchState, Player, Team } from './types/game.d.ts';
 import { applyMoodToTeam } from './engine/playerMood';
 import { simulateMinute, calculateTeamStrength } from './engine/simEngine';
 import { FORMATIONS, pickBestXI } from './engine/formations';
 import { getInitialLeagueState, getFantasyLeagueState, updateLeagueStats, deductWeeklySalaries, generateIncomingOffers, autoListAiPlayers, simulateAiMarketSignings, advanceSeason, simulateAiTrades, simulateAiFreeAgentSignings, simulateAiClausulazos, simulateAiInterClausulazos, appendTransfer, decrementSuspensions, signingBlockKey, transferredKey, squadNeeds, groupFor, repickAiFormations, writebackMatchStamina, decayTeamStaminaAfterMatch, decrementInjuries, applyStaminaRecovery, computeTvBonus, applyTvBonus, isTransferWindowOpen, windowJornadasLeft, jornadasUntilWindowOpen } from './store/leagueStore';
-import type { TransferRecord, ManagerSeasonRecord } from './store/leagueStore';
+import type { TransferRecord, ManagerSeasonRecord, IncomingOffer } from './store/leagueStore';
 import type { LeagueState } from './store/leagueStore';
 import { migrateLegacyKey, getActiveSlotId, saveSlot, createSlotFromCurrent } from './store/saveSlots';
 import { computeBoardObjective, computeTransferDelta, firingChance, applyMeterDelta, isObjectiveMet, computeMatchMeterDelta, computeMatchReputationDelta, computeSeasonReputationDelta, computeSeasonMeterDelta } from './engine/florentinometro';
@@ -40,6 +40,7 @@ import { TeamCrest } from './components/TeamCrest';
 import { PitchDiagram } from './components/PitchDiagram';
 import { StatDrillDown } from './components/StatDrillDown';
 import { MessageModal } from './components/MessageModal';
+import { PlayerNegotiationModal } from './components/PlayerNegotiationModal';
 import { BoardAlertModal } from './components/BoardAlertModal';
 import { DisclaimerView } from './components/DisclaimerView';
 import { SwapModal } from './components/SwapModal';
@@ -60,33 +61,6 @@ import { runtimePlayerFromPack, joinPlayerName } from './data/playerBuilder';
 
 type View = 'LEAGUE' | 'SQUAD' | 'ALIGNMENT' | 'RESULTS' | 'STATS' | 'FINANCES' | 'TRANSFERS' | 'JORNADA_RESULTS' | 'END_OF_SEASON' | 'PLAYER_DETAIL' | 'BACKUP' | 'EDITOR' | 'EQUIPO' | 'MANAGER_CAREER' | 'PACK_LOADER';
 
-// Player decides whether to accept the transfer after the clubs agree. The
-// buyer-side AI is implicitly offering wages proportional to the fee paid:
-// the bigger the fee relative to the player's value, the better the wage
-// package, and the higher the acceptance probability. Inputs:
-//  - feeRatio = fee / market price (1.0 = fair, >1.0 = premium)
-//  - buyerStrength vs current club (a stronger buyer is more attractive)
-// Returns true if the player approves the move.
-const playerApprovesMove = (player: Player, buyer: Team, feePaid: number, seasonYear: number): boolean => {
-  const price = Math.max(1, computePrice(player, seasonYear));
-  const feeRatio = feePaid / price;
-  // Implicit wage package: scaled with the fee. A 1.5x fee ratio implies a
-  // solid raise on top of current wages.
-  const currentWage = playerWeeklySalary(player, seasonYear);
-  const impliedWage = currentWage * Math.max(1, feeRatio * 1.1);
-  const wageBump = impliedWage / Math.max(1, currentWage);
-  // Buyer reputation proxy: average lineup media.
-  const buyerStrength = buyer.players.length > 0
-    ? buyer.players.reduce((s, p) => s + p.media, 0) / buyer.players.length
-    : 50;
-  // Base probability from fee ratio (capped to 0.95).
-  let p = Math.min(0.95, Math.max(0.15, 0.45 + (feeRatio - 1) * 0.4));
-  // Wage bump: small additional swing.
-  p += Math.min(0.15, (wageBump - 1) * 0.3);
-  // Better destination club: small boost.
-  p += Math.min(0.1, Math.max(-0.05, (buyerStrength - 60) / 200));
-  return Math.random() < Math.max(0.1, Math.min(0.97, p));
-};
 
 function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
   useT(); // subscribe to language changes so nav labels and messages re-render
@@ -180,6 +154,8 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
   const [previousView, setPreviousView] = useState<View>('LEAGUE');
   const [viewingTeamId, setViewingTeamId] = useState<string | null>(null);
   const [message, setMessage] = useState<{ title: string; body: string; tone?: 'info' | 'danger' | 'warning' } | null>(null);
+  const [saleNegotiation, setSaleNegotiation] = useState<{ offer: IncomingOffer; player: Player; buyer: Team; seller: Team } | null>(null);
+  const [clausulaNegotiation, setClausulaNegotiation] = useState<{ player: Player; buyer: Team; seller: Team; cost: number; fromTeamId: string } | null>(null);
   const [boardAlert, setBoardAlert] = useState<{ title: string; body: string; tone: 'danger' | 'warning' | 'success' } | null>(null);
   const [lastBoardAlert, setLastBoardAlert] = useState<{ title: string; body: string; tone: 'danger' | 'warning' | 'success' } | null>(null);
   const [htPaused, setHtPaused] = useState(false);
@@ -708,16 +684,25 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
     const price = computePrice(player, league.year);
     const clausulaCost = computeClausulazoPrice(price);
     if (buyer.budget < clausulaCost) return { accepted: false, message: 'No tienes presupuesto suficiente para la cláusula.' };
-    // Even with a clausulazo paid, the player still has to want the move.
-    // Clausulazo pays a 2x premium so the implicit wage offer is generous;
-    // approval is high but not automatic.
-    if (!playerApprovesMove(player, buyer, clausulaCost, league.year)) {
-      return { accepted: false, message: `${player.name} no quiere venir a tu club aunque pagues la cláusula.` };
-    }
+    // Clubs side: clausulazo amount is established. Open the player
+    // negotiation modal; the actual commit waits for the modal outcome.
+    setClausulaNegotiation({ player, buyer, seller, cost: clausulaCost, fromTeamId });
+    return { accepted: true, message: 'Negociando con el jugador...' };
+  };
 
+  const commitClausula = (player: Player, fromTeamId: string, clausulaCost: number, agreedSalary: number, years: number) => {
     setLeague(prev => {
+      const seller = prev.teams.find(tm => tm.id === fromTeamId);
+      const buyer = prev.teams.find(tm => tm.id === prev.userTeamId);
+      if (!seller || !buyer) return prev;
+      const expYear = prev.year + years;
+      const playerWithContract: Player = {
+        ...player,
+        forSale: false,
+        contract: { salary: agreedSalary, expiration: `${expYear}-06-30` },
+      };
       const entry: TransferRecord = {
-        id: `clausula_${prev.currentJornada}_${playerId}_${Date.now()}`,
+        id: `clausula_${prev.currentJornada}_${player.id}_${Date.now()}`,
         jornada: prev.currentJornada, year: prev.year,
         playerName: player.name, playerPosition: player.position,
         fromTeamName: seller.name, toTeamName: buyer.name,
@@ -731,22 +716,21 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
       const prevRec = prev.seasonClausulazosReceived ?? {};
       return {
         ...prev,
-        teams: prev.teams.map(t => {
-          if (t.id === fromTeamId) return { ...t, players: t.players.filter(p => p.id !== playerId), lineup: t.lineup.filter(id => id !== playerId) };
-          if (t.id === prev.userTeamId) return { ...t, players: [...t.players, { ...player, forSale: false }], budget: t.budget - clausulaCost };
-          return t;
+        teams: prev.teams.map(tm => {
+          if (tm.id === fromTeamId) return { ...tm, players: tm.players.filter(p => p.id !== player.id), lineup: tm.lineup.filter(id => id !== player.id) };
+          if (tm.id === prev.userTeamId) return { ...tm, players: [...tm.players, playerWithContract], budget: tm.budget - clausulaCost };
+          return tm;
         }),
         transferLog: appendTransfer(prev.transferLog, entry),
         florentinometro: newMeter,
         florentinometroPeak: Math.max(prev.florentinometroPeak ?? 5, newMeter),
         florentinometroMin: Math.min(prev.florentinometroMin ?? 5, newMeter),
         seasonTransferSpent: (prev.seasonTransferSpent ?? 0) + clausulaCost,
-        blockedSignings: [...prev.blockedSignings, transferredKey(playerId)],
+        blockedSignings: [...prev.blockedSignings, transferredKey(player.id)],
         seasonClausulazosMade: (prev.seasonClausulazosMade ?? 0) + 1,
         seasonClausulazosReceived: { ...prevRec, [fromTeamId]: (prevRec[fromTeamId] ?? 0) + 1 },
       };
     });
-    return { accepted: true, message: `Cláusula ejecutada. ${formatEuros(clausulaCost)} pagados a TEBAS.` };
   };
 
   const handleToggleForSale = (playerId: string) => {
@@ -820,20 +804,21 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
       setMessage({ title: t('msg.minSquadRival.title'), body: t('msg.minSquadRival.body', { team: buyer.name, n: String(buyerFinalSize) }), tone: 'warning' });
       return;
     }
-    // Player approval gate: the AI buyer negotiates terms with the player.
-    // Approval probability is driven by offer-vs-value ratio plus a mood bump.
-    // Big-money moves almost always go through; lowball deals get the player
-    // to say no even if both clubs agreed.
-    if (!playerApprovesMove(player, buyer, offer.amount, league.year)) {
-      setMessage({
-        title: 'El jugador no acepta',
-        body: `${player.name} rechaza las condiciones que le ofrece ${buyer.name}. El traspaso se cae.`,
-        tone: 'danger',
-      });
-      // Withdraw the offer so it doesn't sit forever.
-      setLeague(prev => ({ ...prev, incomingOffers: prev.incomingOffers.filter(o => o.id !== offerId) }));
-      return;
-    }
+    // Clubs have agreed. Open a visible negotiation modal: the AI buyer talks
+    // to the player. The actual transfer commit waits for the modal outcome.
+    setSaleNegotiation({ offer, player, buyer, seller: userTeam });
+    return;
+  };
+
+  const commitIncomingOfferAccept = (offer: IncomingOffer, agreedSalary: number, years: number) => {
+    const userTeam = league.teams.find(t => t.id === league.userTeamId);
+    const buyer = league.teams.find(t => t.id === offer.fromTeamId);
+    const player = userTeam?.players.find(p => p.id === offer.playerId);
+    if (!userTeam || !buyer || !player) return;
+    const offeredIds = offer.offeredPlayerIds ?? [];
+    const offeredPlayers = offeredIds
+      .map(id => buyer.players.find(p => p.id === id))
+      .filter((p): p is NonNullable<typeof p> => Boolean(p));
     setLeague(prev => {
 
       const tradeId = offeredPlayers.length > 0
@@ -885,11 +870,12 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
             };
           }
           if (t.id === offer.fromTeamId) {
+            const expYear = prev.year + years;
             return {
               ...t,
               players: t.players
                 .filter(p => !offeredIdSet.has(p.id))
-                .concat({ ...player, forSale: false }),
+                .concat({ ...player, forSale: false, contract: { salary: agreedSalary, expiration: `${expYear}-06-30` } }),
               lineup: t.lineup.filter(id => !offeredIdSet.has(id)),
               budget: t.budget - offer.amount,
             };
@@ -2831,6 +2817,57 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
         <ProManagerTutorialModal
           managerName={league.managerName ?? ''}
           onClose={() => setShowProManagerTutorial(false)}
+        />
+      )}
+
+      {saleNegotiation && (
+        <PlayerNegotiationModal
+          player={saleNegotiation.player}
+          buyerTeam={saleNegotiation.buyer}
+          sellerTeam={saleNegotiation.seller}
+          feePaid={saleNegotiation.offer.amount}
+          seasonYear={league.year}
+          mode="user-selling"
+          onAccept={(salary, years) => {
+            commitIncomingOfferAccept(saleNegotiation.offer, salary, years);
+            setSaleNegotiation(null);
+          }}
+          onReject={() => {
+            // Player refused; withdraw the offer so it doesn't sit forever.
+            const offerId = saleNegotiation.offer.id;
+            setLeague(prev => ({ ...prev, incomingOffers: prev.incomingOffers.filter(o => o.id !== offerId) }));
+            setSaleNegotiation(null);
+          }}
+          onClose={() => setSaleNegotiation(null)}
+        />
+      )}
+
+      {clausulaNegotiation && (
+        <PlayerNegotiationModal
+          player={clausulaNegotiation.player}
+          buyerTeam={clausulaNegotiation.buyer}
+          sellerTeam={clausulaNegotiation.seller}
+          feePaid={clausulaNegotiation.cost}
+          seasonYear={league.year}
+          mode="user-buying"
+          onAccept={(salary, years) => {
+            commitClausula(clausulaNegotiation.player, clausulaNegotiation.fromTeamId, clausulaNegotiation.cost, salary, years);
+            setClausulaNegotiation(null);
+            setMessage({
+              title: 'Fichaje cerrado',
+              body: `${clausulaNegotiation.player.name} firma por ${clausulaNegotiation.buyer.name}. ${formatEuros(clausulaNegotiation.cost)} pagados.`,
+              tone: 'info',
+            });
+          }}
+          onReject={() => {
+            setClausulaNegotiation(null);
+            setMessage({
+              title: 'Negociación fallida',
+              body: `${clausulaNegotiation.player.name} no aceptó tus condiciones. La cláusula no se ejecuta.`,
+              tone: 'warning',
+            });
+          }}
+          onClose={() => setClausulaNegotiation(null)}
         />
       )}
     </div>
