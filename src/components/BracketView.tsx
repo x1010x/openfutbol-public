@@ -6,10 +6,12 @@ interface Props {
   state: TournamentState;
   onAdvanceRound: () => void;
   onPlayUserTie: (tieId: string) => void;
+  onOpenAlignment: () => void;
+  onOpenSquad: () => void;
   onExit: () => void;
 }
 
-export const BracketView = ({ state, onAdvanceRound, onPlayUserTie, onExit }: Props) => {
+export const BracketView = ({ state, onAdvanceRound, onPlayUserTie, onOpenAlignment, onOpenSquad, onExit }: Props) => {
   const teamById = (id: string | null) => id ? state.teams.find(t => t.id === id) : null;
   const champion = state.champion ? teamById(state.champion) : null;
   const userTeam = teamById(state.userTeamId);
@@ -62,9 +64,17 @@ export const BracketView = ({ state, onAdvanceRound, onPlayUserTie, onExit }: Pr
             </span>
           )}
         </div>
-        <button onClick={onExit} className="bg-vga-red text-vga-bright-white px-3 py-1 text-[8px] border border-vga-black hover:bg-vga-light-red">
-          Salir
-        </button>
+        <div className="flex items-center gap-1">
+          <button onClick={onOpenAlignment} className="bg-vga-green text-vga-bright-white px-3 py-1 text-[8px] uppercase font-bold border border-vga-black hover:bg-vga-light-green">
+            Alineación
+          </button>
+          <button onClick={onOpenSquad} className="bg-vga-magenta text-vga-bright-white px-3 py-1 text-[8px] uppercase font-bold border border-vga-black hover:bg-vga-light-magenta">
+            Equipo
+          </button>
+          <button onClick={onExit} className="bg-vga-red text-vga-bright-white px-3 py-1 text-[8px] uppercase font-bold border border-vga-black hover:bg-vga-light-red">
+            Salir
+          </button>
+        </div>
       </div>
 
       {/* Champion banner */}

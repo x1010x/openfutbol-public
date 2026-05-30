@@ -154,6 +154,7 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
   const [tournament, setTournament] = useState<TournamentState | null>(() => loadTournament());
   const [tournamentRoundRecap, setTournamentRoundRecap] = useState<number | null>(null);
   const [tournamentMatchTieId, setTournamentMatchTieId] = useState<string | null>(null);
+  const [tournamentSubView, setTournamentSubView] = useState<null | 'ALIGNMENT' | 'SQUAD'>(null);
   const [showInstructions, setShowInstructions] = useState(false);
   const [showColaborar, setShowColaborar] = useState(false);
   const [instructionsScroll, setInstructionsScroll] = useState<'changelog' | 'engine' | undefined>(undefined);
@@ -1923,6 +1924,34 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
     // Tournament flow: a live tournament always takes priority over league
     // setup/menu views. Setup view only when explicitly opened.
     if (tournament && !match) {
+      const userTournamentTeam = tournament.teams.find(t => t.id === tournament.userTeamId);
+      const updateTournamentUserTeam = (patch: Partial<Team>) => {
+        setTournament(prev => prev ? {
+          ...prev,
+          teams: prev.teams.map(t => t.id === prev.userTeamId ? { ...t, ...patch } : t),
+        } : prev);
+      };
+      if (tournamentSubView === 'ALIGNMENT' && userTournamentTeam) {
+        return (
+          <AlignmentView
+            team={userTournamentTeam}
+            onUpdate={(patch) => updateTournamentUserTeam(patch)}
+            onToggleDiscipline={() => updateTournamentUserTeam({ tacticalDiscipline: !(userTournamentTeam.tacticalDiscipline ?? true) })}
+            onBack={() => setTournamentSubView(null)}
+          />
+        );
+      }
+      if (tournamentSubView === 'SQUAD' && userTournamentTeam) {
+        return (
+          <SquadViewCompact
+            team={userTournamentTeam}
+            seasonYear={new Date().getFullYear()}
+            readOnly
+            onToggleForSale={() => { /* no transfers in tournaments */ }}
+            onBack={() => setTournamentSubView(null)}
+          />
+        );
+      }
       return (
         <BracketView
           state={tournament}
@@ -1932,7 +1961,9 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
             setTournamentRoundRecap(playedRound);
           }}
           onPlayUserTie={(tieId) => startTournamentMatch(tieId)}
-          onExit={() => { setTournament(null); setShowTournamentFlow(false); setTournamentRoundRecap(null); }}
+          onOpenAlignment={() => setTournamentSubView('ALIGNMENT')}
+          onOpenSquad={() => setTournamentSubView('SQUAD')}
+          onExit={() => { setTournament(null); setShowTournamentFlow(false); setTournamentRoundRecap(null); setTournamentSubView(null); }}
         />
       );
     }
