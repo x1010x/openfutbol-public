@@ -44,8 +44,8 @@ import { PlayerNegotiationModal } from './components/PlayerNegotiationModal';
 import { TournamentSetupView } from './components/TournamentSetupView';
 import { BracketView } from './components/BracketView';
 import { TournamentRoundResultsModal } from './components/TournamentRoundResultsModal';
-import { createTournament, advanceCurrentStage, saveTournament, loadTournament } from './store/tournamentStore';
-import type { TournamentState } from './store/tournamentStore';
+import { createTournament, advanceCurrentStage, saveTournament, loadTournament, userNextAction, recordUserLigaMatch, recordUserKoLeg } from './store/tournamentStore';
+import type { TournamentState, UserNextAction } from './store/tournamentStore';
 import { BoardAlertModal } from './components/BoardAlertModal';
 import { DisclaimerView } from './components/DisclaimerView';
 import { SwapModal } from './components/SwapModal';
@@ -153,7 +153,7 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
   const [showTournamentFlow, setShowTournamentFlow] = useState(false);
   const [tournament, setTournament] = useState<TournamentState | null>(() => loadTournament());
   const [tournamentRoundRecap, setTournamentRoundRecap] = useState<number | null>(null);
-  const [tournamentMatchTieId, setTournamentMatchTieId] = useState<string | null>(null);
+  const [tournamentMatchCtx, setTournamentMatchCtx] = useState<UserNextAction | null>(null);
   const [tournamentSubView, setTournamentSubView] = useState<null | 'ALIGNMENT' | 'SQUAD'>(null);
   const [showInstructions, setShowInstructions] = useState(false);
   const [showColaborar, setShowColaborar] = useState(false);
@@ -1347,20 +1347,16 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
   };
 
   // Live-play a tournament tie: build a MatchState from the tie's teams and
-  // hand off to the existing match loop. The tournamentMatchTieId flag tells
+  // hand off to the existing match loop. The tournamentMatchCtx flag tells
   // finalizeMatch which post-match path to take.
-  const startTournamentMatch = (tieId: string) => {
+  // Live-play whatever match the user has next in the tournament: a liga
+  // group match, or a single leg of their KO tie.
+  const startTournamentMatch = () => {
     if (!tournament) return;
-    const stage = tournament.stages[tournament.currentStageIdx];
-    if (stage.config.kind !== 'ko' || !stage.ties) return;
-    const tie = stage.ties.find(t => t.id === tieId);
-    if (!tie || !tie.homeTeamId || !tie.awayTeamId) return;
-    // v1: live-play the FIRST unplayed leg. Aggregate logic handles the rest
-    // when the user auto-sims subsequent legs via "Auto-sim fase".
-    const firstUnplayedLeg = tie.legs.find(l => !l.played);
-    if (!firstUnplayedLeg) return;
-    const home = tournament.teams.find(t => t.id === firstUnplayedLeg.homeTeamId);
-    const away = tournament.teams.find(t => t.id === firstUnplayedLeg.awayTeamId);
+    const action = userNextAction(tournament);
+    if (!action) return;
+    const home = tournament.teams.find(t => t.id === action.homeTeamId);
+    const away = tournament.teams.find(t => t.id === action.awayTeamId);
     if (!home || !away) return;
     const speed = (matchDuration * 1000) / 90;
     const initialMatch: MatchState = {
@@ -1382,7 +1378,7 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
       stoppageTime1: 0, stoppageTime2: 0,
       attendance: computeAttendance(home, away),
     };
-    setTournamentMatchTieId(tieId);
+    setTournamentMatchCtx(action);
     setHtPaused(false);
     setShowSubPanel(false);
     if (matchDuration === 0) {
@@ -1400,34 +1396,23 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
     // Tournament context: skip league writebacks. Update the tie with the
     // score, decide a winner (PK shootout when level), then auto-sim the
     // remaining ties of the round via advanceRound.
-    if (tournamentMatchTieId && tournament) {
+    if (tournamentMatchCtx && tournament) {
       const hs = finalMatch.homeScore;
       const as = finalMatch.awayScore;
-      const playedStageIdx = tournament.currentStageIdx;
-      // Mark the first unplayed leg of this tie as played with the user's
-      // result, then run advanceCurrentStage which auto-sims everything else
-      // (remaining legs of THIS tie + every other tie of the stage).
+      const prevStageIdx = tournament.currentStageIdx;
       setTournament(prev => {
         if (!prev) return prev;
-        const newStages = prev.stages.map((s, idx) => {
-          if (idx !== prev.currentStageIdx || s.config.kind !== 'ko' || !s.ties) return s;
-          return {
-            ...s,
-            ties: s.ties.map(tie => {
-              if (tie.id !== tournamentMatchTieId) return tie;
-              const legIdx = tie.legs.findIndex(l => !l.played);
-              if (legIdx < 0) return tie;
-              return {
-                ...tie,
-                legs: tie.legs.map((l, i) => i === legIdx ? { ...l, homeScore: hs, awayScore: as, played: true } : l),
-              };
-            }),
-          };
-        });
-        return advanceCurrentStage({ ...prev, stages: newStages });
+        const updated = tournamentMatchCtx.type === 'liga'
+          ? recordUserLigaMatch(prev, tournamentMatchCtx.groupId, tournamentMatchCtx.matchIdx, hs, as)
+          : recordUserKoLeg(prev, tournamentMatchCtx.tieId, tournamentMatchCtx.legIdx, hs, as);
+        // Show the stage recap modal only when the stage actually closed,
+        // not after every single match.
+        if (updated.currentStageIdx !== prev.currentStageIdx || updated.champion) {
+          setTournamentRoundRecap(prevStageIdx);
+        }
+        return updated;
       });
-      setTournamentRoundRecap(playedStageIdx);
-      setTournamentMatchTieId(null);
+      setTournamentMatchCtx(null);
       setMatch(null);
       setIsPlaying(false);
       setHtPaused(false);
@@ -1688,7 +1673,7 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
   // wins when present, otherwise the league user. Tournaments allow spectator
   // mode, so this is nullable; downstream consumers coalesce to '' when an
   // empty string suffices (no team highlighted, no AI bias).
-  const activeUserTeamId: string | null = tournamentMatchTieId && tournament ? tournament.userTeamId : league.userTeamId;
+  const activeUserTeamId: string | null = tournamentMatchCtx && tournament ? tournament.userTeamId : league.userTeamId;
   const activeUserTeamIdSafe = activeUserTeamId ?? '';
 
   useEffect(() => {
@@ -1976,7 +1961,7 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
             setTournament(prev => prev ? advanceCurrentStage(prev) : null);
             setTournamentRoundRecap(playedStageIdx);
           }}
-          onPlayUserTie={(tieId) => startTournamentMatch(tieId)}
+          onPlayUserMatch={() => startTournamentMatch()}
           onOpenAlignment={() => setTournamentSubView('ALIGNMENT')}
           onOpenSquad={() => setTournamentSubView('SQUAD')}
           onExit={() => { setTournament(null); setShowTournamentFlow(false); setTournamentRoundRecap(null); setTournamentSubView(null); }}
@@ -2830,8 +2815,8 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
             <MatchScreen
               match={match}
               userTeamId={activeUserTeamIdSafe}
-              year={tournamentMatchTieId && tournament ? new Date().getFullYear() : league.year}
-              currentJornada={tournamentMatchTieId ? 0 : league.currentJornada}
+              year={tournamentMatchCtx && tournament ? new Date().getFullYear() : league.year}
+              currentJornada={tournamentMatchCtx ? 0 : league.currentJornada}
               budget={userBudget}
               isPlaying={isPlaying}
               showSubPanel={showSubPanel}

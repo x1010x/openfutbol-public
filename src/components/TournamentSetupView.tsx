@@ -351,7 +351,10 @@ const NextRoundCard = ({ input, onAdd }: { input: number; onAdd: (d: StageDraft)
 
   const submit = () => {
     if (effectiveKind === 'liga') onAdd({ kind: 'liga', groupSize: safeGs, advancePerGroup: safeAdv });
-    else onAdd({ kind: 'ko', legs, awayGoalsRule: legs >= 2 ? awayGoals : undefined });
+    else {
+      const finalLegs = (isFinal ? Math.min(legs, 2) : legs) as 1 | 2 | 3 | 4;
+      onAdd({ kind: 'ko', legs: finalLegs, awayGoalsRule: finalLegs >= 2 ? awayGoals : undefined });
+    }
   };
 
   return (
@@ -403,7 +406,7 @@ const NextRoundCard = ({ input, onAdd }: { input: number; onAdd: (d: StageDraft)
           <div className="flex flex-col gap-1">
             <span className="text-vga-gray text-[7px] uppercase tracking-widest">{isFinal ? 'Partidos de la final' : 'Partidos por eliminatoria'}</span>
             <div className="flex gap-1">
-              {[1, 2, 3, 4].map(n => (
+              {(isFinal ? [1, 2] : [1, 2, 3, 4]).map(n => (
                 <button key={n} onClick={() => setLegs(n as 1 | 2 | 3 | 4)}
                   className={`px-3 py-1 text-[10px] uppercase font-bold border ${legs === n ? 'bg-vga-yellow text-vga-black border-vga-bright-white' : 'bg-vga-black text-vga-bright-white border-vga-blue hover:border-vga-yellow'}`}>
                   {n}

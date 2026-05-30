@@ -1,17 +1,17 @@
 import type { TournamentState, TournamentStage, TournamentTie, KoStageConfig, LigaStageConfig } from '../store/tournamentStore';
-import { groupStandings } from '../store/tournamentStore';
+import { groupStandings, userNextAction } from '../store/tournamentStore';
 import { TeamCrest } from './TeamCrest';
 
 interface Props {
   state: TournamentState;
   onAdvanceStage: () => void;
-  onPlayUserTie?: (tieId: string) => void;
+  onPlayUserMatch?: () => void;
   onOpenAlignment: () => void;
   onOpenSquad: () => void;
   onExit: () => void;
 }
 
-export const BracketView = ({ state, onAdvanceStage, onPlayUserTie, onOpenAlignment, onOpenSquad, onExit }: Props) => {
+export const BracketView = ({ state, onAdvanceStage, onPlayUserMatch, onOpenAlignment, onOpenSquad, onExit }: Props) => {
   const teamById = (id: string | null) => id ? state.teams.find(t => t.id === id) : null;
   const champion = state.champion ? teamById(state.champion) : null;
   const userTeam = state.userTeamId ? teamById(state.userTeamId) : null;
@@ -21,8 +21,15 @@ export const BracketView = ({ state, onAdvanceStage, onPlayUserTie, onOpenAlignm
   // User eliminated? Only true if userTeamId set and not in current stage inputs.
   const userOut = userTeam && stage.inputTeamIds && !stage.inputTeamIds.includes(state.userTeamId!);
 
-  const userTieInKo = (stage.config.kind === 'ko' && stage.ties && state.userTeamId)
-    ? stage.ties.find(t => !t.played && (t.homeTeamId === state.userTeamId || t.awayTeamId === state.userTeamId))
+  const nextAction = userNextAction(state);
+  const userMatchLabel = nextAction
+    ? (() => {
+        const h = teamById(nextAction.homeTeamId)?.name ?? '?';
+        const a = teamById(nextAction.awayTeamId)?.name ?? '?';
+        if (nextAction.type === 'liga') return `Jornada ${nextAction.jornada} · ${h} vs ${a}`;
+        const legLabel = nextAction.legIdx === 0 ? 'Ida' : nextAction.legIdx === 1 ? 'Vuelta' : `Partido ${nextAction.legIdx + 1}`;
+        return `${legLabel} · ${h} vs ${a}`;
+      })()
     : null;
 
   return (
@@ -99,21 +106,26 @@ export const BracketView = ({ state, onAdvanceStage, onPlayUserTie, onOpenAlignm
 
       {/* Footer */}
       {!champion && (
-        <div className="flex justify-end gap-2">
-          {userTieInKo && onPlayUserTie && (
+        <div className="flex justify-between items-center gap-2 flex-wrap">
+          <div className="text-vga-cyan text-[9px] uppercase">
+            {userMatchLabel ? `Próximo: ${userMatchLabel}` : ''}
+          </div>
+          <div className="flex gap-2">
+            {nextAction && onPlayUserMatch && (
+              <button
+                onClick={onPlayUserMatch}
+                className="bg-vga-yellow text-vga-black text-[11px] uppercase font-bold border-2 border-vga-bright-white px-4 py-2 hover:bg-vga-bright-white tracking-wider"
+              >
+                Jugar tu partido
+              </button>
+            )}
             <button
-              onClick={() => onPlayUserTie(userTieInKo.id)}
-              className="bg-vga-yellow text-vga-black text-[11px] uppercase font-bold border-2 border-vga-bright-white px-4 py-2 hover:bg-vga-bright-white tracking-wider"
+              onClick={onAdvanceStage}
+              className="bg-vga-light-green text-vga-black text-[11px] uppercase font-bold border-2 border-vga-bright-white px-4 py-2 hover:bg-vga-bright-white tracking-wider"
             >
-              Jugar tu partido
+              {nextAction ? 'Auto-sim fase' : 'Jugar fase'}
             </button>
-          )}
-          <button
-            onClick={onAdvanceStage}
-            className="bg-vga-light-green text-vga-black text-[11px] uppercase font-bold border-2 border-vga-bright-white px-4 py-2 hover:bg-vga-bright-white tracking-wider"
-          >
-            {userTieInKo ? 'Auto-sim fase' : 'Jugar fase'}
-          </button>
+          </div>
         </div>
       )}
     </div>

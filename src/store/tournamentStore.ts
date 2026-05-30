@@ -464,6 +464,140 @@ export const advanceCurrentStage = (state: TournamentState): TournamentState => 
   return { ...state, stages: newStages, currentStageIdx: state.currentStageIdx + 1 };
 };
 
+// ── User-driven step-by-step play ────────────────────────────────────────
+// Describes the next action the user must take in the current stage, or null
+// if they're a spectator / eliminated / stage is complete.
+export type UserNextAction =
+  | { type: 'liga'; groupId: string; matchIdx: number; jornada: number; homeTeamId: string; awayTeamId: string }
+  | { type: 'ko'; tieId: string; legIdx: number; homeTeamId: string; awayTeamId: string };
+
+export const userNextAction = (state: TournamentState): UserNextAction | null => {
+  if (!state.userTeamId || state.champion) return null;
+  const stage = state.stages[state.currentStageIdx];
+  if (!stage) return null;
+  if (stage.config.kind === 'liga' && stage.groups) {
+    // Find the next jornada that has any unplayed user match.
+    for (const g of stage.groups) {
+      const userMatch = g.matches.find(m =>
+        !m.played && (m.homeTeamId === state.userTeamId || m.awayTeamId === state.userTeamId)
+      );
+      if (userMatch) {
+        const matchIdx = g.matches.indexOf(userMatch);
+        return {
+          type: 'liga',
+          groupId: g.id,
+          matchIdx,
+          jornada: userMatch.jornada,
+          homeTeamId: userMatch.homeTeamId,
+          awayTeamId: userMatch.awayTeamId,
+        };
+      }
+    }
+    return null;
+  }
+  if (stage.config.kind === 'ko' && stage.ties) {
+    const userTie = stage.ties.find(t =>
+      !t.played && (t.homeTeamId === state.userTeamId || t.awayTeamId === state.userTeamId)
+    );
+    if (!userTie) return null;
+    const legIdx = userTie.legs.findIndex(l => !l.played);
+    if (legIdx < 0) return null;
+    const leg = userTie.legs[legIdx];
+    return { type: 'ko', tieId: userTie.id, legIdx, homeTeamId: leg.homeTeamId, awayTeamId: leg.awayTeamId };
+  }
+  return null;
+};
+
+// Record the user's match in a liga stage and sim every OTHER match of the
+// same jornada (in any group). Stage advances automatically when complete.
+export const recordUserLigaMatch = (
+  state: TournamentState,
+  groupId: string,
+  matchIdx: number,
+  homeScore: number,
+  awayScore: number,
+): TournamentState => {
+  const stageIdx = state.currentStageIdx;
+  const stage = state.stages[stageIdx];
+  if (stage.config.kind !== 'liga' || !stage.groups) return state;
+  const target = stage.groups.find(g => g.id === groupId);
+  if (!target) return state;
+  const targetMatch = target.matches[matchIdx];
+  if (!targetMatch) return state;
+  const jornada = targetMatch.jornada;
+  const teamById = (id: string) => state.teams.find(t => t.id === id)!;
+  const newGroups = stage.groups.map(g => ({
+    ...g,
+    matches: g.matches.map((m, i) => {
+      // User match: exact set scores.
+      if (g.id === groupId && i === matchIdx) {
+        return { ...m, homeScore, awayScore, played: true };
+      }
+      // Other matches in the same jornada (any group) get auto-simmed so
+      // standings advance jornada-by-jornada like a real league.
+      if (!m.played && m.jornada === jornada) {
+        const { hs, as } = scoreMatch(teamById(m.homeTeamId), teamById(m.awayTeamId));
+        return { ...m, homeScore: hs, awayScore: as, played: true };
+      }
+      return m;
+    }),
+  }));
+  const allPlayed = newGroups.every(g => g.matches.every(m => m.played));
+  const newStage: TournamentStage = { ...stage, groups: newGroups };
+  const newStages = [...state.stages];
+  newStages[stageIdx] = newStage;
+  let newState: TournamentState = { ...state, stages: newStages };
+  if (allPlayed) newState = advanceCurrentStage(newState);
+  return newState;
+};
+
+// Record the user's leg in a KO stage and sim the SAME leg index for every
+// other tie. Stage advances automatically when every leg of every tie is done.
+export const recordUserKoLeg = (
+  state: TournamentState,
+  tieId: string,
+  legIdx: number,
+  homeScore: number,
+  awayScore: number,
+): TournamentState => {
+  const stageIdx = state.currentStageIdx;
+  const stage = state.stages[stageIdx];
+  if (stage.config.kind !== 'ko' || !stage.ties) return state;
+  const cfg = stage.config as KoStageConfig;
+  const teamById = (id: string) => state.teams.find(t => t.id === id)!;
+  const newTies = stage.ties.map(tie => {
+    // User tie: set just the requested leg, leave the rest alone so the user
+    // can keep playing future legs of their own tie.
+    if (tie.id === tieId) {
+      const updatedLegs = tie.legs.map((l, i) =>
+        i === legIdx ? { ...l, homeScore, awayScore, played: true } : l
+      );
+      const allLegsPlayed = updatedLegs.every(l => l.played);
+      if (allLegsPlayed) return finalizeTie(tie, updatedLegs, cfg, state);
+      return { ...tie, legs: updatedLegs };
+    }
+    // Other tie: sim the same leg index.
+    if (tie.legs[legIdx] && !tie.legs[legIdx].played) {
+      const sameLeg = tie.legs[legIdx];
+      const { hs, as } = scoreMatch(teamById(sameLeg.homeTeamId), teamById(sameLeg.awayTeamId));
+      const updatedLegs = tie.legs.map((l, i) =>
+        i === legIdx ? { ...l, homeScore: hs, awayScore: as, played: true } : l
+      );
+      const allLegsPlayed = updatedLegs.every(l => l.played);
+      if (allLegsPlayed) return finalizeTie(tie, updatedLegs, cfg, state);
+      return { ...tie, legs: updatedLegs };
+    }
+    return tie;
+  });
+  const allDone = newTies.every(t => t.played);
+  const newStage: TournamentStage = { ...stage, ties: newTies };
+  const newStages = [...state.stages];
+  newStages[stageIdx] = newStage;
+  let newState: TournamentState = { ...state, stages: newStages };
+  if (allDone) newState = advanceCurrentStage(newState);
+  return newState;
+};
+
 // ── Persistence ───────────────────────────────────────────────────────────
 export const saveTournament = (state: TournamentState | null) => {
   try {
