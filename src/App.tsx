@@ -49,7 +49,7 @@ import { FantasyDraftView } from './components/FantasyDraftView';
 import type { StatKey } from './components/StatDrillDown';
 import { extractDbId } from './data/mockTeams';
 import { startAmbiance, stopAmbiance, fadeOutAmbiance, setAmbianceMuted, playGoalSignal, playGoalWithCelebration, playMissed, playWhistle, playWhistleEnd } from './sfx';
-import { computePrice, evaluateOffer, formatEuros, computeClausulazoPrice, computeAttendance, playerWeeklySalary } from './data/economy';
+import { computePrice, evaluateOffer, formatEuros, computeClausulazoPrice, computeAttendance } from './data/economy';
 import { PlayerTooltipProvider } from './contexts/PlayerTooltipContext';
 import { formatJornadaDate } from './engine/calendar';
 import type { OfferResult } from './data/economy';
@@ -1813,55 +1813,6 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
         awaySubsUsed: newSubsUsed,
         events: [...prev.events, ...newEvents],
       } : null);
-    }
-  };
-
-  const performUserSub = (playerOutId: string, playerInId: string) => {
-    if (!match) return;
-    const isUserHome = match.homeTeam.id === league.userTeamId;
-    const team = isUserHome ? match.homeTeam : match.awayTeam;
-    const subsUsed = isUserHome ? match.homeSubsUsed : match.awaySubsUsed;
-    if (subsUsed >= 3) return;
-
-    const playerOut = team.players.find(p => p.id === playerOutId);
-    const playerIn = team.players.find(p => p.id === playerInId);
-    if (!playerOut || !playerIn) return;
-
-    const newLineup = team.lineup.map(id => id === playerOutId ? playerInId : id);
-    const newTeam = { ...team, lineup: newLineup };
-    const stamMap = isUserHome ? { ...match.homeStamina } : { ...match.awayStamina };
-    stamMap[playerInId] = playerIn.stamina ?? 99;
-
-    const subEvent: MatchEvent = {
-      minute: match.minute,
-      type: 'sub',
-      description: `Cambio: entra ${playerIn.fullName}, sale ${playerOut.fullName}.`,
-      teamId: team.id,
-      playerId: playerInId,
-      playerOffId: playerOutId,
-    };
-
-    if (isUserHome) {
-      setMatch(prev => prev ? {
-        ...prev,
-        homeTeam: newTeam,
-        homeStamina: stamMap,
-        homeSubsUsed: subsUsed + 1,
-        events: [...prev.events, subEvent],
-      } : null);
-    } else {
-      setMatch(prev => prev ? {
-        ...prev,
-        awayTeam: newTeam,
-        awayStamina: stamMap,
-        awaySubsUsed: subsUsed + 1,
-        events: [...prev.events, subEvent],
-      } : null);
-    }
-    const newSubsUsed = subsUsed + 1;
-    if (newSubsUsed >= 3) {
-      setShowSubPanel(false);
-      setIsPlaying(true);
     }
   };
 

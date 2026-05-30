@@ -527,9 +527,6 @@ const MarketSection = ({
   const teamById = (id: string) => allTeams?.find(t => t.id === id);
   const [reviewOfferId, setReviewOfferId] = useState<string | null>(null);
   const closeCounter = () => { setCounterOfferId(null); setCounterCash(0); setCounterPlayerIds(new Set()); };
-  const openCounter = (offerId: string, baseAmount: number) => {
-    setCounterOfferId(offerId); setCounterCash(baseAmount); setCounterPlayerIds(new Set());
-  };
 
   // Reset transient state when player changes
   useEffect(() => { setBid(price); setResult(null); setExpanded(false); closeCounter(); }, [player.id, price]);
