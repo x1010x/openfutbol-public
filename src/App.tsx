@@ -48,7 +48,7 @@ import { FantasyDraftView } from './components/FantasyDraftView';
 import type { StatKey } from './components/StatDrillDown';
 import { extractDbId } from './data/mockTeams';
 import { startAmbiance, stopAmbiance, fadeOutAmbiance, setAmbianceMuted, playGoalSignal, playGoalWithCelebration, playMissed, playWhistle, playWhistleEnd } from './sfx';
-import { computePrice, evaluateOffer, formatEuros, computeClausulazoPrice, computeAttendance } from './data/economy';
+import { computePrice, evaluateOffer, formatEuros, computeClausulazoPrice, computeAttendance, playerWeeklySalary } from './data/economy';
 import { PlayerTooltipProvider } from './contexts/PlayerTooltipContext';
 import { formatJornadaDate } from './engine/calendar';
 import type { OfferResult } from './data/economy';
@@ -59,6 +59,34 @@ import { buildTeamFromPackClub, trimRoster } from './data/packTeamBuilder';
 import { runtimePlayerFromPack, joinPlayerName } from './data/playerBuilder';
 
 type View = 'LEAGUE' | 'SQUAD' | 'ALIGNMENT' | 'RESULTS' | 'STATS' | 'FINANCES' | 'TRANSFERS' | 'JORNADA_RESULTS' | 'END_OF_SEASON' | 'PLAYER_DETAIL' | 'BACKUP' | 'EDITOR' | 'EQUIPO' | 'MANAGER_CAREER' | 'PACK_LOADER';
+
+// Player decides whether to accept the transfer after the clubs agree. The
+// buyer-side AI is implicitly offering wages proportional to the fee paid:
+// the bigger the fee relative to the player's value, the better the wage
+// package, and the higher the acceptance probability. Inputs:
+//  - feeRatio = fee / market price (1.0 = fair, >1.0 = premium)
+//  - buyerStrength vs current club (a stronger buyer is more attractive)
+// Returns true if the player approves the move.
+const playerApprovesMove = (player: Player, buyer: Team, feePaid: number, seasonYear: number): boolean => {
+  const price = Math.max(1, computePrice(player, seasonYear));
+  const feeRatio = feePaid / price;
+  // Implicit wage package: scaled with the fee. A 1.5x fee ratio implies a
+  // solid raise on top of current wages.
+  const currentWage = playerWeeklySalary(player, seasonYear);
+  const impliedWage = currentWage * Math.max(1, feeRatio * 1.1);
+  const wageBump = impliedWage / Math.max(1, currentWage);
+  // Buyer reputation proxy: average lineup media.
+  const buyerStrength = buyer.players.length > 0
+    ? buyer.players.reduce((s, p) => s + p.media, 0) / buyer.players.length
+    : 50;
+  // Base probability from fee ratio (capped to 0.95).
+  let p = Math.min(0.95, Math.max(0.15, 0.45 + (feeRatio - 1) * 0.4));
+  // Wage bump: small additional swing.
+  p += Math.min(0.15, (wageBump - 1) * 0.3);
+  // Better destination club: small boost.
+  p += Math.min(0.1, Math.max(-0.05, (buyerStrength - 60) / 200));
+  return Math.random() < Math.max(0.1, Math.min(0.97, p));
+};
 
 function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
   useT(); // subscribe to language changes so nav labels and messages re-render
@@ -680,6 +708,12 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
     const price = computePrice(player, league.year);
     const clausulaCost = computeClausulazoPrice(price);
     if (buyer.budget < clausulaCost) return { accepted: false, message: 'No tienes presupuesto suficiente para la cláusula.' };
+    // Even with a clausulazo paid, the player still has to want the move.
+    // Clausulazo pays a 2x premium so the implicit wage offer is generous;
+    // approval is high but not automatic.
+    if (!playerApprovesMove(player, buyer, clausulaCost, league.year)) {
+      return { accepted: false, message: `${player.name} no quiere venir a tu club aunque pagues la cláusula.` };
+    }
 
     setLeague(prev => {
       const entry: TransferRecord = {
@@ -784,6 +818,20 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
     }
     if (buyerFinalSize < 11) {
       setMessage({ title: t('msg.minSquadRival.title'), body: t('msg.minSquadRival.body', { team: buyer.name, n: String(buyerFinalSize) }), tone: 'warning' });
+      return;
+    }
+    // Player approval gate: the AI buyer negotiates terms with the player.
+    // Approval probability is driven by offer-vs-value ratio plus a mood bump.
+    // Big-money moves almost always go through; lowball deals get the player
+    // to say no even if both clubs agreed.
+    if (!playerApprovesMove(player, buyer, offer.amount, league.year)) {
+      setMessage({
+        title: 'El jugador no acepta',
+        body: `${player.name} rechaza las condiciones que le ofrece ${buyer.name}. El traspaso se cae.`,
+        tone: 'danger',
+      });
+      // Withdraw the offer so it doesn't sit forever.
+      setLeague(prev => ({ ...prev, incomingOffers: prev.incomingOffers.filter(o => o.id !== offerId) }));
       return;
     }
     setLeague(prev => {
@@ -1303,6 +1351,8 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
       finalMatch.events,
       finalMatch.homeStartingLineup,
       finalMatch.awayStartingLineup,
+      finalMatch.stoppageTime1 ?? 0,
+      finalMatch.stoppageTime2 ?? 0,
     );
     newLeague = applyTvBonus(newLeague, league.userTeamId, tvBonus);
     // Florentinometro + reputation: context-aware match delta
@@ -1711,6 +1761,57 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
       }
     }
     return next;
+  };
+
+  // Commit a batch of staged substitutions from the in-game AlignmentView.
+  // stagedLineup is the new final lineup; subPairs are the (out, in) pairs
+  // that count as subs (position swaps and net-zero shuffles are excluded).
+  const commitUserSubs = (stagedLineup: string[], subPairs: { outId: string; inId: string }[]) => {
+    if (!match) return;
+    const isUserHome = match.homeTeam.id === league.userTeamId;
+    const team = isUserHome ? match.homeTeam : match.awayTeam;
+    const subsUsed = isUserHome ? match.homeSubsUsed : match.awaySubsUsed;
+    if (subPairs.length === 0 && stagedLineup.join(',') === team.lineup.join(',')) return;
+
+    const stamMap = isUserHome ? { ...match.homeStamina } : { ...match.awayStamina };
+    const newEvents: MatchEvent[] = [];
+    for (const { outId, inId } of subPairs) {
+      const pIn = team.players.find(p => p.id === inId);
+      const pOut = outId ? team.players.find(p => p.id === outId) : undefined;
+      if (!pIn) continue;
+      stamMap[pIn.id] = pIn.stamina ?? 99;
+      newEvents.push({
+        minute: match.minute,
+        type: 'sub',
+        description: pOut
+          ? `Cambio: entra ${pIn.fullName}, sale ${pOut.fullName}.`
+          : `Entra ${pIn.fullName}.`,
+        teamId: team.id,
+        playerId: inId,
+        playerOffId: outId || undefined,
+      });
+    }
+    const newSubsUsed = subsUsed + subPairs.length;
+    if (newSubsUsed > 3) return; // hard guard
+
+    const newTeam = { ...team, lineup: stagedLineup };
+    if (isUserHome) {
+      setMatch(prev => prev ? {
+        ...prev,
+        homeTeam: newTeam,
+        homeStamina: stamMap,
+        homeSubsUsed: newSubsUsed,
+        events: [...prev.events, ...newEvents],
+      } : null);
+    } else {
+      setMatch(prev => prev ? {
+        ...prev,
+        awayTeam: newTeam,
+        awayStamina: stamMap,
+        awaySubsUsed: newSubsUsed,
+        events: [...prev.events, ...newEvents],
+      } : null);
+    }
   };
 
   const performUserSub = (playerOutId: string, playerInId: string) => {
@@ -2542,7 +2643,7 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
               className="text-vga-cyan text-[8px] hover:text-vga-yellow underline decoration-dotted underline-offset-2 cool:text-rc-accent cool:hover:text-rc-primary flex items-center gap-1"
               title="Ver cambios recientes"
             >
-              OPENFUTBOL v1.7.0-{__BUILD_TIMESTAMP__}
+              OPENFUTBOL v1.8.0-{__BUILD_TIMESTAMP__}
               {hasNewVersion && (
                 <span className="bg-vga-red text-vga-bright-white text-[7px] px-1 font-bold animate-pulse">
                   NUEVO
@@ -2650,9 +2751,16 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
                       maxSubs: 3,
                       injuredIds,
                       sentOff,
+                      subbedOffIds: match.events
+                        .filter(e => e.type === 'sub' && e.teamId === userTeamInMatch.id && e.playerOffId)
+                        .map(e => e.playerOffId as string),
                       htPaused,
-                      onSubstitute: (outId, inId) => { performUserSub(outId, inId); setPreselectedSubPlayerId(null); },
-                      onContinue: () => { setShowSubPanel(false); setPreselectedSubPlayerId(null); setIsPlaying(true); },
+                      onCommit: (stagedLineup, subPairs) => {
+                        commitUserSubs(stagedLineup, subPairs);
+                        setShowSubPanel(false);
+                        setPreselectedSubPlayerId(null);
+                        setIsPlaying(true);
+                      },
                       initialSelectedPlayerId: preselectedSubPlayerId,
                     }}
                   />

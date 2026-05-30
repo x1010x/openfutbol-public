@@ -22,6 +22,15 @@ export const computeWeeklySalary = (price: number): number => {
   return Math.round((price / 2000) * engineSettings.salaryMult / 10) * 10;
 };
 
+// Prefer the player's actual contract.salary (weekly). Fall back to derived from
+// market price when contract is missing. Single source of truth for both the
+// inspector display and the weekly wage deduction.
+export const playerWeeklySalary = (player: Player, seasonYear: number): number => {
+  const fromContract = player.contract?.salary;
+  if (fromContract && fromContract > 0) return fromContract;
+  return computeWeeklySalary(computePrice(player, seasonYear));
+};
+
 export const computeClausulazoPrice = (price: number): number =>
   Math.round(price * engineSettings.clausulazoMult / 100_000) * 100_000;
 
@@ -105,8 +114,5 @@ export const computeAttendance = (homeTeam: Team, awayTeam: Team): AttendanceRes
 };
 
 export const teamWeeklySalary = (team: Team, seasonYear: number): number => {
-  return team.players.reduce(
-    (sum, p) => sum + computeWeeklySalary(computePrice(p, seasonYear)),
-    0
-  );
+  return team.players.reduce((sum, p) => sum + playerWeeklySalary(p, seasonYear), 0);
 };

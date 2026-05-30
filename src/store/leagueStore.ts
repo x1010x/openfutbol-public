@@ -401,13 +401,23 @@ export const getFantasyLeagueState = (
   };
 };
 
-const buildMinutesMap = (startingLineup: string[], events: MatchEvent[], teamId: string): Record<string, number> => {
+const buildMinutesMap = (
+  startingLineup: string[],
+  events: MatchEvent[],
+  teamId: string,
+  stoppage1 = 0,
+  stoppage2 = 0,
+): Record<string, number> => {
+  // Total real minutes in the match = 90 + both stoppage periods.
+  // A player on at minute M was playing from M up through fullTime (so they get
+  // fullTime - M minutes). Starters get the full match by default.
+  const fullTime = 90 + stoppage1 + stoppage2;
   const minutes: Record<string, number> = {};
-  for (const pid of startingLineup) minutes[pid] = 90;
+  for (const pid of startingLineup) minutes[pid] = fullTime;
   for (const ev of events) {
     if (ev.type !== 'sub' || ev.teamId !== teamId) continue;
     if (ev.playerOffId) minutes[ev.playerOffId] = ev.minute;
-    if (ev.playerId) minutes[ev.playerId] = (minutes[ev.playerId] ?? 0) + (90 - ev.minute);
+    if (ev.playerId) minutes[ev.playerId] = (minutes[ev.playerId] ?? 0) + Math.max(0, fullTime - ev.minute);
   }
   return minutes;
 };
@@ -421,6 +431,8 @@ export const updateLeagueStats = (
   events: MatchEvent[] = [],
   homeStartingLineup?: string[],
   awayStartingLineup?: string[],
+  stoppage1 = 0,
+  stoppage2 = 0,
 ): LeagueState => {
   const newStats = { ...state.stats };
   const newTeams = [...state.teams];
@@ -518,8 +530,8 @@ export const updateLeagueStats = (
     }
   });
 
-  const homeMinutes = homeStartingLineup ? buildMinutesMap(homeStartingLineup, events, homeId) : null;
-  const awayMinutes = awayStartingLineup ? buildMinutesMap(awayStartingLineup, events, awayId) : null;
+  const homeMinutes = homeStartingLineup ? buildMinutesMap(homeStartingLineup, events, homeId, stoppage1, stoppage2) : null;
+  const awayMinutes = awayStartingLineup ? buildMinutesMap(awayStartingLineup, events, awayId, stoppage1, stoppage2) : null;
 
   const sides: { id: string; oppId: string; gf: number; ga: number; minutesMap: Record<string, number> | null }[] = [
     { id: homeId, oppId: awayId, gf: homeScore, ga: awayScore, minutesMap: homeMinutes },
@@ -531,7 +543,7 @@ export const updateLeagueStats = (
     team.players.forEach(player => {
       const mins = side.minutesMap ? (side.minutesMap[player.id] ?? 0) : null;
       // If we have a minutes map, use it. Otherwise fall back to lineup membership = 90 min.
-      const playedMins = mins !== null ? mins : (team.lineup.includes(player.id) ? 90 : 0);
+      const playedMins = mins !== null ? mins : (team.lineup.includes(player.id) ? (90 + stoppage1 + stoppage2) : 0);
       if (playedMins <= 0) return;
 
       const slotIdx = team.lineup.indexOf(player.id);

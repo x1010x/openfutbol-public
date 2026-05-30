@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import type { Player, Position, Team } from '../types/game.d.ts';
 import type { IncomingOffer } from '../store/leagueStore';
 import { computePrice, formatEuros } from '../data/economy';
+import { NegotiationModal } from './NegotiationModal';
 import { moodStateOf } from '../engine/playerMood';
 import { CountryBadge } from './CountryBadge';
 import { TeamCrest } from './TeamCrest';
@@ -105,6 +106,7 @@ export const SquadViewCompact = ({
   blockedSignings = [],
   onAcceptIncomingOffer,
   onRejectIncomingOffer,
+  onCounterIncomingOffer,
   onOffer,
   onPayClausula,
   onSwitchClassic,
@@ -335,6 +337,7 @@ export const SquadViewCompact = ({
             player={selected}
             team={team}
             seasonYear={seasonYear}
+            currentJornada={currentJornada}
             inLineup={lineupSet.has(selected.id)}
             readOnly={readOnly}
             onToggleForSale={onToggleForSale}
@@ -346,6 +349,7 @@ export const SquadViewCompact = ({
             isBlocked={blockedSignings.some(k => k.endsWith(`:${selected.id}`))}
             onAcceptIncomingOffer={onAcceptIncomingOffer}
             onRejectIncomingOffer={onRejectIncomingOffer}
+            onCounterIncomingOffer={onCounterIncomingOffer}
             onOffer={onOffer ? (amount) => onOffer(selected.id, amount) : undefined}
             onPayClausula={onPayClausula ? () => onPayClausula(selected.id) : undefined}
           /> : (
@@ -366,13 +370,14 @@ const Stat = ({ label, value, color }: { label: string; value: string; color: st
 );
 
 const Inspector = ({
-  player, team, seasonYear, inLineup, readOnly, onToggleForSale, onPlayerClick,
+  player, team, seasonYear, currentJornada, inLineup, readOnly, onToggleForSale, onPlayerClick,
   incomingOffers, allTeams, userTeam, windowOpen = false, isBlocked = false,
-  onAcceptIncomingOffer, onRejectIncomingOffer, onOffer, onPayClausula,
+  onAcceptIncomingOffer, onRejectIncomingOffer, onCounterIncomingOffer, onOffer, onPayClausula,
 }: {
   player: Player;
   team: Team;
   seasonYear: number;
+  currentJornada?: number;
   inLineup: boolean;
   readOnly: boolean;
   onToggleForSale: (id: string) => void;
@@ -384,6 +389,7 @@ const Inspector = ({
   isBlocked?: boolean;
   onAcceptIncomingOffer?: (offerId: string) => void;
   onRejectIncomingOffer?: (offerId: string) => void;
+  onCounterIncomingOffer?: (offerId: string, requestedCash: number, requestedPlayerIds: string[]) => void;
   onOffer?: (amount: number) => import('../data/economy').OfferResult;
   onPayClausula?: () => import('../data/economy').OfferResult;
 }) => {
@@ -450,7 +456,9 @@ const Inspector = ({
 
       <MarketSection
         player={player}
+        team={team}
         seasonYear={seasonYear}
+        currentJornada={currentJornada}
         readOnly={readOnly}
         incomingOffers={incomingOffers}
         allTeams={allTeams}
@@ -459,6 +467,7 @@ const Inspector = ({
         isBlocked={isBlocked}
         onAcceptIncomingOffer={onAcceptIncomingOffer}
         onRejectIncomingOffer={onRejectIncomingOffer}
+        onCounterIncomingOffer={onCounterIncomingOffer}
         onOffer={onOffer}
         onPayClausula={onPayClausula}
       />
@@ -488,11 +497,13 @@ const Inspector = ({
 };
 
 const MarketSection = ({
-  player, seasonYear, readOnly, incomingOffers = [], allTeams, userTeam,
-  windowOpen, isBlocked, onAcceptIncomingOffer, onRejectIncomingOffer, onOffer, onPayClausula,
+  player, team, seasonYear, currentJornada, readOnly, incomingOffers = [], allTeams, userTeam,
+  windowOpen, isBlocked, onAcceptIncomingOffer, onRejectIncomingOffer, onCounterIncomingOffer, onOffer, onPayClausula,
 }: {
   player: Player;
+  team: Team;
   seasonYear: number;
+  currentJornada?: number;
   readOnly: boolean;
   incomingOffers?: IncomingOffer[];
   allTeams?: Team[];
@@ -501,6 +512,7 @@ const MarketSection = ({
   isBlocked: boolean;
   onAcceptIncomingOffer?: (offerId: string) => void;
   onRejectIncomingOffer?: (offerId: string) => void;
+  onCounterIncomingOffer?: (offerId: string, requestedCash: number, requestedPlayerIds: string[]) => void;
   onOffer?: (amount: number) => import('../data/economy').OfferResult;
   onPayClausula?: () => import('../data/economy').OfferResult;
 }) => {
@@ -509,10 +521,18 @@ const MarketSection = ({
   const [bid, setBid] = useState<number>(price);
   const [result, setResult] = useState<{ ok: boolean; msg: string } | null>(null);
   const [expanded, setExpanded] = useState<boolean>(false);
+  const [counterOfferId, setCounterOfferId] = useState<string | null>(null);
+  const [counterCash, setCounterCash] = useState<number>(0);
+  const [counterPlayerIds, setCounterPlayerIds] = useState<Set<string>>(new Set());
   const teamById = (id: string) => allTeams?.find(t => t.id === id);
+  const [reviewOfferId, setReviewOfferId] = useState<string | null>(null);
+  const closeCounter = () => { setCounterOfferId(null); setCounterCash(0); setCounterPlayerIds(new Set()); };
+  const openCounter = (offerId: string, baseAmount: number) => {
+    setCounterOfferId(offerId); setCounterCash(baseAmount); setCounterPlayerIds(new Set());
+  };
 
   // Reset transient state when player changes
-  useEffect(() => { setBid(price); setResult(null); setExpanded(false); }, [player.id, price]);
+  useEffect(() => { setBid(price); setResult(null); setExpanded(false); closeCounter(); }, [player.id, price]);
 
   const isOwn = !readOnly;
   const showOffers = isOwn && incomingOffers.length > 0;
@@ -551,24 +571,86 @@ const MarketSection = ({
           <div className="text-vga-cyan text-[7px] uppercase tracking-widest">Ofertas recibidas</div>
           {incomingOffers.map(o => {
             const bidder = teamById(o.fromTeamId);
+            const isCountering = counterOfferId === o.id;
+            const counterStep = Math.max(100_000, Math.round(price * 0.05 / 100_000) * 100_000);
+            const bidderBench = bidder
+              ? bidder.players.filter(p => !bidder.lineup.includes(p.id)).sort((a, b) => b.media - a.media)
+              : [];
+            const counterPlayersValue = [...counterPlayerIds]
+              .map(id => bidder?.players.find(p => p.id === id))
+              .filter((p): p is Player => Boolean(p))
+              .reduce((s, p) => s + computePrice(p, seasonYear), 0);
+            const counterTotal = counterCash + counterPlayersValue;
             return (
-              <div key={o.id} className="grid grid-cols-[1fr_auto_auto] items-center gap-1 border border-vga-blue px-2 py-1 text-[7px]">
-                <div className="min-w-0">
-                  <div className="text-vga-bright-white uppercase truncate">{bidder?.name ?? '—'}</div>
-                  <div className="text-vga-light-green font-bold font-mono">{formatEuros(o.amount)}</div>
+              <div key={o.id} className="border border-vga-blue text-[7px]">
+                <div className="grid grid-cols-[1fr_auto] items-center gap-1 px-2 py-1">
+                  <div className="min-w-0">
+                    <div className="text-vga-bright-white uppercase truncate">{bidder?.name ?? '—'}</div>
+                    <div className="text-vga-light-green font-bold font-mono">{formatEuros(o.amount)}</div>
+                  </div>
+                  <button
+                    onClick={() => setReviewOfferId(o.id)}
+                    className="bg-vga-blue text-vga-bright-white px-3 py-1 text-[8px] uppercase font-bold border border-vga-bright-white hover:bg-vga-light-blue tracking-wider"
+                  >
+                    Ver oferta
+                  </button>
                 </div>
-                <button
-                  onClick={() => onAcceptIncomingOffer?.(o.id)}
-                  className="bg-vga-light-green text-vga-black px-2 py-1 text-[7px] uppercase font-bold border border-vga-bright-white hover:bg-vga-bright-white"
-                >
-                  Sí
-                </button>
-                <button
-                  onClick={() => onRejectIncomingOffer?.(o.id)}
-                  className="bg-vga-red text-vga-bright-white px-2 py-1 text-[7px] uppercase font-bold border border-vga-bright-white hover:bg-vga-light-red"
-                >
-                  No
-                </button>
+                {isCountering && bidder && (
+                  <div className="border-t border-vga-yellow bg-vga-blue/20 p-2 flex flex-col gap-2">
+                    <div className="text-[7px] text-vga-yellow font-bold uppercase">Pide a {bidder.name}</div>
+                    <div className="flex items-center gap-1 flex-wrap">
+                      <span className="text-[7px] text-vga-bright-white uppercase">Efectivo:</span>
+                      <button onClick={() => setCounterCash(c => Math.max(0, c - counterStep))} className="bg-vga-gray text-vga-black px-1.5 border border-vga-black text-[8px]">−</button>
+                      <span className="text-vga-yellow font-bold text-[9px] font-mono min-w-[80px] text-center">{formatEuros(counterCash)}</span>
+                      <button onClick={() => setCounterCash(c => c + counterStep)} className="bg-vga-gray text-vga-black px-1.5 border border-vga-black text-[8px]">+</button>
+                      <button onClick={() => setCounterCash(0)} className="text-[6px] text-vga-gray border border-vga-gray px-1">0</button>
+                      <button onClick={() => setCounterCash(o.amount)} className="text-[6px] text-vga-gray border border-vga-gray px-1">BASE</button>
+                    </div>
+                    {bidderBench.length > 0 && (
+                      <div className="flex flex-col gap-0.5">
+                        <div className="text-[7px] text-vga-bright-white uppercase">Jugadores (máx 2)</div>
+                        <div className="max-h-28 overflow-y-auto flex flex-col gap-0.5">
+                          {bidderBench.map(p => {
+                            const sel = counterPlayerIds.has(p.id);
+                            const pPrice = computePrice(p, seasonYear);
+                            const canAdd = sel || counterPlayerIds.size < 2;
+                            return (
+                              <button
+                                key={p.id}
+                                disabled={!canAdd}
+                                onClick={() => setCounterPlayerIds(prev => {
+                                  const next = new Set(prev);
+                                  if (next.has(p.id)) next.delete(p.id); else next.add(p.id);
+                                  return next;
+                                })}
+                                className={`flex items-center justify-between px-2 py-0.5 text-[7px] border ${sel ? 'bg-vga-yellow text-vga-black border-vga-black' : canAdd ? 'bg-vga-black text-vga-bright-white border-vga-gray hover:border-vga-yellow' : 'bg-vga-black text-vga-gray border-vga-gray opacity-40 cursor-default'}`}
+                              >
+                                <span className="truncate"><span className="font-bold mr-1">{p.position}</span>{p.name}</span>
+                                <span className="text-vga-cyan ml-2 shrink-0">{p.media} · {formatEuros(pPrice)}</span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="text-[7px]">
+                        <span className="text-vga-gray">Total: </span>
+                        <span className="text-vga-yellow font-bold font-mono">{formatEuros(counterTotal)}</span>
+                        <span className="text-vga-gray ml-1">({Math.round((counterTotal / price) * 100)}%)</span>
+                      </div>
+                      <div className="flex gap-1">
+                        <button onClick={closeCounter} className="bg-vga-gray text-vga-black px-2 py-1 text-[7px] uppercase border border-vga-black">Cancelar</button>
+                        <button
+                          onClick={() => { onCounterIncomingOffer!(o.id, counterCash, [...counterPlayerIds]); closeCounter(); }}
+                          className="bg-vga-light-green text-vga-black px-2 py-1 text-[7px] uppercase font-bold border border-vga-bright-white hover:bg-vga-bright-white"
+                        >
+                          Enviar
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             );
           })}
@@ -660,6 +742,26 @@ const MarketSection = ({
           )}
         </div>
       )}
+      {reviewOfferId && (() => {
+        const o = incomingOffers.find(x => x.id === reviewOfferId);
+        const buyer = o ? teamById(o.fromTeamId) : undefined;
+        if (!o || !buyer) return null;
+        return (
+          <NegotiationModal
+            player={player}
+            sellerTeam={team}
+            buyerTeam={buyer}
+            offer={o}
+            seasonYear={seasonYear}
+            currentJornada={currentJornada}
+            isOwnPlayer={isOwn}
+            onAccept={() => onAcceptIncomingOffer?.(o.id)}
+            onReject={() => onRejectIncomingOffer?.(o.id)}
+            onCounter={onCounterIncomingOffer ? (cash, ids) => onCounterIncomingOffer(o.id, cash, ids) : undefined}
+            onClose={() => setReviewOfferId(null)}
+          />
+        );
+      })()}
     </div>
   );
 };

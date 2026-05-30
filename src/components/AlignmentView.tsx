@@ -13,9 +13,12 @@ interface IngameProps {
   maxSubs: number;
   injuredIds: string[];
   sentOff: string[];
+  // Players who have already been subbed off in this match — cannot return.
+  subbedOffIds: string[];
   htPaused: boolean;
-  onSubstitute: (outId: string, inId: string) => void;
-  onContinue: () => void;
+  // Commit-on-continue. The staged lineup is the final lineup; subPairs are the
+  // net (outId, inId) pairs that count toward subsUsed. Empty arrays = no-op.
+  onCommit: (stagedLineup: string[], subPairs: { outId: string; inId: string }[]) => void;
   // If set, opens with this player's slot already selected (e.g. clicked from match pitch)
   initialSelectedPlayerId?: string | null;
 }
@@ -243,15 +246,43 @@ export const AlignmentView = ({ team, onUpdate, onBack, onToggleDiscipline, inga
   const t = useT();
   const teamMED = Math.floor(calculateTeamStrength(team) / 2);
   const slots = FORMATIONS[team.formation];
+
+  // In-game mode stages all changes locally; nothing is committed until
+  // Continuar is pressed. Out-of-game keeps the legacy direct-write behaviour
+  // (onUpdate is called per slot assignment).
+  const [stagedLineup, setStagedLineup] = useState<string[]>(() => {
+    const arr: string[] = [];
+    for (let i = 0; i < slots.length; i++) arr.push(team.lineup[i] ?? '');
+    return arr;
+  });
+  const effectiveLineup = ingame ? stagedLineup : team.lineup;
+  const originalLineup = ingame ? team.lineup : team.lineup;
+
   const initialSelectedSlot = ingame?.initialSelectedPlayerId
-    ? (() => { const i = team.lineup.indexOf(ingame.initialSelectedPlayerId); return i >= 0 ? i : null; })()
+    ? (() => { const i = effectiveLineup.indexOf(ingame.initialSelectedPlayerId); return i >= 0 ? i : null; })()
     : null;
   const [selectedSlot, setSelectedSlot] = useState<number | null>(initialSelectedSlot);
 
   const slotOfPlayer = new Map<string, number>();
-  team.lineup.forEach((id, idx) => { if (id) slotOfPlayer.set(id, idx); });
-  const currentTitulars = team.lineup.filter(Boolean);
+  effectiveLineup.forEach((id, idx) => { if (id) slotOfPlayer.set(id, idx); });
+  const currentTitulars = effectiveLineup.filter(Boolean);
   const titularCount = currentTitulars.length;
+
+  // Compute pending sub count from the staging diff. A "pending sub" is any
+  // player brought on (in staged but not in original) — naturally covers
+  // fill-empty-slot and ignores pure position swaps and sub-out-then-back-in.
+  const pendingSubs: { outId: string; inId: string }[] = ingame ? (() => {
+    const origIn = new Set(originalLineup.filter(Boolean));
+    const stagIn = new Set(stagedLineup.filter(Boolean));
+    const ins = [...stagIn].filter(id => !origIn.has(id));
+    const outs = [...origIn].filter(id => !stagIn.has(id));
+    const n = Math.max(ins.length, outs.length);
+    const pairs: { outId: string; inId: string }[] = [];
+    for (let i = 0; i < n; i++) pairs.push({ outId: outs[i] ?? '', inId: ins[i] ?? '' });
+    return pairs.filter(p => p.inId); // only count brought-on players
+  })() : [];
+  const pendingSubCount = pendingSubs.length;
+  const effectiveSubsUsed = ingame ? ingame.subsUsed + pendingSubCount : 0;
 
   const handleFormationChange = (f: FormationId) => {
     if (f === team.formation) return;
@@ -267,12 +298,29 @@ export const AlignmentView = ({ team, onUpdate, onBack, onToggleDiscipline, inga
 
   const assignToSlot = (slotIdx: number, playerId: string | null) => {
     if (ingame) {
-      // In-game mode: real substitution (permanent)
-      if (playerId === null) { setSelectedSlot(null); return; }
-      const outId = team.lineup[slotIdx];
-      if (outId && ingame.subsUsed < ingame.maxSubs) {
-        ingame.onSubstitute(outId, playerId);
+      // In-game mode: stage the change. Position swaps cost no sub; bringing
+      // a bench player on costs 1 (computed at commit time via pendingSubs).
+      const newLineup = [...stagedLineup];
+      while (newLineup.length < slots.length) newLineup.push('');
+      if (playerId === null) {
+        newLineup[slotIdx] = '';
+      } else {
+        const existingSlot = newLineup.indexOf(playerId);
+        if (existingSlot !== -1) newLineup[existingSlot] = newLineup[slotIdx];
+        newLineup[slotIdx] = playerId;
       }
+      // Block staging changes that would exceed the sub budget.
+      const projected = (() => {
+        const origIn = new Set(originalLineup.filter(Boolean));
+        const stagIn = new Set(newLineup.filter(Boolean));
+        const ins = [...stagIn].filter(id => !origIn.has(id));
+        return ingame.subsUsed + ins.length;
+      })();
+      if (projected > ingame.maxSubs) {
+        setSelectedSlot(null);
+        return;
+      }
+      setStagedLineup(newLineup);
       setSelectedSlot(null);
       return;
     }
@@ -307,15 +355,15 @@ export const AlignmentView = ({ team, onUpdate, onBack, onToggleDiscipline, inga
 
   const inPickMode = selectedSlot !== null;
   const slotPos: Position | null = inPickMode ? slots[selectedSlot!] : null;
-  const currentSlotPlayerId = inPickMode ? (team.lineup[selectedSlot!] ?? null) : null;
+  const currentSlotPlayerId = inPickMode ? (effectiveLineup[selectedSlot!] ?? null) : null;
 
   const candidates = slotPos
     ? team.players.filter(p => {
         if (p.suspensionMatches > 0 || (p.injuryWeeksRemaining ?? 0) > 0) return false;
         if (ingame) {
-          // In-game: only bench players can come in, exclude injured/sentOff in match
           if (ingame.injuredIds.includes(p.id) || ingame.sentOff.includes(p.id)) return false;
-          if (slotOfPlayer.has(p.id)) return false;
+          // Players who have already been subbed off (committed) cannot return.
+          if (ingame.subbedOffIds.includes(p.id)) return false;
         }
         return true;
       })
@@ -387,8 +435,9 @@ export const AlignmentView = ({ team, onUpdate, onBack, onToggleDiscipline, inga
               MED {teamMED}
             </div>
             {ingame ? (
-              <div style={{ background: '#000000', border: `2px solid ${ingame.subsUsed >= ingame.maxSubs ? '#ff5555' : '#55ff55'}`, padding: '2px 6px', fontSize: 14, color: ingame.subsUsed >= ingame.maxSubs ? '#ff5555' : '#55ff55', fontFamily: 'monospace', fontWeight: 'bold' }}>
-                {t('misc.subsCountFmt', { used: String(ingame.subsUsed), max: String(ingame.maxSubs) })}
+              <div style={{ background: '#000000', border: `2px solid ${effectiveSubsUsed >= ingame.maxSubs ? '#ff5555' : '#55ff55'}`, padding: '2px 6px', fontSize: 14, color: effectiveSubsUsed >= ingame.maxSubs ? '#ff5555' : '#55ff55', fontFamily: 'monospace', fontWeight: 'bold' }}>
+                {t('misc.subsCountFmt', { used: String(effectiveSubsUsed), max: String(ingame.maxSubs) })}
+                {pendingSubCount > 0 && <span style={{ marginLeft: 4, fontSize: 10, color: '#ffff55' }}>(+{pendingSubCount})</span>}
               </div>
             ) : (
               <div style={{ background: '#000000', border: `2px solid ${titularCount === 11 ? '#55ff55' : '#ff5555'}`, padding: '2px 6px', fontSize: 14, color: titularCount === 11 ? '#55ff55' : '#ff5555', fontFamily: 'monospace', fontWeight: 'bold' }}>
@@ -396,7 +445,7 @@ export const AlignmentView = ({ team, onUpdate, onBack, onToggleDiscipline, inga
               </div>
             )}
             <button
-              onClick={ingame ? ingame.onContinue : onBack}
+              onClick={ingame ? () => ingame.onCommit(stagedLineup, pendingSubs) : onBack}
               style={{ background: ingame ? '#0000aa' : '#aa0000', color: '#ffffff', border: '2px solid #aaaaaa', padding: '3px 10px', fontSize: 13, fontWeight: 'bold', textTransform: 'uppercase', cursor: 'pointer', boxShadow: ingame ? 'inset 1px 1px 0 #5555ff, inset -1px -1px 0 #000055' : 'inset 1px 1px 0 #ff5555, inset -1px -1px 0 #550000' }}
               onMouseEnter={e => { (e.target as HTMLElement).style.background = ingame ? '#0004e0' : '#ff5555'; }}
               onMouseLeave={e => { (e.target as HTMLElement).style.background = ingame ? '#0000aa' : '#aa0000'; }}
@@ -457,7 +506,7 @@ export const AlignmentView = ({ team, onUpdate, onBack, onToggleDiscipline, inga
           )}
           <div style={{ marginLeft: 'auto', fontSize: 11, color: '#333355' }}>
             {ingame
-              ? (ingame.subsUsed >= ingame.maxSubs ? t('misc.subsExhausted') : inPickMode ? t('misc.pickIncoming') : t('misc.clickTitular'))
+              ? (effectiveSubsUsed >= ingame.maxSubs ? t('misc.subsExhausted') : inPickMode ? t('misc.pickIncoming') : t('misc.clickTitular'))
               : (inPickMode ? t('misc.clickPlayer') : t('misc.clickSlot'))}
           </div>
         </div>
@@ -471,10 +520,10 @@ export const AlignmentView = ({ team, onUpdate, onBack, onToggleDiscipline, inga
               {inPickMode ? t('misc.slotMode', { pos: slotPos ?? '' }) : t('misc.fieldMode', { formation: team.formation })}
             </div>
             <PitchDiagram
-              team={team}
+              team={ingame ? { ...team, lineup: stagedLineup } : team}
               selectedSlot={selectedSlot}
               onSlotClick={(idx) => {
-                if (ingame && ingame.subsUsed >= ingame.maxSubs) return;
+                if (ingame && effectiveSubsUsed >= ingame.maxSubs && !stagedLineup[idx]) return;
                 setSelectedSlot(idx === selectedSlot ? null : idx);
               }}
             />
