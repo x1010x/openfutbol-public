@@ -5,10 +5,11 @@ import { TeamCrest } from './TeamCrest';
 interface Props {
   state: TournamentState;
   onAdvanceRound: () => void;
+  onPlayUserTie: (tieId: string) => void;
   onExit: () => void;
 }
 
-export const BracketView = ({ state, onAdvanceRound, onExit }: Props) => {
+export const BracketView = ({ state, onAdvanceRound, onPlayUserTie, onExit }: Props) => {
   const teamById = (id: string | null) => id ? state.teams.find(t => t.id === id) : null;
   const champion = state.champion ? teamById(state.champion) : null;
   const userTeam = teamById(state.userTeamId);
@@ -148,16 +149,30 @@ export const BracketView = ({ state, onAdvanceRound, onExit }: Props) => {
       </div>
 
       {/* Footer */}
-      {!champion && (
-        <div className="flex justify-end">
-          <button
-            onClick={onAdvanceRound}
-            className="bg-vga-light-green text-vga-black text-[11px] uppercase font-bold border-2 border-vga-bright-white px-4 py-2 hover:bg-vga-bright-white tracking-wider"
-          >
-            Jugar {roundLabel(state.totalRounds, state.currentRound)}
-          </button>
-        </div>
-      )}
+      {!champion && (() => {
+        const userTie = state.ties.find(t =>
+          t.round === state.currentRound && !t.played &&
+          (t.homeTeamId === state.userTeamId || t.awayTeamId === state.userTeamId)
+        );
+        return (
+          <div className="flex justify-end gap-2">
+            {userTie && (
+              <button
+                onClick={() => onPlayUserTie(userTie.id)}
+                className="bg-vga-yellow text-vga-black text-[11px] uppercase font-bold border-2 border-vga-bright-white px-4 py-2 hover:bg-vga-bright-white tracking-wider"
+              >
+                Jugar tu partido
+              </button>
+            )}
+            <button
+              onClick={onAdvanceRound}
+              className="bg-vga-light-green text-vga-black text-[11px] uppercase font-bold border-2 border-vga-bright-white px-4 py-2 hover:bg-vga-bright-white tracking-wider"
+            >
+              {userTie ? 'Auto-sim ronda' : `Jugar ${roundLabel(state.totalRounds, state.currentRound)}`}
+            </button>
+          </div>
+        );
+      })()}
     </div>
   );
 };

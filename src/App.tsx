@@ -153,6 +153,7 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
   const [showTournamentFlow, setShowTournamentFlow] = useState(false);
   const [tournament, setTournament] = useState<TournamentState | null>(() => loadTournament());
   const [tournamentRoundRecap, setTournamentRoundRecap] = useState<number | null>(null);
+  const [tournamentMatchTieId, setTournamentMatchTieId] = useState<string | null>(null);
   const [showInstructions, setShowInstructions] = useState(false);
   const [showColaborar, setShowColaborar] = useState(false);
   const [instructionsScroll, setInstructionsScroll] = useState<'changelog' | 'engine' | undefined>(undefined);
@@ -1344,7 +1345,82 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
     setView('JORNADA_RESULTS');
   };
 
+  // Live-play a tournament tie: build a MatchState from the tie's teams and
+  // hand off to the existing match loop. The tournamentMatchTieId flag tells
+  // finalizeMatch which post-match path to take.
+  const startTournamentMatch = (tieId: string) => {
+    if (!tournament) return;
+    const tie = tournament.ties.find(t => t.id === tieId);
+    if (!tie || !tie.homeTeamId || !tie.awayTeamId) return;
+    const home = tournament.teams.find(t => t.id === tie.homeTeamId);
+    const away = tournament.teams.find(t => t.id === tie.awayTeamId);
+    if (!home || !away) return;
+    const speed = (matchDuration * 1000) / 90;
+    const initialMatch: MatchState = {
+      homeTeam: home,
+      awayTeam: away,
+      homeScore: 0, awayScore: 0, minute: 0, isFinished: false,
+      events: [{ minute: 0, type: 'commentary', description: '¡Empieza el partido!' }],
+      matchSpeed: speed,
+      homeSentOff: [], awaySentOff: [], homeYellows: [], awayYellows: [],
+      homePossession: 0, awayPossession: 0,
+      homeShots: 0, awayShots: 0, homeShotsOnTarget: 0, awayShotsOnTarget: 0,
+      homeFouls: 0, awayFouls: 0,
+      homeBoost: 1 + ((0.05 + Math.random() * 0.15) * engineSettings.homeAdvantageMult),
+      homeStamina: Object.fromEntries(home.players.map(p => [p.id, p.stamina ?? 99])),
+      awayStamina: Object.fromEntries(away.players.map(p => [p.id, p.stamina ?? 99])),
+      homeSubsUsed: 0, awaySubsUsed: 0,
+      homeInjuredInMatch: [], awayInjuredInMatch: [],
+      homeStartingLineup: [...home.lineup], awayStartingLineup: [...away.lineup],
+      stoppageTime1: 0, stoppageTime2: 0,
+      attendance: computeAttendance(home, away),
+    };
+    setTournamentMatchTieId(tieId);
+    setHtPaused(false);
+    setShowSubPanel(false);
+    if (matchDuration === 0) {
+      let m = initialMatch;
+      while (!m.isFinished) m = simulateMinute(m, tournament.userTeamId);
+      finalizeMatch(m);
+      return;
+    }
+    setMatch(initialMatch);
+    setShowPreview(false);
+    setIsPlaying(true);
+  };
+
   const finalizeMatch = (finalMatch: MatchState) => {
+    // Tournament context: skip league writebacks. Update the tie with the
+    // score, decide a winner (PK shootout when level), then auto-sim the
+    // remaining ties of the round via advanceRound.
+    if (tournamentMatchTieId && tournament) {
+      let hs = finalMatch.homeScore;
+      let as = finalMatch.awayScore;
+      if (hs === as) {
+        // Shootout — light skew toward whoever is stronger on paper.
+        const hStr = finalMatch.homeTeam.players.reduce((s, p) => s + p.media, 0);
+        const aStr = finalMatch.awayTeam.players.reduce((s, p) => s + p.media, 0);
+        const homeProb = 0.5 + Math.max(-0.15, Math.min(0.15, (hStr - aStr) / Math.max(hStr, aStr, 1) * 0.5));
+        if (Math.random() < homeProb) hs += 1; else as += 1;
+      }
+      const winnerId = hs > as ? finalMatch.homeTeam.id : finalMatch.awayTeam.id;
+      const playedRound = tournament.currentRound;
+      setTournament(prev => {
+        if (!prev) return prev;
+        const updatedTies = prev.ties.map(t => t.id === tournamentMatchTieId
+          ? { ...t, homeScore: hs, awayScore: as, played: true, winnerTeamId: winnerId }
+          : t);
+        return advanceRound({ ...prev, ties: updatedTies });
+      });
+      setTournamentRoundRecap(playedRound);
+      setTournamentMatchTieId(null);
+      setMatch(null);
+      setIsPlaying(false);
+      setHtPaused(false);
+      setShowSubPanel(false);
+      return;
+    }
+
     const tvBonus = computeTvBonus(league.stats, finalMatch.homeTeam.id, finalMatch.awayTeam.id);
     let newLeague = writebackMatchStamina(
       league,
@@ -1594,15 +1670,19 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
     setView('LEAGUE');
   };
 
+  // Resolve the "active user team id" for the match loop — tournament context
+  // wins when present, otherwise the league user.
+  const activeUserTeamId = tournamentMatchTieId && tournament ? tournament.userTeamId : league.userTeamId;
+
   useEffect(() => {
     let interval: number;
     if (isPlaying && match && !match.isFinished && !isCelebrating) {
       interval = window.setInterval(() => {
-        setMatch(prev => prev ? simulateMinute(prev, league.userTeamId) : null);
+        setMatch(prev => prev ? simulateMinute(prev, activeUserTeamId) : null);
       }, match.matchSpeed);
     }
     return () => clearInterval(interval);
-  }, [isPlaying, match, isCelebrating]);
+  }, [isPlaying, match, isCelebrating, activeUserTeamId]);
 
   useEffect(() => {
     if (eventLogRef.current) {
@@ -1697,7 +1777,7 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
       setIsPlaying(false);
       setHtPaused(true);
       setShowSubPanel(true);
-      setMatch(prev => prev ? applyAiHtSubs(prev, league.userTeamId) : null);
+      setMatch(prev => prev ? applyAiHtSubs(prev, activeUserTeamId) : null);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [match?.minute]);
@@ -1781,7 +1861,7 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
   // that count as subs (position swaps and net-zero shuffles are excluded).
   const commitUserSubs = (stagedLineup: string[], subPairs: { outId: string; inId: string }[]) => {
     if (!match) return;
-    const isUserHome = match.homeTeam.id === league.userTeamId;
+    const isUserHome = match.homeTeam.id === activeUserTeamId;
     const team = isUserHome ? match.homeTeam : match.awayTeam;
     const subsUsed = isUserHome ? match.homeSubsUsed : match.awaySubsUsed;
     if (subPairs.length === 0 && stagedLineup.join(',') === team.lineup.join(',')) return;
@@ -1842,7 +1922,7 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
 
     // Tournament flow: a live tournament always takes priority over league
     // setup/menu views. Setup view only when explicitly opened.
-    if (tournament) {
+    if (tournament && !match) {
       return (
         <BracketView
           state={tournament}
@@ -1851,6 +1931,7 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
             setTournament(prev => prev ? advanceRound(prev) : null);
             setTournamentRoundRecap(playedRound);
           }}
+          onPlayUserTie={(tieId) => startTournamentMatch(tieId)}
           onExit={() => { setTournament(null); setShowTournamentFlow(false); setTournamentRoundRecap(null); }}
         />
       );
@@ -2697,9 +2778,9 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
           <div className="w-full flex flex-col gap-2">
             <MatchScreen
               match={match}
-              userTeamId={league.userTeamId}
-              year={league.year}
-              currentJornada={league.currentJornada}
+              userTeamId={activeUserTeamId}
+              year={tournamentMatchTieId && tournament ? new Date().getFullYear() : league.year}
+              currentJornada={tournamentMatchTieId ? 0 : league.currentJornada}
               budget={userBudget}
               isPlaying={isPlaying}
               showSubPanel={showSubPanel}
@@ -2715,7 +2796,7 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
 
 
             {showSubPanel && !match.isFinished && (() => {
-              const isUserHome = match.homeTeam.id === league.userTeamId;
+              const isUserHome = match.homeTeam.id === activeUserTeamId;
               const userTeamInMatch = isUserHome ? match.homeTeam : match.awayTeam;
               const subsUsed = isUserHome ? match.homeSubsUsed : match.awaySubsUsed;
               const stamMap = isUserHome ? match.homeStamina : match.awayStamina;
@@ -2735,7 +2816,7 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
                     onUpdate={(patch) => {
                       setMatch(prev => {
                         if (!prev) return null;
-                        const isHome = prev.homeTeam.id === league.userTeamId;
+                        const isHome = prev.homeTeam.id === activeUserTeamId;
                         const updated = { ...userTeamInMatch, ...patch };
                         return isHome ? { ...prev, homeTeam: updated } : { ...prev, awayTeam: updated };
                       });
@@ -2744,7 +2825,7 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
                     onToggleDiscipline={() => {
                       setMatch(prev => {
                         if (!prev) return null;
-                        const isHome = prev.homeTeam.id === league.userTeamId;
+                        const isHome = prev.homeTeam.id === activeUserTeamId;
                         const updated = { ...userTeamInMatch, tacticalDiscipline: !(userTeamInMatch.tacticalDiscipline ?? true) };
                         return isHome ? { ...prev, homeTeam: updated } : { ...prev, awayTeam: updated };
                       });
