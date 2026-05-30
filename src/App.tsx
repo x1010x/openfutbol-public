@@ -46,6 +46,7 @@ import { BracketView } from './components/BracketView';
 import { TournamentRoundResultsModal } from './components/TournamentRoundResultsModal';
 import { TournamentMatchPreview } from './components/TournamentMatchPreview';
 import { SeasonStatsTable } from './components/SeasonStatsTable';
+import { PackEditorView } from './components/PackEditorView';
 import { createTournament, advanceCurrentStage, saveTournament, loadTournament, userNextAction, spectatorNextMatch, recordUserLigaMatch, recordUserKoLeg } from './store/tournamentStore';
 import type { TournamentState, UserNextAction } from './store/tournamentStore';
 import { BoardAlertModal } from './components/BoardAlertModal';
@@ -66,7 +67,7 @@ import { usePack } from './state/PackContext';
 import { buildTeamFromPackClub, trimRoster } from './data/packTeamBuilder';
 import { runtimePlayerFromPack, joinPlayerName } from './data/playerBuilder';
 
-type View = 'LEAGUE' | 'SQUAD' | 'ALIGNMENT' | 'RESULTS' | 'STATS' | 'FINANCES' | 'TRANSFERS' | 'JORNADA_RESULTS' | 'END_OF_SEASON' | 'PLAYER_DETAIL' | 'BACKUP' | 'EDITOR' | 'EQUIPO' | 'MANAGER_CAREER' | 'PACK_LOADER';
+type View = 'LEAGUE' | 'SQUAD' | 'ALIGNMENT' | 'RESULTS' | 'STATS' | 'FINANCES' | 'TRANSFERS' | 'JORNADA_RESULTS' | 'END_OF_SEASON' | 'PLAYER_DETAIL' | 'BACKUP' | 'EDITOR' | 'EQUIPO' | 'MANAGER_CAREER' | 'PACK_LOADER' | 'PACK_EDITOR';
 
 
 function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
@@ -1926,6 +1927,10 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
       return <PackLoaderView onBack={() => setView('BACKUP')} />;
     }
 
+    if (view === 'PACK_EDITOR') {
+      return <PackEditorView onBack={() => setView('LEAGUE')} />;
+    }
+
     // Tournament flow: a live tournament always takes priority over league
     // setup/menu views. Setup view only when explicitly opened.
     if (tournament && !match) {
@@ -2253,6 +2258,12 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
               className="w-full bg-vga-magenta text-vga-bright-white py-3 text-[10px] border-b-4 border-r-4 border-vga-black font-bold uppercase tracking-widest hover:opacity-90"
             >
               {t('nav.editor')}
+            </button>
+            <button
+              onClick={() => setView('PACK_EDITOR')}
+              className="w-full bg-vga-yellow text-vga-black py-3 text-[10px] border-b-4 border-r-4 border-vga-black font-bold uppercase tracking-widest hover:opacity-90"
+            >
+              Editor de packs
             </button>
             <button
               onClick={() => setView('BACKUP')}
