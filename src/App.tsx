@@ -156,6 +156,7 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
   const [message, setMessage] = useState<{ title: string; body: string; tone?: 'info' | 'danger' | 'warning' } | null>(null);
   const [saleNegotiation, setSaleNegotiation] = useState<{ offer: IncomingOffer; player: Player; buyer: Team; seller: Team } | null>(null);
   const [clausulaNegotiation, setClausulaNegotiation] = useState<{ player: Player; buyer: Team; seller: Team; cost: number; fromTeamId: string } | null>(null);
+  const [outgoingNegotiation, setOutgoingNegotiation] = useState<{ player: Player; buyer: Team; seller: Team; amount: number; fromTeamId: string; offeredPlayerIds: string[] } | null>(null);
   const [boardAlert, setBoardAlert] = useState<{ title: string; body: string; tone: 'danger' | 'warning' | 'success' } | null>(null);
   const [lastBoardAlert, setLastBoardAlert] = useState<{ title: string; body: string; tone: 'danger' | 'warning' | 'success' } | null>(null);
   const [htPaused, setHtPaused] = useState(false);
@@ -574,11 +575,25 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
       }
       return result;
     }
+    // AI seller accepted the fee. Now open the player negotiation modal —
+    // the player still has to want the move and we (the buyer) set the terms.
+    setOutgoingNegotiation({ player, buyer, seller, amount, fromTeamId, offeredPlayerIds });
+    return { accepted: true, message: '¡Club acepta! Negociando con el jugador...' };
+  };
 
+  const commitOutgoingOfferAccept = (
+    player: Player, fromTeamId: string, amount: number,
+    offeredPlayerIds: string[], agreedSalary: number, years: number,
+  ) => {
     setLeague(prev => {
-      const buyerTeam = prev.teams.find(t => t.id === prev.userTeamId);
+      const seller = prev.teams.find(tm => tm.id === fromTeamId);
+      const buyerTeam = prev.teams.find(tm => tm.id === prev.userTeamId);
+      if (!seller || !buyerTeam) return prev;
+      const offeredPlayers = offeredPlayerIds
+        .map(id => buyerTeam.players.find(p => p.id === id))
+        .filter((p): p is NonNullable<typeof p> => Boolean(p));
       const tradeId = offeredPlayers.length > 0
-        ? `usr_trade_${prev.currentJornada}_${playerId}_${Date.now()}`
+        ? `usr_trade_${prev.currentJornada}_${player.id}_${Date.now()}`
         : undefined;
       const records: TransferRecord[] = [];
       records.push({
@@ -588,7 +603,7 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
         playerName: player.name,
         playerPosition: player.position,
         fromTeamName: seller.name,
-        toTeamName: buyerTeam?.name ?? '',
+        toTeamName: buyerTeam.name,
         amount,
         tradeId,
       });
@@ -599,7 +614,7 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
           year: prev.year,
           playerName: op.name,
           playerPosition: op.position,
-          fromTeamName: buyerTeam?.name ?? '',
+          fromTeamName: buyerTeam.name,
           toTeamName: seller.name,
           amount: 0,
           tradeId,
@@ -612,30 +627,32 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
         ? computeTransferDelta(player, amount, marketValue, true, prev.year)
         : 0;
       const newMeter = florentinoDelta !== 0 ? applyMeterDelta(prev.florentinometro ?? 5, florentinoDelta) : (prev.florentinometro ?? 5);
+      const expYear = prev.year + years;
+      const newContract = { salary: agreedSalary, expiration: `${expYear}-06-30` };
       return {
         ...prev,
-        teams: prev.teams.map(t => {
-          if (t.id === fromTeamId) {
+        teams: prev.teams.map(tm => {
+          if (tm.id === fromTeamId) {
             return {
-              ...t,
-              players: t.players
-                .filter(p => p.id !== playerId)
+              ...tm,
+              players: tm.players
+                .filter(p => p.id !== player.id)
                 .concat(offeredPlayers.map(p => ({ ...p, forSale: false }))),
-              lineup: t.lineup.filter(id => id !== playerId),
-              budget: t.budget + amount,
+              lineup: tm.lineup.filter(id => id !== player.id),
+              budget: tm.budget + amount,
             };
           }
-          if (t.id === prev.userTeamId) {
+          if (tm.id === prev.userTeamId) {
             return {
-              ...t,
-              players: t.players
+              ...tm,
+              players: tm.players
                 .filter(p => !offeredIdSet.has(p.id))
-                .concat({ ...player, forSale: false }),
-              lineup: t.lineup.filter(id => !offeredIdSet.has(id)),
-              budget: t.budget - amount,
+                .concat({ ...player, forSale: false, contract: newContract }),
+              lineup: tm.lineup.filter(id => !offeredIdSet.has(id)),
+              budget: tm.budget - amount,
             };
           }
-          return t;
+          return tm;
         }),
         transferLog: records.reduce((log, rec) => appendTransfer(log, rec), prev.transferLog),
         florentinometro: newMeter,
@@ -643,12 +660,11 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
         florentinometroMin: Math.min(prev.florentinometroMin ?? 5, newMeter),
         seasonTransferSpent: (prev.seasonTransferSpent ?? 0) + amount,
         blockedSignings: [...prev.blockedSignings,
-          transferredKey(playerId),
+          transferredKey(player.id),
           ...offeredPlayers.map(p => transferredKey(p.id)),
         ],
       };
     });
-    return result;
   };
 
   const handleClausula = (playerId: string, fromTeamId: string): OfferResult => {
@@ -2839,6 +2855,42 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
             setSaleNegotiation(null);
           }}
           onClose={() => setSaleNegotiation(null)}
+        />
+      )}
+
+      {outgoingNegotiation && (
+        <PlayerNegotiationModal
+          player={outgoingNegotiation.player}
+          buyerTeam={outgoingNegotiation.buyer}
+          sellerTeam={outgoingNegotiation.seller}
+          feePaid={outgoingNegotiation.amount}
+          seasonYear={league.year}
+          mode="user-buying"
+          onAccept={(salary, years) => {
+            commitOutgoingOfferAccept(
+              outgoingNegotiation.player,
+              outgoingNegotiation.fromTeamId,
+              outgoingNegotiation.amount,
+              outgoingNegotiation.offeredPlayerIds,
+              salary,
+              years,
+            );
+            setOutgoingNegotiation(null);
+            setMessage({
+              title: 'Fichaje cerrado',
+              body: `${outgoingNegotiation.player.name} firma por ${outgoingNegotiation.buyer.name}.`,
+              tone: 'info',
+            });
+          }}
+          onReject={() => {
+            setOutgoingNegotiation(null);
+            setMessage({
+              title: 'Negociación fallida',
+              body: `${outgoingNegotiation.player.name} no aceptó tus condiciones. La operación se cae.`,
+              tone: 'warning',
+            });
+          }}
+          onClose={() => setOutgoingNegotiation(null)}
         />
       )}
 
