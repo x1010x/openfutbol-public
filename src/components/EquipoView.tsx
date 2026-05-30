@@ -156,6 +156,19 @@ export const EquipoView = ({ team, league, onPlayerClick, onBack }: Props) => {
   const topScorer = [...team.players].sort((a, b) => b.seasonStats.goals - a.seasonStats.goals)[0];
   const topAssister = [...team.players].sort((a, b) => b.seasonStats.assists - a.seasonStats.assists)[0];
   const topPaid = [...team.players].sort((a, b) => (b.contract?.salary ?? 0) - (a.contract?.salary ?? 0))[0];
+  // Team MVP — best average rating over the season among regular starters.
+  // Eligibility: at least half the team's matches (min 1) so it ramps in
+  // early in the season but doesn't crown a one-game wonder.
+  const teamPlayed = league.stats?.[team.id]?.played ?? 0;
+  const minAppsMvp = Math.max(1, Math.floor(teamPlayed / 2));
+  const mvpCandidates = team.players.filter(p => p.seasonStats.appearances >= minAppsMvp && p.seasonStats.ratingSum > 0);
+  const teamMvp = mvpCandidates.length > 0
+    ? [...mvpCandidates].sort((a, b) =>
+        (b.seasonStats.ratingSum / Math.max(1, b.seasonStats.appearances)) -
+        (a.seasonStats.ratingSum / Math.max(1, a.seasonStats.appearances))
+      )[0]
+    : null;
+  const teamMvpAvg = teamMvp ? (teamMvp.seasonStats.ratingSum / Math.max(1, teamMvp.seasonStats.appearances)).toFixed(2) : '0';
   const totalGoals = team.players.reduce((s, p) => s + p.seasonStats.goals, 0);
   const totalAssists = team.players.reduce((s, p) => s + p.seasonStats.assists, 0);
   const totalYellows = team.players.reduce((s, p) => s + p.seasonStats.yellowCards, 0);
@@ -330,7 +343,17 @@ export const EquipoView = ({ team, league, onPlayerClick, onBack }: Props) => {
       </div>
 
       {/* Star players */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
+        {teamMvp && (
+          <div onClick={() => onPlayerClick?.(teamMvp.id)} className={`bg-vga-black border-2 border-vga-yellow p-2 flex items-center gap-2 ${onPlayerClick ? 'cursor-pointer hover:border-vga-bright-white' : ''}`}>
+            <PlayerPhoto sourceId={teamMvp.source_id} size="md" className="border border-vga-blue" />
+            <div className="min-w-0 flex-1">
+              <div className="text-vga-yellow text-[7px] uppercase tracking-widest font-bold">MVP del equipo</div>
+              <div className="text-vga-bright-white text-[10px] truncate"><PlayerName player={teamMvp} /></div>
+              <div className="text-vga-light-cyan text-[9px]">{teamMvpAvg} media · {teamMvp.seasonStats.appearances} PJ</div>
+            </div>
+          </div>
+        )}
         {topScorer && topScorer.seasonStats.goals > 0 && (
           <div onClick={() => onPlayerClick?.(topScorer.id)} className={`bg-vga-black border border-vga-blue p-2 flex items-center gap-2 ${onPlayerClick ? 'cursor-pointer hover:border-vga-magenta' : ''}`}>
             <PlayerPhoto sourceId={topScorer.source_id} size="md" className="border border-vga-blue" />

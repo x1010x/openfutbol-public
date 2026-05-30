@@ -8,6 +8,8 @@ interface Props {
   onSlotClick: (slotIdx: number) => void;
   onCircleClick?: (slotIdx: number) => void;
   onNameClick?: (playerId: string) => void;
+  // Player ids that should render with a "incoming" highlight ring (e.g. staged subs).
+  highlightIds?: string[];
 }
 
 const POS_FILL: Record<Position, string> = {
@@ -65,7 +67,7 @@ const shortName = (name: string): string =>
 const MOOD_COLORS = ['#FF5555', '#AA5500', '#FFFF55', '#55FFFF', '#55FF55'];
 const MOOD_SYMBOLS = ['▼▼', '▼', '—', '▲', '▲▲'];
 
-export const PitchDiagram = ({ team, selectedSlot, onSlotClick, onCircleClick, onNameClick }: Props) => {
+export const PitchDiagram = ({ team, selectedSlot, onSlotClick, onCircleClick, onNameClick, highlightIds }: Props) => {
   const slots = FORMATIONS[team.formation];
   const layout = FORMATION_LAYOUTS[team.formation];
 
@@ -112,6 +114,9 @@ export const PitchDiagram = ({ team, selectedSlot, onSlotClick, onCircleClick, o
               style={{ cursor: 'pointer', opacity: unavailable ? 0.45 : 1 }}>
               {isSelected && (
                 <circle cx={x} cy={y} r={6.5} fill="none" stroke="#FFFF55" strokeWidth="0.7" />
+              )}
+              {player && highlightIds?.includes(player.id) && (
+                <circle cx={x} cy={y} r={6.5} fill="none" stroke="#55FFFF" strokeWidth="0.7" strokeDasharray="1.5 1" />
               )}
               {player ? (
                 <>

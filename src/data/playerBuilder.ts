@@ -50,6 +50,22 @@ const statsFromAttributes = (a: PlayerAttributes, isGK: boolean): PlayerStats =>
   };
 };
 
+// Synth weekly salary when the pack ships no contract. Driven by current_ability
+// (1-200) on a curve, lightly tempered by age — peak earners are 25-31 stars.
+// Returns weekly euros, and an expiration 2-4 years from birth-year context.
+const synthesizeContract = (currentAbility: number, birthYear: number): { salary: number; expiration: string } => {
+  const ca = Math.max(40, Math.min(200, currentAbility));
+  // Curve: 60 CA -> ~3k/wk, 120 CA -> ~25k/wk, 160 CA -> ~120k/wk, 180 CA -> ~280k/wk.
+  const base = Math.pow(ca / 60, 3.6) * 3000;
+  // Rough age penalty for very young (still on academy terms) and over-32.
+  const now = new Date().getFullYear();
+  const age = Math.max(16, now - birthYear);
+  const ageMult = age < 21 ? 0.55 : age < 24 ? 0.85 : age >= 34 ? 0.7 : age >= 32 ? 0.85 : 1;
+  const weekly = Math.max(500, Math.round((base * ageMult) / 100) * 100);
+  const expYear = now + (ca >= 140 ? 4 : ca >= 100 ? 3 : 2);
+  return { salary: weekly, expiration: `${expYear}-06-30` };
+};
+
 const NEW_CODE_TO_LEGACY: Record<PositionCode, Position> = {
   GK: 'POR',
   DC: 'DEF', DL: 'DEF', DR: 'DEF', WBL: 'DEF', WBR: 'DEF',
@@ -110,7 +126,7 @@ export const runtimePlayerFromPack = (
     attributes,
     stats_year: statsYear,
     value: packPlayer.value,
-    contract: packPlayer.contract,
+    contract: packPlayer.contract ?? synthesizeContract(currentAbility, parseInt(packPlayer.birth_date.slice(0, 4), 10)),
     number,
     stamina: 99,
     injuryWeeksRemaining: 0,

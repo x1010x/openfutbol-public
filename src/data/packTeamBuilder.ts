@@ -100,6 +100,7 @@ export const buildTeamFromPackClub = (club: Club, pack: Pack, year: number): Tea
     name: club.name,
     colors: [colorBg, colorFg],
     year,
+    manager: makeManagerName(club.id),
     stadiumCapacity: 30000,
     ticketPrice: 20,
     budget: 10_000_000,
@@ -108,4 +109,24 @@ export const buildTeamFromPackClub = (club: Club, pack: Pack, year: number): Tea
     formation,
     tacticalDiscipline: false,
   };
+};
+
+// Deterministic stub coach name per club so each AI team has a consistent
+// manager across saves. Spanish-ish first + last names.
+const MGR_FIRST = [
+  'Pepe', 'Luis', 'Manolo', 'Quique', 'Diego', 'Marcelino', 'Unai', 'Julen',
+  'Andoni', 'Míchel', 'Ernesto', 'Cholo', 'Vicente', 'Rafa', 'Antonio',
+  'Iñaki', 'José', 'Pacho', 'Toni', 'Xabi',
+];
+const MGR_LAST = [
+  'Mendilibar', 'Rodríguez', 'Aguirre', 'Sánchez Flores', 'Bordalás',
+  'García Plaza', 'Setién', 'Lopetegui', 'Iraola', 'Pellegrini', 'Valverde',
+  'Simeone', 'del Bosque', 'Benítez', 'Conte', 'Cazorla', 'Mourinho',
+  'Herrera', 'Caparrós', 'Alonso',
+];
+
+const makeManagerName = (seed: string): string => {
+  let h = 0;
+  for (let i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) >>> 0;
+  return `${MGR_FIRST[h % MGR_FIRST.length]} ${MGR_LAST[(h >>> 5) % MGR_LAST.length]}`;
 };

@@ -232,7 +232,19 @@ const ContentES = ({ onColaborar, changelogRef, engineRef }: {
       <p>
         Hasta 3 cambios por partido. El juego se pausa al llegar al descanso
         y abre el panel automáticamente. También puedes abrirlo en cualquier momento
-        con el botón CAMBIOS. Haz todos los cambios que quieras y pulsa CONTINUAR cuando termines.
+        con el botón CAMBIOS. El partido no se reanuda hasta que pulsas CONTINUAR.
+      </p>
+      <p>
+        Los cambios son <span className="text-vga-yellow">provisionales</span> hasta que pulsas CONTINUAR:
+        si sacas a un jugador y lo vuelves a meter antes de continuar, no se gasta cambio.
+        Pulsa <span className="text-vga-yellow">CANCELAR</span> para deshacer todos los cambios provisionales.
+        Los jugadores que vayan a entrar se marcan con un círculo cian en el campo.
+      </p>
+      <p>
+        Si pinchas a un titular y luego a otro titular en el campo, intercambian posición —
+        no cuenta como cambio. Si tienes un hueco vacío en el once (porque empezaste con menos
+        de 11 o por una expulsión), puedes rellenarlo desde el banquillo y eso sí gasta un cambio.
+        Un jugador que ha sido sustituido <span className="text-vga-light-red">no puede volver al campo</span>.
       </p>
       <p>
         En el panel también puedes cambiar la <span className="text-vga-yellow">FORMACIÓN</span>,
@@ -269,8 +281,11 @@ const ContentES = ({ onColaborar, changelogRef, engineRef }: {
         movimientos de la temporada (fichajes, clausulazos y retiros).
       </p>
       <p>
-        Las ofertas entrantes por tus jugadores se gestionan desde PLANTILLA. Ábrelas para
-        ver todos los clubes interesados.
+        Las ofertas entrantes por tus jugadores se gestionan desde PLANTILLA. Pulsa
+        <span className="text-vga-yellow"> VER OFERTA</span> para abrir el modal de negociación con
+        los escudos de los dos clubes, los entrenadores, la ficha completa del jugador,
+        el desglose económico (incluyendo jugadores incluidos en el trato) y los botones de
+        ACEPTAR / CONTRAOFERTA / RECHAZAR.
       </p>
       <p>
         <span className="text-vga-yellow">Oferta normal</span> — jugadores en venta o agentes libres.
@@ -279,8 +294,20 @@ const ContentES = ({ onColaborar, changelogRef, engineRef }: {
       <p>
         <span className="text-vga-light-red font-bold">CLAUSULAZO TEBAS</span> — si quieres fichar
         a un jugador que no está en el mercado, puedes activar su cláusula de rescisión desde
-        su ficha en PLANTILLA del rival. El coste es el doble de su valor base y el traspaso
-        es inmediato sin negociación.
+        su ficha en PLANTILLA del rival. El coste es el doble de su valor base.
+      </p>
+      <p>
+        <span className="text-vga-cyan font-bold">NEGOCIAR CON EL JUGADOR:</span> aunque los clubes
+        se pongan de acuerdo, el jugador todavía tiene que aceptar las condiciones. Al fichar
+        (cláusula u oferta a un rival) tú decides el sueldo semanal y los años de contrato;
+        cuando vendes a uno de los tuyos, el club comprador negocia con el jugador y verás
+        el resultado en vivo. Si las condiciones no le convencen, el fichaje se cae aunque
+        hubieras pagado.
+      </p>
+      <p>
+        <span className="text-vga-cyan font-bold">PREMIOS DE LIGA:</span> al final de cada temporada
+        se reparten 100M € entre todos los equipos según su posición. El campeón se lleva la mayor
+        parte, el subcampeón menos, y el resto se prorratea del tercero al último.
       </p>
     </Section>
 
@@ -402,6 +429,20 @@ const ContentES = ({ onColaborar, changelogRef, engineRef }: {
     <div ref={changelogRef} id="changelog">
       <Section title="CAMBIOS RECIENTES">
         <ul className="list-disc pl-5 space-y-1">
+          <li>
+            <span className="text-vga-cyan">v1.8.0</span> — Negociaciones, cambios y premios.
+            <ul className="list-disc pl-5 mt-1 space-y-1">
+              <li><span className="text-vga-yellow">Modal de negociación:</span> VER OFERTA abre una pantalla con los escudos y entrenadores de los dos clubes, ficha completa del jugador, desglose económico con jugadores incluidos y botones ACEPTAR / CONTRAOFERTA / RECHAZAR.</li>
+              <li><span className="text-vga-yellow">Negociación con el jugador:</span> tras el acuerdo entre clubes, el jugador todavía decide. Al fichar tú eliges sueldo y años de contrato; al vender, el club comprador negocia con el jugador y ves el resultado en vivo. Si no llegáis a un acuerdo, la operación se cae.</li>
+              <li><span className="text-vga-yellow">Cambios en directo rediseñados:</span> los cambios son provisionales hasta que pulsas CONTINUAR — sacar y meter al mismo no gasta cambio, dos pinchazos en el campo son un cambio de posición sin coste, los huecos vacíos del once se pueden rellenar y un jugador sustituido no vuelve a entrar. Botón CANCELAR para deshacer.</li>
+              <li><span className="text-vga-yellow">Minutos con descuento:</span> los minutos del descuento del primer y segundo tiempo cuentan a los jugadores que estaban en el campo.</li>
+              <li><span className="text-vga-yellow">Sueldos reales:</span> todos los jugadores tienen un sueldo semanal que se descuenta del presupuesto cada jornada. Los jugadores sin contrato cargan uno generado según su calidad y edad.</li>
+              <li><span className="text-vga-yellow">Entrenadores de la IA:</span> cada club rival tiene su propio entrenador con nombre.</li>
+              <li><span className="text-vga-yellow">MVP del equipo:</span> nueva tarjeta en EQUIPO con el mejor jugador de la temporada según media de calificación. Se actualiza cada jornada.</li>
+              <li><span className="text-vga-yellow">Premios de liga:</span> al final de la temporada se reparten 100M € entre todos los equipos según su posición. El campeón se lleva la mayor parte, el subcampeón la siguiente, y el resto se prorratea del tercero al último.</li>
+              <li><span className="text-vga-yellow">Tabla completa de estadísticas:</span> en el fin de temporada, una tabla ordenable con todos los jugadores que han jugado: partidos, minutos, goles, asistencias, tarjetas, porterías a cero y media. Filtros por posición y búsqueda.</li>
+            </ul>
+          </li>
           <li>
             <span className="text-vga-cyan">v1.7.0</span> — Gran actualización: partidas guardadas,
             fin de temporada totalmente rediseñado, mercado nuevo, rankings con fotos y carrera
@@ -683,8 +724,20 @@ const ContentEN = ({ onColaborar, changelogRef, engineRef }: {
     <Section title="SUBSTITUTIONS & LIVE TACTICS">
       <p>
         Up to 3 substitutions per match. The game pauses at half-time and opens the panel automatically.
-        You can also open it at any time with the SUBS button. Make as many changes as you like,
-        then press CONTINUE when you're done.
+        You can also open it at any time with the SUBS button. The match does not resume until you
+        press CONTINUE.
+      </p>
+      <p>
+        Changes stay <span className="text-vga-yellow">pending</span> until you press CONTINUE:
+        if you sub a player out and back in before continuing, no sub is used.
+        Press <span className="text-vga-yellow">CANCEL</span> to discard all pending changes.
+        Players who are about to come on are marked with a cyan ring on the pitch.
+      </p>
+      <p>
+        Click a starter then another starter on the pitch to swap positions — that doesn't use a sub.
+        If you have an empty slot in your XI (because you started with fewer than 11 or because of a
+        sending-off), you can fill it from the bench and that does use one sub.
+        A player who has been subbed off <span className="text-vga-light-red">can't return</span> to the field.
       </p>
       <p>
         From the panel you can also change the <span className="text-vga-yellow">FORMATION</span>,
@@ -718,8 +771,10 @@ const ContentEN = ({ onColaborar, changelogRef, engineRef }: {
         every move of the season — signings, buyouts and retirements.
       </p>
       <p>
-        Incoming offers for your players are managed from SQUAD. Open a player to see all
-        interested clubs grouped together.
+        Incoming offers for your players are managed from SQUAD. Press
+        <span className="text-vga-yellow"> VIEW OFFER</span> to open the negotiation modal with
+        both club crests, both managers, the full player card, the financial breakdown (including
+        any players included in the deal) and ACCEPT / COUNTER / REJECT buttons.
       </p>
       <p>
         <span className="text-vga-yellow">Standard offer</span> — for listed players or free agents.
@@ -728,7 +783,19 @@ const ContentEN = ({ onColaborar, changelogRef, engineRef }: {
       <p>
         <span className="text-vga-light-red font-bold">BUYOUT CLAUSE</span> — if you want a player
         who isn't on the market, trigger their release clause from their card on the rival's SQUAD
-        view. The cost is double their base value and the transfer is instant — no negotiation.
+        view. The cost is double their base value.
+      </p>
+      <p>
+        <span className="text-vga-cyan font-bold">PLAYER NEGOTIATION:</span> even when both clubs
+        agree, the player still has to accept the terms. When you sign someone (clause or offer to
+        a rival) you set the weekly wage and contract length yourself; when you sell one of yours,
+        the buying club negotiates with the player and you see the outcome live. If the terms aren't
+        good enough, the deal falls through even after you paid.
+      </p>
+      <p>
+        <span className="text-vga-cyan font-bold">LEAGUE PRIZES:</span> at the end of every season
+        100M € is distributed across all teams by final position. The champion gets the biggest
+        share, the runner-up the next, and the rest prorated from third place down to last.
       </p>
     </Section>
 
@@ -842,6 +909,20 @@ const ContentEN = ({ onColaborar, changelogRef, engineRef }: {
     <div ref={changelogRef} id="changelog">
       <Section title="RECENT CHANGES">
         <ul className="list-disc pl-5 space-y-1">
+          <li>
+            <span className="text-vga-cyan">v1.8.0</span> — Negotiations, subs and prizes.
+            <ul className="list-disc pl-5 mt-1 space-y-1">
+              <li><span className="text-vga-yellow">Negotiation modal:</span> VIEW OFFER opens a screen with both club crests, both managers, the full player card, financial breakdown with included players and ACCEPT / COUNTER / REJECT buttons.</li>
+              <li><span className="text-vga-yellow">Player negotiation:</span> after the clubs agree, the player still decides. When signing you set wage and contract length; when selling, the buying club negotiates with the player and you watch it unfold live. If you don't reach an agreement the deal falls through.</li>
+              <li><span className="text-vga-yellow">Live subs reworked:</span> changes are pending until you press CONTINUE — subbing out and back in costs nothing, two clicks on the pitch is a free position swap, empty XI slots can be filled, and a subbed-off player can't return. CANCEL discards everything.</li>
+              <li><span className="text-vga-yellow">Stoppage minutes:</span> first and second half stoppage time count toward players on the pitch.</li>
+              <li><span className="text-vga-yellow">Real wages:</span> every player has a weekly wage that hits the budget each round. Players without a contract get one synthesized from their quality and age.</li>
+              <li><span className="text-vga-yellow">AI managers:</span> every rival club now has its own named manager.</li>
+              <li><span className="text-vga-yellow">Team MVP:</span> new card on TEAM showing the best player by average rating. Updates every round.</li>
+              <li><span className="text-vga-yellow">League prizes:</span> at the end of every season 100M € is distributed across all teams by position. Champion takes the biggest share, runner-up next, and the rest prorated from third down to last.</li>
+              <li><span className="text-vga-yellow">Full stats table:</span> end of season ships a sortable table of every player who played — apps, minutes, goals, assists, cards, clean sheets and avg rating. Position filter and search.</li>
+            </ul>
+          </li>
           <li>
             <span className="text-vga-cyan">v1.7.0</span> — Massive update: save slots,
             end-of-season fully redesigned, new market, rankings with photos and a detailed
