@@ -1,80 +1,73 @@
-import type { TournamentState, TournamentTie } from '../store/tournamentStore';
-import { roundLabel } from '../store/tournamentStore';
+import type { TournamentState, TournamentStage, TournamentTie, KoStageConfig, LigaStageConfig } from '../store/tournamentStore';
+import { groupStandings } from '../store/tournamentStore';
 import { TeamCrest } from './TeamCrest';
 
 interface Props {
   state: TournamentState;
-  onAdvanceRound: () => void;
-  onPlayUserTie: (tieId: string) => void;
+  onAdvanceStage: () => void;
+  onPlayUserTie?: (tieId: string) => void;
   onOpenAlignment: () => void;
   onOpenSquad: () => void;
   onExit: () => void;
 }
 
-export const BracketView = ({ state, onAdvanceRound, onPlayUserTie, onOpenAlignment, onOpenSquad, onExit }: Props) => {
+export const BracketView = ({ state, onAdvanceStage, onPlayUserTie, onOpenAlignment, onOpenSquad, onExit }: Props) => {
   const teamById = (id: string | null) => id ? state.teams.find(t => t.id === id) : null;
   const champion = state.champion ? teamById(state.champion) : null;
-  const userTeam = teamById(state.userTeamId);
+  const userTeam = state.userTeamId ? teamById(state.userTeamId) : null;
   const userIsChampion = state.champion === state.userTeamId;
+  const stage = state.stages[state.currentStageIdx];
 
-  const userOut = state.ties.some(t => t.played && t.winnerTeamId && t.winnerTeamId !== state.userTeamId
-    && (t.homeTeamId === state.userTeamId || t.awayTeamId === state.userTeamId));
+  // User eliminated? Only true if userTeamId set and not in current stage inputs.
+  const userOut = userTeam && stage.inputTeamIds && !stage.inputTeamIds.includes(state.userTeamId!);
 
-  // Split each round's ties into a left half and right half. The final lives
-  // alone in the center column. For an N-round tournament:
-  //   - non-final rounds (0..N-2): first half of slots → left, second → right
-  //   - final round (N-1): single tie → center
-  const nonFinalRounds: number[] = [];
-  for (let r = 0; r < state.totalRounds - 1; r++) nonFinalRounds.push(r);
-  const finalRound = state.totalRounds - 1;
-  const finalTie = state.ties.find(t => t.round === finalRound) ?? null;
-
-  const tiesInRound = (r: number) => state.ties.filter(t => t.round === r).sort((a, b) => a.slot - b.slot);
-
-  // For each round, left half = first N/2 ties, right half = last N/2 ties.
-  // We render left rounds in ascending order (Octavos → Cuartos → SF) and
-  // right rounds in DESCENDING order (SF → Cuartos → Octavos) so the bracket
-  // flows toward the centre Final.
-  const leftRounds = nonFinalRounds.map(r => {
-    const ties = tiesInRound(r);
-    return ties.slice(0, Math.ceil(ties.length / 2));
-  });
-  const rightRoundsAsc = nonFinalRounds.map(r => {
-    const ties = tiesInRound(r);
-    return ties.slice(Math.ceil(ties.length / 2));
-  });
-  // Right side renders in reverse: outermost (R1) on the far right.
-  const rightRoundsRev = [...rightRoundsAsc].reverse();
-  const rightRoundLabelsRev = [...nonFinalRounds].reverse();
-
-  // The bracket lives in a CSS grid. Total columns = leftRounds.length + 1
-  // (final) + rightRounds.length. For 16 teams: 3 left + 1 final + 3 right = 7.
-  const columns = leftRounds.length + 1 + rightRoundsRev.length;
+  const userTieInKo = (stage.config.kind === 'ko' && stage.ties && state.userTeamId)
+    ? stage.ties.find(t => !t.played && (t.homeTeamId === state.userTeamId || t.awayTeamId === state.userTeamId))
+    : null;
 
   return (
     <div className="w-full flex flex-col gap-3 animate-in fade-in duration-300">
       {/* Header */}
-      <div className="bg-vga-blue p-2 border-2 border-vga-white flex justify-between items-center vga-panel">
+      <div className="bg-vga-blue p-2 border-2 border-vga-white flex justify-between items-center vga-panel flex-wrap gap-2">
         <div className="flex items-center gap-3 flex-wrap">
           <h2 className="text-vga-yellow text-xs uppercase font-bold">{state.name}</h2>
           <span className="text-vga-bright-white text-[9px] uppercase">{state.teams.length} equipos</span>
-          {userTeam && (
+          {userTeam ? (
             <span className="text-vga-cyan text-[9px] uppercase flex items-center gap-1">
-              · Tu equipo: <TeamCrest colors={userTeam.colors} size="sm" teamId={userTeam.id} title={userTeam.name} /> {userTeam.name}
+              · <TeamCrest colors={userTeam.colors} size="sm" teamId={userTeam.id} title={userTeam.name} /> {userTeam.name}
             </span>
+          ) : (
+            <span className="text-vga-gray text-[9px] uppercase">· modo espectador</span>
           )}
         </div>
         <div className="flex items-center gap-1">
-          <button onClick={onOpenAlignment} className="bg-vga-green text-vga-bright-white px-3 py-1 text-[8px] uppercase font-bold border border-vga-black hover:bg-vga-light-green">
-            Alineación
-          </button>
-          <button onClick={onOpenSquad} className="bg-vga-magenta text-vga-bright-white px-3 py-1 text-[8px] uppercase font-bold border border-vga-black hover:bg-vga-light-magenta">
-            Equipo
-          </button>
+          {userTeam && (
+            <>
+              <button onClick={onOpenAlignment} className="bg-vga-green text-vga-bright-white px-3 py-1 text-[8px] uppercase font-bold border border-vga-black hover:bg-vga-light-green">
+                Alineación
+              </button>
+              <button onClick={onOpenSquad} className="bg-vga-magenta text-vga-bright-white px-3 py-1 text-[8px] uppercase font-bold border border-vga-black hover:bg-vga-light-magenta">
+                Equipo
+              </button>
+            </>
+          )}
           <button onClick={onExit} className="bg-vga-red text-vga-bright-white px-3 py-1 text-[8px] uppercase font-bold border border-vga-black hover:bg-vga-light-red">
             Salir
           </button>
         </div>
+      </div>
+
+      {/* Stage banner */}
+      <div className="bg-vga-blue/40 border-2 border-vga-blue px-3 py-1 flex items-center justify-between">
+        <span className="text-vga-yellow text-[10px] uppercase tracking-widest font-bold">
+          Fase {state.currentStageIdx + 1}/{state.stages.length} · {stage.name}
+        </span>
+        <span className="text-vga-cyan text-[8px] uppercase">
+          {stage.inputCount} → {stage.outputCount}
+          {stage.config.kind === 'ko' && (stage.config as KoStageConfig).legs > 1
+            ? ` · ${(stage.config as KoStageConfig).legs} partidos${(stage.config as KoStageConfig).awayGoalsRule ? ' · gol visitante' : ''}`
+            : null}
+        </span>
       </div>
 
       {/* Champion banner */}
@@ -98,156 +91,149 @@ export const BracketView = ({ state, onAdvanceRound, onPlayUserTie, onOpenAlignm
         </div>
       )}
 
-      {/* Two-sided bracket */}
-      <div className="bg-vga-black border-4 border-vga-blue p-3 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] overflow-x-auto">
-        <div
-          className="grid gap-3 min-w-fit"
-          style={{ gridTemplateColumns: `repeat(${columns}, minmax(180px, 1fr))` }}
-        >
-          {/* Headers row */}
-          {nonFinalRounds.map(r => (
-            <RoundHeader
-              key={`hl-${r}`}
-              label={roundLabel(state.totalRounds, r)}
-              current={r === state.currentRound}
-            />
-          ))}
-          <RoundHeader
-            label={roundLabel(state.totalRounds, finalRound)}
-            current={finalRound === state.currentRound}
-            golden
-          />
-          {rightRoundLabelsRev.map(r => (
-            <RoundHeader
-              key={`hr-${r}`}
-              label={roundLabel(state.totalRounds, r)}
-              current={r === state.currentRound}
-            />
-          ))}
-
-          {/* Bracket body row */}
-          {leftRounds.map((ties, idx) => (
-            <Column
-              key={`l-${idx}`}
-              ties={ties}
-              teamById={teamById}
-              userTeamId={state.userTeamId}
-              align="left"
-            />
-          ))}
-          {/* Final column (vertically centered) */}
-          <div className="flex items-center justify-center">
-            {finalTie && (
-              <TieCard
-                tie={finalTie}
-                teamById={teamById}
-                userTeamId={state.userTeamId}
-                emphasis
-              />
-            )}
-          </div>
-          {rightRoundsRev.map((ties, idx) => (
-            <Column
-              key={`r-${idx}`}
-              ties={ties}
-              teamById={teamById}
-              userTeamId={state.userTeamId}
-              align="right"
-            />
-          ))}
-        </div>
-      </div>
+      {/* Stage body */}
+      {stage.config.kind === 'liga'
+        ? <LigaStageBody stage={stage} teamById={teamById} userTeamId={state.userTeamId} />
+        : <KoStageBody stage={stage} teamById={teamById} userTeamId={state.userTeamId} />
+      }
 
       {/* Footer */}
-      {!champion && (() => {
-        const userTie = state.ties.find(t =>
-          t.round === state.currentRound && !t.played &&
-          (t.homeTeamId === state.userTeamId || t.awayTeamId === state.userTeamId)
-        );
-        return (
-          <div className="flex justify-end gap-2">
-            {userTie && (
-              <button
-                onClick={() => onPlayUserTie(userTie.id)}
-                className="bg-vga-yellow text-vga-black text-[11px] uppercase font-bold border-2 border-vga-bright-white px-4 py-2 hover:bg-vga-bright-white tracking-wider"
-              >
-                Jugar tu partido
-              </button>
-            )}
+      {!champion && (
+        <div className="flex justify-end gap-2">
+          {userTieInKo && onPlayUserTie && (
             <button
-              onClick={onAdvanceRound}
-              className="bg-vga-light-green text-vga-black text-[11px] uppercase font-bold border-2 border-vga-bright-white px-4 py-2 hover:bg-vga-bright-white tracking-wider"
+              onClick={() => onPlayUserTie(userTieInKo.id)}
+              className="bg-vga-yellow text-vga-black text-[11px] uppercase font-bold border-2 border-vga-bright-white px-4 py-2 hover:bg-vga-bright-white tracking-wider"
             >
-              {userTie ? 'Auto-sim ronda' : `Jugar ${roundLabel(state.totalRounds, state.currentRound)}`}
+              Jugar tu partido
             </button>
-          </div>
-        );
-      })()}
+          )}
+          <button
+            onClick={onAdvanceStage}
+            className="bg-vga-light-green text-vga-black text-[11px] uppercase font-bold border-2 border-vga-bright-white px-4 py-2 hover:bg-vga-bright-white tracking-wider"
+          >
+            {userTieInKo ? 'Auto-sim fase' : 'Jugar fase'}
+          </button>
+        </div>
+      )}
     </div>
   );
 };
 
-const RoundHeader = ({ label, current, golden }: { label: string; current: boolean; golden?: boolean }) => (
-  <div className={`text-center text-[9px] uppercase tracking-widest py-1 border-2 ${
-    golden ? 'border-vga-yellow text-vga-yellow bg-vga-blue/30 font-bold'
-      : current ? 'border-vga-yellow text-vga-yellow'
-      : 'border-vga-blue text-vga-cyan'
-  }`}>
-    {label}
-  </div>
-);
-
-const Column = ({ ties, teamById, userTeamId, align }: {
-  ties: TournamentTie[];
+const LigaStageBody = ({ stage, teamById, userTeamId }: {
+  stage: TournamentStage;
   teamById: (id: string | null) => { id: string; name: string; colors?: string[] } | null | undefined;
-  userTeamId: string;
-  align: 'left' | 'right';
-}) => (
-  // Evenly distribute ties vertically so later rounds line up between pairs
-  // from the previous round.
-  <div className={`flex flex-col justify-around gap-2 ${align === 'right' ? 'items-end' : 'items-start'}`}>
-    {ties.map(tie => (
-      <TieCard key={tie.id} tie={tie} teamById={teamById} userTeamId={userTeamId} />
-    ))}
-  </div>
-);
+  userTeamId: string | null;
+}) => {
+  const adv = (stage.config as LigaStageConfig).advancePerGroup;
+  return (
+    <div className="bg-vga-black border-4 border-vga-blue p-3 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex flex-col gap-3 overflow-x-auto">
+      <div className={`grid gap-3`} style={{ gridTemplateColumns: `repeat(auto-fit, minmax(260px, 1fr))` }}>
+        {(stage.groups ?? []).map(group => {
+          const standings = groupStandings(group);
+          return (
+            <div key={group.id} className="border-2 border-vga-blue">
+              <div className="bg-vga-blue/40 border-b border-vga-blue px-2 py-1 text-vga-yellow text-[10px] uppercase font-bold">Grupo {group.letter}</div>
+              <table className="w-full text-[8px] font-mono">
+                <thead className="bg-vga-blue/20 text-vga-cyan">
+                  <tr>
+                    <th className="text-left px-1 py-1">#</th>
+                    <th className="text-left px-1 py-1">EQUIPO</th>
+                    <th className="text-right px-1 py-1">PJ</th>
+                    <th className="text-right px-1 py-1">G</th>
+                    <th className="text-right px-1 py-1">DG</th>
+                    <th className="text-right px-1 py-1">PTS</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {standings.map((s, i) => {
+                    const tm = teamById(s.teamId);
+                    const isUser = s.teamId === userTeamId;
+                    const isAdv = i < adv;
+                    return (
+                      <tr key={s.teamId} className={`${isUser ? 'bg-vga-yellow/20' : ''} border-b border-vga-blue/30`}>
+                        <td className={`px-1 py-0.5 ${isAdv ? 'text-vga-light-green font-bold' : 'text-vga-gray'}`}>{i + 1}</td>
+                        <td className="px-1 py-0.5 flex items-center gap-1 truncate text-vga-bright-white">
+                          {tm && <TeamCrest colors={tm.colors} size="sm" teamId={tm.id} title={tm.name} />}
+                          <span className="truncate">{tm?.name ?? '—'}</span>
+                        </td>
+                        <td className="text-right px-1 py-0.5">{s.played}</td>
+                        <td className="text-right px-1 py-0.5">{s.gf}</td>
+                        <td className="text-right px-1 py-0.5">{s.gd}</td>
+                        <td className="text-right px-1 py-0.5 text-vga-yellow font-bold">{s.points}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          );
+        })}
+      </div>
+      <div className="text-vga-gray text-[8px] uppercase tracking-widest text-center">
+        Pasan {adv} por grupo
+      </div>
+    </div>
+  );
+};
 
-const TieCard = ({ tie, teamById, userTeamId, emphasis }: {
+const KoStageBody = ({ stage, teamById, userTeamId }: {
+  stage: TournamentStage;
+  teamById: (id: string | null) => { id: string; name: string; colors?: string[] } | null | undefined;
+  userTeamId: string | null;
+}) => {
+  const cfg = stage.config as KoStageConfig;
+  const ties = (stage.ties ?? []).slice().sort((a, b) => a.slot - b.slot);
+  return (
+    <div className="bg-vga-black border-4 border-vga-blue p-3 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] overflow-x-auto">
+      <div className="grid gap-2" style={{ gridTemplateColumns: `repeat(auto-fit, minmax(220px, 1fr))` }}>
+        {ties.map(tie => (
+          <TieCard key={tie.id} tie={tie} legs={cfg.legs} teamById={teamById} userTeamId={userTeamId} />
+        ))}
+      </div>
+    </div>
+  );
+};
+
+const TieCard = ({ tie, legs, teamById, userTeamId }: {
   tie: TournamentTie;
+  legs: number;
   teamById: (id: string | null) => { id: string; name: string; colors?: string[] } | null | undefined;
-  userTeamId: string;
-  emphasis?: boolean;
+  userTeamId: string | null;
 }) => {
   const home = teamById(tie.homeTeamId);
   const away = teamById(tie.awayTeamId);
-  const userInTie = tie.homeTeamId === userTeamId || tie.awayTeamId === userTeamId;
-  const winnerIsHome = tie.winnerTeamId && tie.winnerTeamId === tie.homeTeamId;
-  const winnerIsAway = tie.winnerTeamId && tie.winnerTeamId === tie.awayTeamId;
+  const userInTie = userTeamId && (tie.homeTeamId === userTeamId || tie.awayTeamId === userTeamId);
+  const winnerIsHome = tie.winnerTeamId === tie.homeTeamId;
+  const winnerIsAway = tie.winnerTeamId === tie.awayTeamId;
   return (
-    <div
-      className={`w-full border-2 ${userInTie ? 'border-vga-yellow' : tie.played ? 'border-vga-blue' : 'border-vga-gray'} bg-vga-black ${emphasis ? 'shadow-[3px_3px_0px_0px_rgba(255,255,85,0.5)]' : ''}`}
-    >
-      <Row team={home} score={tie.homeScore} loser={tie.played && !winnerIsHome} winner={!!winnerIsHome} />
-      <Row team={away} score={tie.awayScore} loser={tie.played && !winnerIsAway} winner={!!winnerIsAway} />
+    <div className={`border-2 ${userInTie ? 'border-vga-yellow' : tie.played ? 'border-vga-blue' : 'border-vga-gray'} bg-vga-black`}>
+      <Row team={home} aggScore={tie.played ? tie.aggHome : null} winner={winnerIsHome} loser={tie.played && !winnerIsHome} />
+      <Row team={away} aggScore={tie.played ? tie.aggAway : null} winner={winnerIsAway} loser={tie.played && !winnerIsAway} />
+      {legs > 1 && tie.legs.some(l => l.played) && (
+        <div className="px-2 py-1 text-[7px] text-vga-gray uppercase border-t border-vga-blue flex justify-between flex-wrap gap-x-2">
+          {tie.legs.map((l, i) => l.played ? (
+            <span key={i}>P{i + 1}: {l.homeScore}-{l.awayScore}</span>
+          ) : null)}
+        </div>
+      )}
     </div>
   );
 };
 
-const Row = ({ team, score, winner, loser }: {
+const Row = ({ team, aggScore, winner, loser }: {
   team: { id: string; name: string; colors?: string[] } | null | undefined;
-  score: number | null;
+  aggScore: number | null;
   winner: boolean;
   loser: boolean;
 }) => (
   <div className={`grid grid-cols-[24px_1fr_auto] items-center gap-1 px-2 py-1 border-b border-vga-blue last:border-b-0 ${loser ? 'opacity-50' : ''}`}>
-    {team
-      ? <TeamCrest colors={team.colors} size="sm" teamId={team.id} title={team.name} />
-      : <div className="w-[18px] h-[18px] border border-vga-gray" />}
+    {team ? <TeamCrest colors={team.colors} size="sm" teamId={team.id} title={team.name} /> : <div className="w-[18px] h-[18px] border border-vga-gray" />}
     <span className={`text-[9px] uppercase truncate ${winner ? 'text-vga-yellow font-bold' : 'text-vga-bright-white'}`}>
       {team?.name ?? '—'}
     </span>
     <span className={`text-[11px] font-mono font-bold ${winner ? 'text-vga-light-green' : 'text-vga-gray'}`}>
-      {score ?? '·'}
+      {aggScore ?? '·'}
     </span>
   </div>
 );

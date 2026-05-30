@@ -44,7 +44,7 @@ import { PlayerNegotiationModal } from './components/PlayerNegotiationModal';
 import { TournamentSetupView } from './components/TournamentSetupView';
 import { BracketView } from './components/BracketView';
 import { TournamentRoundResultsModal } from './components/TournamentRoundResultsModal';
-import { createCopaTournament, advanceRound, saveTournament, loadTournament } from './store/tournamentStore';
+import { createTournament, advanceCurrentStage, saveTournament, loadTournament } from './store/tournamentStore';
 import type { TournamentState } from './store/tournamentStore';
 import { BoardAlertModal } from './components/BoardAlertModal';
 import { DisclaimerView } from './components/DisclaimerView';
@@ -1351,10 +1351,16 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
   // finalizeMatch which post-match path to take.
   const startTournamentMatch = (tieId: string) => {
     if (!tournament) return;
-    const tie = tournament.ties.find(t => t.id === tieId);
+    const stage = tournament.stages[tournament.currentStageIdx];
+    if (stage.config.kind !== 'ko' || !stage.ties) return;
+    const tie = stage.ties.find(t => t.id === tieId);
     if (!tie || !tie.homeTeamId || !tie.awayTeamId) return;
-    const home = tournament.teams.find(t => t.id === tie.homeTeamId);
-    const away = tournament.teams.find(t => t.id === tie.awayTeamId);
+    // v1: live-play the FIRST unplayed leg. Aggregate logic handles the rest
+    // when the user auto-sims subsequent legs via "Auto-sim fase".
+    const firstUnplayedLeg = tie.legs.find(l => !l.played);
+    if (!firstUnplayedLeg) return;
+    const home = tournament.teams.find(t => t.id === firstUnplayedLeg.homeTeamId);
+    const away = tournament.teams.find(t => t.id === firstUnplayedLeg.awayTeamId);
     if (!home || !away) return;
     const speed = (matchDuration * 1000) / 90;
     const initialMatch: MatchState = {
@@ -1381,7 +1387,7 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
     setShowSubPanel(false);
     if (matchDuration === 0) {
       let m = initialMatch;
-      while (!m.isFinished) m = simulateMinute(m, tournament.userTeamId);
+      while (!m.isFinished) m = simulateMinute(m, tournament.userTeamId ?? '');
       finalizeMatch(m);
       return;
     }
@@ -1395,25 +1401,32 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
     // score, decide a winner (PK shootout when level), then auto-sim the
     // remaining ties of the round via advanceRound.
     if (tournamentMatchTieId && tournament) {
-      let hs = finalMatch.homeScore;
-      let as = finalMatch.awayScore;
-      if (hs === as) {
-        // Shootout — light skew toward whoever is stronger on paper.
-        const hStr = finalMatch.homeTeam.players.reduce((s, p) => s + p.media, 0);
-        const aStr = finalMatch.awayTeam.players.reduce((s, p) => s + p.media, 0);
-        const homeProb = 0.5 + Math.max(-0.15, Math.min(0.15, (hStr - aStr) / Math.max(hStr, aStr, 1) * 0.5));
-        if (Math.random() < homeProb) hs += 1; else as += 1;
-      }
-      const winnerId = hs > as ? finalMatch.homeTeam.id : finalMatch.awayTeam.id;
-      const playedRound = tournament.currentRound;
+      const hs = finalMatch.homeScore;
+      const as = finalMatch.awayScore;
+      const playedStageIdx = tournament.currentStageIdx;
+      // Mark the first unplayed leg of this tie as played with the user's
+      // result, then run advanceCurrentStage which auto-sims everything else
+      // (remaining legs of THIS tie + every other tie of the stage).
       setTournament(prev => {
         if (!prev) return prev;
-        const updatedTies = prev.ties.map(t => t.id === tournamentMatchTieId
-          ? { ...t, homeScore: hs, awayScore: as, played: true, winnerTeamId: winnerId }
-          : t);
-        return advanceRound({ ...prev, ties: updatedTies });
+        const newStages = prev.stages.map((s, idx) => {
+          if (idx !== prev.currentStageIdx || s.config.kind !== 'ko' || !s.ties) return s;
+          return {
+            ...s,
+            ties: s.ties.map(tie => {
+              if (tie.id !== tournamentMatchTieId) return tie;
+              const legIdx = tie.legs.findIndex(l => !l.played);
+              if (legIdx < 0) return tie;
+              return {
+                ...tie,
+                legs: tie.legs.map((l, i) => i === legIdx ? { ...l, homeScore: hs, awayScore: as, played: true } : l),
+              };
+            }),
+          };
+        });
+        return advanceCurrentStage({ ...prev, stages: newStages });
       });
-      setTournamentRoundRecap(playedRound);
+      setTournamentRoundRecap(playedStageIdx);
       setTournamentMatchTieId(null);
       setMatch(null);
       setIsPlaying(false);
@@ -1672,14 +1685,17 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
   };
 
   // Resolve the "active user team id" for the match loop — tournament context
-  // wins when present, otherwise the league user.
-  const activeUserTeamId = tournamentMatchTieId && tournament ? tournament.userTeamId : league.userTeamId;
+  // wins when present, otherwise the league user. Tournaments allow spectator
+  // mode, so this is nullable; downstream consumers coalesce to '' when an
+  // empty string suffices (no team highlighted, no AI bias).
+  const activeUserTeamId: string | null = tournamentMatchTieId && tournament ? tournament.userTeamId : league.userTeamId;
+  const activeUserTeamIdSafe = activeUserTeamId ?? '';
 
   useEffect(() => {
     let interval: number;
     if (isPlaying && match && !match.isFinished && !isCelebrating) {
       interval = window.setInterval(() => {
-        setMatch(prev => prev ? simulateMinute(prev, activeUserTeamId) : null);
+        setMatch(prev => prev ? simulateMinute(prev, activeUserTeamIdSafe) : null);
       }, match.matchSpeed);
     }
     return () => clearInterval(interval);
@@ -1778,7 +1794,7 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
       setIsPlaying(false);
       setHtPaused(true);
       setShowSubPanel(true);
-      setMatch(prev => prev ? applyAiHtSubs(prev, activeUserTeamId) : null);
+      setMatch(prev => prev ? applyAiHtSubs(prev, activeUserTeamIdSafe) : null);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [match?.minute]);
@@ -1924,7 +1940,7 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
     // Tournament flow: a live tournament always takes priority over league
     // setup/menu views. Setup view only when explicitly opened.
     if (tournament && !match) {
-      const userTournamentTeam = tournament.teams.find(t => t.id === tournament.userTeamId);
+      const userTournamentTeam = tournament.userTeamId ? tournament.teams.find(t => t.id === tournament.userTeamId) : null;
       const updateTournamentUserTeam = (patch: Partial<Team>) => {
         setTournament(prev => prev ? {
           ...prev,
@@ -1947,7 +1963,7 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
             team={userTournamentTeam}
             seasonYear={new Date().getFullYear()}
             readOnly
-            onToggleForSale={() => { /* no transfers in tournaments */ }}
+            onToggleForSale={() => { /* no transfers in tournaments (v1) */ }}
             onBack={() => setTournamentSubView(null)}
           />
         );
@@ -1955,10 +1971,10 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
       return (
         <BracketView
           state={tournament}
-          onAdvanceRound={() => {
-            const playedRound = tournament.currentRound;
-            setTournament(prev => prev ? advanceRound(prev) : null);
-            setTournamentRoundRecap(playedRound);
+          onAdvanceStage={() => {
+            const playedStageIdx = tournament.currentStageIdx;
+            setTournament(prev => prev ? advanceCurrentStage(prev) : null);
+            setTournamentRoundRecap(playedStageIdx);
           }}
           onPlayUserTie={(tieId) => startTournamentMatch(tieId)}
           onOpenAlignment={() => setTournamentSubView('ALIGNMENT')}
@@ -1971,15 +1987,19 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
       return (
         <TournamentSetupView
           onBack={() => setShowTournamentFlow(false)}
-          onConfirm={(name, clubIds, userClubId) => {
+          onConfirm={(name, clubIds, userClubId, stages, transfersEnabled) => {
             if (!pack) return;
             const teams = clubIds
               .map(id => pack.clubs.find(c => c.id === id))
               .filter((c): c is NonNullable<typeof c> => Boolean(c))
               .map(c => buildTeamFromPackClub(c, pack, new Date().getFullYear()));
             if (teams.length !== clubIds.length) return;
-            setTournament(createCopaTournament(name, teams, userClubId));
-            setShowTournamentFlow(false);
+            try {
+              setTournament(createTournament(name, teams, userClubId, stages, transfersEnabled));
+              setShowTournamentFlow(false);
+            } catch (e) {
+              setMessage({ title: 'Configuración inválida', body: (e as Error).message, tone: 'warning' });
+            }
           }}
         />
       );
@@ -2809,7 +2829,7 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
           <div className="w-full flex flex-col gap-2">
             <MatchScreen
               match={match}
-              userTeamId={activeUserTeamId}
+              userTeamId={activeUserTeamIdSafe}
               year={tournamentMatchTieId && tournament ? new Date().getFullYear() : league.year}
               currentJornada={tournamentMatchTieId ? 0 : league.currentJornada}
               budget={userBudget}
@@ -2952,7 +2972,7 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
       {tournament && tournamentRoundRecap !== null && (
         <TournamentRoundResultsModal
           state={tournament}
-          justPlayedRound={tournamentRoundRecap}
+          justPlayedStageIdx={tournamentRoundRecap}
           onClose={() => setTournamentRoundRecap(null)}
         />
       )}
