@@ -37,7 +37,11 @@ export const TournamentSetupView = ({ onConfirm, onBack }: Props) => {
     setSelected(prev => {
       const next = new Set(prev);
       if (next.has(id)) { next.delete(id); if (userClubId === id) setUserClubId(null); }
-      else if (next.size < size) next.add(id);
+      else if (next.size < size) {
+        next.add(id);
+        // Default: first team picked is "yours". The user can still reassign.
+        if (!userClubId) setUserClubId(id);
+      }
       return next;
     });
 
@@ -105,17 +109,25 @@ export const TournamentSetupView = ({ onConfirm, onBack }: Props) => {
           <div className="border-2 border-vga-blue p-2 bg-vga-black">
             <div className="text-vga-cyan text-[8px] uppercase tracking-widest mb-1">Tu equipo en el torneo</div>
             <div className="flex flex-wrap gap-1">
-              {selectedList.map(t => (
-                <button
-                  key={t.id}
-                  onClick={() => setUserClubId(t.id)}
-                  className={`px-2 py-1 text-[9px] uppercase border ${userClubId === t.id
-                    ? 'bg-vga-yellow text-vga-black border-vga-bright-white font-bold'
-                    : 'bg-vga-black text-vga-bright-white border-vga-blue hover:border-vga-yellow'}`}
-                >
-                  {t.name}
-                </button>
-              ))}
+              {selectedList.map(t => {
+                const isMine = userClubId === t.id;
+                return (
+                  <button
+                    key={t.id}
+                    onClick={() => setUserClubId(t.id)}
+                    className={`px-2 py-1 text-[9px] uppercase border-2 ${isMine
+                      ? 'bg-vga-yellow text-vga-black border-vga-bright-white font-bold shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
+                      : 'bg-vga-black text-vga-bright-white border-vga-blue hover:border-vga-yellow'}`}
+                  >
+                    {isMine ? '★ ' : ''}{t.name}
+                  </button>
+                );
+              })}
+            </div>
+            <div className="text-vga-gray text-[7px] uppercase mt-1">
+              {userClubId
+                ? `★ ${selectedList.find(t => t.id === userClubId)?.name} es tu equipo. Pincha otro para cambiarlo.`
+                : 'Pincha un equipo para marcarlo como tuyo.'}
             </div>
           </div>
         )}
