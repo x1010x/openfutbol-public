@@ -244,10 +244,53 @@ export const EndOfSeasonView = ({ league, onContinueSameTeam, onAdvanceAndChange
   }
 
   const mostTitles = [...champCount.entries()].sort((a, b) => b[1] - a[1])[0];
+  const titlesRanking = [...champCount.entries()].sort((a, b) => b[1] - a[1]).slice(0, 10);
   const mostPichichi = [...pichichiCount.entries()].sort((a, b) => b[1].count - a[1].count || b[1].goals - a[1].goals)[0];
   const mostZamora = [...zamoraCount.entries()].sort((a, b) => b[1].count - a[1].count)[0];
   const mostMejor = [...mejorCount.entries()].sort((a, b) => b[1].count - a[1].count)[0];
   const seasonsPlayed = history.length;
+
+  // ── Career aggregates from playerHistory ────────────────────────────────
+  // Sum every completed season per player (matched by dbId) so we can crown
+  // all-time leaders even after a player has moved clubs or retired.
+  interface CareerAgg {
+    name: string;
+    teams: Set<string>;
+    goals: number; assists: number;
+    yellow: number; red: number;
+    minutes: number; appearances: number;
+    seasons: number;
+  }
+  const career = new Map<string, CareerAgg>();
+  for (const [dbId, recs] of Object.entries(league.playerHistory ?? {})) {
+    if (!recs || recs.length === 0) continue;
+    const latest = recs[recs.length - 1];
+    const agg: CareerAgg = career.get(dbId) ?? {
+      name: latest.shirtName ?? dbId,
+      teams: new Set<string>(),
+      goals: 0, assists: 0, yellow: 0, red: 0,
+      minutes: 0, appearances: 0, seasons: 0,
+    };
+    for (const r of recs) {
+      agg.goals += r.goals;
+      agg.assists += r.assists;
+      agg.yellow += r.yellowCards;
+      agg.red += r.redCards;
+      agg.minutes += r.minutes ?? 0;
+      agg.appearances += r.appearances ?? 0;
+      agg.seasons += 1;
+      if (r.teamName) agg.teams.add(r.teamName);
+      if (r.shirtName) agg.name = r.shirtName;
+    }
+    career.set(dbId, agg);
+  }
+  const careerArr = [...career.values()];
+  const topScorerCareer = [...careerArr].sort((a, b) => b.goals - a.goals)[0];
+  const topAssisterCareer = [...careerArr].sort((a, b) => b.assists - a.assists)[0];
+  const topMinutesCareer = [...careerArr].sort((a, b) => b.minutes - a.minutes)[0];
+  const topAppsCareer = [...careerArr].sort((a, b) => b.appearances - a.appearances)[0];
+  const topYellowsCareer = [...careerArr].sort((a, b) => b.yellow - a.yellow)[0];
+  const topRedsCareer = [...careerArr].sort((a, b) => b.red - a.red)[0];
 
   // ── Curiosidades ────────────────────────────────────────────────────────
   const teamsAvgAge = teams.map(team => {
@@ -540,6 +583,50 @@ export const EndOfSeasonView = ({ league, onContinueSameTeam, onAdvanceAndChange
                 <div className="text-vga-bright-white truncate">{allTimeWinning.teamName} <span className="text-vga-light-green">· {allTimeWinning.runs} victorias</span></div>
               </div>
             )}
+            {topScorerCareer && topScorerCareer.goals > 0 && (
+              <div>
+                <div className="text-vga-yellow text-[7px] uppercase">Goleador histórico</div>
+                <div className="text-vga-bright-white truncate">{topScorerCareer.name} <span className="text-vga-light-green">· {topScorerCareer.goals}G en {topScorerCareer.seasons} temp.</span></div>
+              </div>
+            )}
+            {topAssisterCareer && topAssisterCareer.assists > 0 && (
+              <div>
+                <div className="text-vga-yellow text-[7px] uppercase">Asistente histórico</div>
+                <div className="text-vga-bright-white truncate">{topAssisterCareer.name} <span className="text-vga-light-cyan">· {topAssisterCareer.assists} ast.</span></div>
+              </div>
+            )}
+            {topMinutesCareer && topMinutesCareer.minutes > 0 && (
+              <div>
+                <div className="text-vga-yellow text-[7px] uppercase">Más minutos jugados</div>
+                <div className="text-vga-bright-white truncate">{topMinutesCareer.name} <span className="text-vga-bright-white">· {topMinutesCareer.minutes.toLocaleString()} min</span></div>
+              </div>
+            )}
+            {topAppsCareer && topAppsCareer.appearances > 0 && (
+              <div>
+                <div className="text-vga-yellow text-[7px] uppercase">Más partidos jugados</div>
+                <div className="text-vga-bright-white truncate">{topAppsCareer.name} <span className="text-vga-cyan">· {topAppsCareer.appearances} PJ</span></div>
+              </div>
+            )}
+
+            {/* Récords negativos */}
+            {(topYellowsCareer || topRedsCareer) && (
+              <div className="border-t border-vga-light-red pt-1 mt-1">
+                <div className="text-vga-light-red text-[7px] uppercase font-bold mb-1">Récords negativos</div>
+                {topYellowsCareer && topYellowsCareer.yellow > 0 && (
+                  <div>
+                    <div className="text-vga-yellow text-[7px] uppercase">Más amarillas</div>
+                    <div className="text-vga-bright-white truncate">{topYellowsCareer.name} <span className="text-vga-yellow">· {topYellowsCareer.yellow} TA</span></div>
+                  </div>
+                )}
+                {topRedsCareer && topRedsCareer.red > 0 && (
+                  <div className="mt-1">
+                    <div className="text-vga-yellow text-[7px] uppercase">Más rojas</div>
+                    <div className="text-vga-bright-white truncate">{topRedsCareer.name} <span className="text-vga-light-red">· {topRedsCareer.red} TR</span></div>
+                  </div>
+                )}
+              </div>
+            )}
+
             {seasonsPlayed === 0 && (
               <div className="text-vga-gray italic text-[8px] mt-1">
                 Solo se ha jugado una temporada. Los récords históricos se construirán con cada nueva.
@@ -547,6 +634,29 @@ export const EndOfSeasonView = ({ league, onContinueSameTeam, onAdvanceAndChange
             )}
           </div>
         </Panel>
+
+        {titlesRanking.length > 0 && (
+          <Panel title="Ranking histórico de títulos" accent="text-vga-yellow">
+            <table className="w-full text-[8px] font-mono">
+              <thead className="text-vga-cyan border-b border-vga-blue">
+                <tr>
+                  <th className="text-left px-1 py-0.5">#</th>
+                  <th className="text-left px-1 py-0.5">Equipo</th>
+                  <th className="text-right px-1 py-0.5">Títulos</th>
+                </tr>
+              </thead>
+              <tbody>
+                {titlesRanking.map(([teamName, count], i) => (
+                  <tr key={teamName} className={`border-b border-vga-blue/30 ${i === 0 ? 'bg-vga-yellow/10' : ''}`}>
+                    <td className={`px-1 py-0.5 font-bold ${i === 0 ? 'text-vga-yellow' : 'text-vga-gray'}`}>{i + 1}</td>
+                    <td className="px-1 py-0.5 text-vga-bright-white truncate">{teamName}</td>
+                    <td className="px-1 py-0.5 text-right text-vga-light-green font-bold">{count}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </Panel>
+        )}
       </div>
 
       {/* Player oddities */}
