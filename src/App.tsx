@@ -1282,6 +1282,9 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
             const firedIdx = Math.floor(Math.random() * 4);
             const firedMsg = { title: t('florentino.fired'), body: t(`florentino.firedBody.${firedIdx}`), tone: 'danger' as const };
             setTimeout(() => { setBoardAlert(firedMsg); setLastBoardAlert(firedMsg); }, 100);
+            // Skip the jornada-results step when fired — go straight to the
+            // season summary + Pro Manager end view together.
+            setTimeout(() => setView('END_OF_SEASON'), 200);
           } else {
             newLeague = { ...newLeague, boardWarnings: warnings };
             const isLastWarning = warnings === FIRE_THRESHOLD - 1;
@@ -2326,8 +2329,15 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
 
     if (view === 'END_OF_SEASON') {
       if (league.gameMode === 'promanager') {
+        const wasFiredMid = !!league.boardFired;
         return (
-          <div className="w-full flex flex-col gap-3">
+          <div className="w-full flex flex-col gap-4">
+            {wasFiredMid && (
+              <div className="bg-vga-light-red border-4 border-vga-bright-white p-3 text-center shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
+                <div className="text-vga-bright-white text-[10px] uppercase tracking-widest font-bold">Despedido en la jornada {league.currentJornada}</div>
+                <div className="text-vga-yellow text-[8px] uppercase mt-1">Esto es el balance de tu paso por el club.</div>
+              </div>
+            )}
             <EndOfSeasonView
               league={league}
               hideActions
@@ -2335,19 +2345,24 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
               onTeamClick={(teamId) => { setViewingTeamId(teamId); setView('SQUAD'); }}
               onPlayerClick={(playerId) => showPlayerDetail(playerId)}
             />
-            <ProManagerEndView
-              teams={league.teams}
-              stats={league.stats}
-              userTeamId={league.userTeamId}
-              managerName={league.managerName ?? ''}
-              florentinometro={league.florentinometro ?? 5}
-              boardObjective={league.boardObjective ?? 'avoid_relegation'}
-              managerReputation={league.managerReputation ?? 50}
-              year={league.year}
-              firedByTeamIds={league.firedByTeamIds}
-              onPickTeam={handleProManagerPickTeam}
-              onRetire={handleProManagerRetire}
-            />
+            <div className="border-t-4 border-vga-yellow pt-2">
+              <div className="text-vga-yellow text-[10px] uppercase tracking-widest font-bold mb-2 text-center">
+                {wasFiredMid ? 'Próximo destino' : 'Pro Manager · Final de temporada'}
+              </div>
+              <ProManagerEndView
+                teams={league.teams}
+                stats={league.stats}
+                userTeamId={league.userTeamId}
+                managerName={league.managerName ?? ''}
+                florentinometro={league.florentinometro ?? 5}
+                boardObjective={league.boardObjective ?? 'avoid_relegation'}
+                managerReputation={league.managerReputation ?? 50}
+                year={league.year}
+                firedByTeamIds={league.firedByTeamIds}
+                onPickTeam={handleProManagerPickTeam}
+                onRetire={handleProManagerRetire}
+              />
+            </div>
           </div>
         );
       }
