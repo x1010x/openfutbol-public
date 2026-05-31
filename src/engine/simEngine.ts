@@ -395,9 +395,20 @@ export const simulateMinute = (state: MatchState, userTeamId?: string): MatchSta
           const redThreshold = yellowThreshold + 0.02 * cardMod * engineSettings.cardStrictness;
           const cardRand = Math.random();
 
+          // Helper: remove a sent-off player from their team's lineup so
+          // the slot empties out on the pitch and they can't be subbed back
+          // in (subs already exclude sentOff in AlignmentView).
+          const dropFromLineup = (pid: string) => {
+            if (isHomeEvent) {
+              awayTeam = { ...awayTeam, lineup: awayTeam.lineup.filter(id => id !== pid) };
+            } else {
+              homeTeam = { ...homeTeam, lineup: homeTeam.lineup.filter(id => id !== pid) };
+            }
+          };
           if (cardRand < yellowThreshold) {
             if (defYellows.includes(defender.id)) {
               defSentOff.push(defender.id);
+              dropFromLineup(defender.id);
               newEvents.push({
                 minute: nextMinute,
                 type: 'red',
@@ -417,6 +428,7 @@ export const simulateMinute = (state: MatchState, userTeamId?: string): MatchSta
             }
           } else if (cardRand < redThreshold) {
             defSentOff.push(defender.id);
+            dropFromLineup(defender.id);
             newEvents.push({
               minute: nextMinute,
               type: 'red',
