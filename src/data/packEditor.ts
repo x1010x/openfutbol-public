@@ -266,6 +266,42 @@ export const autoFixIssues = (pack: Pack, issues: PackIssue[]): { pack: Pack; fi
   return { pack: p, fixed };
 };
 
+// ── Mass operations on player selections ────────────────────────────────
+export interface BulkPlayerOp {
+  caDelta?: number;       // adds to current_ability, then clamps 1-200
+  paDelta?: number;       // adds to potential_ability, then clamps 1-200
+  ageDelta?: number;      // shifts birth_date by N years (positive = older)
+  valueMultiplier?: number;  // multiplies value
+  clubId?: string | null;    // reassigns club (null = free agent)
+  countryId?: string;        // reassigns country
+}
+
+const clamp200 = (n: number) => Math.max(1, Math.min(200, Math.round(n)));
+
+export const applyBulkPlayerOp = (pack: Pack, playerIds: string[], op: BulkPlayerOp): Pack => {
+  const ids = new Set(playerIds);
+  return {
+    ...pack,
+    players: pack.players.map(p => {
+      if (!ids.has(p.id)) return p;
+      const next = { ...p };
+      if (op.caDelta != null) next.current_ability = clamp200(p.current_ability + op.caDelta);
+      if (op.paDelta != null) next.potential_ability = clamp200(p.potential_ability + op.paDelta);
+      if (op.ageDelta != null) {
+        const m = /^(\d{4})(-\d{2}-\d{2})$/.exec(p.birth_date);
+        if (m) {
+          const newYear = parseInt(m[1], 10) - op.ageDelta;
+          next.birth_date = `${newYear}${m[2]}`;
+        }
+      }
+      if (op.valueMultiplier != null) next.value = Math.max(0, Math.round(p.value * op.valueMultiplier));
+      if (op.clubId !== undefined) next.club_id = op.clubId;
+      if (op.countryId != null) next.country_id = op.countryId;
+      return next;
+    }),
+  };
+};
+
 // ── Filtered export ──────────────────────────────────────────────────────
 export interface ExportFilter {
   countryIds?: string[];   // include only these countries (and their leagues/clubs/players)

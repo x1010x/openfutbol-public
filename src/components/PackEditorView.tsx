@@ -9,7 +9,8 @@ import {
   packStats, stampMetaNow,
   blankContinent, blankCountry, blankLeague, blankClub, blankPlayer,
   validatePack, autoFixIssues, subsetPack,
-  type ExportFilter,
+  applyBulkPlayerOp,
+  type ExportFilter, type BulkPlayerOp,
 } from '../data/packEditor';
 
 type Tab = 'continents' | 'countries' | 'leagues' | 'clubs' | 'players';
@@ -27,6 +28,9 @@ export const PackEditorView = ({ onBack }: Props) => {
   const [loadError, setLoadError] = useState<string | null>(null);
   const [showValidator, setShowValidator] = useState(false);
   const [showExportPicker, setShowExportPicker] = useState(false);
+  const [showBulkOp, setShowBulkOp] = useState(false);
+  // Multi-select set for the players tab (clear when tab changes).
+  const [bulkSelection, setBulkSelection] = useState<Set<string>>(new Set());
   const fileRef = useRef<HTMLInputElement>(null);
 
   // Auto-save on every change.
@@ -87,6 +91,11 @@ export const PackEditorView = ({ onBack }: Props) => {
           <span className="text-vga-bright-white text-[9px] uppercase">{pack.meta.name || '—'}</span>
         </div>
         <div className="flex items-center gap-1 flex-wrap">
+          {tab === 'players' && bulkSelection.size > 0 && (
+            <button onClick={() => setShowBulkOp(true)} className="bg-vga-magenta text-vga-bright-white px-3 py-1 text-[9px] uppercase font-bold border border-vga-black hover:bg-vga-light-magenta">
+              Operación masiva ({bulkSelection.size})
+            </button>
+          )}
           <button onClick={() => setShowValidator(true)} className="bg-vga-cyan text-vga-black px-3 py-1 text-[9px] uppercase font-bold border border-vga-black hover:bg-vga-light-cyan">
             Validar
           </button>
@@ -132,7 +141,7 @@ export const PackEditorView = ({ onBack }: Props) => {
         {(['continents','countries','leagues','clubs','players'] as Tab[]).map(t => (
           <button
             key={t}
-            onClick={() => { setTab(t); setSelectedId(null); setSearch(''); }}
+            onClick={() => { setTab(t); setSelectedId(null); setSearch(''); setBulkSelection(new Set()); }}
             className={`px-3 py-2 text-[9px] uppercase font-bold border-2 ${tab === t
               ? 'bg-vga-yellow text-vga-black border-vga-bright-white'
               : 'bg-vga-black text-vga-cyan border-vga-blue hover:border-vga-yellow'}`}
@@ -155,6 +164,17 @@ export const PackEditorView = ({ onBack }: Props) => {
           pack={pack}
           onClose={() => setShowExportPicker(false)}
           onExport={(filter) => { handleExport(filter); setShowExportPicker(false); }}
+        />
+      )}
+      {showBulkOp && (
+        <BulkOpModal
+          pack={pack}
+          playerIds={[...bulkSelection]}
+          onClose={() => setShowBulkOp(false)}
+          onApply={(op) => {
+            setPack(p => p ? applyBulkPlayerOp(p, [...bulkSelection], op) : p);
+            setShowBulkOp(false);
+          }}
         />
       )}
 
@@ -186,7 +206,19 @@ export const PackEditorView = ({ onBack }: Props) => {
             </button>
           </div>
           <div className="max-h-[70vh] overflow-auto">
-            <Listing pack={pack} tab={tab} search={search} selectedId={selectedId} onSelect={setSelectedId} />
+            <Listing
+              pack={pack}
+              tab={tab}
+              search={search}
+              selectedId={selectedId}
+              onSelect={setSelectedId}
+              bulkSelection={tab === 'players' ? bulkSelection : null}
+              onBulkToggle={tab === 'players' ? (id) => setBulkSelection(prev => {
+                const next = new Set(prev); next.has(id) ? next.delete(id) : next.add(id); return next;
+              }) : null}
+              onBulkSelectAll={tab === 'players' ? (ids) => setBulkSelection(new Set(ids)) : null}
+              onBulkClear={tab === 'players' ? () => setBulkSelection(new Set()) : null}
+            />
           </div>
         </div>
 
@@ -278,9 +310,13 @@ const LandingScreen = ({
 );
 
 // ─────────────────────────────────────────────────────────────────────────
-const Listing = ({ pack, tab, search, selectedId, onSelect }: {
+const Listing = ({ pack, tab, search, selectedId, onSelect, bulkSelection, onBulkToggle, onBulkSelectAll, onBulkClear }: {
   pack: Pack; tab: Tab; search: string; selectedId: string | null;
   onSelect: (id: string) => void;
+  bulkSelection: Set<string> | null;
+  onBulkToggle: ((id: string) => void) | null;
+  onBulkSelectAll: ((ids: string[]) => void) | null;
+  onBulkClear: (() => void) | null;
 }) => {
   const q = search.trim().toLowerCase();
   const items = useMemo(() => {
@@ -295,22 +331,46 @@ const Listing = ({ pack, tab, search, selectedId, onSelect }: {
     return arr;
   }, [pack, tab, q]);
 
+  const allShownChecked = bulkSelection != null && items.length > 0 && items.every(it => bulkSelection.has(it.id));
+
   return (
     <table className="w-full text-[9px]">
       <thead className="bg-vga-blue/20 text-vga-cyan sticky top-0">
         <tr>
+          {bulkSelection != null && (
+            <th className="text-left px-2 py-1 w-6">
+              <input
+                type="checkbox"
+                checked={allShownChecked}
+                onChange={e => {
+                  if (e.target.checked) onBulkSelectAll?.(items.map(i => i.id));
+                  else onBulkClear?.();
+                }}
+              />
+            </th>
+          )}
           <HeaderColumns tab={tab} />
         </tr>
       </thead>
       <tbody>
         {items.map(item => {
           const isSel = item.id === selectedId;
+          const isBulkSel = bulkSelection?.has(item.id) ?? false;
           return (
             <tr
               key={item.id}
               onClick={() => onSelect(item.id)}
-              className={`${isSel ? 'bg-vga-yellow/20' : ''} cursor-pointer hover:bg-vga-blue/20 border-b border-vga-blue/30`}
+              className={`${isSel ? 'bg-vga-yellow/20' : isBulkSel ? 'bg-vga-magenta/20' : ''} cursor-pointer hover:bg-vga-blue/20 border-b border-vga-blue/30`}
             >
+              {bulkSelection != null && (
+                <td className="px-2 py-1" onClick={e => e.stopPropagation()}>
+                  <input
+                    type="checkbox"
+                    checked={isBulkSel}
+                    onChange={() => onBulkToggle?.(item.id)}
+                  />
+                </td>
+              )}
               <RowCells pack={pack} tab={tab} item={item as never} />
             </tr>
           );
@@ -596,6 +656,109 @@ const ValidatorModal = ({ pack, onClose, onApplyFix, onJumpToIssue }: {
     </div>
   );
 };
+
+// ── Bulk operation modal ────────────────────────────────────────────────
+const BulkOpModal = ({ pack, playerIds, onClose, onApply }: {
+  pack: Pack;
+  playerIds: string[];
+  onClose: () => void;
+  onApply: (op: BulkPlayerOp) => void;
+}) => {
+  const [caDelta, setCaDelta] = useState<number>(0);
+  const [paDelta, setPaDelta] = useState<number>(0);
+  const [ageDelta, setAgeDelta] = useState<number>(0);
+  const [valueMult, setValueMult] = useState<number>(1);
+  const [clubAssign, setClubAssign] = useState<string>('__none__');   // __none__ = no change, '' = free agent
+  const [countryAssign, setCountryAssign] = useState<string>('__none__');
+
+  const buildOp = (): BulkPlayerOp => {
+    const op: BulkPlayerOp = {};
+    if (caDelta !== 0) op.caDelta = caDelta;
+    if (paDelta !== 0) op.paDelta = paDelta;
+    if (ageDelta !== 0) op.ageDelta = ageDelta;
+    if (valueMult !== 1) op.valueMultiplier = valueMult;
+    if (clubAssign !== '__none__') op.clubId = clubAssign === '' ? null : clubAssign;
+    if (countryAssign !== '__none__') op.countryId = countryAssign;
+    return op;
+  };
+  const op = buildOp();
+  const willChange = Object.keys(op).length > 0;
+
+  return (
+    <div onClick={onClose} className="fixed inset-0 z-50 bg-black/85 flex items-center justify-center p-4 animate-in fade-in duration-150">
+      <div onClick={e => e.stopPropagation()} className="w-full max-w-xl border-4 border-vga-bright-white bg-vga-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] flex flex-col">
+        <div className="bg-vga-magenta/40 border-b-2 border-vga-magenta px-3 py-2">
+          <span className="text-vga-yellow text-[10px] uppercase tracking-widest font-bold">
+            Operación masiva — {playerIds.length} jugador{playerIds.length === 1 ? '' : 'es'}
+          </span>
+        </div>
+        <div className="p-3 flex flex-col gap-3 max-h-[70vh] overflow-y-auto">
+          <BulkRow label="CA (±)">
+            <BulkNumber value={caDelta} onChange={setCaDelta} step={1} />
+            <span className="text-vga-gray text-[8px] uppercase">Se clamea a 1-200</span>
+          </BulkRow>
+          <BulkRow label="PA (±)">
+            <BulkNumber value={paDelta} onChange={setPaDelta} step={1} />
+          </BulkRow>
+          <BulkRow label="Edad (±años)">
+            <BulkNumber value={ageDelta} onChange={setAgeDelta} step={1} />
+            <span className="text-vga-gray text-[8px] uppercase">Positivo = más viejos</span>
+          </BulkRow>
+          <BulkRow label="Valor (×)">
+            <BulkNumber value={valueMult} onChange={setValueMult} step={0.1} />
+            <span className="text-vga-gray text-[8px] uppercase">1.0 = sin cambio</span>
+          </BulkRow>
+          <BulkRow label="Reasignar club">
+            <select value={clubAssign} onChange={e => setClubAssign(e.target.value)} className="bg-vga-black border border-vga-blue text-vga-bright-white text-[10px] px-2 py-1 outline-none focus:border-vga-yellow font-mono">
+              <option value="__none__">— sin cambio —</option>
+              <option value="">— a libre —</option>
+              {pack.clubs.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+            </select>
+          </BulkRow>
+          <BulkRow label="Reasignar país">
+            <select value={countryAssign} onChange={e => setCountryAssign(e.target.value)} className="bg-vga-black border border-vga-blue text-vga-bright-white text-[10px] px-2 py-1 outline-none focus:border-vga-yellow font-mono">
+              <option value="__none__">— sin cambio —</option>
+              {pack.countries.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+            </select>
+          </BulkRow>
+        </div>
+        <div className="border-t-2 border-vga-blue p-2 bg-vga-blue/30 flex gap-2 justify-end">
+          <button onClick={onClose} className="bg-vga-gray text-vga-black px-3 py-1.5 text-[9px] uppercase border-2 border-vga-black hover:bg-vga-white">Cancelar</button>
+          <button
+            onClick={() => onApply(op)}
+            disabled={!willChange}
+            className={`px-3 py-1.5 text-[9px] uppercase font-bold border-2 ${willChange
+              ? 'bg-vga-light-green text-vga-black border-vga-bright-white hover:bg-vga-bright-white'
+              : 'bg-vga-gray text-vga-black border-vga-gray opacity-60 cursor-not-allowed'}`}
+          >
+            Aplicar a {playerIds.length}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const BulkRow = ({ label, children }: { label: string; children: React.ReactNode }) => (
+  <div className="grid grid-cols-[120px_1fr] items-center gap-2">
+    <span className="text-vga-cyan text-[8px] uppercase tracking-widest">{label}</span>
+    <div className="flex items-center gap-2 flex-wrap">{children}</div>
+  </div>
+);
+
+const BulkNumber = ({ value, onChange, step }: { value: number; onChange: (n: number) => void; step: number }) => (
+  <div className="flex items-center gap-1">
+    <button onClick={() => onChange(value - step)} className="bg-vga-gray text-vga-black px-2 py-0.5 text-[10px] border border-vga-black">−</button>
+    <input
+      type="number"
+      step={step}
+      value={value}
+      onChange={e => onChange(parseFloat(e.target.value) || 0)}
+      className="w-20 bg-vga-black border border-vga-blue text-vga-bright-white text-[10px] px-2 py-1 outline-none focus:border-vga-yellow font-mono text-center"
+    />
+    <button onClick={() => onChange(value + step)} className="bg-vga-gray text-vga-black px-2 py-0.5 text-[10px] border border-vga-black">+</button>
+  </div>
+);
 
 // ── Export picker modal ─────────────────────────────────────────────────
 const ExportPickerModal = ({ pack, onClose, onExport }: {
