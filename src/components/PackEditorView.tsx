@@ -1,5 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { Pack, Continent, Country, League, Club, PackPlayer, PositionCode } from '../types/game.d.ts';
+
+interface ListingFilters {
+  continentId?: string;
+  countryId?: string;
+  leagueId?: string;
+  clubId?: string;
+  positionCode?: PositionCode;
+}
 import { usePack } from '../state/PackContext';
 import { parsePack } from '../data/packLoader';
 import { StatsPackEditorView } from './StatsPackEditorView';
@@ -344,6 +352,47 @@ const LandingScreen = ({
 // ─────────────────────────────────────────────────────────────────────────
 const PAGE_SIZE = 100;
 
+const POSITION_OPTIONS: PositionCode[] = ['GK','DC','DL','DR','WBL','WBR','DMC','MC','ML','MR','AMC','AML','AMR','FC'];
+
+// Compare-friendly value for the current sort key per tab. Strings normalized
+// to lowercase so case doesn't bias the sort.
+const sortValue = (pack: Pack, tab: Tab, key: string, raw: { id: string }): string | number => {
+  if (tab === 'continents') {
+    const e = raw as Continent;
+    return (e.name ?? '').toLowerCase();
+  }
+  if (tab === 'countries') {
+    const e = raw as Country;
+    if (key === 'code') return (e.code ?? '').toLowerCase();
+    if (key === 'continent') return (pack.continents.find(c => c.id === e.continent_id)?.name ?? '').toLowerCase();
+    if (key === 'reputation') return e.reputation;
+    return (e.name ?? '').toLowerCase();
+  }
+  if (tab === 'leagues') {
+    const e = raw as League;
+    if (key === 'country') return (pack.countries.find(c => c.id === e.country_id)?.name ?? '').toLowerCase();
+    if (key === 'tier') return e.tier;
+    if (key === 'reputation') return e.reputation;
+    return (e.name ?? '').toLowerCase();
+  }
+  if (tab === 'clubs') {
+    const e = raw as Club;
+    if (key === 'league') return (pack.leagues.find(l => l.id === e.league_id)?.name ?? '').toLowerCase();
+    return (e.name ?? '').toLowerCase();
+  }
+  // players
+  const p = raw as PackPlayer;
+  if (key === 'pos') {
+    const top = [...p.positions].sort((a, b) => b.level - a.level)[0];
+    return top?.code ?? '';
+  }
+  if (key === 'ca') return p.current_ability;
+  if (key === 'pa') return p.potential_ability;
+  if (key === 'club') return (p.club_id ? pack.clubs.find(c => c.id === p.club_id)?.name ?? '' : 'zzzz').toLowerCase();
+  // Default 'name': last name then first.
+  return `${p.last_name} ${p.first_name}`.toLowerCase();
+};
+
 const Listing = ({ pack, tab, search, selectedId, onSelect, bulkSelection, onBulkToggle, onBulkSelectAll, onBulkClear }: {
   pack: Pack; tab: Tab; search: string; selectedId: string | null;
   onSelect: (id: string) => void;
@@ -353,17 +402,78 @@ const Listing = ({ pack, tab, search, selectedId, onSelect, bulkSelection, onBul
   onBulkClear: (() => void) | null;
 }) => {
   const q = search.trim().toLowerCase();
+  const [filters, setFilters] = useState<ListingFilters>({});
+  const [sortKey, setSortKey] = useState<string>('name');
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
+  // Reset filters and sort when the tab changes — country pick from "countries"
+  // is not meaningful inside "leagues".
+  useEffect(() => { setFilters({}); setSortKey('name'); setSortDir('asc'); }, [tab]);
+  const toggleSort = (key: string, defaultDir: 'asc' | 'desc' = 'asc') => {
+    if (sortKey === key) setSortDir(d => d === 'asc' ? 'desc' : 'asc');
+    else { setSortKey(key); setSortDir(defaultDir); }
+  };
+
+  // Pre-compute lookup sets when a parent filter is set.
+  const leagueIdsForCountry = useMemo(() => {
+    if (!filters.countryId) return null;
+    return new Set(pack.leagues.filter(l => l.country_id === filters.countryId).map(l => l.id));
+  }, [pack.leagues, filters.countryId]);
+
+  const clubIdsForCurrentScope = useMemo(() => {
+    // Used when filtering players: build the set of acceptable club_ids given
+    // either filter.clubId, filter.leagueId, or filter.countryId.
+    if (filters.clubId) return new Set([filters.clubId]);
+    if (filters.leagueId) return new Set(pack.clubs.filter(c => c.league_id === filters.leagueId).map(c => c.id));
+    if (leagueIdsForCountry) return new Set(pack.clubs.filter(c => leagueIdsForCountry.has(c.league_id)).map(c => c.id));
+    return null;
+  }, [pack.clubs, filters.clubId, filters.leagueId, leagueIdsForCountry]);
+
   const items = useMemo(() => {
-    const arr = pack[tab] as Array<{ id: string }>;
-    if (!q) return arr;
-    if (tab === 'continents' || tab === 'countries' || tab === 'leagues' || tab === 'clubs') {
-      return (arr as Array<{ id: string; name?: string }>).filter(e => (e.name ?? '').toLowerCase().includes(q));
+    let arr = pack[tab] as Array<{ id: string }>;
+
+    // Apply per-tab filters.
+    if (tab === 'countries' && filters.continentId) {
+      arr = (arr as Country[]).filter(c => c.continent_id === filters.continentId);
+    }
+    if (tab === 'leagues' && filters.countryId) {
+      arr = (arr as League[]).filter(l => l.country_id === filters.countryId);
+    }
+    if (tab === 'clubs') {
+      if (filters.leagueId) {
+        arr = (arr as Club[]).filter(c => c.league_id === filters.leagueId);
+      } else if (leagueIdsForCountry) {
+        arr = (arr as Club[]).filter(c => leagueIdsForCountry.has(c.league_id));
+      }
     }
     if (tab === 'players') {
-      return (arr as PackPlayer[]).filter(p => (p.first_name + ' ' + p.last_name).toLowerCase().includes(q));
+      let ps = arr as PackPlayer[];
+      if (filters.countryId && !filters.clubId && !filters.leagueId) {
+        // Filter by player nationality when only country is set.
+        ps = ps.filter(p => p.country_id === filters.countryId);
+      }
+      if (clubIdsForCurrentScope) {
+        ps = ps.filter(p => p.club_id != null && clubIdsForCurrentScope.has(p.club_id));
+      }
+      if (filters.positionCode) {
+        ps = ps.filter(p => p.positions.some(pos => pos.code === filters.positionCode));
+      }
+      arr = ps as Array<{ id: string }>;
     }
-    return arr;
-  }, [pack, tab, q]);
+
+    // Search filter.
+    if (q) {
+      if (tab === 'continents' || tab === 'countries' || tab === 'leagues' || tab === 'clubs') {
+        arr = (arr as Array<{ id: string; name?: string }>).filter(e => (e.name ?? '').toLowerCase().includes(q));
+      } else if (tab === 'players') {
+        arr = (arr as PackPlayer[]).filter(p => (p.first_name + ' ' + p.last_name).toLowerCase().includes(q));
+      }
+    }
+
+    // Sort (after filtering, before pagination).
+    const cmp = sortDir === 'asc' ? 1 : -1;
+    const sorted = [...arr].sort((a, b) => sortValue(pack, tab, sortKey, a) > sortValue(pack, tab, sortKey, b) ? cmp : sortValue(pack, tab, sortKey, a) < sortValue(pack, tab, sortKey, b) ? -cmp : 0);
+    return sorted;
+  }, [pack, tab, q, filters, leagueIdsForCountry, clubIdsForCurrentScope, sortKey, sortDir]);
 
   // Paginate only when there's no search. Searching shows every match
   // because a deliberate filter is normally small enough to render.
@@ -379,8 +489,55 @@ const Listing = ({ pack, tab, search, selectedId, onSelect, bulkSelection, onBul
 
   const allShownChecked = bulkSelection != null && visible.length > 0 && visible.every(it => bulkSelection.has(it.id));
 
+  // Build the filter row for the current tab. continents has none.
+  const filterBar = (tab === 'continents') ? null : (
+    <div className="px-2 py-1.5 border-b border-vga-blue bg-vga-blue/10 flex flex-wrap items-center gap-2">
+      <span className="text-vga-cyan text-[7px] uppercase tracking-widest">Filtrar:</span>
+      {tab === 'countries' && (
+        <FilterSelect label="Continente" value={filters.continentId ?? ''}
+          options={[['', '— todos —'], ...pack.continents.map(c => [c.id, c.name] as [string, string])]}
+          onChange={v => setFilters({ continentId: v || undefined })} />
+      )}
+      {(tab === 'leagues' || tab === 'clubs' || tab === 'players') && (
+        <FilterSelect label="País" value={filters.countryId ?? ''}
+          options={[['', '— todos —'], ...pack.countries.map(c => [c.id, c.name] as [string, string])]}
+          onChange={v => setFilters(f => ({ ...f, countryId: v || undefined, leagueId: undefined, clubId: undefined }))} />
+      )}
+      {(tab === 'clubs' || tab === 'players') && (
+        <FilterSelect label="Liga" value={filters.leagueId ?? ''}
+          options={[['', '— todas —'], ...pack.leagues
+            .filter(l => !filters.countryId || l.country_id === filters.countryId)
+            .map(l => [l.id, l.name] as [string, string])]}
+          onChange={v => setFilters(f => ({ ...f, leagueId: v || undefined, clubId: undefined }))} />
+      )}
+      {tab === 'players' && (
+        <>
+          <FilterSelect label="Club" value={filters.clubId ?? ''}
+            options={[['', '— todos —'], ...pack.clubs
+              .filter(c => {
+                if (filters.leagueId) return c.league_id === filters.leagueId;
+                if (filters.countryId) return leagueIdsForCountry?.has(c.league_id) ?? true;
+                return true;
+              })
+              .map(c => [c.id, c.name] as [string, string])]}
+            onChange={v => setFilters(f => ({ ...f, clubId: v || undefined }))} />
+          <FilterSelect label="Posición" value={filters.positionCode ?? ''}
+            options={[['', '— todas —'], ...POSITION_OPTIONS.map(p => [p, p] as [string, string])]}
+            onChange={v => setFilters(f => ({ ...f, positionCode: (v || undefined) as PositionCode | undefined }))} />
+        </>
+      )}
+      {Object.values(filters).some(Boolean) && (
+        <button onClick={() => setFilters({})}
+          className="ml-auto px-2 py-0.5 text-[8px] uppercase border border-vga-red text-vga-light-red hover:bg-vga-red hover:text-vga-bright-white">
+          Limpiar
+        </button>
+      )}
+    </div>
+  );
+
   return (
     <div className="flex flex-col max-h-[70vh] min-h-0">
+      {filterBar}
       {/* Scrollable table area */}
       <div className="overflow-auto flex-1 min-h-0">
         <table className="w-full text-[9px]">
@@ -398,7 +555,7 @@ const Listing = ({ pack, tab, search, selectedId, onSelect, bulkSelection, onBul
                   />
                 </th>
               )}
-              <HeaderColumns tab={tab} />
+              <HeaderColumns tab={tab} sortKey={sortKey} sortDir={sortDir} onSort={toggleSort} />
             </tr>
           </thead>
           <tbody>
@@ -451,12 +608,63 @@ const Listing = ({ pack, tab, search, selectedId, onSelect, bulkSelection, onBul
   );
 };
 
-const HeaderColumns = ({ tab }: { tab: Tab }) => {
-  if (tab === 'continents') return <><th className="text-left px-2 py-1">Nombre</th></>;
-  if (tab === 'countries')  return <><th className="text-left px-2 py-1">Nombre</th><th className="text-left px-2 py-1">Cód.</th><th className="text-left px-2 py-1">Continente</th><th className="text-right px-2 py-1">Rep.</th></>;
-  if (tab === 'leagues')    return <><th className="text-left px-2 py-1">Nombre</th><th className="text-left px-2 py-1">País</th><th className="text-right px-2 py-1">Tier</th><th className="text-right px-2 py-1">Rep.</th></>;
-  if (tab === 'clubs')      return <><th className="text-left px-2 py-1">Nombre</th><th className="text-left px-2 py-1">Liga</th><th className="text-left px-2 py-1">Colores</th></>;
-  return <><th className="text-left px-2 py-1">Nombre</th><th className="text-left px-2 py-1">Pos.</th><th className="text-right px-2 py-1">CA</th><th className="text-right px-2 py-1">PA</th><th className="text-left px-2 py-1">Club</th></>;
+const FilterSelect = ({ label, value, options, onChange }: {
+  label: string; value: string;
+  options: [string, string][];
+  onChange: (v: string) => void;
+}) => (
+  <label className="flex items-center gap-1">
+    <span className="text-vga-gray text-[8px] uppercase">{label}:</span>
+    <select
+      value={value}
+      onChange={e => onChange(e.target.value)}
+      className="bg-vga-black border border-vga-blue text-vga-bright-white text-[9px] px-1 py-0.5 outline-none focus:border-vga-yellow"
+    >
+      {options.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+    </select>
+  </label>
+);
+
+const SortableTh = ({ label, sortKey, currentSortKey, sortDir, onSort, align = 'left' }: {
+  label: string; sortKey: string; currentSortKey: string; sortDir: 'asc' | 'desc';
+  onSort: (k: string) => void; align?: 'left' | 'right';
+}) => (
+  <th
+    onClick={() => onSort(sortKey)}
+    className={`px-2 py-1 cursor-pointer select-none hover:text-vga-yellow ${align === 'right' ? 'text-right' : 'text-left'} ${currentSortKey === sortKey ? 'text-vga-yellow' : ''}`}
+  >
+    {label}{currentSortKey === sortKey ? (sortDir === 'asc' ? ' ▲' : ' ▼') : ''}
+  </th>
+);
+
+const HeaderColumns = ({ tab, sortKey, sortDir, onSort }: {
+  tab: Tab; sortKey: string; sortDir: 'asc' | 'desc'; onSort: (k: string) => void;
+}) => {
+  if (tab === 'continents') return <SortableTh label="Nombre" sortKey="name" currentSortKey={sortKey} sortDir={sortDir} onSort={onSort} />;
+  if (tab === 'countries')  return <>
+    <SortableTh label="Nombre" sortKey="name" currentSortKey={sortKey} sortDir={sortDir} onSort={onSort} />
+    <SortableTh label="Cód." sortKey="code" currentSortKey={sortKey} sortDir={sortDir} onSort={onSort} />
+    <SortableTh label="Continente" sortKey="continent" currentSortKey={sortKey} sortDir={sortDir} onSort={onSort} />
+    <SortableTh label="Rep." sortKey="reputation" currentSortKey={sortKey} sortDir={sortDir} onSort={onSort} align="right" />
+  </>;
+  if (tab === 'leagues')    return <>
+    <SortableTh label="Nombre" sortKey="name" currentSortKey={sortKey} sortDir={sortDir} onSort={onSort} />
+    <SortableTh label="País" sortKey="country" currentSortKey={sortKey} sortDir={sortDir} onSort={onSort} />
+    <SortableTh label="Tier" sortKey="tier" currentSortKey={sortKey} sortDir={sortDir} onSort={onSort} align="right" />
+    <SortableTh label="Rep." sortKey="reputation" currentSortKey={sortKey} sortDir={sortDir} onSort={onSort} align="right" />
+  </>;
+  if (tab === 'clubs')      return <>
+    <SortableTh label="Nombre" sortKey="name" currentSortKey={sortKey} sortDir={sortDir} onSort={onSort} />
+    <SortableTh label="Liga" sortKey="league" currentSortKey={sortKey} sortDir={sortDir} onSort={onSort} />
+    <th className="text-left px-2 py-1">Colores</th>
+  </>;
+  return <>
+    <SortableTh label="Nombre" sortKey="name" currentSortKey={sortKey} sortDir={sortDir} onSort={onSort} />
+    <SortableTh label="Pos." sortKey="pos" currentSortKey={sortKey} sortDir={sortDir} onSort={onSort} />
+    <SortableTh label="CA" sortKey="ca" currentSortKey={sortKey} sortDir={sortDir} onSort={onSort} align="right" />
+    <SortableTh label="PA" sortKey="pa" currentSortKey={sortKey} sortDir={sortDir} onSort={onSort} align="right" />
+    <SortableTh label="Club" sortKey="club" currentSortKey={sortKey} sortDir={sortDir} onSort={onSort} />
+  </>;
 };
 
 const RowCells = ({ pack, tab, item }: { pack: Pack; tab: Tab; item: Continent | Country | League | Club | PackPlayer }) => {
