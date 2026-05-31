@@ -344,6 +344,8 @@ const LandingScreen = ({
 );
 
 // ─────────────────────────────────────────────────────────────────────────
+const PAGE_SIZE = 100;
+
 const Listing = ({ pack, tab, search, selectedId, onSelect, bulkSelection, onBulkToggle, onBulkSelectAll, onBulkClear }: {
   pack: Pack; tab: Tab; search: string; selectedId: string | null;
   onSelect: (id: string) => void;
@@ -365,52 +367,86 @@ const Listing = ({ pack, tab, search, selectedId, onSelect, bulkSelection, onBul
     return arr;
   }, [pack, tab, q]);
 
-  const allShownChecked = bulkSelection != null && items.length > 0 && items.every(it => bulkSelection.has(it.id));
+  // Paginate only when there's no search. Searching shows every match
+  // because a deliberate filter is normally small enough to render.
+  const [page, setPage] = useState(0);
+  // Reset page when the result set changes (tab change, new search, etc.).
+  useEffect(() => { setPage(0); }, [tab, q, pack]);
+  const paginated = !q;
+  const pageCount = paginated ? Math.max(1, Math.ceil(items.length / PAGE_SIZE)) : 1;
+  const safePage = Math.min(page, pageCount - 1);
+  const visible = paginated
+    ? items.slice(safePage * PAGE_SIZE, (safePage + 1) * PAGE_SIZE)
+    : items;
+
+  const allShownChecked = bulkSelection != null && visible.length > 0 && visible.every(it => bulkSelection.has(it.id));
 
   return (
-    <table className="w-full text-[9px]">
-      <thead className="bg-vga-blue/20 text-vga-cyan sticky top-0">
-        <tr>
-          {bulkSelection != null && (
-            <th className="text-left px-2 py-1 w-6">
-              <input
-                type="checkbox"
-                checked={allShownChecked}
-                onChange={e => {
-                  if (e.target.checked) onBulkSelectAll?.(items.map(i => i.id));
-                  else onBulkClear?.();
-                }}
-              />
-            </th>
-          )}
-          <HeaderColumns tab={tab} />
-        </tr>
-      </thead>
-      <tbody>
-        {items.map(item => {
-          const isSel = item.id === selectedId;
-          const isBulkSel = bulkSelection?.has(item.id) ?? false;
-          return (
-            <tr
-              key={item.id}
-              onClick={() => onSelect(item.id)}
-              className={`${isSel ? 'bg-vga-yellow/20' : isBulkSel ? 'bg-vga-magenta/20' : ''} cursor-pointer hover:bg-vga-blue/20 border-b border-vga-blue/30`}
-            >
-              {bulkSelection != null && (
-                <td className="px-2 py-1" onClick={e => e.stopPropagation()}>
-                  <input
-                    type="checkbox"
-                    checked={isBulkSel}
-                    onChange={() => onBulkToggle?.(item.id)}
-                  />
-                </td>
-              )}
-              <RowCells pack={pack} tab={tab} item={item as never} />
-            </tr>
-          );
-        })}
-      </tbody>
-    </table>
+    <div className="flex flex-col">
+      <table className="w-full text-[9px]">
+        <thead className="bg-vga-blue/20 text-vga-cyan sticky top-0">
+          <tr>
+            {bulkSelection != null && (
+              <th className="text-left px-2 py-1 w-6">
+                <input
+                  type="checkbox"
+                  checked={allShownChecked}
+                  onChange={e => {
+                    if (e.target.checked) onBulkSelectAll?.(visible.map(i => i.id));
+                    else onBulkClear?.();
+                  }}
+                />
+              </th>
+            )}
+            <HeaderColumns tab={tab} />
+          </tr>
+        </thead>
+        <tbody>
+          {visible.map(item => {
+            const isSel = item.id === selectedId;
+            const isBulkSel = bulkSelection?.has(item.id) ?? false;
+            return (
+              <tr
+                key={item.id}
+                onClick={() => onSelect(item.id)}
+                className={`${isSel ? 'bg-vga-yellow/20' : isBulkSel ? 'bg-vga-magenta/20' : ''} cursor-pointer hover:bg-vga-blue/20 border-b border-vga-blue/30`}
+              >
+                {bulkSelection != null && (
+                  <td className="px-2 py-1" onClick={e => e.stopPropagation()}>
+                    <input
+                      type="checkbox"
+                      checked={isBulkSel}
+                      onChange={() => onBulkToggle?.(item.id)}
+                    />
+                  </td>
+                )}
+                <RowCells pack={pack} tab={tab} item={item as never} />
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+
+      {/* Pagination footer (only when there's no active search) */}
+      {paginated && items.length > PAGE_SIZE && (
+        <div className="flex items-center justify-between gap-2 px-2 py-1.5 border-t border-vga-blue bg-vga-blue/10 sticky bottom-0">
+          <span className="text-vga-gray text-[8px] uppercase">
+            {safePage * PAGE_SIZE + 1}-{Math.min((safePage + 1) * PAGE_SIZE, items.length)} de {items.length}
+          </span>
+          <div className="flex items-center gap-1">
+            <button onClick={() => setPage(0)} disabled={safePage === 0}
+              className={`px-2 py-0.5 text-[8px] uppercase border border-vga-blue ${safePage === 0 ? 'opacity-40 cursor-not-allowed' : 'hover:border-vga-yellow text-vga-cyan'}`}>«</button>
+            <button onClick={() => setPage(p => Math.max(0, p - 1))} disabled={safePage === 0}
+              className={`px-2 py-0.5 text-[8px] uppercase border border-vga-blue ${safePage === 0 ? 'opacity-40 cursor-not-allowed' : 'hover:border-vga-yellow text-vga-cyan'}`}>‹</button>
+            <span className="text-vga-yellow font-mono text-[9px] px-2">{safePage + 1}/{pageCount}</span>
+            <button onClick={() => setPage(p => Math.min(pageCount - 1, p + 1))} disabled={safePage >= pageCount - 1}
+              className={`px-2 py-0.5 text-[8px] uppercase border border-vga-blue ${safePage >= pageCount - 1 ? 'opacity-40 cursor-not-allowed' : 'hover:border-vga-yellow text-vga-cyan'}`}>›</button>
+            <button onClick={() => setPage(pageCount - 1)} disabled={safePage >= pageCount - 1}
+              className={`px-2 py-0.5 text-[8px] uppercase border border-vga-blue ${safePage >= pageCount - 1 ? 'opacity-40 cursor-not-allowed' : 'hover:border-vga-yellow text-vga-cyan'}`}>»</button>
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
 

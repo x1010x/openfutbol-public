@@ -109,6 +109,17 @@ export const StatsPackEditorView = ({ basePack, onBack }: Props) => {
       })
     : entries;
 
+  // Paginate when there's no search — 11k entries blow up the DOM otherwise.
+  const PAGE_SIZE = 100;
+  const [page, setPage] = useState(0);
+  useEffect(() => { setPage(0); }, [q]);
+  const paginated = !q;
+  const pageCount = paginated ? Math.max(1, Math.ceil(filteredEntries.length / PAGE_SIZE)) : 1;
+  const safePage = Math.min(page, pageCount - 1);
+  const visibleEntries = paginated
+    ? filteredEntries.slice(safePage * PAGE_SIZE, (safePage + 1) * PAGE_SIZE)
+    : filteredEntries;
+
   const selected = selectedSid ? sp.entries[selectedSid] as StatsEntry | undefined : null;
 
   return (
@@ -157,7 +168,7 @@ export const StatsPackEditorView = ({ basePack, onBack }: Props) => {
                 </tr>
               </thead>
               <tbody>
-                {filteredEntries.map(([sid, e]) => {
+                {visibleEntries.map(([sid, e]) => {
                   const name = nameBySid.get(Number(sid)) ?? '—';
                   const isSel = selectedSid === sid;
                   return (
@@ -178,6 +189,24 @@ export const StatsPackEditorView = ({ basePack, onBack }: Props) => {
               </tbody>
             </table>
           </div>
+          {paginated && filteredEntries.length > PAGE_SIZE && (
+            <div className="flex items-center justify-between gap-2 px-2 py-1.5 border-t border-vga-blue bg-vga-blue/10">
+              <span className="text-vga-gray text-[8px] uppercase">
+                {safePage * PAGE_SIZE + 1}-{Math.min((safePage + 1) * PAGE_SIZE, filteredEntries.length)} de {filteredEntries.length}
+              </span>
+              <div className="flex items-center gap-1">
+                <button onClick={() => setPage(0)} disabled={safePage === 0}
+                  className={`px-2 py-0.5 text-[8px] uppercase border border-vga-blue ${safePage === 0 ? 'opacity-40 cursor-not-allowed' : 'hover:border-vga-yellow text-vga-cyan'}`}>«</button>
+                <button onClick={() => setPage(p => Math.max(0, p - 1))} disabled={safePage === 0}
+                  className={`px-2 py-0.5 text-[8px] uppercase border border-vga-blue ${safePage === 0 ? 'opacity-40 cursor-not-allowed' : 'hover:border-vga-yellow text-vga-cyan'}`}>‹</button>
+                <span className="text-vga-yellow font-mono text-[9px] px-2">{safePage + 1}/{pageCount}</span>
+                <button onClick={() => setPage(p => Math.min(pageCount - 1, p + 1))} disabled={safePage >= pageCount - 1}
+                  className={`px-2 py-0.5 text-[8px] uppercase border border-vga-blue ${safePage >= pageCount - 1 ? 'opacity-40 cursor-not-allowed' : 'hover:border-vga-yellow text-vga-cyan'}`}>›</button>
+                <button onClick={() => setPage(pageCount - 1)} disabled={safePage >= pageCount - 1}
+                  className={`px-2 py-0.5 text-[8px] uppercase border border-vga-blue ${safePage >= pageCount - 1 ? 'opacity-40 cursor-not-allowed' : 'hover:border-vga-yellow text-vga-cyan'}`}>»</button>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Editor side */}
