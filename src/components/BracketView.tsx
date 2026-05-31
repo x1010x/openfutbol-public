@@ -154,22 +154,29 @@ const LigaStageBody = ({ stage, teamById, userTeamId }: {
 }) => {
   const adv = (stage.config as LigaStageConfig).advancePerGroup;
   return (
-    <div className="bg-vga-black border-4 border-vga-blue p-3 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex flex-col gap-3 overflow-x-auto">
-      <div className={`grid gap-3`} style={{ gridTemplateColumns: `repeat(auto-fit, minmax(260px, 1fr))` }}>
+    <div className="bg-vga-black border-4 border-vga-blue p-3 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex flex-col gap-4">
+      <div className="text-vga-gray text-[8px] uppercase tracking-widest text-center">
+        Pasan {adv} por grupo
+      </div>
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
         {(stage.groups ?? []).map(group => {
           const standings = groupStandings(group);
           return (
-            <div key={group.id} className="border-2 border-vga-blue">
-              <div className="bg-vga-blue/40 border-b border-vga-blue px-2 py-1 text-vga-yellow text-[10px] uppercase font-bold">Grupo {group.letter}</div>
-              <table className="w-full text-[8px] font-mono">
-                <thead className="bg-vga-blue/20 text-vga-cyan">
-                  <tr>
-                    <th className="text-left px-1 py-1">#</th>
-                    <th className="text-left px-1 py-1">EQUIPO</th>
-                    <th className="text-right px-1 py-1">PJ</th>
-                    <th className="text-right px-1 py-1">G</th>
-                    <th className="text-right px-1 py-1">DG</th>
-                    <th className="text-right px-1 py-1">PTS</th>
+            <div key={group.id} className="border-4 border-vga-white bg-vga-gray p-2 vga-panel">
+              <h3 className="text-vga-yellow text-center mb-2 text-[10px] uppercase tracking-widest font-bold">Grupo {group.letter}</h3>
+              <table className="w-full text-[8px] text-left border-collapse">
+                <thead>
+                  <tr className="bg-vga-blue text-vga-bright-white uppercase text-[7px]">
+                    <th className="p-1 border border-vga-white text-center">#</th>
+                    <th className="p-1 border border-vga-white text-left">Equipo</th>
+                    <th className="p-1 border border-vga-white text-center">PJ</th>
+                    <th className="p-1 border border-vga-white text-center">V</th>
+                    <th className="p-1 border border-vga-white text-center">E</th>
+                    <th className="p-1 border border-vga-white text-center">D</th>
+                    <th className="p-1 border border-vga-white text-center">GF</th>
+                    <th className="p-1 border border-vga-white text-center">GC</th>
+                    <th className="p-1 border border-vga-white text-center">DG</th>
+                    <th className="p-1 border border-vga-white text-center">PTS</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -177,17 +184,25 @@ const LigaStageBody = ({ stage, teamById, userTeamId }: {
                     const tm = teamById(s.teamId);
                     const isUser = s.teamId === userTeamId;
                     const isAdv = i < adv;
+                    const baseBg = i % 2 === 0 ? 'bg-vga-black' : 'bg-vga-gray';
+                    const rowClass = isUser ? 'bg-vga-blue' : baseBg;
                     return (
-                      <tr key={s.teamId} className={`${isUser ? 'bg-vga-yellow/20' : ''} border-b border-vga-blue/30`}>
-                        <td className={`px-1 py-0.5 ${isAdv ? 'text-vga-light-green font-bold' : 'text-vga-gray'}`}>{i + 1}</td>
-                        <td className="px-1 py-0.5 flex items-center gap-1 truncate text-vga-bright-white">
-                          {tm && <TeamCrest colors={tm.colors} size="sm" teamId={tm.id} title={tm.name} />}
-                          <span className="truncate">{tm?.name ?? '—'}</span>
+                      <tr key={s.teamId} className={rowClass}>
+                        <td className={`p-1 border border-vga-white text-center font-bold ${isAdv ? 'text-vga-light-green' : 'text-vga-yellow'}`}>{i + 1}</td>
+                        <td className={`p-1 border border-vga-white truncate max-w-[180px] ${isUser ? 'text-vga-yellow font-bold' : ''}`}>
+                          <div className="flex items-center gap-1.5">
+                            {tm && <TeamCrest colors={tm.colors} size="xs" teamId={tm.id} />}
+                            <span className="truncate">{tm?.name ?? '—'}</span>
+                          </div>
                         </td>
-                        <td className="text-right px-1 py-0.5">{s.played}</td>
-                        <td className="text-right px-1 py-0.5">{s.gf}</td>
-                        <td className="text-right px-1 py-0.5">{s.gd}</td>
-                        <td className="text-right px-1 py-0.5 text-vga-yellow font-bold">{s.points}</td>
+                        <td className="p-1 border border-vga-white text-center">{s.played}</td>
+                        <td className="p-1 border border-vga-white text-center text-vga-light-green">{s.won}</td>
+                        <td className="p-1 border border-vga-white text-center text-vga-white">{s.drawn}</td>
+                        <td className="p-1 border border-vga-white text-center text-vga-light-red">{s.lost}</td>
+                        <td className="p-1 border border-vga-white text-center">{s.gf}</td>
+                        <td className="p-1 border border-vga-white text-center">{s.ga}</td>
+                        <td className="p-1 border border-vga-white text-center">{s.gd}</td>
+                        <td className="p-1 border border-vga-white text-center text-vga-yellow font-bold">{s.points}</td>
                       </tr>
                     );
                   })}
@@ -196,9 +211,6 @@ const LigaStageBody = ({ stage, teamById, userTeamId }: {
             </div>
           );
         })}
-      </div>
-      <div className="text-vga-gray text-[8px] uppercase tracking-widest text-center">
-        Pasan {adv} por grupo
       </div>
     </div>
   );
