@@ -84,6 +84,8 @@ function eventIcon(type: string): string {
     case 'sub': return '⇄';
     case 'injury': return '+';
     case 'shot': return '·';
+    case 'corner': return '◣';
+    case 'penalty': return '!';
     default: return '›';
   }
 }
@@ -95,6 +97,8 @@ function eventColor(type: string): string {
     case 'red': return 'text-vga-light-red';
     case 'sub': return 'text-vga-light-green';
     case 'injury': return 'text-vga-light-red';
+    case 'corner': return 'text-vga-cyan';
+    case 'penalty': return 'text-vga-magenta';
     default: return 'text-vga-white';
   }
 }

@@ -126,7 +126,11 @@ export const runtimePlayerFromPack = (
     attributes,
     stats_year: statsYear,
     value: packPlayer.value,
-    contract: packPlayer.contract ?? synthesizeContract(currentAbility, parseInt(packPlayer.birth_date.slice(0, 4), 10)),
+    contract: packPlayer.contract
+      // Packs ship annual salary; the rest of the game treats contract.salary
+      // as weekly. Convert at construction so display + wage deduction line up.
+      ? { salary: Math.max(500, Math.round(packPlayer.contract.salary / 52 / 100) * 100), expiration: packPlayer.contract.expiration }
+      : synthesizeContract(currentAbility, parseInt(packPlayer.birth_date.slice(0, 4), 10)),
     number,
     stamina: 99,
     injuryWeeksRemaining: 0,

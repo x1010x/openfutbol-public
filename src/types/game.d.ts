@@ -221,7 +221,7 @@ export interface Team {
 export interface MatchEvent {
   minute: number;
   description?: string;
-  type: 'goal' | 'shot' | 'card' | 'commentary' | 'yellow' | 'red' | 'injury' | 'sub';
+  type: 'goal' | 'shot' | 'card' | 'commentary' | 'yellow' | 'red' | 'injury' | 'sub' | 'corner' | 'penalty';
   teamId?: string;
   playerId?: string;
   assistantId?: string;
@@ -260,6 +260,13 @@ export interface MatchState {
   awayStartingLineup: string[];
   stoppageTime1: number;
   stoppageTime2: number;
+  // When a penalty is awarded, this is set so the next tick resolves the kick.
+  // Lets the UI play a whistle SFX and pause briefly between award and shot.
+  pendingPenalty?: {
+    isHomeEvent: boolean;
+    takerId: string;
+    takerName: string;
+  } | null;
   attendance?: {
     count: number;
     capacity: number;

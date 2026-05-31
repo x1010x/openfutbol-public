@@ -1730,6 +1730,7 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
   const lastGoalCountRef = useRef<number>(0);
   const lastShotCountRef = useRef<number>(0);
   const lastCardCountRef = useRef<number>(0);
+  const lastPenaltyCountRef = useRef<number>(0);
   const lastHtPausedRef = useRef<boolean>(false);
   const lastFinishedRef = useRef<boolean>(false);
   useEffect(() => {
@@ -1737,6 +1738,7 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
       lastGoalCountRef.current = 0;
       lastShotCountRef.current = 0;
       lastCardCountRef.current = 0;
+      lastPenaltyCountRef.current = 0;
       lastHtPausedRef.current = false;
       lastFinishedRef.current = false;
       return;
@@ -1745,6 +1747,19 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
     const goals = events.filter(e => e.type === 'goal');
     const shots = events.filter(e => e.type === 'shot');
     const cards = events.filter(e => e.type === 'yellow' || e.type === 'red');
+    const penalties = events.filter(e => e.type === 'penalty');
+
+    // Penalty pause: whistle now, then 1.5s of dramatic silence before the
+    // next tick (which resolves the kick). Reuses the same celebration flag
+    // so the match loop stays frozen during the wait.
+    if (penalties.length > lastPenaltyCountRef.current) {
+      lastPenaltyCountRef.current = penalties.length;
+      setIsCelebrating(true);
+      playWhistle();
+      const t = setTimeout(() => setIsCelebrating(false), 1500);
+      // Best-effort cleanup if the match is torn down mid-pause.
+      return () => clearTimeout(t);
+    }
 
     if (goals.length > lastGoalCountRef.current) {
       const newest = goals[goals.length - 1];

@@ -44,6 +44,7 @@ export const simulateMinute = (state: MatchState, userTeamId?: string): MatchSta
   const nextMinute = state.minute + 1;
   let stoppageTime1 = state.stoppageTime1;
   let stoppageTime2 = state.stoppageTime2;
+  let pendingPenalty = state.pendingPenalty ?? null;
   let newEvents: MatchEvent[] = [...state.events];
   let homeScore = state.homeScore;
   let awayScore = state.awayScore;
@@ -152,7 +153,51 @@ export const simulateMinute = (state: MatchState, userTeamId?: string): MatchSta
   const homePossession = state.homePossession + (homeHasBall ? 1 : 0);
   const awayPossession = state.awayPossession + (homeHasBall ? 0 : 1);
 
-  if (Math.random() < engineSettings.matchEventRate) {
+  // Resolve a pending penalty FIRST — the previous tick whistled, now we
+  // shoot. Skips the regular event for this tick so the UI doesn't pile
+  // two highlights on top of each other.
+  if (pendingPenalty) {
+    const isHomeEvent = pendingPenalty.isHomeEvent;
+    const attackingTeam = isHomeEvent ? homeTeam : awayTeam;
+    const defendingTeam = isHomeEvent ? awayTeam : homeTeam;
+    const atkStamMap = isHomeEvent ? newHomeStamina : newAwayStamina;
+    const taker = attackingTeam.players.find(p => p.id === pendingPenalty!.takerId);
+    const gk = defendingTeam.players.find(p => defendingTeam.lineup.includes(p.id) && slotOf(p.id, !isHomeEvent) === 'POR');
+    if (taker) {
+      const takerSlot = slotOf(taker.id, isHomeEvent);
+      const conv = 0.75 + (effectiveStat(taker, 'shooting', takerSlot) * sf(taker.id, atkStamMap) - 60) * 0.005;
+      if (isHomeEvent) homeShots++; else awayShots++;
+      if (Math.random() < Math.max(0.5, Math.min(0.95, conv))) {
+        if (isHomeEvent) { homeScore++; homeShotsOnTarget++; }
+        else { awayScore++; awayShotsOnTarget++; }
+        newEvents.push({
+          minute: nextMinute,
+          type: 'goal',
+          description: t('commentary.penaltyGoal', { team: attackingTeam.name, scorer: taker.fullName }),
+          teamId: attackingTeam.id,
+          playerId: taker.id,
+        });
+      } else if (Math.random() < 0.6 && gk) {
+        if (isHomeEvent) homeShotsOnTarget++; else awayShotsOnTarget++;
+        newEvents.push({
+          minute: nextMinute,
+          type: 'shot',
+          description: t('commentary.penaltySave', { keeper: gk.fullName, scorer: taker.fullName }),
+          teamId: attackingTeam.id,
+          playerId: taker.id,
+        });
+      } else {
+        newEvents.push({
+          minute: nextMinute,
+          type: 'shot',
+          description: t('commentary.penaltyMiss', { scorer: taker.fullName }),
+          teamId: attackingTeam.id,
+          playerId: taker.id,
+        });
+      }
+    }
+    pendingPenalty = null;
+  } else if (Math.random() < engineSettings.matchEventRate) {
     const isHomeEvent = homeHasBall;
     const attackingTeam = isHomeEvent ? homeTeam : awayTeam;
     const defendingTeam = isHomeEvent ? awayTeam : homeTeam;
@@ -251,7 +296,8 @@ export const simulateMinute = (state: MatchState, userTeamId?: string): MatchSta
         }
       }
     }
-    // FALTAS Y TARJETAS (20% de los eventos)
+    // FALTAS Y TARJETAS (20% de los eventos) — algunas son penaltis o faltas
+    // directas convertidas en gol.
     else if (rand < 0.6) {
       if (isHomeEvent) awayFouls++; else homeFouls++;
 
@@ -278,27 +324,27 @@ export const simulateMinute = (state: MatchState, userTeamId?: string): MatchSta
         const attackerSlot = slotOf(attacker.id, isHomeEvent);
         const defenderSlot = slotOf(defender.id, !isHomeEvent);
 
-        const atkBoost = isHomeEvent ? homeBoost : 1;
-        const defBoost = isHomeEvent ? 1 : homeBoost;
-        const attackerSkill = (effectiveStat(attacker, 'dribbling', attackerSlot) + effectiveStat(attacker, 'speed', attackerSlot)) * atkBoost * sf(attacker.id, atkStamMap);
-        const defenderSkill = (effectiveStat(defender, 'defending', defenderSlot) + effectiveStat(defender, 'physical', defenderSlot)) * defBoost * sf(defender.id, defStamMap);
-        const gap = attackerSkill - defenderSkill;
-        const cardMod = Math.max(0.5, Math.min(1.7, 1 + gap * 0.01));
-        const yellowThreshold = 0.15 * cardMod * engineSettings.cardStrictness;
-        const redThreshold = yellowThreshold + 0.02 * cardMod * engineSettings.cardStrictness;
-        const cardRand = Math.random();
+        // ¿En el área? ~9% de las faltas → penalti. ~5% fuera del área se
+        // convierten en falta directa peligrosa (gol).
+        const foulRand = Math.random();
+        const gk = defendingTeam.players.find(p => defendingTeam.lineup.includes(p.id) && slotOf(p.id, !isHomeEvent) === 'POR');
 
-        if (cardRand < yellowThreshold) {
-          if (defYellows.includes(defender.id)) {
-            defSentOff.push(defender.id);
-            newEvents.push({
-              minute: nextMinute,
-              type: 'red',
-              description: t('commentary.yellowRed', { defender: defender.fullName, team: defendingTeam.name, attacker: attacker.fullName }),
-              teamId: defendingTeam.id,
-              playerId: defender.id,
-            });
-          } else {
+        if (foulRand < 0.09) {
+          // PENALTI — solo se anuncia este tick; el remate se resuelve en el
+          // siguiente tick. Da tiempo al silbato y a una pausa dramática.
+          newEvents.push({
+            minute: nextMinute,
+            type: 'penalty',
+            description: t('commentary.penaltyAwarded', { team: attackingTeam.name, defender: defender.fullName, attacker: attacker.fullName }),
+            teamId: attackingTeam.id,
+            playerId: defender.id,
+          });
+          const takerPool = attackers.length > 0 ? attackers : [attacker];
+          const taker = [...takerPool].sort((a, b) => effectiveStat(b, 'shooting', slotOf(b.id, isHomeEvent)) - effectiveStat(a, 'shooting', slotOf(a.id, isHomeEvent)))[0];
+          pendingPenalty = { isHomeEvent, takerId: taker.id, takerName: taker.fullName };
+
+          // Amarilla casi segura en el defensor que cometió el penalti.
+          if (Math.random() < 0.75 && !defYellows.includes(defender.id)) {
             defYellows.push(defender.id);
             newEvents.push({
               minute: nextMinute,
@@ -308,14 +354,152 @@ export const simulateMinute = (state: MatchState, userTeamId?: string): MatchSta
               playerId: defender.id,
             });
           }
-        } else if (cardRand < redThreshold) {
-          defSentOff.push(defender.id);
+        } else if (foulRand < 0.14) {
+          // FALTA DIRECTA peligrosa: tira el mejor del equipo, ~12% entra.
+          const takerPool = attackers;
+          const taker = [...takerPool].sort((a, b) => effectiveStat(b, 'shooting', slotOf(b.id, isHomeEvent)) - effectiveStat(a, 'shooting', slotOf(a.id, isHomeEvent)))[0];
+          if (taker) {
+            const shootingNorm = effectiveStat(taker, 'shooting', slotOf(taker.id, isHomeEvent)) / 100;
+            const fkChance = Math.max(0.05, Math.min(0.22, 0.08 + shootingNorm * 0.1));
+            if (isHomeEvent) homeShots++; else awayShots++;
+            if (Math.random() < fkChance) {
+              if (isHomeEvent) { homeScore++; homeShotsOnTarget++; }
+              else { awayScore++; awayShotsOnTarget++; }
+              newEvents.push({
+                minute: nextMinute,
+                type: 'goal',
+                description: t('commentary.freekickGoal', { team: attackingTeam.name, scorer: taker.fullName }),
+                teamId: attackingTeam.id,
+                playerId: taker.id,
+              });
+            } else if (gk) {
+              if (isHomeEvent) homeShotsOnTarget++; else awayShotsOnTarget++;
+              newEvents.push({
+                minute: nextMinute,
+                type: 'shot',
+                description: t('commentary.freekickShot', { shooter: taker.fullName, keeper: gk.fullName }),
+                teamId: attackingTeam.id,
+                playerId: taker.id,
+              });
+            }
+          }
+        } else {
+          // Falta normal: posible amarilla / roja como antes.
+          const atkBoost = isHomeEvent ? homeBoost : 1;
+          const defBoost = isHomeEvent ? 1 : homeBoost;
+          const attackerSkill = (effectiveStat(attacker, 'dribbling', attackerSlot) + effectiveStat(attacker, 'speed', attackerSlot)) * atkBoost * sf(attacker.id, atkStamMap);
+          const defenderSkill = (effectiveStat(defender, 'defending', defenderSlot) + effectiveStat(defender, 'physical', defenderSlot)) * defBoost * sf(defender.id, defStamMap);
+          const gap = attackerSkill - defenderSkill;
+          const cardMod = Math.max(0.5, Math.min(1.7, 1 + gap * 0.01));
+          const yellowThreshold = 0.15 * cardMod * engineSettings.cardStrictness;
+          const redThreshold = yellowThreshold + 0.02 * cardMod * engineSettings.cardStrictness;
+          const cardRand = Math.random();
+
+          if (cardRand < yellowThreshold) {
+            if (defYellows.includes(defender.id)) {
+              defSentOff.push(defender.id);
+              newEvents.push({
+                minute: nextMinute,
+                type: 'red',
+                description: t('commentary.yellowRed', { defender: defender.fullName, team: defendingTeam.name, attacker: attacker.fullName }),
+                teamId: defendingTeam.id,
+                playerId: defender.id,
+              });
+            } else {
+              defYellows.push(defender.id);
+              newEvents.push({
+                minute: nextMinute,
+                type: 'yellow',
+                description: t('commentary.yellow', { defender: defender.fullName, attacker: attacker.fullName, team: defendingTeam.name }),
+                teamId: defendingTeam.id,
+                playerId: defender.id,
+              });
+            }
+          } else if (cardRand < redThreshold) {
+            defSentOff.push(defender.id);
+            newEvents.push({
+              minute: nextMinute,
+              type: 'red',
+              description: t('commentary.red', { defender: defender.fullName, team: defendingTeam.name, attacker: attacker.fullName }),
+              teamId: defendingTeam.id,
+              playerId: defender.id,
+            });
+          }
+        }
+      }
+    }
+    // CÓRNERS (15% de los eventos) — a veces acaban en gol de cabeza
+    else if (rand < 0.75) {
+      const actingSentOff = isHomeEvent ? homeSentOff : awaySentOff;
+      const defSentOffNow = isHomeEvent ? awaySentOff : homeSentOff;
+      const attackLineup = attackingTeam.players.filter(p => attackingTeam.lineup.includes(p.id) && !actingSentOff.includes(p.id));
+      const defenseLineup = defendingTeam.players.filter(p => defendingTeam.lineup.includes(p.id) && !defSentOffNow.includes(p.id));
+      const gk = defenseLineup.find(p => slotOf(p.id, !isHomeEvent) === 'POR');
+
+      newEvents.push({
+        minute: nextMinute,
+        type: 'corner',
+        description: t('commentary.corner', { team: attackingTeam.name }),
+        teamId: attackingTeam.id,
+      });
+
+      // Rematadores: prefiere DEL, DEF (centrales fuertes), MED. ~9% acaba
+      // siendo gol de cabeza; los demás se quedan en ocasión o despejada.
+      const headerCandidates = attackLineup.filter(p => {
+        const pos = slotOf(p.id, isHomeEvent);
+        return pos === 'DEL' || pos === 'DEF' || pos === 'MED';
+      });
+      if (headerCandidates.length > 0) {
+        const weights = headerCandidates.map(p => {
+          const pos = slotOf(p.id, isHomeEvent);
+          return pos === 'DEL' ? 3 : pos === 'DEF' ? 2 : 1;
+        });
+        const totalW = weights.reduce((a, b) => a + b, 0);
+        let r = Math.random() * totalW;
+        let header: Player | undefined;
+        for (let i = 0; i < headerCandidates.length; i++) {
+          r -= weights[i];
+          if (r <= 0) { header = headerCandidates[i]; break; }
+        }
+        if (!header) header = headerCandidates[headerCandidates.length - 1];
+
+        if (isHomeEvent) homeShots++; else awayShots++;
+        // Conversión basada en físico+remate del rematador vs portero.
+        const headerSlot = slotOf(header.id, isHomeEvent);
+        const headPower = (effectiveStat(header, 'physical', headerSlot) + effectiveStat(header, 'shooting', headerSlot)) * 0.5;
+        const gkPower = gk ? effectiveStat(gk, 'goalkeeping', 'POR') : 50;
+        const headerChance = Math.max(0.04, Math.min(0.18, 0.07 + (headPower - gkPower) * 0.003));
+
+        if (Math.random() < headerChance) {
+          if (isHomeEvent) { homeScore++; homeShotsOnTarget++; }
+          else { awayScore++; awayShotsOnTarget++; }
+          // Asistente: alguien de mediocampo o extremo (el del centro).
+          let assistant: Player | undefined;
+          if (Math.random() < engineSettings.assistRate) {
+            const possible = attackLineup.filter(p =>
+              p.id !== header.id &&
+              ['MED', 'AML', 'AMR'].includes(slotOf(p.id, isHomeEvent))
+            );
+            if (possible.length > 0) assistant = possible[Math.floor(Math.random() * possible.length)];
+          }
           newEvents.push({
             minute: nextMinute,
-            type: 'red',
-            description: t('commentary.red', { defender: defender.fullName, team: defendingTeam.name, attacker: attacker.fullName }),
-            teamId: defendingTeam.id,
-            playerId: defender.id,
+            type: 'goal',
+            description: assistant
+              ? t('commentary.headerGoalAssist', { team: attackingTeam.name, scorer: header.fullName, assist: assistant.fullName })
+              : t('commentary.headerGoal', { team: attackingTeam.name, scorer: header.fullName }),
+            teamId: attackingTeam.id,
+            playerId: header.id,
+            assistantId: assistant?.id,
+          });
+        } else if (Math.random() < 0.35 && gk) {
+          if (isHomeEvent) homeShotsOnTarget++; else awayShotsOnTarget++;
+          newEvents.push({
+            minute: nextMinute,
+            type: 'shot',
+            description: t('commentary.headerShot', { shooter: header.fullName, keeper: gk.fullName }),
+            teamId: attackingTeam.id,
+            playerId: header.id,
           });
         }
       }
@@ -441,5 +625,6 @@ export const simulateMinute = (state: MatchState, userTeamId?: string): MatchSta
     awaySubsUsed,
     stoppageTime1,
     stoppageTime2,
+    pendingPenalty,
   };
 };
