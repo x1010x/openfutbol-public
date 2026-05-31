@@ -2810,7 +2810,10 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
   };
 
   return (
-    <PlayerTooltipProvider year={league?.year ?? selectedYear ?? new Date().getFullYear()}>
+    <PlayerTooltipProvider
+      year={league?.year ?? selectedYear ?? new Date().getFullYear()}
+      teams={tournament?.teams ?? league?.teams ?? []}
+    >
     <div className="min-h-screen bg-vga-black cool:bg-rc-bg overflow-x-hidden">
       {showDisclaimer && <DisclaimerView onDismiss={dismissDisclaimer} />}
 

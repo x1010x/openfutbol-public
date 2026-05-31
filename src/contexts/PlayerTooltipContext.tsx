@@ -1,8 +1,9 @@
-import { createContext, useContext, useState, useCallback, useRef } from 'react';
+import { createContext, useContext, useState, useCallback, useRef, useMemo } from 'react';
 import { createPortal } from 'react-dom';
-import type { Player } from '../types/game.d.ts';
+import type { Player, Team } from '../types/game.d.ts';
 import { PlayerPhoto } from '../components/PlayerPhoto';
 import { CountryBadge } from '../components/CountryBadge';
+import { TeamCrest } from '../components/TeamCrest';
 import { groupFor } from '../store/leagueStore';
 
 type DraftPos = 'POR' | 'DEF' | 'MED' | 'DEL';
@@ -109,7 +110,7 @@ const Radar = ({ stats, isGK, size = 110 }: { stats: Record<string, number>; isG
   );
 };
 
-const Tooltip = ({ player, x, y, year }: TooltipState & { year: number }) => {
+const Tooltip = ({ player, x, y, year, team }: TooltipState & { year: number; team: { id: string; name: string; colors?: string[] } | null }) => {
   const pos = groupFor(player.position) as DraftPos;
   const age = year - player.birthYear;
   const keyStats = KEY_STATS[pos] ?? [];
@@ -143,6 +144,12 @@ const Tooltip = ({ player, x, y, year }: TooltipState & { year: number }) => {
           <span className="shrink-0"><CountryBadge code={player.country_code} size="sm" /></span>
         )}
       </div>
+      {team && (
+        <div className="px-2 py-1 flex items-center gap-2 border-b border-vga-gray bg-vga-blue/30">
+          <TeamCrest colors={team.colors} size="sm" teamId={team.id} title={team.name} />
+          <span className="text-vga-bright-white text-[10px] uppercase truncate">{team.name}</span>
+        </div>
+      )}
 
       {/* Photo + meta */}
       <div className="flex gap-2 p-2 border-b border-vga-gray">
@@ -257,10 +264,17 @@ const Tooltip = ({ player, x, y, year }: TooltipState & { year: number }) => {
   );
 };
 
-export const PlayerTooltipProvider = ({ children, year }: { children: React.ReactNode; year: number }) => {
+export const PlayerTooltipProvider = ({ children, year, teams }: { children: React.ReactNode; year: number; teams?: Team[] }) => {
   const [tip, setTip] = useState<TooltipState | null>(null);
   const showTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const hideTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Map every player id to its team so the tooltip can pop the right crest.
+  const teamByPlayerId = useMemo(() => {
+    const m = new Map<string, Team>();
+    for (const t of teams ?? []) for (const p of t.players) m.set(p.id, t);
+    return m;
+  }, [teams]);
 
   const show = useCallback((player: Player, x: number, y: number) => {
     if (hideTimer.current) clearTimeout(hideTimer.current);
@@ -276,7 +290,7 @@ export const PlayerTooltipProvider = ({ children, year }: { children: React.Reac
   return (
     <PlayerTooltipContext.Provider value={{ show, hide }}>
       {children}
-      {tip && <Tooltip {...tip} year={year} />}
+      {tip && <Tooltip {...tip} year={year} team={teamByPlayerId.get(tip.player.id) ?? null} />}
     </PlayerTooltipContext.Provider>
   );
 };
