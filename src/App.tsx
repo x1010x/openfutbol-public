@@ -158,6 +158,8 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
   const [tournamentRoundRecap, setTournamentRoundRecap] = useState<number | null>(null);
   const [tournamentMatchCtx, setTournamentMatchCtx] = useState<UserNextAction | null>(null);
   const [tournamentSubView, setTournamentSubView] = useState<null | 'ALIGNMENT' | 'SQUAD' | 'STATS'>(null);
+  // When set, the SQUAD subview shows this team instead of the user's team.
+  const [tournamentViewingTeamId, setTournamentViewingTeamId] = useState<string | null>(null);
   const [tournamentPendingAction, setTournamentPendingAction] = useState<UserNextAction | null>(null);
   const [showInstructions, setShowInstructions] = useState(false);
   const [showColaborar, setShowColaborar] = useState(false);
@@ -1951,16 +1953,23 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
           />
         );
       }
-      if (tournamentSubView === 'SQUAD' && userTournamentTeam) {
-        return (
-          <SquadViewCompact
-            team={userTournamentTeam}
-            seasonYear={new Date().getFullYear()}
-            readOnly
-            onToggleForSale={() => { /* no transfers in tournaments (v1) */ }}
-            onBack={() => setTournamentSubView(null)}
-          />
-        );
+      if (tournamentSubView === 'SQUAD') {
+        // Default to user's own team; if the user clicked a row in the bracket
+        // we show that team instead (read-only either way).
+        const teamToShow = tournamentViewingTeamId
+          ? tournament.teams.find(t => t.id === tournamentViewingTeamId)
+          : userTournamentTeam;
+        if (teamToShow) {
+          return (
+            <SquadViewCompact
+              team={teamToShow}
+              seasonYear={new Date().getFullYear()}
+              readOnly
+              onToggleForSale={() => { /* no transfers in tournaments (v1) */ }}
+              onBack={() => { setTournamentSubView(null); setTournamentViewingTeamId(null); }}
+            />
+          );
+        }
       }
       if (tournamentSubView === 'STATS') {
         return (
@@ -2030,12 +2039,13 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
             if (action) setTournamentPendingAction(action);
           }}
           onOpenAlignment={() => setTournamentSubView('ALIGNMENT')}
-          onOpenSquad={() => setTournamentSubView('SQUAD')}
+          onOpenSquad={() => { setTournamentViewingTeamId(null); setTournamentSubView('SQUAD'); }}
           onOpenStats={() => setTournamentSubView('STATS')}
+          onTeamClick={(teamId) => { setTournamentViewingTeamId(teamId); setTournamentSubView('SQUAD'); }}
           onExit={() => {
             setTournament(null); setShowTournamentFlow(false);
             setTournamentRoundRecap(null); setTournamentSubView(null);
-            setTournamentPendingAction(null);
+            setTournamentPendingAction(null); setTournamentViewingTeamId(null);
           }}
         />
       );

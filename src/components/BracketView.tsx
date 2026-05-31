@@ -1,6 +1,7 @@
-import type { TournamentState, TournamentStage, TournamentTie, KoStageConfig, LigaStageConfig } from '../store/tournamentStore';
+import type { TournamentState, TournamentStage, TournamentTie, KoStageConfig, LigaStageConfig, TournamentGroup, GroupMatch } from '../store/tournamentStore';
 import { groupStandings, userNextAction, spectatorNextMatch } from '../store/tournamentStore';
 import { TeamCrest } from './TeamCrest';
+import { useState } from 'react';
 
 interface Props {
   state: TournamentState;
@@ -10,10 +11,14 @@ interface Props {
   onOpenAlignment: () => void;
   onOpenSquad: () => void;
   onOpenStats: () => void;
+  onTeamClick?: (teamId: string) => void;
   onExit: () => void;
 }
 
-export const BracketView = ({ state, onAdvanceStage, onPlayUserMatch, onPlaySpectatorMatch, onOpenAlignment, onOpenSquad, onOpenStats, onExit }: Props) => {
+type GroupStatKey = 'played' | 'won' | 'drawn' | 'lost' | 'gf' | 'ga' | 'gd' | 'points';
+
+export const BracketView = ({ state, onAdvanceStage, onPlayUserMatch, onPlaySpectatorMatch, onOpenAlignment, onOpenSquad, onOpenStats, onTeamClick, onExit }: Props) => {
+  const [drillDown, setDrillDown] = useState<{ teamId: string; group: TournamentGroup; statKey: GroupStatKey } | null>(null);
   const teamById = (id: string | null) => id ? state.teams.find(t => t.id === id) : null;
   const champion = state.champion ? teamById(state.champion) : null;
   const userTeam = state.userTeamId ? teamById(state.userTeamId) : null;
@@ -107,9 +112,23 @@ export const BracketView = ({ state, onAdvanceStage, onPlayUserMatch, onPlaySpec
 
       {/* Stage body */}
       {stage.config.kind === 'liga'
-        ? <LigaStageBody stage={stage} teamById={teamById} userTeamId={state.userTeamId} />
+        ? <LigaStageBody
+            stage={stage} teamById={teamById} userTeamId={state.userTeamId}
+            onTeamClick={onTeamClick}
+            onCellClick={(teamId, group, statKey) => setDrillDown({ teamId, group, statKey })}
+          />
         : <KoStageBody stage={stage} teamById={teamById} userTeamId={state.userTeamId} />
       }
+
+      {drillDown && (
+        <GroupDrillDownModal
+          group={drillDown.group}
+          teamId={drillDown.teamId}
+          statKey={drillDown.statKey}
+          teamById={teamById}
+          onClose={() => setDrillDown(null)}
+        />
+      )}
 
       {/* Footer */}
       {!champion && (
@@ -147,10 +166,12 @@ export const BracketView = ({ state, onAdvanceStage, onPlayUserMatch, onPlaySpec
   );
 };
 
-const LigaStageBody = ({ stage, teamById, userTeamId }: {
+const LigaStageBody = ({ stage, teamById, userTeamId, onTeamClick, onCellClick }: {
   stage: TournamentStage;
   teamById: (id: string | null) => { id: string; name: string; colors?: string[] } | null | undefined;
   userTeamId: string | null;
+  onTeamClick?: (teamId: string) => void;
+  onCellClick?: (teamId: string, group: TournamentGroup, statKey: GroupStatKey) => void;
 }) => {
   const adv = (stage.config as LigaStageConfig).advancePerGroup;
   return (
@@ -186,23 +207,29 @@ const LigaStageBody = ({ stage, teamById, userTeamId }: {
                     const isAdv = i < adv;
                     const baseBg = i % 2 === 0 ? 'bg-vga-black' : 'bg-vga-gray';
                     const rowClass = isUser ? 'bg-vga-blue' : baseBg;
+                    const cellCls = (extra = '') =>
+                      `p-1 border border-vga-white text-center ${extra} ${onCellClick ? 'cursor-pointer hover:bg-vga-magenta' : ''}`;
+                    const cellClick = (k: GroupStatKey) => onCellClick && onCellClick(s.teamId, group, k);
                     return (
                       <tr key={s.teamId} className={rowClass}>
                         <td className={`p-1 border border-vga-white text-center font-bold ${isAdv ? 'text-vga-light-green' : 'text-vga-yellow'}`}>{i + 1}</td>
-                        <td className={`p-1 border border-vga-white truncate max-w-[180px] ${isUser ? 'text-vga-yellow font-bold' : ''}`}>
+                        <td
+                          onClick={onTeamClick ? () => onTeamClick(s.teamId) : undefined}
+                          className={`p-1 border border-vga-white truncate max-w-[180px] ${isUser ? 'text-vga-yellow font-bold' : ''} ${onTeamClick ? 'cursor-pointer hover:bg-vga-magenta' : ''}`}
+                        >
                           <div className="flex items-center gap-1.5">
                             {tm && <TeamCrest colors={tm.colors} size="xs" teamId={tm.id} />}
-                            <span className="truncate">{tm?.name ?? '—'}</span>
+                            <span className={`truncate ${onTeamClick ? 'underline decoration-dotted underline-offset-2' : ''}`}>{tm?.name ?? '—'}</span>
                           </div>
                         </td>
-                        <td className="p-1 border border-vga-white text-center">{s.played}</td>
-                        <td className="p-1 border border-vga-white text-center text-vga-light-green">{s.won}</td>
-                        <td className="p-1 border border-vga-white text-center text-vga-white">{s.drawn}</td>
-                        <td className="p-1 border border-vga-white text-center text-vga-light-red">{s.lost}</td>
-                        <td className="p-1 border border-vga-white text-center">{s.gf}</td>
-                        <td className="p-1 border border-vga-white text-center">{s.ga}</td>
-                        <td className="p-1 border border-vga-white text-center">{s.gd}</td>
-                        <td className="p-1 border border-vga-white text-center text-vga-yellow font-bold">{s.points}</td>
+                        <td onClick={() => cellClick('played')} className={cellCls()}>{s.played}</td>
+                        <td onClick={() => cellClick('won')}    className={cellCls('text-vga-light-green')}>{s.won}</td>
+                        <td onClick={() => cellClick('drawn')}  className={cellCls('text-vga-white')}>{s.drawn}</td>
+                        <td onClick={() => cellClick('lost')}   className={cellCls('text-vga-light-red')}>{s.lost}</td>
+                        <td onClick={() => cellClick('gf')}     className={cellCls()}>{s.gf}</td>
+                        <td onClick={() => cellClick('ga')}     className={cellCls()}>{s.ga}</td>
+                        <td onClick={() => cellClick('gd')}     className={cellCls()}>{s.gd}</td>
+                        <td onClick={() => cellClick('points')} className={cellCls('text-vga-yellow font-bold')}>{s.points}</td>
                       </tr>
                     );
                   })}
@@ -256,6 +283,93 @@ const TieCard = ({ tie, legs, teamById, userTeamId }: {
           ) : null)}
         </div>
       )}
+    </div>
+  );
+};
+
+// ── Group drill-down modal ──────────────────────────────────────────────
+const STAT_LABEL: Record<GroupStatKey, string> = {
+  played: 'Partidos', won: 'Victorias', drawn: 'Empates', lost: 'Derrotas',
+  gf: 'Goles a favor', ga: 'Goles en contra', gd: 'Diferencia de goles', points: 'Puntos',
+};
+
+// Result of a match from the perspective of `teamId`.
+const matchResult = (m: GroupMatch, teamId: string): 'W' | 'D' | 'L' | null => {
+  if (!m.played || m.homeScore == null || m.awayScore == null) return null;
+  const isHome = m.homeTeamId === teamId;
+  const my = isHome ? m.homeScore : m.awayScore;
+  const opp = isHome ? m.awayScore : m.homeScore;
+  if (my > opp) return 'W';
+  if (my < opp) return 'L';
+  return 'D';
+};
+
+const GroupDrillDownModal = ({ group, teamId, statKey, teamById, onClose }: {
+  group: TournamentGroup;
+  teamId: string;
+  statKey: GroupStatKey;
+  teamById: (id: string | null) => { id: string; name: string; colors?: string[] } | null | undefined;
+  onClose: () => void;
+}) => {
+  const team = teamById(teamId);
+  const matches = group.matches.filter(m => m.homeTeamId === teamId || m.awayTeamId === teamId);
+
+  // Highlight matches that contributed to the picked stat.
+  const matters = (m: GroupMatch): boolean => {
+    if (statKey === 'played') return m.played;
+    const r = matchResult(m, teamId);
+    if (statKey === 'won')   return r === 'W';
+    if (statKey === 'drawn') return r === 'D';
+    if (statKey === 'lost')  return r === 'L';
+    if (statKey === 'gf' || statKey === 'gd' || statKey === 'points') {
+      const isHome = m.homeTeamId === teamId;
+      const my = isHome ? m.homeScore : m.awayScore;
+      return m.played && (my ?? 0) > 0;
+    }
+    if (statKey === 'ga') {
+      const isHome = m.homeTeamId === teamId;
+      const opp = isHome ? m.awayScore : m.homeScore;
+      return m.played && (opp ?? 0) > 0;
+    }
+    return m.played;
+  };
+
+  return (
+    <div onClick={onClose} className="fixed inset-0 z-50 bg-black/85 flex items-center justify-center p-4 animate-in fade-in duration-150">
+      <div onClick={e => e.stopPropagation()} className="w-full max-w-xl border-4 border-vga-bright-white bg-vga-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] max-h-[90vh] flex flex-col">
+        <div className="bg-vga-blue/40 border-b-2 border-vga-blue px-3 py-2 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            {team && <TeamCrest colors={team.colors} size="sm" teamId={team.id} title={team.name} />}
+            <span className="text-vga-yellow text-[10px] uppercase tracking-widest font-bold">{team?.name ?? '—'}</span>
+            <span className="text-vga-cyan text-[9px] uppercase">· Grupo {group.letter} · {STAT_LABEL[statKey]}</span>
+          </div>
+          <button onClick={onClose} className="bg-vga-red text-vga-bright-white px-2 py-1 text-[8px] uppercase border border-vga-black hover:bg-vga-light-red">
+            Cerrar
+          </button>
+        </div>
+        <div className="flex-1 overflow-y-auto p-3 flex flex-col gap-1">
+          {matches.length === 0 ? (
+            <div className="text-vga-gray text-[9px] uppercase text-center py-4">Sin partidos.</div>
+          ) : matches.sort((a, b) => a.jornada - b.jornada).map(m => {
+            const h = teamById(m.homeTeamId);
+            const a = teamById(m.awayTeamId);
+            const r = matchResult(m, teamId);
+            const isHighlight = matters(m);
+            const rBg = r === 'W' ? 'bg-vga-light-green text-vga-black' : r === 'L' ? 'bg-vga-red text-vga-bright-white' : r === 'D' ? 'bg-vga-yellow text-vga-black' : 'bg-vga-gray text-vga-black';
+            return (
+              <div key={`${m.homeTeamId}-${m.awayTeamId}-${m.jornada}`} className={`grid grid-cols-[40px_1fr_auto_24px_auto_1fr_24px] items-center gap-1 px-2 py-1 text-[9px] border-2 ${isHighlight ? 'border-vga-yellow' : 'border-vga-blue'} bg-vga-black`}>
+                <span className="text-vga-gray text-[7px] uppercase">J{m.jornada}</span>
+                <span className={`uppercase truncate text-right ${m.homeTeamId === teamId ? 'text-vga-yellow font-bold' : 'text-vga-bright-white'}`}>{h?.name ?? '—'}</span>
+                <span className="text-vga-light-green font-mono font-bold">{m.homeScore ?? '·'}</span>
+                <span className="text-vga-gray text-center">·</span>
+                <span className="text-vga-light-green font-mono font-bold">{m.awayScore ?? '·'}</span>
+                <span className={`uppercase truncate ${m.awayTeamId === teamId ? 'text-vga-yellow font-bold' : 'text-vga-bright-white'}`}>{a?.name ?? '—'}</span>
+                <span className={`text-center text-[8px] font-bold ${rBg} py-0.5`}>{r ?? '—'}</span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
     </div>
   );
 };
