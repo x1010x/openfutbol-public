@@ -152,6 +152,14 @@ export const EndOfSeasonView = ({ league, onContinueSameTeam, onAdvanceAndChange
   let longestUnbeaten: { teamName: string; runs: number } | null = null;
   let longestWinning: { teamName: string; runs: number } | null = null;
 
+  // All-time variants (don't filter by current year) — fed by both
+  // teamRecords (per-team) and leagueHistory (per-season).
+  let allTimeBiggestWin: { ownerName: string; rec: NonNullable<TeamRecords['biggestWin']> } | null = null;
+  let allTimeHeaviest: { ownerName: string; rec: NonNullable<TeamRecords['heaviestDefeat']> } | null = null;
+  let allTimeCraziest: { ownerName: string; rec: NonNullable<TeamRecords['mostGoalsInMatch']> } | null = null;
+  let allTimeUnbeaten: { teamName: string; runs: number } | null = null;
+  let allTimeWinning: { teamName: string; runs: number } | null = null;
+
   for (const [teamId, rec] of Object.entries(teamRecords ?? {})) {
     const team = teams.find(t => t.id === teamId);
     if (!team) continue;
@@ -160,23 +168,86 @@ export const EndOfSeasonView = ({ league, onContinueSameTeam, onAdvanceAndChange
       const curDiff = biggestWin ? biggestWin.rec.gf - biggestWin.rec.ga : -1;
       if (diff > curDiff) biggestWin = { ownerName: team.name, rec: rec.biggestWin };
     }
+    if (rec.biggestWin) {
+      const diff = rec.biggestWin.gf - rec.biggestWin.ga;
+      const curDiff = allTimeBiggestWin ? allTimeBiggestWin.rec.gf - allTimeBiggestWin.rec.ga : -1;
+      if (diff > curDiff) allTimeBiggestWin = { ownerName: team.name, rec: rec.biggestWin };
+    }
     if (rec.heaviestDefeat && rec.heaviestDefeat.year === year) {
       const diff = rec.heaviestDefeat.ga - rec.heaviestDefeat.gf;
       const curDiff = heaviestDefeat ? heaviestDefeat.rec.ga - heaviestDefeat.rec.gf : -1;
       if (diff > curDiff) heaviestDefeat = { ownerName: team.name, rec: rec.heaviestDefeat };
+    }
+    if (rec.heaviestDefeat) {
+      const diff = rec.heaviestDefeat.ga - rec.heaviestDefeat.gf;
+      const curDiff = allTimeHeaviest ? allTimeHeaviest.rec.ga - allTimeHeaviest.rec.gf : -1;
+      if (diff > curDiff) allTimeHeaviest = { ownerName: team.name, rec: rec.heaviestDefeat };
     }
     if (rec.mostGoalsInMatch && rec.mostGoalsInMatch.year === year) {
       const total = rec.mostGoalsInMatch.gf + rec.mostGoalsInMatch.ga;
       const curTotal = craziestMatch ? craziestMatch.rec.gf + craziestMatch.rec.ga : -1;
       if (total > curTotal) craziestMatch = { ownerName: team.name, rec: rec.mostGoalsInMatch };
     }
+    if (rec.mostGoalsInMatch) {
+      const total = rec.mostGoalsInMatch.gf + rec.mostGoalsInMatch.ga;
+      const curTotal = allTimeCraziest ? allTimeCraziest.rec.gf + allTimeCraziest.rec.ga : -1;
+      if (total > curTotal) allTimeCraziest = { ownerName: team.name, rec: rec.mostGoalsInMatch };
+    }
     if ((rec.longestUnbeaten ?? 0) > (longestUnbeaten?.runs ?? 0)) {
       longestUnbeaten = { teamName: team.name, runs: rec.longestUnbeaten };
+    }
+    if ((rec.longestUnbeaten ?? 0) > (allTimeUnbeaten?.runs ?? 0)) {
+      allTimeUnbeaten = { teamName: team.name, runs: rec.longestUnbeaten };
     }
     if ((rec.longestWinning ?? 0) > (longestWinning?.runs ?? 0)) {
       longestWinning = { teamName: team.name, runs: rec.longestWinning };
     }
+    if ((rec.longestWinning ?? 0) > (allTimeWinning?.runs ?? 0)) {
+      allTimeWinning = { teamName: team.name, runs: rec.longestWinning };
+    }
   }
+
+  // Hall of fame from leagueHistory: count champion / pichichi / zamora /
+  // mejor-del-equipo titles across every completed season.
+  const history = league.leagueHistory ?? [];
+  const champCount = new Map<string, number>();
+  const pichichiCount = new Map<string, { count: number; goals: number; lastTeam: string }>();
+  const zamoraCount = new Map<string, { count: number; lastTeam: string }>();
+  const mejorCount = new Map<string, { count: number; lastTeam: string }>();
+  let bestSeasonPts: { teamName: string; points: number; year: number } | null = null;
+
+  for (const entry of history) {
+    if (entry.champion) champCount.set(entry.champion, (champCount.get(entry.champion) ?? 0) + 1);
+    if (entry.pichichi) {
+      const k = entry.pichichi.playerName;
+      const prev = pichichiCount.get(k);
+      pichichiCount.set(k, {
+        count: (prev?.count ?? 0) + 1,
+        goals: (prev?.goals ?? 0) + entry.pichichi.value,
+        lastTeam: entry.pichichi.teamName,
+      });
+    }
+    if (entry.zamora) {
+      const k = entry.zamora.playerName;
+      const prev = zamoraCount.get(k);
+      zamoraCount.set(k, { count: (prev?.count ?? 0) + 1, lastTeam: entry.zamora.teamName });
+    }
+    for (const [tid, mejor] of Object.entries(entry.mejorPorEquipo ?? {})) {
+      const t = teams.find(tm => tm.id === tid);
+      const prev = mejorCount.get(mejor.playerName);
+      mejorCount.set(mejor.playerName, { count: (prev?.count ?? 0) + 1, lastTeam: t?.name ?? '' });
+    }
+    const top = entry.standings[0];
+    if (top && (!bestSeasonPts || top.points > bestSeasonPts.points)) {
+      bestSeasonPts = { teamName: top.teamName, points: top.points, year: entry.year };
+    }
+  }
+
+  const mostTitles = [...champCount.entries()].sort((a, b) => b[1] - a[1])[0];
+  const mostPichichi = [...pichichiCount.entries()].sort((a, b) => b[1].count - a[1].count || b[1].goals - a[1].goals)[0];
+  const mostZamora = [...zamoraCount.entries()].sort((a, b) => b[1].count - a[1].count)[0];
+  const mostMejor = [...mejorCount.entries()].sort((a, b) => b[1].count - a[1].count)[0];
+  const seasonsPlayed = history.length;
 
   // ── Curiosidades ────────────────────────────────────────────────────────
   const teamsAvgAge = teams.map(team => {
@@ -402,6 +473,76 @@ export const EndOfSeasonView = ({ league, onContinueSameTeam, onAdvanceAndChange
               <div>
                 <div className="text-vga-magenta text-[7px] uppercase">Mr. Empate</div>
                 <div className="text-vga-bright-white truncate">{mostDraws.name} <span className="text-vga-light-cyan">· {mostDraws.drawn} empates</span></div>
+              </div>
+            )}
+          </div>
+        </Panel>
+
+        <Panel title={`Récords históricos (${seasonsPlayed + 1} temporada${seasonsPlayed + 1 === 1 ? '' : 's'})`} accent="text-vga-yellow">
+          <div className="flex flex-col gap-2 text-[8px]">
+            {mostTitles && (
+              <div>
+                <div className="text-vga-yellow text-[7px] uppercase">Más títulos</div>
+                <div className="text-vga-bright-white truncate">{mostTitles[0]} <span className="text-vga-light-green">· {mostTitles[1]} título{mostTitles[1] === 1 ? '' : 's'}</span></div>
+              </div>
+            )}
+            {bestSeasonPts && (
+              <div>
+                <div className="text-vga-yellow text-[7px] uppercase">Mejor temporada</div>
+                <div className="text-vga-bright-white truncate">{bestSeasonPts.teamName} ({bestSeasonPts.year}) <span className="text-vga-yellow">· {bestSeasonPts.points} pts</span></div>
+              </div>
+            )}
+            {mostPichichi && (
+              <div>
+                <div className="text-vga-yellow text-[7px] uppercase">Pichichi histórico</div>
+                <div className="text-vga-bright-white truncate">{mostPichichi[0]} <span className="text-vga-light-green">· {mostPichichi[1].count} pichichi{mostPichichi[1].count === 1 ? '' : 's'} ({mostPichichi[1].goals}G)</span></div>
+              </div>
+            )}
+            {mostZamora && (
+              <div>
+                <div className="text-vga-yellow text-[7px] uppercase">Zamora histórico</div>
+                <div className="text-vga-bright-white truncate">{mostZamora[0]} <span className="text-vga-light-cyan">· {mostZamora[1].count} zamora{mostZamora[1].count === 1 ? '' : 's'}</span></div>
+              </div>
+            )}
+            {mostMejor && (
+              <div>
+                <div className="text-vga-yellow text-[7px] uppercase">MVP de equipo más veces</div>
+                <div className="text-vga-bright-white truncate">{mostMejor[0]} <span className="text-vga-magenta">· {mostMejor[1].count} vez{mostMejor[1].count === 1 ? '' : 'es'}</span></div>
+              </div>
+            )}
+            {allTimeBiggestWin && (
+              <div>
+                <div className="text-vga-yellow text-[7px] uppercase">Goleada histórica</div>
+                <div className="text-vga-bright-white truncate">{fmtScoreVs(allTimeBiggestWin.rec, allTimeBiggestWin.ownerName, true)} <span className="text-vga-gray">({allTimeBiggestWin.rec.year})</span></div>
+              </div>
+            )}
+            {allTimeHeaviest && (
+              <div>
+                <div className="text-vga-yellow text-[7px] uppercase">Ridículo histórico</div>
+                <div className="text-vga-bright-white truncate">{fmtScoreVs(allTimeHeaviest.rec, allTimeHeaviest.ownerName, false)} <span className="text-vga-gray">({allTimeHeaviest.rec.year})</span></div>
+              </div>
+            )}
+            {allTimeCraziest && (
+              <div>
+                <div className="text-vga-yellow text-[7px] uppercase">Partido más loco</div>
+                <div className="text-vga-bright-white truncate">{fmtScoreVs(allTimeCraziest.rec, allTimeCraziest.ownerName, true)} · {allTimeCraziest.rec.gf + allTimeCraziest.rec.ga}g <span className="text-vga-gray">({allTimeCraziest.rec.year})</span></div>
+              </div>
+            )}
+            {allTimeUnbeaten && allTimeUnbeaten.runs > 0 && (
+              <div>
+                <div className="text-vga-yellow text-[7px] uppercase">Racha invicta histórica</div>
+                <div className="text-vga-bright-white truncate">{allTimeUnbeaten.teamName} <span className="text-vga-light-green">· {allTimeUnbeaten.runs} jornadas</span></div>
+              </div>
+            )}
+            {allTimeWinning && allTimeWinning.runs > 0 && (
+              <div>
+                <div className="text-vga-yellow text-[7px] uppercase">Racha ganadora histórica</div>
+                <div className="text-vga-bright-white truncate">{allTimeWinning.teamName} <span className="text-vga-light-green">· {allTimeWinning.runs} victorias</span></div>
+              </div>
+            )}
+            {seasonsPlayed === 0 && (
+              <div className="text-vga-gray italic text-[8px] mt-1">
+                Solo se ha jugado una temporada. Los récords históricos se construirán con cada nueva.
               </div>
             )}
           </div>
