@@ -158,7 +158,10 @@ const Tooltip = ({ player, x, y, year }: TooltipState & { year: number }) => {
             {contractExp && <> · <span className="text-vga-cyan">⌛</span> {contractExp}</>}
           </div>
           {player.contract?.salary != null && (
-            <div className="text-vga-light-red">sueldo {fmtEur(player.contract.salary)}/sem</div>
+            <div className="text-vga-light-red leading-tight">
+              <div>sueldo {fmtEur(player.contract.salary)}/sem</div>
+              <div className="text-vga-gray text-[7px]">{fmtEur(player.contract.salary * 52)} anual</div>
+            </div>
           )}
           {player.stats_year && (
             <div className="text-vga-magenta font-bold">{player.stats_year}</div>

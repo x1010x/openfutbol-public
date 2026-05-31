@@ -504,7 +504,8 @@ export const TransfersView = ({
                     <span className="text-vga-gray">Edad</span><span className="text-right">{playerAge(p, seasonYear)}</span>
                     <span className="text-vga-gray">Posición</span><span className="text-vga-magenta text-right">{p.position}</span>
                     <span className="text-vga-gray">Club</span><span className="text-vga-cyan text-right truncate">{selected.teamName}</span>
-                    <span className="text-vga-gray">Sueldo</span><span className="text-right">{formatEuros(p.contract?.salary ?? 0)}</span>
+                    <span className="text-vga-gray">Sueldo/sem</span><span className="text-right">{formatEuros(p.contract?.salary ?? 0)}</span>
+                    <span className="text-vga-gray">Sueldo/año</span><span className="text-right text-vga-gray">{formatEuros((p.contract?.salary ?? 0) * 52)}</span>
                     <span className="text-vga-gray">Valor</span><span className="text-vga-light-green font-bold text-right">{formatEuros(price)}</span>
                     <span className="text-vga-gray">G / A</span><span className="text-right">{p.seasonStats.goals} / {p.seasonStats.assists}</span>
                     <span className="text-vga-gray">TA / TR</span><span className="text-right">{p.seasonStats.yellowCards} / {p.seasonStats.redCards}</span>

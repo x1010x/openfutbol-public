@@ -434,8 +434,9 @@ const Inspector = ({
       </div>
 
       <div className="p-3 border-b border-vga-blue flex flex-col gap-1 text-[8px]">
-        <Row label="Sueldo" value={formatEuros(player.contract?.salary ?? 0)} color="text-vga-gray" />
-        <Row label="Valor"  value={formatEuros(value)}                        color="text-vga-cyan" />
+        <Row label="Sueldo/sem" value={formatEuros(player.contract?.salary ?? 0)}      color="text-vga-gray" />
+        <Row label="Sueldo/año" value={formatEuros((player.contract?.salary ?? 0) * 52)} color="text-vga-gray" />
+        <Row label="Valor"      value={formatEuros(value)}                              color="text-vga-cyan" />
         {player.contract?.expiration && (
           <Row label="Contrato" value={player.contract.expiration} color="text-vga-gray" />
         )}

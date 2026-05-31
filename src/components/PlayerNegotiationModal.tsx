@@ -150,8 +150,8 @@ export const PlayerNegotiationModal = ({
           {/* Demand panel */}
           <div className="border border-vga-blue p-2 flex flex-col gap-1">
             <div className="text-vga-magenta text-[8px] uppercase tracking-widest">Lo que pide el jugador</div>
-            <Row label="Sueldo actual"       value={`${formatEuros(currentWage)}/sem`} color="text-vga-gray" />
-            <Row label="Sueldo exigido"      value={`${formatEuros(demand)}/sem`}      color="text-vga-yellow" />
+            <Row label="Sueldo actual"       value={`${formatEuros(currentWage)}/sem  (${formatEuros(currentWage * 52)} anual)`} color="text-vga-gray" />
+            <Row label="Sueldo exigido"      value={`${formatEuros(demand)}/sem  (${formatEuros(demand * 52)} anual)`}           color="text-vga-yellow" />
             <Row label="Traspaso pagado"     value={formatEuros(feePaid)}              color="text-vga-light-green" />
             <Row label="Contrato propuesto"  value={`${years} años`}                   color="text-vga-cyan" />
           </div>
@@ -166,6 +166,9 @@ export const PlayerNegotiationModal = ({
                 <span className={`font-bold text-[11px] font-mono min-w-[120px] text-center ${ratioColor}`}>{formatEuros(offer)}/sem</span>
                 <button onClick={() => setOffer(o => o + step)} className="bg-vga-gray text-vga-black px-2 border border-vga-black text-[10px]">+</button>
                 <span className="text-[7px] text-vga-gray">({Math.round(ratio * 100)}% de lo pedido)</span>
+              </div>
+              <div className="text-[7px] text-vga-gray uppercase ml-[58px]">
+                Equivale a {formatEuros(offer * 52)} al año
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-[8px] text-vga-bright-white uppercase">Contrato:</span>

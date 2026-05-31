@@ -193,7 +193,8 @@ export const FinancesView = ({ team, finances, rivalTeams, seasonYear, transferL
                   <th className="text-left pl-2 py-1">#</th>
                   <th className="text-left">Jugador</th>
                   <th className="text-left">Pos</th>
-                  <th className="text-right pr-2">Sueldo / sem</th>
+                  <th className="text-right">Sueldo / sem</th>
+                  <th className="text-right pr-2">Sueldo / año</th>
                 </tr>
               </thead>
               <tbody>
@@ -202,7 +203,8 @@ export const FinancesView = ({ team, finances, rivalTeams, seasonYear, transferL
                     <td className={`pl-2 py-0.5 ${i === 0 ? 'text-vga-yellow font-bold' : 'text-vga-magenta'}`}>{i + 1}</td>
                     <td className="text-vga-bright-white truncate max-w-[140px]">{p.name}</td>
                     <td className={`${POS_COLOR[p.position] ?? 'text-vga-white'} font-bold uppercase`}>{p.position}</td>
-                    <td className="text-right pr-2 text-vga-light-red font-bold tabular-nums">{formatEuros(p.contract?.salary ?? 0)}</td>
+                    <td className="text-right text-vga-light-red font-bold tabular-nums">{formatEuros(p.contract?.salary ?? 0)}</td>
+                    <td className="text-right pr-2 text-vga-gray tabular-nums">{formatEuros((p.contract?.salary ?? 0) * 52)}</td>
                   </tr>
                 ))}
               </tbody>

@@ -103,7 +103,8 @@ export const NegotiationModal = ({
               <Stat label="OVR" value={Math.round((player.current_ability ?? player.media * 2) / 2)} />
               <Stat label="Edad" value={seasonYear - player.birthYear} />
               <Stat label="Valor" value={formatEuros(price)} />
-              <Stat label="Sueldo" value={`${formatEuros(salary)}/sem`} />
+              <Stat label="Sueldo/sem" value={formatEuros(salary)} />
+              <Stat label="Sueldo/año" value={formatEuros(salary * 52)} />
               <Stat label="Contrato" value={player.contract?.expiration ?? '—'} />
             </div>
             {player.seasonStats && (

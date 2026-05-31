@@ -151,7 +151,12 @@ export const PlayerDetailView = ({ player, teamName, history, seasonYear, onBack
           <MiniTile label={t('label.age')}   value={t('misc.ageYears', { age: String(age) })} color="text-vga-bright-white" />
           <MiniTile label="CA"               value={String(caDisplay)} color="text-vga-light-green" extra={paDisplay != null ? `PA ${paDisplay}` : undefined} />
           <MiniTile label={t('label.value')} value={formatEuros(price)} color="text-vga-light-green" />
-          <MiniTile label="Sueldo"           value={formatEuros(player.contract?.salary ?? 0)} color="text-vga-cyan" />
+          <MiniTile
+            label="Sueldo"
+            value={`${formatEuros(player.contract?.salary ?? 0)}/sem`}
+            color="text-vga-cyan"
+            extra={`${formatEuros((player.contract?.salary ?? 0) * 52)} anual`}
+          />
         </div>
       </div>
 
