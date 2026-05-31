@@ -157,3 +157,145 @@ export const stampMetaNow = (pack: Pack, name?: string): Pack => ({
     imported_at: new Date().toISOString(),
   },
 });
+
+// ── Validation ───────────────────────────────────────────────────────────
+export type IssueLevel = 'error' | 'warn' | 'info';
+
+export interface PackIssue {
+  level: IssueLevel;
+  code: string;
+  message: string;
+  entity?: { tab: EntityKey; id: string };
+  fix?: 'drop-orphan' | 'clamp-ca-pa' | 'reset-birthdate' | 'add-position';
+}
+
+const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
+
+export const validatePack = (pack: Pack): PackIssue[] => {
+  const issues: PackIssue[] = [];
+
+  // ID/source_id uniqueness within each table.
+  for (const key of ['continents','countries','leagues','clubs','players'] as EntityKey[]) {
+    const arr = pack[key] as Array<{ id: string; source_id?: number }>;
+    const ids = new Set<string>();
+    const sids = new Set<number>();
+    for (const e of arr) {
+      if (ids.has(e.id)) issues.push({ level: 'error', code: 'dup-id', message: `${key}: id duplicado "${e.id}"`, entity: { tab: key, id: e.id } });
+      ids.add(e.id);
+      if (e.source_id != null) {
+        if (sids.has(e.source_id)) issues.push({ level: 'warn', code: 'dup-source-id', message: `${key}: source_id duplicado ${e.source_id}` });
+        sids.add(e.source_id);
+      }
+    }
+  }
+
+  const continentIds = new Set(pack.continents.map(c => c.id));
+  const countryIds = new Set(pack.countries.map(c => c.id));
+  const leagueIds = new Set(pack.leagues.map(l => l.id));
+  const clubIds = new Set(pack.clubs.map(c => c.id));
+
+  for (const c of pack.countries) {
+    if (!continentIds.has(c.continent_id)) {
+      issues.push({ level: 'error', code: 'orphan-country', message: `País "${c.name}" sin continente válido`, entity: { tab: 'countries', id: c.id }, fix: 'drop-orphan' });
+    }
+  }
+  for (const l of pack.leagues) {
+    if (!countryIds.has(l.country_id)) {
+      issues.push({ level: 'error', code: 'orphan-league', message: `Liga "${l.name}" sin país válido`, entity: { tab: 'leagues', id: l.id }, fix: 'drop-orphan' });
+    }
+  }
+  for (const c of pack.clubs) {
+    if (!leagueIds.has(c.league_id)) {
+      issues.push({ level: 'error', code: 'orphan-club', message: `Club "${c.name}" sin liga válida`, entity: { tab: 'clubs', id: c.id }, fix: 'drop-orphan' });
+    }
+  }
+  for (const p of pack.players) {
+    if (p.club_id != null && !clubIds.has(p.club_id)) {
+      issues.push({ level: 'warn', code: 'orphan-player', message: `Jugador "${p.first_name} ${p.last_name}" apunta a un club inexistente`, entity: { tab: 'players', id: p.id }, fix: 'drop-orphan' });
+    }
+    if (!countryIds.has(p.country_id)) {
+      issues.push({ level: 'warn', code: 'player-country', message: `Jugador "${p.first_name} ${p.last_name}" sin país válido`, entity: { tab: 'players', id: p.id } });
+    }
+    if (p.current_ability < 1 || p.current_ability > 200 || p.potential_ability < 1 || p.potential_ability > 200) {
+      issues.push({ level: 'error', code: 'ca-pa-range', message: `Jugador "${p.first_name} ${p.last_name}" CA/PA fuera de rango`, entity: { tab: 'players', id: p.id }, fix: 'clamp-ca-pa' });
+    }
+    if (!ISO_DATE.test(p.birth_date)) {
+      issues.push({ level: 'error', code: 'birth-format', message: `Jugador "${p.first_name} ${p.last_name}" fecha de nacimiento inválida`, entity: { tab: 'players', id: p.id }, fix: 'reset-birthdate' });
+    }
+    if (!p.positions || p.positions.length === 0) {
+      issues.push({ level: 'error', code: 'no-positions', message: `Jugador "${p.first_name} ${p.last_name}" sin posiciones`, entity: { tab: 'players', id: p.id }, fix: 'add-position' });
+    }
+  }
+
+  if (pack.players.length === 0) {
+    issues.push({ level: 'info', code: 'empty-players', message: 'El pack no tiene jugadores.' });
+  }
+
+  return issues;
+};
+
+export const autoFixIssues = (pack: Pack, issues: PackIssue[]): { pack: Pack; fixed: number } => {
+  let p = pack;
+  let fixed = 0;
+  for (const issue of issues) {
+    if (!issue.fix || !issue.entity) continue;
+    if (issue.fix === 'drop-orphan') {
+      if (issue.entity.tab === 'countries') p = deleteCountryCascade(p, issue.entity.id);
+      else if (issue.entity.tab === 'leagues') p = deleteLeagueCascade(p, issue.entity.id);
+      else if (issue.entity.tab === 'clubs') p = deleteClubCascade(p, issue.entity.id);
+      else if (issue.entity.tab === 'players') p = deleteEntity(p, 'players', issue.entity.id);
+      fixed++;
+    } else if (issue.fix === 'clamp-ca-pa') {
+      p = updateEntity(p, 'players', issue.entity.id, {
+        current_ability: Math.max(1, Math.min(200, p.players.find(pl => pl.id === issue.entity!.id)?.current_ability ?? 100)),
+        potential_ability: Math.max(1, Math.min(200, p.players.find(pl => pl.id === issue.entity!.id)?.potential_ability ?? 100)),
+      } as never);
+      fixed++;
+    } else if (issue.fix === 'reset-birthdate') {
+      p = updateEntity(p, 'players', issue.entity.id, {
+        birth_date: `${new Date().getFullYear() - 25}-01-01`,
+      } as never);
+      fixed++;
+    } else if (issue.fix === 'add-position') {
+      p = updateEntity(p, 'players', issue.entity.id, {
+        positions: [{ code: 'MC', level: 10 }],
+      } as never);
+      fixed++;
+    }
+  }
+  return { pack: p, fixed };
+};
+
+// ── Filtered export ──────────────────────────────────────────────────────
+export interface ExportFilter {
+  countryIds?: string[];   // include only these countries (and their leagues/clubs/players)
+  leagueIds?: string[];    // OR include only these leagues
+}
+
+export const subsetPack = (pack: Pack, filter: ExportFilter): Pack => {
+  let countries = pack.countries;
+  let leagues = pack.leagues;
+  if (filter.countryIds && filter.countryIds.length > 0) {
+    const keep = new Set(filter.countryIds);
+    countries = countries.filter(c => keep.has(c.id));
+    const keptCountryIds = new Set(countries.map(c => c.id));
+    leagues = leagues.filter(l => keptCountryIds.has(l.country_id));
+  }
+  if (filter.leagueIds && filter.leagueIds.length > 0) {
+    const keep = new Set(filter.leagueIds);
+    leagues = leagues.filter(l => keep.has(l.id));
+    const keptLeagueCountryIds = new Set(leagues.map(l => l.country_id));
+    countries = countries.filter(c => keptLeagueCountryIds.has(c.id));
+  }
+  const keptCountryIds = new Set(countries.map(c => c.id));
+  const keptLeagueIds = new Set(leagues.map(l => l.id));
+  const clubs = pack.clubs.filter(c => keptLeagueIds.has(c.league_id));
+  const keptClubIds = new Set(clubs.map(c => c.id));
+  const players = pack.players.filter(p =>
+    keptCountryIds.has(p.country_id) || (p.club_id && keptClubIds.has(p.club_id))
+  ).map(p => p.club_id && !keptClubIds.has(p.club_id) ? { ...p, club_id: null } : p);
+  // Keep all continents referenced by the kept countries (cheap, small).
+  const keptContinentIds = new Set(countries.map(c => c.continent_id));
+  const continents = pack.continents.filter(c => keptContinentIds.has(c.id));
+  return { ...pack, continents, countries, leagues, clubs, players };
+};

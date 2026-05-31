@@ -8,6 +8,8 @@ import {
   deleteCountryCascade, deleteLeagueCascade, deleteClubCascade,
   packStats, stampMetaNow,
   blankContinent, blankCountry, blankLeague, blankClub, blankPlayer,
+  validatePack, autoFixIssues, subsetPack,
+  type ExportFilter,
 } from '../data/packEditor';
 
 type Tab = 'continents' | 'countries' | 'leagues' | 'clubs' | 'players';
@@ -23,6 +25,8 @@ export const PackEditorView = ({ onBack }: Props) => {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [showValidator, setShowValidator] = useState(false);
+  const [showExportPicker, setShowExportPicker] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
   // Auto-save on every change.
@@ -52,10 +56,11 @@ export const PackEditorView = ({ onBack }: Props) => {
     if (fileRef.current) fileRef.current.value = '';
   };
 
-  const handleExport = () => {
+  const handleExport = (filter?: ExportFilter) => {
     if (!pack) return;
-    const stamped = stampMetaNow(pack);
-    setPack(stamped);
+    const subsetted = filter ? subsetPack(pack, filter) : pack;
+    const stamped = stampMetaNow(subsetted);
+    if (!filter) setPack(stamped);
     const fname = `${(stamped.meta.name || 'openfutbol').replace(/[^a-z0-9_-]+/gi, '_')}.pack.json`;
     downloadPackJson(stamped, fname);
   };
@@ -81,9 +86,15 @@ export const PackEditorView = ({ onBack }: Props) => {
           <h2 className="text-vga-yellow text-xs uppercase font-bold">Editor de packs</h2>
           <span className="text-vga-bright-white text-[9px] uppercase">{pack.meta.name || '—'}</span>
         </div>
-        <div className="flex items-center gap-1">
-          <button onClick={handleExport} className="bg-vga-light-green text-vga-black px-3 py-1 text-[9px] uppercase font-bold border border-vga-black hover:bg-vga-bright-white">
-            Exportar
+        <div className="flex items-center gap-1 flex-wrap">
+          <button onClick={() => setShowValidator(true)} className="bg-vga-cyan text-vga-black px-3 py-1 text-[9px] uppercase font-bold border border-vga-black hover:bg-vga-light-cyan">
+            Validar
+          </button>
+          <button onClick={() => setShowExportPicker(true)} className="bg-vga-yellow text-vga-black px-3 py-1 text-[9px] uppercase font-bold border border-vga-black hover:bg-vga-bright-white">
+            Exportar filtrado
+          </button>
+          <button onClick={() => handleExport()} className="bg-vga-light-green text-vga-black px-3 py-1 text-[9px] uppercase font-bold border border-vga-black hover:bg-vga-bright-white">
+            Exportar todo
           </button>
           <button onClick={() => { if (confirm('¿Descartar el pack en edición?')) reset(); }} className="bg-vga-gray text-vga-black px-3 py-1 text-[8px] uppercase font-bold border border-vga-black hover:bg-vga-white">
             Cambiar pack
@@ -130,6 +141,22 @@ export const PackEditorView = ({ onBack }: Props) => {
           </button>
         ))}
       </div>
+
+      {showValidator && (
+        <ValidatorModal
+          pack={pack}
+          onClose={() => setShowValidator(false)}
+          onApplyFix={(fixed) => { setPack(fixed); }}
+          onJumpToIssue={(tab, id) => { setTab(tab); setSelectedId(id); setShowValidator(false); }}
+        />
+      )}
+      {showExportPicker && (
+        <ExportPickerModal
+          pack={pack}
+          onClose={() => setShowExportPicker(false)}
+          onExport={(filter) => { handleExport(filter); setShowExportPicker(false); }}
+        />
+      )}
 
       {/* Main body */}
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-3">
@@ -495,4 +522,153 @@ const clampInt = (v: string, min: number, max: number): number => {
   const n = parseInt(v, 10);
   if (Number.isNaN(n)) return min;
   return Math.max(min, Math.min(max, n));
+};
+
+// ── Validator modal ──────────────────────────────────────────────────────
+const ValidatorModal = ({ pack, onClose, onApplyFix, onJumpToIssue }: {
+  pack: Pack; onClose: () => void;
+  onApplyFix: (fixedPack: Pack) => void;
+  onJumpToIssue: (tab: Tab, id: string) => void;
+}) => {
+  const issues = useMemo(() => validatePack(pack), [pack]);
+  const errors = issues.filter(i => i.level === 'error');
+  const warns = issues.filter(i => i.level === 'warn');
+  const infos = issues.filter(i => i.level === 'info');
+  const fixable = issues.filter(i => i.fix);
+
+  return (
+    <div onClick={onClose} className="fixed inset-0 z-50 bg-black/85 flex items-center justify-center p-4 animate-in fade-in duration-150">
+      <div onClick={e => e.stopPropagation()} className="w-full max-w-3xl border-4 border-vga-bright-white bg-vga-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] max-h-[90vh] flex flex-col">
+        <div className="bg-vga-blue/40 border-b-2 border-vga-blue px-3 py-2 flex items-center justify-between gap-2">
+          <span className="text-vga-yellow text-[10px] uppercase tracking-widest font-bold">Validación del pack</span>
+          <div className="flex items-center gap-2 text-[9px] uppercase">
+            <span className="text-vga-light-red">Errores: {errors.length}</span>
+            <span className="text-vga-yellow">Avisos: {warns.length}</span>
+            <span className="text-vga-cyan">Info: {infos.length}</span>
+          </div>
+        </div>
+        <div className="flex-1 overflow-y-auto p-3 flex flex-col gap-1">
+          {issues.length === 0 ? (
+            <div className="text-vga-light-green text-[10px] uppercase text-center py-6">✓ Pack limpio. Sin problemas detectados.</div>
+          ) : (
+            issues.map((iss, i) => (
+              <div key={i} className={`border-l-2 p-2 text-[9px] flex items-center justify-between gap-2 ${
+                iss.level === 'error' ? 'border-vga-light-red bg-vga-light-red/10' :
+                iss.level === 'warn'  ? 'border-vga-yellow bg-vga-yellow/10' :
+                                        'border-vga-cyan bg-vga-cyan/10'
+              }`}>
+                <div className="min-w-0">
+                  <div className={`uppercase font-bold text-[7px] ${iss.level === 'error' ? 'text-vga-light-red' : iss.level === 'warn' ? 'text-vga-yellow' : 'text-vga-cyan'}`}>
+                    {iss.level} · {iss.code}
+                  </div>
+                  <div className="text-vga-bright-white">{iss.message}</div>
+                </div>
+                {iss.entity && (
+                  <button
+                    onClick={() => onJumpToIssue(iss.entity!.tab as Tab, iss.entity!.id)}
+                    className="bg-vga-blue text-vga-bright-white px-2 py-1 text-[8px] uppercase border border-vga-bright-white hover:bg-vga-light-blue shrink-0"
+                  >
+                    Ir
+                  </button>
+                )}
+              </div>
+            ))
+          )}
+        </div>
+        <div className="border-t-2 border-vga-blue p-2 bg-vga-blue/30 flex gap-2 justify-end">
+          {fixable.length > 0 && (
+            <button
+              onClick={() => {
+                const { pack: fixed, fixed: n } = autoFixIssues(pack, fixable);
+                onApplyFix(fixed);
+                alert(`Auto-arreglos aplicados: ${n}`);
+              }}
+              className="bg-vga-yellow text-vga-black px-3 py-1.5 text-[9px] uppercase font-bold border-2 border-vga-bright-white hover:bg-vga-bright-white"
+            >
+              Auto-arreglar ({fixable.length})
+            </button>
+          )}
+          <button onClick={onClose} className="bg-vga-blue text-vga-bright-white px-3 py-1.5 text-[9px] uppercase font-bold border-2 border-vga-bright-white hover:bg-vga-light-blue">
+            Cerrar
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ── Export picker modal ─────────────────────────────────────────────────
+const ExportPickerModal = ({ pack, onClose, onExport }: {
+  pack: Pack;
+  onClose: () => void;
+  onExport: (filter: ExportFilter) => void;
+}) => {
+  const [mode, setMode] = useState<'countries' | 'leagues'>('countries');
+  const [picked, setPicked] = useState<Set<string>>(new Set());
+
+  const toggle = (id: string) => setPicked(prev => {
+    const next = new Set(prev); next.has(id) ? next.delete(id) : next.add(id); return next;
+  });
+
+  const items = mode === 'countries' ? pack.countries : pack.leagues;
+  const itemsByParent = mode === 'leagues'
+    ? new Map(pack.countries.map(c => [c.id, c.name]))
+    : new Map<string, string>();
+
+  // Preview counts
+  const preview = useMemo(() => {
+    const filter: ExportFilter = mode === 'countries' ? { countryIds: [...picked] } : { leagueIds: [...picked] };
+    return picked.size > 0 ? subsetPack(pack, filter) : null;
+  }, [pack, mode, picked]);
+
+  return (
+    <div onClick={onClose} className="fixed inset-0 z-50 bg-black/85 flex items-center justify-center p-4 animate-in fade-in duration-150">
+      <div onClick={e => e.stopPropagation()} className="w-full max-w-2xl border-4 border-vga-bright-white bg-vga-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] max-h-[90vh] flex flex-col">
+        <div className="bg-vga-blue/40 border-b-2 border-vga-blue px-3 py-2 flex items-center justify-between">
+          <span className="text-vga-yellow text-[10px] uppercase tracking-widest font-bold">Exportar filtrado</span>
+          <div className="flex gap-1">
+            <button onClick={() => { setMode('countries'); setPicked(new Set()); }} className={`px-2 py-1 text-[8px] uppercase border ${mode === 'countries' ? 'bg-vga-yellow text-vga-black border-vga-bright-white' : 'bg-vga-black text-vga-cyan border-vga-blue'}`}>Por país</button>
+            <button onClick={() => { setMode('leagues'); setPicked(new Set()); }} className={`px-2 py-1 text-[8px] uppercase border ${mode === 'leagues' ? 'bg-vga-yellow text-vga-black border-vga-bright-white' : 'bg-vga-black text-vga-cyan border-vga-blue'}`}>Por liga</button>
+          </div>
+        </div>
+        <div className="flex-1 overflow-y-auto p-3 grid grid-cols-1 md:grid-cols-2 gap-1">
+          {items.map(item => {
+            const sel = picked.has(item.id);
+            const parent = mode === 'leagues' ? itemsByParent.get((item as { country_id: string }).country_id) : null;
+            return (
+              <button
+                key={item.id}
+                onClick={() => toggle(item.id)}
+                className={`text-left px-2 py-1 text-[9px] uppercase border ${sel ? 'bg-vga-yellow text-vga-black border-vga-bright-white font-bold' : 'bg-vga-black text-vga-bright-white border-vga-blue hover:border-vga-yellow'}`}
+              >
+                {item.name}
+                {parent && <span className="ml-1 text-vga-gray normal-case">({parent})</span>}
+              </button>
+            );
+          })}
+        </div>
+        <div className="border-t-2 border-vga-blue p-2 bg-vga-blue/30 flex items-center justify-between gap-2">
+          <div className="text-vga-cyan text-[8px] uppercase">
+            {preview
+              ? `${preview.clubs.length} clubes · ${preview.players.length} jugadores`
+              : 'Selecciona algún ítem'}
+          </div>
+          <div className="flex gap-2">
+            <button onClick={onClose} className="bg-vga-gray text-vga-black px-3 py-1.5 text-[9px] uppercase border-2 border-vga-black hover:bg-vga-white">
+              Cancelar
+            </button>
+            <button
+              onClick={() => onExport(mode === 'countries' ? { countryIds: [...picked] } : { leagueIds: [...picked] })}
+              disabled={picked.size === 0}
+              className={`px-3 py-1.5 text-[9px] uppercase font-bold border-2 ${picked.size > 0
+                ? 'bg-vga-light-green text-vga-black border-vga-bright-white hover:bg-vga-bright-white'
+                : 'bg-vga-gray text-vga-black border-vga-gray opacity-60 cursor-not-allowed'}`}
+            >
+              Exportar selección
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 };
