@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import type { Pack, Continent, Country, League, Club, PackPlayer, PositionCode } from '../types/game.d.ts';
+import type { Pack, Continent, Country, League, Club, PackPlayer, PositionCode, StatsPack } from '../types/game.d.ts';
+import type { StatsEntry } from '../data/statsIndex';
 
 interface ListingFilters {
   continentId?: string;
@@ -26,6 +27,7 @@ import {
   blankContinent, blankCountry, blankLeague, blankClub, blankPlayer,
   validatePack, autoFixIssues, subsetPack,
   applyBulkPlayerOp,
+  loadEditingStatsPack, saveEditingStatsPack, updateStatsMacro,
   type ExportFilter, type BulkPlayerOp,
 } from '../data/packEditor';
 
@@ -38,6 +40,7 @@ interface Props {
 export const PackEditorView = ({ onBack }: Props) => {
   const { pack: currentPack } = usePack();
   const [pack, setPack] = useState<Pack | null>(() => loadEditingPack());
+  const [statsPack, setStatsPack] = useState<StatsPack | null>(() => loadEditingStatsPack());
   const [mode, setMode] = useState<'base' | 'stats'>('base');
   const [tab, setTab] = useState<Tab>('clubs');
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -52,6 +55,10 @@ export const PackEditorView = ({ onBack }: Props) => {
 
   // Auto-save on every change.
   useEffect(() => { saveEditingPack(pack); }, [pack]);
+  useEffect(() => { saveEditingStatsPack(statsPack); }, [statsPack]);
+  // Reload the stats pack when the user enters the editor (could have edited
+  // it in the stats mode).
+  useEffect(() => { if (mode === 'base') setStatsPack(loadEditingStatsPack()); }, [mode]);
 
   const reset = () => { setPack(null); setSelectedId(null); setSearch(''); };
 
@@ -239,6 +246,7 @@ export const PackEditorView = ({ onBack }: Props) => {
           </div>
           <Listing
             pack={pack}
+            statsPack={statsPack}
             tab={tab}
             search={search}
             selectedId={selectedId}
@@ -257,6 +265,8 @@ export const PackEditorView = ({ onBack }: Props) => {
           {selectedId
             ? <EntityEditor
                 pack={pack}
+                statsPack={statsPack}
+                onStatsMacroChange={(sid, key, v) => setStatsPack(prev => prev ? updateStatsMacro(prev, sid, key, v) : prev)}
                 tab={tab}
                 id={selectedId}
                 onPatch={(patch) => setPack(p => p ? updateEntity(p, tab, selectedId, patch as never) : p)}
@@ -364,6 +374,7 @@ const POSITION_OPTIONS: PositionCode[] = ['GK','DC','DL','DR','WBL','WBR','DMC',
 // Compare-friendly value for the current sort key per tab. Strings normalized
 // to lowercase so case doesn't bias the sort.
 const sortValue = (pack: Pack, tab: Tab, key: string, raw: { id: string }): string | number => {
+  if (key === 'sid') return (raw as { source_id?: number }).source_id ?? 0;
   if (tab === 'continents') {
     const e = raw as Continent;
     return (e.name ?? '').toLowerCase();
@@ -400,8 +411,9 @@ const sortValue = (pack: Pack, tab: Tab, key: string, raw: { id: string }): stri
   return `${p.last_name} ${p.first_name}`.toLowerCase();
 };
 
-const Listing = ({ pack, tab, search, selectedId, onSelect, bulkSelection, onBulkToggle, onBulkSelectAll, onBulkClear }: {
-  pack: Pack; tab: Tab; search: string; selectedId: string | null;
+const Listing = ({ pack, statsPack, tab, search, selectedId, onSelect, bulkSelection, onBulkToggle, onBulkSelectAll, onBulkClear }: {
+  pack: Pack; statsPack: StatsPack | null;
+  tab: Tab; search: string; selectedId: string | null;
   onSelect: (id: string) => void;
   bulkSelection: Set<string> | null;
   onBulkToggle: ((id: string) => void) | null;
@@ -560,7 +572,7 @@ const Listing = ({ pack, tab, search, selectedId, onSelect, bulkSelection, onBul
                   />
                 </th>
               )}
-              <HeaderColumns tab={tab} sortKey={sortKey} sortDir={sortDir} onSort={toggleSort} />
+              <HeaderColumns tab={tab} sortKey={sortKey} sortDir={sortDir} onSort={toggleSort} hasStatsPack={!!statsPack} />
             </tr>
           </thead>
           <tbody>
@@ -582,7 +594,7 @@ const Listing = ({ pack, tab, search, selectedId, onSelect, bulkSelection, onBul
                       />
                     </td>
                   )}
-                  <RowCells pack={pack} tab={tab} item={item as never} />
+                  <RowCells pack={pack} tab={tab} item={item as never} statsPack={statsPack} />
                 </tr>
               );
             })}
@@ -642,45 +654,61 @@ const SortableTh = ({ label, sortKey, currentSortKey, sortDir, onSort, align = '
   </th>
 );
 
-const HeaderColumns = ({ tab, sortKey, sortDir, onSort }: {
-  tab: Tab; sortKey: string; sortDir: 'asc' | 'desc'; onSort: (k: string) => void;
+const HeaderColumns = ({ tab, sortKey, sortDir, onSort, hasStatsPack }: {
+  tab: Tab; sortKey: string; sortDir: 'asc' | 'desc'; onSort: (k: string) => void; hasStatsPack: boolean;
 }) => {
-  if (tab === 'continents') return <SortableTh label="Nombre" sortKey="name" currentSortKey={sortKey} sortDir={sortDir} onSort={onSort} />;
+  const Sid = () => <SortableTh label="SID" sortKey="sid" currentSortKey={sortKey} sortDir={sortDir} onSort={onSort} align="right" />;
+  if (tab === 'continents') return <>
+    <Sid />
+    <SortableTh label="Nombre" sortKey="name" currentSortKey={sortKey} sortDir={sortDir} onSort={onSort} />
+  </>;
   if (tab === 'countries')  return <>
+    <Sid />
     <SortableTh label="Nombre" sortKey="name" currentSortKey={sortKey} sortDir={sortDir} onSort={onSort} />
     <SortableTh label="Cód." sortKey="code" currentSortKey={sortKey} sortDir={sortDir} onSort={onSort} />
     <SortableTh label="Continente" sortKey="continent" currentSortKey={sortKey} sortDir={sortDir} onSort={onSort} />
     <SortableTh label="Rep." sortKey="reputation" currentSortKey={sortKey} sortDir={sortDir} onSort={onSort} align="right" />
   </>;
   if (tab === 'leagues')    return <>
+    <Sid />
     <SortableTh label="Nombre" sortKey="name" currentSortKey={sortKey} sortDir={sortDir} onSort={onSort} />
     <SortableTh label="País" sortKey="country" currentSortKey={sortKey} sortDir={sortDir} onSort={onSort} />
     <SortableTh label="Tier" sortKey="tier" currentSortKey={sortKey} sortDir={sortDir} onSort={onSort} align="right" />
     <SortableTh label="Rep." sortKey="reputation" currentSortKey={sortKey} sortDir={sortDir} onSort={onSort} align="right" />
   </>;
   if (tab === 'clubs')      return <>
+    <Sid />
     <SortableTh label="Nombre" sortKey="name" currentSortKey={sortKey} sortDir={sortDir} onSort={onSort} />
     <SortableTh label="Liga" sortKey="league" currentSortKey={sortKey} sortDir={sortDir} onSort={onSort} />
     <th className="text-left px-2 py-1">Colores</th>
   </>;
   return <>
+    <Sid />
     <SortableTh label="Nombre" sortKey="name" currentSortKey={sortKey} sortDir={sortDir} onSort={onSort} />
     <SortableTh label="Pos." sortKey="pos" currentSortKey={sortKey} sortDir={sortDir} onSort={onSort} />
     <SortableTh label="CA" sortKey="ca" currentSortKey={sortKey} sortDir={sortDir} onSort={onSort} align="right" />
     <SortableTh label="PA" sortKey="pa" currentSortKey={sortKey} sortDir={sortDir} onSort={onSort} align="right" />
     <SortableTh label="Club" sortKey="club" currentSortKey={sortKey} sortDir={sortDir} onSort={onSort} />
+    {hasStatsPack && <th className="text-center px-2 py-1 text-vga-cyan">★</th>}
   </>;
 };
 
-const RowCells = ({ pack, tab, item }: { pack: Pack; tab: Tab; item: Continent | Country | League | Club | PackPlayer }) => {
+const RowCells = ({ pack, tab, item, statsPack }: {
+  pack: Pack; tab: Tab; item: Continent | Country | League | Club | PackPlayer;
+  statsPack: StatsPack | null;
+}) => {
+  const sid = (item as { source_id?: number }).source_id;
+  const SidCell = <td className="px-2 py-1 text-right text-vga-gray font-mono">{sid ?? '—'}</td>;
+
   if (tab === 'continents') {
     const c = item as Continent;
-    return <td className="px-2 py-1 text-vga-bright-white">{c.name}</td>;
+    return <>{SidCell}<td className="px-2 py-1 text-vga-bright-white">{c.name}</td></>;
   }
   if (tab === 'countries') {
     const c = item as Country;
     const cont = pack.continents.find(x => x.id === c.continent_id);
     return <>
+      {SidCell}
       <td className="px-2 py-1 text-vga-bright-white">{c.name}</td>
       <td className="px-2 py-1 text-vga-cyan">{c.code}</td>
       <td className="px-2 py-1 text-vga-gray">{cont?.name ?? '—'}</td>
@@ -691,6 +719,7 @@ const RowCells = ({ pack, tab, item }: { pack: Pack; tab: Tab; item: Continent |
     const l = item as League;
     const country = pack.countries.find(x => x.id === l.country_id);
     return <>
+      {SidCell}
       <td className="px-2 py-1 text-vga-bright-white">{l.name}</td>
       <td className="px-2 py-1 text-vga-gray">{country?.name ?? '—'}</td>
       <td className="px-2 py-1 text-right text-vga-cyan">{l.tier}</td>
@@ -703,6 +732,7 @@ const RowCells = ({ pack, tab, item }: { pack: Pack; tab: Tab; item: Continent |
     const bg = c.colors?.background ?? '#333';
     const fg = c.colors?.foreground ?? '#fff';
     return <>
+      {SidCell}
       <td className="px-2 py-1 text-vga-bright-white">{c.name}</td>
       <td className="px-2 py-1 text-vga-gray">{league?.name ?? '—'}</td>
       <td className="px-2 py-1 flex items-center gap-1">
@@ -714,18 +744,25 @@ const RowCells = ({ pack, tab, item }: { pack: Pack; tab: Tab; item: Continent |
   const p = item as PackPlayer;
   const club = p.club_id ? pack.clubs.find(c => c.id === p.club_id) : null;
   const primary = [...p.positions].sort((a, b) => b.level - a.level)[0];
+  const hasStats = statsPack ? !!statsPack.entries[String(p.source_id)] : false;
   return <>
+    {SidCell}
     <td className="px-2 py-1 text-vga-bright-white">{p.first_name} {p.last_name}</td>
     <td className="px-2 py-1 text-vga-magenta">{primary?.code ?? '—'} <span className="text-vga-gray">{primary?.level ?? ''}</span></td>
     <td className="px-2 py-1 text-right text-vga-yellow">{p.current_ability}</td>
     <td className="px-2 py-1 text-right text-vga-cyan">{p.potential_ability}</td>
     <td className="px-2 py-1 text-vga-gray truncate">{club?.name ?? 'libre'}</td>
+    {statsPack && (
+      <td className="px-2 py-1 text-center">{hasStats ? <span className="text-vga-light-green font-bold">★</span> : <span className="text-vga-gray">·</span>}</td>
+    )}
   </>;
 };
 
 // ─────────────────────────────────────────────────────────────────────────
-const EntityEditor = ({ pack, tab, id, onPatch, onDelete }: {
-  pack: Pack; tab: Tab; id: string;
+const EntityEditor = ({ pack, statsPack, onStatsMacroChange, tab, id, onPatch, onDelete }: {
+  pack: Pack; statsPack: StatsPack | null;
+  onStatsMacroChange: (sourceId: string, macroKey: 'pa'|'sh'|'ps'|'dr'|'de'|'ph'|'gk', value: number) => void;
+  tab: Tab; id: string;
   onPatch: (patch: Record<string, unknown>) => void;
   onDelete: () => void;
 }) => {
@@ -848,7 +885,68 @@ const EntityEditor = ({ pack, tab, id, onPatch, onDelete }: {
         + posición
       </button>
     </div>
+
+    <InlineStatsPanel
+      player={e}
+      statsPack={statsPack}
+      onMacroChange={onStatsMacroChange}
+    />
   </Form>;
+};
+
+// Inline panel that shows up in the player editor when there's a stats pack
+// loaded. If the player has a stats entry, sliders for the seven macros let
+// you edit them in-place. If not, a hint pointing at the Stats pack mode.
+const InlineStatsPanel = ({ player, statsPack, onMacroChange }: {
+  player: PackPlayer;
+  statsPack: StatsPack | null;
+  onMacroChange: (sourceId: string, macroKey: 'pa'|'sh'|'ps'|'dr'|'de'|'ph'|'gk', value: number) => void;
+}) => {
+  if (!statsPack) {
+    return (
+      <div className="border border-vga-blue p-2 mt-2 text-vga-gray text-[8px] uppercase">
+        Cargá o generá un Stats pack para editar las stats extendidas desde aquí.
+      </div>
+    );
+  }
+  const sid = String(player.source_id);
+  const entry = statsPack.entries[sid] as StatsEntry | undefined;
+  if (!entry) {
+    return (
+      <div className="border border-vga-blue p-2 mt-2 text-vga-gray text-[8px] uppercase">
+        Este jugador no tiene stats extendidas en el pack actual.
+      </div>
+    );
+  }
+  const MACROS: { key: 'pa'|'sh'|'ps'|'dr'|'de'|'ph'|'gk'; label: string }[] = [
+    { key: 'pa', label: 'PAS' },
+    { key: 'sh', label: 'TIR' },
+    { key: 'ps', label: 'PSE' },
+    { key: 'dr', label: 'DRI' },
+    { key: 'de', label: 'DEF' },
+    { key: 'ph', label: 'FIS' },
+    { key: 'gk', label: 'POR' },
+  ];
+  return (
+    <div className="border-2 border-vga-cyan p-2 mt-2 flex flex-col gap-1">
+      <div className="flex items-center justify-between">
+        <span className="text-vga-cyan text-[8px] uppercase tracking-widest font-bold">★ Stats extendidas</span>
+        <span className="text-vga-gray text-[7px]">OV {entry.ov} · {statsPack.meta.name}</span>
+      </div>
+      {MACROS.map(({ key, label }) => (
+        <div key={key} className="grid grid-cols-[40px_1fr_30px] items-center gap-2">
+          <span className="text-vga-cyan text-[8px] uppercase">{label}</span>
+          <input
+            type="range" min={20} max={99}
+            value={entry.macro[key] ?? 50}
+            onChange={ev => onMacroChange(sid, key, parseInt(ev.target.value, 10))}
+            className="w-full"
+          />
+          <span className="text-vga-bright-white font-mono text-[9px] text-center">{entry.macro[key] ?? '—'}</span>
+        </div>
+      ))}
+    </div>
+  );
 };
 
 const POSITION_CODES: PositionCode[] = ['GK','DC','DL','DR','WBL','WBR','DMC','MC','ML','MR','AMC','AML','AMR','FC'];
