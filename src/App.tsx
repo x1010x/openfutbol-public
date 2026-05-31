@@ -173,6 +173,7 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
   const [saleNegotiation, setSaleNegotiation] = useState<{ offer: IncomingOffer; player: Player; buyer: Team; seller: Team } | null>(null);
   const [clausulaNegotiation, setClausulaNegotiation] = useState<{ player: Player; buyer: Team; seller: Team; cost: number; fromTeamId: string } | null>(null);
   const [outgoingNegotiation, setOutgoingNegotiation] = useState<{ player: Player; buyer: Team; seller: Team; amount: number; fromTeamId: string; offeredPlayerIds: string[] } | null>(null);
+  const [freeAgentNegotiation, setFreeAgentNegotiation] = useState<{ player: Player; buyer: Team } | null>(null);
   const [boardAlert, setBoardAlert] = useState<{ title: string; body: string; tone: 'danger' | 'warning' | 'success' } | null>(null);
   const [lastBoardAlert, setLastBoardAlert] = useState<{ title: string; body: string; tone: 'danger' | 'warning' | 'success' } | null>(null);
   const [htPaused, setHtPaused] = useState(false);
@@ -472,7 +473,11 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
     }));
   };
 
-  const handleOfferForFreeAgent = (playerId: string, amount: number): OfferResult => {
+  // Free agents have no transfer fee — the user goes straight to negotiating
+  // wages with the player. The `amount` arg is kept for backwards compat with
+  // the existing inline UI but is ignored.
+  const handleOfferForFreeAgent = (playerId: string, _amount: number): OfferResult => {
+    void _amount;
     if (!windowOpen) {
       return { accepted: false, message: t('transfer.windowClosedAction') };
     }
@@ -485,51 +490,38 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
     if (league.blockedSignings.includes(blockKey)) {
       return { accepted: false, message: 'No se admiten más ofertas por este jugador esta temporada.' };
     }
-    if (buyer.budget < amount) {
-      return { accepted: false, message: 'No tienes presupuesto suficiente.' };
-    }
-    const price = computePrice(player, league.year);
-    const result = evaluateOffer(price, amount);
-    if (!result.accepted) {
-      if (result.blocked) {
-        setLeague(prev => ({ ...prev, blockedSignings: [...prev.blockedSignings, blockKey] }));
-      }
-      return result;
-    }
+    setFreeAgentNegotiation({ player, buyer });
+    return { accepted: true, message: 'Negociando con el jugador...' };
+  };
 
+  const commitFreeAgentSigning = (player: Player, agreedSalary: number, years: number) => {
     setLeague(prev => {
       const userTeam = prev.teams.find(t => t.id === prev.userTeamId);
+      if (!userTeam) return prev;
+      const expYear = prev.year + years;
+      const signedPlayer: Player = {
+        ...player,
+        forSale: false,
+        contract: { salary: agreedSalary, expiration: `${expYear}-06-30` },
+      };
       const entry: TransferRecord = {
         id: `tx_${prev.currentJornada}_${player.id}_${Date.now()}`,
-        jornada: prev.currentJornada,
-        year: prev.year,
-        playerName: player.name,
-        playerPosition: player.position,
-        fromTeamName: null,
-        toTeamName: userTeam?.name ?? '',
-        amount,
+        jornada: prev.currentJornada, year: prev.year,
+        playerName: player.name, playerPosition: player.position,
+        fromTeamName: null, toTeamName: userTeam.name,
+        amount: 0,
       };
-      const marketValue = computePrice(player, prev.year);
-      const florentinoDelta = (prev.gameMode === 'promanager' && !prev.boardFired)
-        ? computeTransferDelta(player, amount, marketValue, true, prev.year)
-        : 0;
-      const newMeter = florentinoDelta !== 0 ? applyMeterDelta(prev.florentinometro ?? 5, florentinoDelta) : (prev.florentinometro ?? 5);
       return {
         ...prev,
         teams: prev.teams.map(t =>
           t.id === prev.userTeamId
-            ? { ...t, players: [...t.players, player], budget: t.budget - amount }
+            ? { ...t, players: [...t.players, signedPlayer] }
             : t
         ),
-        freeAgents: prev.freeAgents.filter(p => p.id !== playerId),
+        freeAgents: prev.freeAgents.filter(p => p.id !== player.id),
         transferLog: appendTransfer(prev.transferLog, entry),
-        florentinometro: newMeter,
-        florentinometroPeak: Math.max(prev.florentinometroPeak ?? 5, newMeter),
-        florentinometroMin: Math.min(prev.florentinometroMin ?? 5, newMeter),
-        seasonTransferSpent: (prev.seasonTransferSpent ?? 0) + amount,
       };
     });
-    return result;
   };
 
   const handleOfferForPlayer = (
@@ -3122,6 +3114,52 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
           onClose={() => setOutgoingNegotiation(null)}
         />
       )}
+
+      {freeAgentNegotiation && (() => {
+        const fakeSeller: Team = {
+          id: 'free_agent',
+          name: 'Agente libre',
+          colors: ['#333333', '#ffffff'],
+          year: league.year,
+          stadiumCapacity: 0,
+          ticketPrice: 0,
+          budget: 0,
+          players: [],
+          lineup: [],
+          formation: '4-4-2',
+          tacticalDiscipline: false,
+        };
+        return (
+          <PlayerNegotiationModal
+            player={freeAgentNegotiation.player}
+            buyerTeam={freeAgentNegotiation.buyer}
+            sellerTeam={fakeSeller}
+            feePaid={0}
+            seasonYear={league.year}
+            mode="user-buying"
+            onAccept={(salary, years) => {
+              commitFreeAgentSigning(freeAgentNegotiation.player, salary, years);
+              const p = freeAgentNegotiation.player;
+              setFreeAgentNegotiation(null);
+              setMessage({
+                title: 'Fichaje cerrado',
+                body: `${p.name} llega libre a tu club.`,
+                tone: 'info',
+              });
+            }}
+            onReject={() => {
+              const p = freeAgentNegotiation.player;
+              setFreeAgentNegotiation(null);
+              setMessage({
+                title: 'Negociación fallida',
+                body: `${p.name} no aceptó las condiciones que le ofreciste.`,
+                tone: 'warning',
+              });
+            }}
+            onClose={() => setFreeAgentNegotiation(null)}
+          />
+        );
+      })()}
 
       {clausulaNegotiation && (
         <PlayerNegotiationModal

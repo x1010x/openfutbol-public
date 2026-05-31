@@ -462,7 +462,9 @@ export const TransfersView = ({
                         <td className="text-right text-vga-light-green font-bold">{playerOvr(p)}</td>
                         <td className="text-right text-vga-cyan text-[8px]">{p.seasonStats.goals}/{p.seasonStats.assists}</td>
                         <td className="pl-2 truncate max-w-[140px] text-vga-cyan">{e.teamName}</td>
-                        <td className="text-right pr-2 text-vga-light-green font-bold">{formatEuros(price)}</td>
+                        <td className="text-right pr-2 text-vga-light-green font-bold">
+                          {e.isFreeAgent ? <span className="text-vga-gray">GRATIS</span> : formatEuros(price)}
+                        </td>
                         <td className="text-center pr-2 text-[8px]">{tag}</td>
                       </tr>
                     );
@@ -514,7 +516,14 @@ export const TransfersView = ({
                       <div className="text-vga-gray text-[8px] text-center py-1 border border-vga-gray uppercase">{t('misc.blocked')}</div>
                     ) : (
                       <>
-                        {!(selected.player.forSale === false && !selected.isFreeAgent && selected.teamId) && (
+                        {selected.isFreeAgent ? (
+                          <button
+                            onClick={() => { onOfferFreeAgent(p.id, 0); }}
+                            className="bg-vga-light-green hover:bg-vga-bright-white text-vga-black text-[9px] px-2 py-1 border border-vga-black font-bold uppercase"
+                          >
+                            Negociar contrato
+                          </button>
+                        ) : !(selected.player.forSale === false && !selected.isFreeAgent && selected.teamId) && (
                           <button onClick={() => setOfferEntry(selected)} className="bg-vga-green hover:bg-vga-light-green text-vga-bright-white text-[9px] px-2 py-1 border border-vga-black font-bold uppercase">
                             {t('btn.makeOffer')}
                           </button>
