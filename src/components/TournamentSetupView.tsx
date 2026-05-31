@@ -116,6 +116,113 @@ export const TournamentSetupView = ({ onConfirm, onBack }: Props) => {
     }));
   }, [pack]);
 
+  // Club strength heuristic: average CA of the roster's top 11 players.
+  // Computed once per pack so the autofill is snappy even on 1300+ clubs.
+  const clubStrength = useMemo(() => {
+    const m = new Map<string, number>();
+    if (!pack) return m;
+    const byClub = new Map<string, number[]>();
+    for (const p of pack.players) {
+      if (!p.club_id) continue;
+      const arr = byClub.get(p.club_id) ?? [];
+      arr.push(p.current_ability);
+      byClub.set(p.club_id, arr);
+    }
+    for (const [id, cas] of byClub) {
+      cas.sort((a, b) => b - a);
+      const top = cas.slice(0, 11);
+      if (top.length === 0) continue;
+      m.set(id, top.reduce((s, v) => s + v, 0) / top.length);
+    }
+    return m;
+  }, [pack]);
+
+  // Club → country code and club → league id, used by the autofill filters.
+  const clubMeta = useMemo(() => {
+    const meta = new Map<string, { countryCode: string; leagueId: string; leagueName: string; countryName: string }>();
+    if (!pack) return meta;
+    for (const c of pack.clubs) {
+      const league = pack.leagues.find(l => l.id === c.league_id);
+      const country = league ? pack.countries.find(co => co.id === league.country_id) : undefined;
+      meta.set(c.id, {
+        countryCode: country?.code?.toUpperCase() ?? 'unknown',
+        leagueId: c.league_id,
+        leagueName: league?.name ?? '',
+        countryName: country?.name ?? '',
+      });
+    }
+    return meta;
+  }, [pack]);
+
+  const fillSelection = (sourceIds: string[]) => {
+    const next = new Set<string>();
+    let count = 0;
+    for (const id of sourceIds) {
+      if (count >= targetSize) break;
+      next.add(id);
+      count++;
+    }
+    setSelected(next);
+    // Default user team to the first one if not in spectator mode.
+    if (!spectate) {
+      const first = sourceIds[0];
+      if (first) setUserClubId(first);
+    }
+  };
+
+  const fillByBest = () => {
+    const ranked = [...templates].sort((a, b) =>
+      (clubStrength.get(b.id) ?? 0) - (clubStrength.get(a.id) ?? 0)
+    );
+    fillSelection(ranked.map(t => t.id));
+  };
+
+  const fillRandom = () => {
+    const shuffled = [...templates].map(t => t.id);
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    fillSelection(shuffled);
+  };
+
+  const fillByLeague = (leagueId: string) => {
+    if (!leagueId) return;
+    const fromLeague = templates
+      .filter(t => clubMeta.get(t.id)?.leagueId === leagueId)
+      .sort((a, b) => (clubStrength.get(b.id) ?? 0) - (clubStrength.get(a.id) ?? 0));
+    fillSelection(fromLeague.map(t => t.id));
+  };
+
+  const fillByCountry = (countryCode: string) => {
+    if (!countryCode) return;
+    const fromCountry = templates
+      .filter(t => clubMeta.get(t.id)?.countryCode === countryCode)
+      .sort((a, b) => (clubStrength.get(b.id) ?? 0) - (clubStrength.get(a.id) ?? 0));
+    fillSelection(fromCountry.map(t => t.id));
+  };
+
+  // Build alphabetized league/country option lists for the dropdowns.
+  const leagueOptions = useMemo(() => {
+    if (!pack) return [] as { id: string; label: string }[];
+    return [...pack.leagues]
+      .map(l => {
+        const country = pack.countries.find(c => c.id === l.country_id);
+        return { id: l.id, label: `${l.name}${country ? ` · ${country.name}` : ''}` };
+      })
+      .sort((a, b) => a.label.localeCompare(b.label));
+  }, [pack]);
+  const countryOptions = useMemo(() => {
+    if (!pack) return [] as { code: string; label: string }[];
+    const seen = new Map<string, string>();
+    for (const c of pack.countries) {
+      if (c.code) seen.set(c.code.toUpperCase(), c.name);
+    }
+    return [...seen.entries()]
+      .map(([code, label]) => ({ code, label }))
+      .sort((a, b) => a.label.localeCompare(b.label));
+  }, [pack]);
+
   const pickFormat = (id: FormatId) => {
     setFormatId(id);
     const newFmt = FORMATS.find(f => f.id === id)!;
@@ -286,6 +393,18 @@ export const TournamentSetupView = ({ onConfirm, onBack }: Props) => {
           </button>
         </div>
 
+        <FillToolbar
+          targetSize={targetSize}
+          selectedSize={selected.size}
+          leagueOptions={leagueOptions}
+          countryOptions={countryOptions}
+          onFillBest={fillByBest}
+          onFillRandom={fillRandom}
+          onFillByLeague={fillByLeague}
+          onFillByCountry={fillByCountry}
+          onClear={() => { setSelected(new Set()); setUserClubId(null); }}
+        />
+
         <TeamSelector templates={templates} selected={selected} onToggle={toggle} maxTeams={targetSize} />
 
         {!spectate && selectedList.length > 0 && (
@@ -328,6 +447,96 @@ export const TournamentSetupView = ({ onConfirm, onBack }: Props) => {
 };
 
 // ── Next round configurator (advanced mode) ─────────────────────────────
+// ── Autofill toolbar ─────────────────────────────────────────────────────
+const FillToolbar = ({
+  targetSize, selectedSize,
+  leagueOptions, countryOptions,
+  onFillBest, onFillRandom, onFillByLeague, onFillByCountry, onClear,
+}: {
+  targetSize: number;
+  selectedSize: number;
+  leagueOptions: { id: string; label: string }[];
+  countryOptions: { code: string; label: string }[];
+  onFillBest: () => void;
+  onFillRandom: () => void;
+  onFillByLeague: (id: string) => void;
+  onFillByCountry: (code: string) => void;
+  onClear: () => void;
+}) => {
+  const [leagueId, setLeagueId] = useState('');
+  const [countryCode, setCountryCode] = useState('');
+
+  return (
+    <div className="border-2 border-vga-cyan bg-vga-blue/10 p-2 flex flex-col gap-2">
+      <div className="flex items-center justify-between gap-2 flex-wrap">
+        <span className="text-vga-cyan text-[8px] uppercase tracking-widest">
+          Rellenar {targetSize} equipos
+        </span>
+        {selectedSize > 0 && (
+          <button onClick={onClear} className="px-2 py-0.5 text-[8px] uppercase border border-vga-red text-vga-light-red hover:bg-vga-red hover:text-vga-bright-white">
+            Vaciar selección
+          </button>
+        )}
+      </div>
+      <div className="flex flex-wrap gap-1">
+        <button onClick={onFillBest}
+          className="px-3 py-1.5 text-[9px] uppercase font-bold border-2 border-vga-bright-white bg-vga-light-green text-vga-black hover:bg-vga-bright-white">
+          Mejores disponibles
+        </button>
+        <button onClick={onFillRandom}
+          className="px-3 py-1.5 text-[9px] uppercase font-bold border-2 border-vga-bright-white bg-vga-yellow text-vga-black hover:bg-vga-bright-white">
+          Al azar
+        </button>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+        <div className="flex items-center gap-1 flex-wrap">
+          <span className="text-vga-gray text-[8px] uppercase shrink-0">Por país:</span>
+          <select
+            value={countryCode}
+            onChange={e => setCountryCode(e.target.value)}
+            className="bg-vga-black border border-vga-blue text-vga-bright-white text-[9px] px-1 py-0.5 outline-none focus:border-vga-yellow flex-1 min-w-[140px]"
+          >
+            <option value="">— elige país —</option>
+            {countryOptions.map(c => <option key={c.code} value={c.code}>{c.label}</option>)}
+          </select>
+          <button
+            onClick={() => onFillByCountry(countryCode)}
+            disabled={!countryCode}
+            className={`px-2 py-1 text-[9px] uppercase font-bold border-2 ${countryCode
+              ? 'border-vga-bright-white bg-vga-cyan text-vga-black hover:bg-vga-light-cyan'
+              : 'border-vga-gray bg-vga-gray text-vga-black opacity-50 cursor-not-allowed'}`}
+          >
+            Aplicar
+          </button>
+        </div>
+        <div className="flex items-center gap-1 flex-wrap">
+          <span className="text-vga-gray text-[8px] uppercase shrink-0">Por liga:</span>
+          <select
+            value={leagueId}
+            onChange={e => setLeagueId(e.target.value)}
+            className="bg-vga-black border border-vga-blue text-vga-bright-white text-[9px] px-1 py-0.5 outline-none focus:border-vga-yellow flex-1 min-w-[140px]"
+          >
+            <option value="">— elige liga —</option>
+            {leagueOptions.map(l => <option key={l.id} value={l.id}>{l.label}</option>)}
+          </select>
+          <button
+            onClick={() => onFillByLeague(leagueId)}
+            disabled={!leagueId}
+            className={`px-2 py-1 text-[9px] uppercase font-bold border-2 ${leagueId
+              ? 'border-vga-bright-white bg-vga-cyan text-vga-black hover:bg-vga-light-cyan'
+              : 'border-vga-gray bg-vga-gray text-vga-black opacity-50 cursor-not-allowed'}`}
+          >
+            Aplicar
+          </button>
+        </div>
+      </div>
+      <div className="text-vga-gray text-[7px] uppercase">
+        Si la fuente tiene menos equipos que {targetSize}, completa solo los disponibles. La selección actual se reemplaza por completo.
+      </div>
+    </div>
+  );
+};
+
 const NextRoundCard = ({ input, onAdd }: { input: number; onAdd: (d: StageDraft) => void }) => {
   // The "Final" is the special case of input = 2 — it's always a KO tie, just
   // configure the leg count + away-goals rule.
