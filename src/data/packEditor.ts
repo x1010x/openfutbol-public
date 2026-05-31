@@ -1,4 +1,5 @@
-import type { Pack, Continent, Country, League, Club, PackPlayer } from '../types/game.d.ts';
+import type { Pack, Continent, Country, League, Club, PackPlayer, StatsPack } from '../types/game.d.ts';
+import type { StatsEntry } from './statsIndex';
 
 const STORAGE_KEY = 'openfutbol_pack_editor_v1';
 
@@ -307,6 +308,99 @@ export interface ExportFilter {
   countryIds?: string[];   // include only these countries (and their leagues/clubs/players)
   leagueIds?: string[];    // OR include only these leagues
 }
+
+// ── Stats pack ──────────────────────────────────────────────────────────
+const STATS_STORAGE_KEY = 'openfutbol_stats_pack_editor_v1';
+
+export const loadEditingStatsPack = (): StatsPack | null => {
+  try {
+    const raw = localStorage.getItem(STATS_STORAGE_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw) as StatsPack;
+  } catch { return null; }
+};
+
+export const saveEditingStatsPack = (sp: StatsPack | null): void => {
+  try {
+    if (sp == null) localStorage.removeItem(STATS_STORAGE_KEY);
+    else localStorage.setItem(STATS_STORAGE_KEY, JSON.stringify(sp));
+  } catch { /* best effort */ }
+};
+
+export const downloadStatsPack = (sp: StatsPack, filename = 'openfutbol-stats.json'): void => {
+  const blob = new Blob([JSON.stringify(sp, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 0);
+};
+
+// Generate a stats pack from a base pack: every player gets macros derived
+// from their CA + primary position so the user has a baseline to tweak.
+export const generateStatsPackFromBase = (pack: Pack, name: string): StatsPack => {
+  const entries: Record<string, StatsEntry> = {};
+  for (const p of pack.players) {
+    const primary = [...p.positions].sort((a, b) => b.level - a.level)[0];
+    const isGK = primary?.code === 'GK';
+    const ov = Math.max(20, Math.min(99, Math.round(p.current_ability / 2)));
+    // Spread macros around ov with small jitters; goalkeepers get a real gk
+    // value and weak field stats.
+    const jit = (n: number, j = 6) => Math.max(20, Math.min(99, n + Math.round((Math.random() - 0.5) * j)));
+    const macro = isGK
+      ? { pa: 30, sh: 25, ps: 40, dr: 35, de: 55, ph: jit(ov - 5), gk: jit(ov) }
+      : { pa: jit(ov), sh: jit(ov), ps: jit(ov), dr: jit(ov), de: jit(ov - 5), ph: jit(ov), gk: 15 };
+    entries[String(p.source_id)] = {
+      fy: new Date().getFullYear(),
+      ov, macro,
+      micro: {
+        crossing: 50, finishing: 50, heading: 50, shortPassing: 50, volleys: 50,
+        dribblingSkill: 50, curve: 50, fkAccuracy: 50, longPassing: 50, ballControl: 50,
+        longShots: 50, marking: 50, standingTackle: 50, slidingTackle: 50, penalties: 50,
+        aggression: 50, interceptions: 50, positioning: 50, vision: 50, composure: 50,
+        reactions: 50, intRep: 50,
+        acceleration: 50, sprintSpeed: 50, agility: 50, balance: 50, shotPower: 50,
+        jumping: 50, stamina: 50, strength: 50,
+      },
+      gk: isGK ? jit(ov) : 15,
+    };
+  }
+  return {
+    meta: {
+      name, version: '1', source: 'editor',
+      generated_at: new Date().toISOString(),
+      schema_version: 1, count: Object.keys(entries).length,
+    },
+    entries,
+  };
+};
+
+export const updateStatsEntry = (sp: StatsPack, sourceId: string, patch: Partial<StatsEntry>): StatsPack => ({
+  ...sp,
+  entries: {
+    ...sp.entries,
+    [sourceId]: { ...(sp.entries[sourceId] as StatsEntry), ...patch } as unknown as Record<string, unknown>,
+  },
+});
+
+export const updateStatsMacro = (sp: StatsPack, sourceId: string, macroKey: 'pa'|'sh'|'ps'|'dr'|'de'|'ph'|'gk', value: number): StatsPack => {
+  const e = sp.entries[sourceId] as StatsEntry | undefined;
+  if (!e) return sp;
+  return {
+    ...sp,
+    entries: {
+      ...sp.entries,
+      [sourceId]: { ...e, macro: { ...e.macro, [macroKey]: value } } as unknown as Record<string, unknown>,
+    },
+  };
+};
+
+export const deleteStatsEntry = (sp: StatsPack, sourceId: string): StatsPack => {
+  const next = { ...sp.entries };
+  delete next[sourceId];
+  return { ...sp, entries: next, meta: { ...sp.meta, count: Object.keys(next).length } };
+};
 
 export const subsetPack = (pack: Pack, filter: ExportFilter): Pack => {
   let countries = pack.countries;

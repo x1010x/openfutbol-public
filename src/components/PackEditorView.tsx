@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import type { Pack, Continent, Country, League, Club, PackPlayer, PositionCode } from '../types/game.d.ts';
 import { usePack } from '../state/PackContext';
 import { parsePack } from '../data/packLoader';
+import { StatsPackEditorView } from './StatsPackEditorView';
 import {
   loadEditingPack, saveEditingPack, downloadPackJson,
   updateEntity, deleteEntity,
@@ -22,6 +23,7 @@ interface Props {
 export const PackEditorView = ({ onBack }: Props) => {
   const { pack: currentPack } = usePack();
   const [pack, setPack] = useState<Pack | null>(() => loadEditingPack());
+  const [mode, setMode] = useState<'base' | 'stats'>('base');
   const [tab, setTab] = useState<Tab>('clubs');
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [search, setSearch] = useState('');
@@ -69,22 +71,37 @@ export const PackEditorView = ({ onBack }: Props) => {
     downloadPackJson(stamped, fname);
   };
 
+  if (mode === 'stats') {
+    return (
+      <div className="w-full flex flex-col gap-2">
+        <ModeSwitch mode={mode} onChange={setMode} />
+        <StatsPackEditorView basePack={pack ?? currentPack ?? null} onBack={onBack} />
+      </div>
+    );
+  }
+
   if (!pack) {
-    return <LandingScreen
-      currentAvailable={!!currentPack}
-      loadError={loadError}
-      onLoadCurrent={loadFromCurrent}
-      onBack={onBack}
-      onPickFile={() => fileRef.current?.click()}
-      fileRef={fileRef}
-      onFile={handleFile}
-    />;
+    return (
+      <div className="w-full flex flex-col gap-2">
+        <ModeSwitch mode={mode} onChange={setMode} />
+        <LandingScreen
+          currentAvailable={!!currentPack}
+          loadError={loadError}
+          onLoadCurrent={loadFromCurrent}
+          onBack={onBack}
+          onPickFile={() => fileRef.current?.click()}
+          fileRef={fileRef}
+          onFile={handleFile}
+        />
+      </div>
+    );
   }
 
   const stats = packStats(pack);
 
   return (
     <div className="w-full max-w-6xl flex flex-col gap-3 animate-in fade-in duration-300">
+      <ModeSwitch mode={mode} onChange={setMode} />
       <div className="bg-vga-blue p-2 border-2 border-vga-white flex justify-between items-center vga-panel">
         <div className="flex items-center gap-2">
           <h2 className="text-vga-yellow text-xs uppercase font-bold">Editor de packs</h2>
@@ -249,6 +266,23 @@ export const PackEditorView = ({ onBack }: Props) => {
     </div>
   );
 };
+
+const ModeSwitch = ({ mode, onChange }: { mode: 'base' | 'stats'; onChange: (m: 'base' | 'stats') => void }) => (
+  <div className="flex gap-1">
+    <button
+      onClick={() => onChange('base')}
+      className={`px-3 py-2 text-[10px] uppercase font-bold border-2 ${mode === 'base' ? 'bg-vga-yellow text-vga-black border-vga-bright-white' : 'bg-vga-black text-vga-cyan border-vga-blue hover:border-vga-yellow'}`}
+    >
+      Pack base
+    </button>
+    <button
+      onClick={() => onChange('stats')}
+      className={`px-3 py-2 text-[10px] uppercase font-bold border-2 ${mode === 'stats' ? 'bg-vga-yellow text-vga-black border-vga-bright-white' : 'bg-vga-black text-vga-cyan border-vga-blue hover:border-vga-yellow'}`}
+    >
+      Stats pack
+    </button>
+  </div>
+);
 
 const Stat = ({ label, value }: { label: string; value: number }) => (
   <div className="flex flex-col">
