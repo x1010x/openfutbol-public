@@ -222,21 +222,19 @@ export const PackEditorView = ({ onBack }: Props) => {
               + Nuevo
             </button>
           </div>
-          <div className="max-h-[70vh] overflow-auto">
-            <Listing
-              pack={pack}
-              tab={tab}
-              search={search}
-              selectedId={selectedId}
-              onSelect={setSelectedId}
-              bulkSelection={tab === 'players' ? bulkSelection : null}
-              onBulkToggle={tab === 'players' ? (id) => setBulkSelection(prev => {
-                const next = new Set(prev); next.has(id) ? next.delete(id) : next.add(id); return next;
-              }) : null}
-              onBulkSelectAll={tab === 'players' ? (ids) => setBulkSelection(new Set(ids)) : null}
-              onBulkClear={tab === 'players' ? () => setBulkSelection(new Set()) : null}
-            />
-          </div>
+          <Listing
+            pack={pack}
+            tab={tab}
+            search={search}
+            selectedId={selectedId}
+            onSelect={setSelectedId}
+            bulkSelection={tab === 'players' ? bulkSelection : null}
+            onBulkToggle={tab === 'players' ? (id) => setBulkSelection(prev => {
+              const next = new Set(prev); next.has(id) ? next.delete(id) : next.add(id); return next;
+            }) : null}
+            onBulkSelectAll={tab === 'players' ? (ids) => setBulkSelection(new Set(ids)) : null}
+            onBulkClear={tab === 'players' ? () => setBulkSelection(new Set()) : null}
+          />
         </div>
 
         {/* Editor side */}
@@ -382,54 +380,57 @@ const Listing = ({ pack, tab, search, selectedId, onSelect, bulkSelection, onBul
   const allShownChecked = bulkSelection != null && visible.length > 0 && visible.every(it => bulkSelection.has(it.id));
 
   return (
-    <div className="flex flex-col">
-      <table className="w-full text-[9px]">
-        <thead className="bg-vga-blue/20 text-vga-cyan sticky top-0">
-          <tr>
-            {bulkSelection != null && (
-              <th className="text-left px-2 py-1 w-6">
-                <input
-                  type="checkbox"
-                  checked={allShownChecked}
-                  onChange={e => {
-                    if (e.target.checked) onBulkSelectAll?.(visible.map(i => i.id));
-                    else onBulkClear?.();
-                  }}
-                />
-              </th>
-            )}
-            <HeaderColumns tab={tab} />
-          </tr>
-        </thead>
-        <tbody>
-          {visible.map(item => {
-            const isSel = item.id === selectedId;
-            const isBulkSel = bulkSelection?.has(item.id) ?? false;
-            return (
-              <tr
-                key={item.id}
-                onClick={() => onSelect(item.id)}
-                className={`${isSel ? 'bg-vga-yellow/20' : isBulkSel ? 'bg-vga-magenta/20' : ''} cursor-pointer hover:bg-vga-blue/20 border-b border-vga-blue/30`}
-              >
-                {bulkSelection != null && (
-                  <td className="px-2 py-1" onClick={e => e.stopPropagation()}>
-                    <input
-                      type="checkbox"
-                      checked={isBulkSel}
-                      onChange={() => onBulkToggle?.(item.id)}
-                    />
-                  </td>
-                )}
-                <RowCells pack={pack} tab={tab} item={item as never} />
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
+    <div className="flex flex-col max-h-[70vh] min-h-0">
+      {/* Scrollable table area */}
+      <div className="overflow-auto flex-1 min-h-0">
+        <table className="w-full text-[9px]">
+          <thead className="bg-vga-blue/20 text-vga-cyan sticky top-0">
+            <tr>
+              {bulkSelection != null && (
+                <th className="text-left px-2 py-1 w-6">
+                  <input
+                    type="checkbox"
+                    checked={allShownChecked}
+                    onChange={e => {
+                      if (e.target.checked) onBulkSelectAll?.(visible.map(i => i.id));
+                      else onBulkClear?.();
+                    }}
+                  />
+                </th>
+              )}
+              <HeaderColumns tab={tab} />
+            </tr>
+          </thead>
+          <tbody>
+            {visible.map(item => {
+              const isSel = item.id === selectedId;
+              const isBulkSel = bulkSelection?.has(item.id) ?? false;
+              return (
+                <tr
+                  key={item.id}
+                  onClick={() => onSelect(item.id)}
+                  className={`${isSel ? 'bg-vga-yellow/20' : isBulkSel ? 'bg-vga-magenta/20' : ''} cursor-pointer hover:bg-vga-blue/20 border-b border-vga-blue/30`}
+                >
+                  {bulkSelection != null && (
+                    <td className="px-2 py-1" onClick={e => e.stopPropagation()}>
+                      <input
+                        type="checkbox"
+                        checked={isBulkSel}
+                        onChange={() => onBulkToggle?.(item.id)}
+                      />
+                    </td>
+                  )}
+                  <RowCells pack={pack} tab={tab} item={item as never} />
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
 
-      {/* Pagination footer (only when there's no active search) */}
+      {/* Pagination footer pinned outside the scroll area */}
       {paginated && items.length > PAGE_SIZE && (
-        <div className="flex items-center justify-between gap-2 px-2 py-1.5 border-t border-vga-blue bg-vga-blue/10 sticky bottom-0">
+        <div className="flex items-center justify-between gap-2 px-2 py-1.5 border-t-2 border-vga-blue bg-vga-blue/30 shrink-0">
           <span className="text-vga-gray text-[8px] uppercase">
             {safePage * PAGE_SIZE + 1}-{Math.min((safePage + 1) * PAGE_SIZE, items.length)} de {items.length}
           </span>

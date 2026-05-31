@@ -148,8 +148,8 @@ export const StatsPackEditorView = ({ basePack, onBack }: Props) => {
 
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-3">
         {/* List */}
-        <div className="bg-vga-black border-2 border-vga-blue flex flex-col">
-          <div className="p-2 border-b border-vga-blue">
+        <div className="bg-vga-black border-2 border-vga-blue flex flex-col max-h-[70vh] min-h-0">
+          <div className="p-2 border-b border-vga-blue shrink-0">
             <input
               value={search}
               onChange={e => setSearch(e.target.value)}
@@ -157,7 +157,7 @@ export const StatsPackEditorView = ({ basePack, onBack }: Props) => {
               className="w-full bg-vga-black border border-vga-blue text-vga-bright-white text-[9px] px-2 py-1 outline-none focus:border-vga-yellow"
             />
           </div>
-          <div className="max-h-[70vh] overflow-auto">
+          <div className="overflow-auto flex-1 min-h-0">
             <table className="w-full text-[9px]">
               <thead className="bg-vga-blue/20 text-vga-cyan sticky top-0">
                 <tr>
@@ -190,7 +190,7 @@ export const StatsPackEditorView = ({ basePack, onBack }: Props) => {
             </table>
           </div>
           {paginated && filteredEntries.length > PAGE_SIZE && (
-            <div className="flex items-center justify-between gap-2 px-2 py-1.5 border-t border-vga-blue bg-vga-blue/10">
+            <div className="flex items-center justify-between gap-2 px-2 py-1.5 border-t-2 border-vga-blue bg-vga-blue/30 shrink-0">
               <span className="text-vga-gray text-[8px] uppercase">
                 {safePage * PAGE_SIZE + 1}-{Math.min((safePage + 1) * PAGE_SIZE, filteredEntries.length)} de {filteredEntries.length}
               </span>
