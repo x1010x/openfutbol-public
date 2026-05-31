@@ -11,6 +11,13 @@ interface ListingFilters {
 import { usePack } from '../state/PackContext';
 import { parsePack } from '../data/packLoader';
 import { StatsPackEditorView } from './StatsPackEditorView';
+import { GameSelect } from './GameSelect';
+
+// Helper: sorted [value, label] pairs by label (case-insensitive).
+const sortedNamedOptions = <T extends { id: string; name?: string }>(arr: T[]): [string, string][] =>
+  [...arr]
+    .sort((a, b) => (a.name ?? '').toLowerCase().localeCompare((b.name ?? '').toLowerCase()))
+    .map(e => [e.id, e.name ?? '—'] as [string, string]);
 import {
   loadEditingPack, saveEditingPack, downloadPackJson,
   updateEntity, deleteEntity,
@@ -495,31 +502,29 @@ const Listing = ({ pack, tab, search, selectedId, onSelect, bulkSelection, onBul
       <span className="text-vga-cyan text-[7px] uppercase tracking-widest">Filtrar:</span>
       {tab === 'countries' && (
         <FilterSelect label="Continente" value={filters.continentId ?? ''}
-          options={[['', '— todos —'], ...pack.continents.map(c => [c.id, c.name] as [string, string])]}
+          options={[['', '— todos —'], ...sortedNamedOptions(pack.continents)]}
           onChange={v => setFilters({ continentId: v || undefined })} />
       )}
       {(tab === 'leagues' || tab === 'clubs' || tab === 'players') && (
         <FilterSelect label="País" value={filters.countryId ?? ''}
-          options={[['', '— todos —'], ...pack.countries.map(c => [c.id, c.name] as [string, string])]}
+          options={[['', '— todos —'], ...sortedNamedOptions(pack.countries)]}
           onChange={v => setFilters(f => ({ ...f, countryId: v || undefined, leagueId: undefined, clubId: undefined }))} />
       )}
       {(tab === 'clubs' || tab === 'players') && (
         <FilterSelect label="Liga" value={filters.leagueId ?? ''}
-          options={[['', '— todas —'], ...pack.leagues
-            .filter(l => !filters.countryId || l.country_id === filters.countryId)
-            .map(l => [l.id, l.name] as [string, string])]}
+          options={[['', '— todas —'], ...sortedNamedOptions(pack.leagues
+            .filter(l => !filters.countryId || l.country_id === filters.countryId))]}
           onChange={v => setFilters(f => ({ ...f, leagueId: v || undefined, clubId: undefined }))} />
       )}
       {tab === 'players' && (
         <>
           <FilterSelect label="Club" value={filters.clubId ?? ''}
-            options={[['', '— todos —'], ...pack.clubs
+            options={[['', '— todos —'], ...sortedNamedOptions(pack.clubs
               .filter(c => {
                 if (filters.leagueId) return c.league_id === filters.leagueId;
                 if (filters.countryId) return leagueIdsForCountry?.has(c.league_id) ?? true;
                 return true;
-              })
-              .map(c => [c.id, c.name] as [string, string])]}
+              }))]}
             onChange={v => setFilters(f => ({ ...f, clubId: v || undefined }))} />
           <FilterSelect label="Posición" value={filters.positionCode ?? ''}
             options={[['', '— todas —'], ...POSITION_OPTIONS.map(p => [p, p] as [string, string])]}
@@ -615,13 +620,13 @@ const FilterSelect = ({ label, value, options, onChange }: {
 }) => (
   <label className="flex items-center gap-1">
     <span className="text-vga-gray text-[8px] uppercase">{label}:</span>
-    <select
-      value={value}
-      onChange={e => onChange(e.target.value)}
-      className="bg-vga-black border border-vga-blue text-vga-bright-white text-[9px] px-1 py-0.5 outline-none focus:border-vga-yellow"
-    >
-      {options.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
-    </select>
+    <div className="min-w-[140px]">
+      <GameSelect
+        value={value}
+        options={options.map(([v, l]) => ({ value: v, label: l }))}
+        onChange={onChange}
+      />
+    </div>
   </label>
 );
 
@@ -739,9 +744,11 @@ const EntityEditor = ({ pack, tab, id, onPatch, onDelete }: {
       <Field label="Código"><input className={inputCls} maxLength={4} value={e.code} onChange={ev => onPatch({ code: ev.target.value.toUpperCase() })} /></Field>
       <Field label="Slug"><input className={inputCls} value={e.slug} onChange={ev => onPatch({ slug: ev.target.value })} /></Field>
       <Field label="Continente">
-        <select className={inputCls} value={e.continent_id} onChange={ev => onPatch({ continent_id: ev.target.value })}>
-          {pack.continents.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-        </select>
+        <GameSelect
+          value={e.continent_id}
+          options={sortedNamedOptions(pack.continents).map(([v, l]) => ({ value: v, label: l }))}
+          onChange={v => onPatch({ continent_id: v })}
+        />
       </Field>
       <Field label="Reputación"><input className={inputCls} type="number" value={e.reputation} onChange={ev => onPatch({ reputation: parseInt(ev.target.value, 10) || 0 })} /></Field>
     </Form>;
@@ -752,9 +759,11 @@ const EntityEditor = ({ pack, tab, id, onPatch, onDelete }: {
     return <Form title="Liga" onDelete={onDelete}>
       <Field label="Nombre"><input className={inputCls} value={e.name} onChange={ev => onPatch({ name: ev.target.value })} /></Field>
       <Field label="País">
-        <select className={inputCls} value={e.country_id} onChange={ev => onPatch({ country_id: ev.target.value })}>
-          {pack.countries.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-        </select>
+        <GameSelect
+          value={e.country_id}
+          options={sortedNamedOptions(pack.countries).map(([v, l]) => ({ value: v, label: l }))}
+          onChange={v => onPatch({ country_id: v })}
+        />
       </Field>
       <Field label="Tier"><input className={inputCls} type="number" value={e.tier} onChange={ev => onPatch({ tier: parseInt(ev.target.value, 10) || 1 })} /></Field>
       <Field label="Reputación"><input className={inputCls} type="number" value={e.reputation} onChange={ev => onPatch({ reputation: parseInt(ev.target.value, 10) || 0 })} /></Field>
@@ -770,9 +779,11 @@ const EntityEditor = ({ pack, tab, id, onPatch, onDelete }: {
     return <Form title="Club" onDelete={onDelete}>
       <Field label="Nombre"><input className={inputCls} value={e.name} onChange={ev => onPatch({ name: ev.target.value })} /></Field>
       <Field label="Liga">
-        <select className={inputCls} value={e.league_id} onChange={ev => onPatch({ league_id: ev.target.value })}>
-          {pack.leagues.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
-        </select>
+        <GameSelect
+          value={e.league_id}
+          options={sortedNamedOptions(pack.leagues).map(([v, l]) => ({ value: v, label: l }))}
+          onChange={v => onPatch({ league_id: v })}
+        />
       </Field>
       <Field label="Color fondo"><input className={inputCls} type="color" value={bg} onChange={ev => onPatch({ colors: { background: ev.target.value, foreground: fg } })} /></Field>
       <Field label="Color texto"><input className={inputCls} type="color" value={fg} onChange={ev => onPatch({ colors: { background: bg, foreground: ev.target.value } })} /></Field>
@@ -787,15 +798,19 @@ const EntityEditor = ({ pack, tab, id, onPatch, onDelete }: {
       <Field label="Apellido"><input className={inputCls} value={e.last_name} onChange={ev => onPatch({ last_name: ev.target.value })} /></Field>
     </div>
     <Field label="Club">
-      <select className={inputCls} value={e.club_id ?? ''} onChange={ev => onPatch({ club_id: ev.target.value || null })}>
-        <option value="">— libre —</option>
-        {pack.clubs.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-      </select>
+      <GameSelect
+        value={e.club_id ?? ''}
+        emptyLabel="— libre —"
+        options={[{ value: '', label: '— libre —' }, ...sortedNamedOptions(pack.clubs).map(([v, l]) => ({ value: v, label: l }))]}
+        onChange={v => onPatch({ club_id: v || null })}
+      />
     </Field>
     <Field label="País">
-      <select className={inputCls} value={e.country_id} onChange={ev => onPatch({ country_id: ev.target.value })}>
-        {pack.countries.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-      </select>
+      <GameSelect
+        value={e.country_id}
+        options={sortedNamedOptions(pack.countries).map(([v, l]) => ({ value: v, label: l }))}
+        onChange={v => onPatch({ country_id: v })}
+      />
     </Field>
     <Field label="Fecha de nacimiento (YYYY-MM-DD)"><input className={inputCls} value={e.birth_date} onChange={ev => onPatch({ birth_date: ev.target.value })} /></Field>
     <div className="grid grid-cols-2 gap-2">
@@ -808,13 +823,15 @@ const EntityEditor = ({ pack, tab, id, onPatch, onDelete }: {
       <div className="text-vga-cyan text-[8px] uppercase tracking-widest">Posiciones (1-20)</div>
       {e.positions.map((entry, i) => (
         <div key={i} className="grid grid-cols-[1fr_60px_auto] gap-1 items-center">
-          <select className={inputCls} value={entry.code} onChange={ev => {
-            const newPositions = [...e.positions];
-            newPositions[i] = { ...entry, code: ev.target.value as PositionCode };
-            onPatch({ positions: newPositions });
-          }}>
-            {POSITION_CODES.map(c => <option key={c} value={c}>{c}</option>)}
-          </select>
+          <GameSelect
+            value={entry.code}
+            options={POSITION_CODES.map(c => ({ value: c, label: c }))}
+            onChange={v => {
+              const newPositions = [...e.positions];
+              newPositions[i] = { ...entry, code: v as PositionCode };
+              onPatch({ positions: newPositions });
+            }}
+          />
           <input className={inputCls} type="number" min={1} max={20} value={entry.level} onChange={ev => {
             const newPositions = [...e.positions];
             newPositions[i] = { ...entry, level: clampInt(ev.target.value, 1, 20) };
@@ -988,17 +1005,29 @@ const BulkOpModal = ({ pack, playerIds, onClose, onApply }: {
             <span className="text-vga-gray text-[8px] uppercase">1.0 = sin cambio</span>
           </BulkRow>
           <BulkRow label="Reasignar club">
-            <select value={clubAssign} onChange={e => setClubAssign(e.target.value)} className="bg-vga-black border border-vga-blue text-vga-bright-white text-[10px] px-2 py-1 outline-none focus:border-vga-yellow font-mono">
-              <option value="__none__">— sin cambio —</option>
-              <option value="">— a libre —</option>
-              {pack.clubs.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-            </select>
+            <div className="min-w-[220px] flex-1">
+              <GameSelect
+                value={clubAssign}
+                options={[
+                  { value: '__none__', label: '— sin cambio —' },
+                  { value: '', label: '— a libre —' },
+                  ...sortedNamedOptions(pack.clubs).map(([v, l]) => ({ value: v, label: l })),
+                ]}
+                onChange={setClubAssign}
+              />
+            </div>
           </BulkRow>
           <BulkRow label="Reasignar país">
-            <select value={countryAssign} onChange={e => setCountryAssign(e.target.value)} className="bg-vga-black border border-vga-blue text-vga-bright-white text-[10px] px-2 py-1 outline-none focus:border-vga-yellow font-mono">
-              <option value="__none__">— sin cambio —</option>
-              {pack.countries.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-            </select>
+            <div className="min-w-[220px] flex-1">
+              <GameSelect
+                value={countryAssign}
+                options={[
+                  { value: '__none__', label: '— sin cambio —' },
+                  ...sortedNamedOptions(pack.countries).map(([v, l]) => ({ value: v, label: l })),
+                ]}
+                onChange={setCountryAssign}
+              />
+            </div>
           </BulkRow>
         </div>
         <div className="border-t-2 border-vga-blue p-2 bg-vga-blue/30 flex gap-2 justify-end">
