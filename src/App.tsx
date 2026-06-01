@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { t, useT, getLang, setLang, getSupportedLangs } from './i18n';
+import { t, useT } from './i18n';
 
 import { getAvailableYears, getAvailableYearsWithStats, getTeamColorsForYear, migrateTeam, buildFreeAgentFromDB, buildTeamFromSeason, getTeamTemplatesForYear, getFantasyPool, buildFantasyTeam } from './data/mockTeams';
 import type { FormationId, MatchEvent, MatchState, Player, Team } from './types/game.d.ts';
@@ -262,8 +262,7 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
     }
   }, []);
 
-  const [muted, setMuted] = useState<boolean>(() => localStorage.getItem('openfutbol_muted') === '1');
-  const toggleMute = () => setMuted(m => { localStorage.setItem('openfutbol_muted', m ? '0' : '1'); return !m; });
+  const [muted] = useState<boolean>(() => localStorage.getItem('openfutbol_muted') === '1');
 
   const [theme] = useState<'retrocutre' | 'retrocool'>(() =>
     (localStorage.getItem('openfutbol_theme') as 'retrocutre' | 'retrocool') ?? 'retrocool'
