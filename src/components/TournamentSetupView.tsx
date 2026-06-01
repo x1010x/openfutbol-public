@@ -3,6 +3,7 @@ import type { TeamTemplate } from '../data/mockTeams';
 import { getPackTemplates } from '../data/packTeamBuilder';
 import { usePack } from '../state/PackContext';
 import { TeamSelector } from './TeamSelector';
+import { ScreenHeader } from './ScreenHeader';
 import {
   MAX_TEAMS, MAX_GROUP_SIZE, MAX_LEGS,
   presetCopa, presetMundial,
@@ -254,12 +255,7 @@ export const TournamentSetupView = ({ onConfirm, onBack }: Props) => {
 
   return (
     <div className="w-full max-w-4xl flex flex-col gap-4 animate-in fade-in duration-300">
-      <div className="bg-vga-blue p-2 border-2 border-vga-white flex justify-between items-center vga-panel">
-        <h2 className="text-vga-yellow text-xs uppercase font-bold">Crear torneo</h2>
-        <button onClick={onBack} className="bg-vga-red text-vga-bright-white px-3 py-1 text-[8px] uppercase font-bold border border-vga-black hover:bg-vga-light-red">
-          Volver
-        </button>
-      </div>
+      <ScreenHeader title="CREAR TORNEO" onBack={onBack} />
 
       <div className="bg-vga-gray border-4 border-vga-blue p-4 flex flex-col gap-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
         <div className="flex flex-col gap-1">

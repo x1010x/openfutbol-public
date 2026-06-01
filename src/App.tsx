@@ -15,6 +15,7 @@ import { engineSettings, loadEngineSettings } from './engine/engineSettings';
 loadEngineSettings();
 import { LeagueTable } from './components/LeagueTable';
 import { StatusBar } from './components/StatusBar';
+import { AppHeader } from './components/AppHeader';
 import { SquadView } from './components/SquadView';
 import { SquadViewCompact } from './components/SquadViewCompact';
 import { TeamSelection } from './components/TeamSelection';
@@ -2228,75 +2229,143 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
       const fantasyAvailable = getAvailableYears().length > 0;
       if (!showPlayFlow) {
         return (
-          <div className="w-full max-w-sm flex flex-col gap-3 animate-in fade-in duration-300 rc-menu">
-            <div className="bg-vga-blue border-4 border-vga-white p-6 text-center shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] mb-2 rc-menu-title">
-              <div className="text-vga-yellow text-xl font-bold tracking-widest mb-1 cool:text-rc-primary">OPENFUTBOL</div>
-              <div className="text-vga-cyan text-[8px] tracking-widest cool:text-rc-accent">FÚTBOL DE GESTIÓN</div>
-            </div>
-            <button
-              onClick={() => setShowPlayFlow(true)}
-              className="w-full bg-vga-green text-vga-bright-white py-4 text-sm border-b-4 border-r-4 border-vga-black font-bold uppercase tracking-widest hover:opacity-90 rc-btn-play"
-            >
-              {t('btn.play')}
-            </button>
-            {fantasyAvailable && (
-            <button
-              onClick={() => setShowFantasyFlow(true)}
-              className="w-full bg-vga-yellow text-vga-black py-4 text-sm border-b-4 border-r-4 border-vga-black font-bold uppercase tracking-widest hover:opacity-90 rc-btn-fantasy"
-            >
-              {t('btn.fantasy')}
-            </button>
-            )}
-            <button
-              onClick={() => setShowProManagerFlow(true)}
-              className="w-full bg-vga-magenta text-vga-bright-white py-4 text-sm border-b-4 border-r-4 border-vga-black font-bold uppercase tracking-widest hover:opacity-90"
-            >
-              {t('btn.proManager')}
-            </button>
-            <button
-              onClick={() => setShowTournamentFlow(true)}
-              className="w-full bg-vga-cyan text-vga-black py-4 text-sm border-b-4 border-r-4 border-vga-black font-bold uppercase tracking-widest hover:opacity-90"
-            >
-              Torneo
-            </button>
-            {(league.managerCareer?.length ?? 0) > 0 && (
-              <button
-                onClick={() => setView('MANAGER_CAREER')}
-                className="w-full bg-vga-black text-vga-magenta py-3 text-[10px] border-2 border-vga-magenta font-bold uppercase tracking-widest hover:bg-vga-magenta hover:text-vga-bright-white"
-              >
-                {t('btn.managerCareer')}
+          <div className="of-home" aria-label="Menú principal OpenFutbol">
+            <div className="of-home-crt" aria-hidden="true" />
+            <div className="of-home-stadium" aria-hidden="true" />
+
+            <div className="of-home-grid">
+              <button onClick={() => setShowPlayFlow(true)} className="of-mode of-mode-pink" title="Modo Liga">
+                <span className="of-mode-corner of-mode-corner-tl" />
+                <span className="of-mode-corner of-mode-corner-tr" />
+                <span className="of-mode-corner of-mode-corner-bl" />
+                <span className="of-mode-corner of-mode-corner-br" />
+                <div className="of-mode-body">
+                  <img className="of-mode-icon of-mode-icon-img" src="/img/play.png" alt="" />
+                  <div className="of-mode-text">
+                    <div className="of-mode-title">{t('btn.play')}</div>
+                    <div className="of-mode-desc">Elige un año y un club, gestiona la plantilla y compite jornada a jornada en una liga completa.</div>
+                  </div>
+                </div>
+                <div className="of-mode-cta">ENTRAR →</div>
               </button>
+
+              <button onClick={() => setShowProManagerFlow(true)} className="of-mode of-mode-cyan" title="Carrera de entrenador">
+                <span className="of-mode-corner of-mode-corner-tl" />
+                <span className="of-mode-corner of-mode-corner-tr" />
+                <span className="of-mode-corner of-mode-corner-bl" />
+                <span className="of-mode-corner of-mode-corner-br" />
+                <div className="of-mode-body">
+                  <img className="of-mode-icon of-mode-icon-img" src="/img/promanager.png" alt="" />
+                  <div className="of-mode-text">
+                    <div className="of-mode-title">{t('btn.proManager')}</div>
+                    <div className="of-mode-desc">Carrera de entrenador: ofertas, objetivos y reputación. Si no cumples, te despiden a mitad de temporada.</div>
+                  </div>
+                </div>
+                <div className="of-mode-cta">ENTRAR →</div>
+              </button>
+
+              <button onClick={() => setShowTournamentFlow(true)} className="of-mode of-mode-yellow" title="Crear torneo">
+                <span className="of-mode-corner of-mode-corner-tl" />
+                <span className="of-mode-corner of-mode-corner-tr" />
+                <span className="of-mode-corner of-mode-corner-bl" />
+                <span className="of-mode-corner of-mode-corner-br" />
+                <div className="of-mode-body">
+                  <img className="of-mode-icon of-mode-icon-img" src="/img/tournament.png" alt="" />
+                  <div className="of-mode-text">
+                    <div className="of-mode-title">TORNEO</div>
+                    <div className="of-mode-desc">Diseña una competición a tu medida: liga corta, grupos o eliminatoria directa con los equipos que elijas.</div>
+                  </div>
+                </div>
+                <div className="of-mode-cta">ENTRAR →</div>
+              </button>
+            </div>
+
+            {(fantasyAvailable || (league.managerCareer?.length ?? 0) > 0) && (
+              <div className={`of-home-grid of-home-grid-2 ${fantasyAvailable && (league.managerCareer?.length ?? 0) > 0 ? 'two' : 'one'}`}>
+                {fantasyAvailable && (
+                  <button onClick={() => setShowFantasyFlow(true)} className="of-mode of-mode-sm of-mode-yellow" title="Modo Fantasy">
+                    <span className="of-mode-corner of-mode-corner-tl" /><span className="of-mode-corner of-mode-corner-tr" /><span className="of-mode-corner of-mode-corner-bl" /><span className="of-mode-corner of-mode-corner-br" />
+                    <div className="of-mode-body">
+                      <div className="of-mode-text">
+                        <div className="of-mode-title">{t('btn.fantasy')}</div>
+                        <div className="of-mode-desc">Draft de jugadores reales con presupuesto fijo — monta el mejor once posible y juega la liga.</div>
+                      </div>
+                    </div>
+                  </button>
+                )}
+                {(league.managerCareer?.length ?? 0) > 0 && (
+                  <button onClick={() => setView('MANAGER_CAREER')} className="of-mode of-mode-sm of-mode-pink" title="Histórico del entrenador">
+                    <span className="of-mode-corner of-mode-corner-tl" /><span className="of-mode-corner of-mode-corner-tr" /><span className="of-mode-corner of-mode-corner-bl" /><span className="of-mode-corner of-mode-corner-br" />
+                    <div className="of-mode-body">
+                      <div className="of-mode-text">
+                        <div className="of-mode-title">{t('btn.managerCareer')}</div>
+                        <div className="of-mode-desc">Continúa con tu entrenador: clubes, títulos, reputación y récords acumulados.</div>
+                      </div>
+                    </div>
+                  </button>
+                )}
+              </div>
             )}
-            <button
-              onClick={() => setShowInstructions(true)}
-              className="w-full bg-vga-blue text-vga-bright-white py-3 text-[10px] border-b-4 border-r-4 border-vga-black font-bold uppercase tracking-widest hover:opacity-90"
-            >
-              {t('nav.helpChangelog')}
-            </button>
-            <button
-              onClick={() => setView('EDITOR')}
-              className="w-full bg-vga-magenta text-vga-bright-white py-3 text-[10px] border-b-4 border-r-4 border-vga-black font-bold uppercase tracking-widest hover:opacity-90"
-            >
-              {t('nav.editor')}
-            </button>
-            <button
-              onClick={() => setView('PACK_EDITOR')}
-              className="w-full bg-vga-yellow text-vga-black py-3 text-[10px] border-b-4 border-r-4 border-vga-black font-bold uppercase tracking-widest hover:opacity-90"
-            >
-              Editor de packs
-            </button>
-            <button
-              onClick={() => setView('BACKUP')}
-              className="w-full bg-vga-gray text-vga-black py-3 text-[10px] border-2 border-vga-black font-bold uppercase tracking-widest hover:bg-vga-bright-white"
-            >
-              {t('btn.settings')}
-            </button>
-            <button
-              onClick={() => setShowColaborar(true)}
-              className="w-full bg-vga-black text-vga-cyan py-3 text-[10px] border-2 border-vga-cyan font-bold uppercase tracking-widest hover:bg-vga-cyan hover:text-vga-black"
-            >
-              {t('nav.collaborate')}
-            </button>
+
+            <div className="of-status">
+              <div className="of-status-label">ESTADO ACTUAL</div>
+              <div className="of-status-cells">
+                <div className="of-status-cell">
+                  <svg viewBox="0 0 64 64" className="of-status-ico" aria-hidden="true"><circle cx="32" cy="22" r="10" fill="none" stroke="currentColor" strokeWidth="3"/><path d="M14 54c2-10 10-14 18-14s16 4 18 14" fill="none" stroke="currentColor" strokeWidth="3"/></svg>
+                  <div className="of-status-text"><div className="of-status-key">Modo actual</div><div className="of-status-val">{pack ? 'Pack cargado' : 'No iniciado'}</div></div>
+                </div>
+                <div className="of-status-cell">
+                  <svg viewBox="0 0 64 64" className="of-status-ico" aria-hidden="true"><rect x="8" y="20" width="48" height="24" rx="2" fill="none" stroke="currentColor" strokeWidth="3"/><path d="M20 20 V44 M44 20 V44" stroke="currentColor" strokeWidth="3"/></svg>
+                  <div className="of-status-text"><div className="of-status-key">Equipos</div><div className="of-status-val">{pack ? pack.clubs.length.toLocaleString('es-ES') : '—'}</div></div>
+                </div>
+                <div className="of-status-cell">
+                  <svg viewBox="0 0 64 64" className="of-status-ico" aria-hidden="true"><circle cx="22" cy="24" r="8" fill="none" stroke="currentColor" strokeWidth="3"/><circle cx="42" cy="24" r="8" fill="none" stroke="currentColor" strokeWidth="3"/><path d="M10 50c2-8 8-12 16-12 4 0 8 1 12 4M54 50c-2-8-8-12-16-12" fill="none" stroke="currentColor" strokeWidth="3"/></svg>
+                  <div className="of-status-text"><div className="of-status-key">Jugadores</div><div className="of-status-val">{pack ? pack.players.length.toLocaleString('es-ES') : '—'}</div></div>
+                </div>
+                <div className="of-status-cell">
+                  <svg viewBox="0 0 64 64" className="of-status-ico" aria-hidden="true"><polygon points="32,8 38,24 56,24 42,34 48,52 32,42 16,52 22,34 8,24 26,24" fill="none" stroke="currentColor" strokeWidth="3"/></svg>
+                  <div className="of-status-text"><div className="of-status-key">Competiciones</div><div className="of-status-val">{pack ? pack.leagues.length : '—'}</div></div>
+                </div>
+                <div className="of-status-cell">
+                  <svg viewBox="0 0 64 64" className="of-status-ico" aria-hidden="true"><path d="M8 50 L24 34 L34 44 L56 18" fill="none" stroke="currentColor" strokeWidth="3"/><path d="M44 18 H56 V30" fill="none" stroke="currentColor" strokeWidth="3"/></svg>
+                  <div className="of-status-text"><div className="of-status-key">Última partida</div><div className="of-status-val">-- / -- / ----</div></div>
+                </div>
+              </div>
+            </div>
+
+            <div className="of-tools">
+              <div className="of-tools-label">HERRAMIENTAS</div>
+              <div className="of-tools-grid">
+                <button onClick={() => setShowInstructions(true)} className="of-tool of-tool-pink" title="Cómo se juega y novedades de la versión">
+                  <svg viewBox="0 0 64 64" className="of-tool-ico" aria-hidden="true"><path d="M10 14h20v36H10zM34 14h20v36H34z" fill="none" stroke="currentColor" strokeWidth="4"/></svg>
+                  <span>{t('nav.helpChangelog')}</span>
+                </button>
+                <button onClick={() => setView('EDITOR')} className="of-tool of-tool-cyan" title="Editores: equipos, jugadores y packs">
+                  <svg viewBox="0 0 64 64" className="of-tool-ico" aria-hidden="true"><path d="M16 48l8-2 24-24-6-6-24 24z" fill="none" stroke="currentColor" strokeWidth="4"/></svg>
+                  <span>{t('nav.editor')}</span>
+                </button>
+                <button onClick={() => setView('BACKUP')} className="of-tool of-tool-pink" title="Idioma, sonido, packs y copias de seguridad">
+                  <svg viewBox="0 0 64 64" className="of-tool-ico" aria-hidden="true"><circle cx="32" cy="32" r="8" fill="none" stroke="currentColor" strokeWidth="4"/><circle cx="32" cy="32" r="20" fill="none" stroke="currentColor" strokeWidth="2" strokeDasharray="3 3"/></svg>
+                  <span>{t('btn.settings')}</span>
+                </button>
+                <button onClick={() => setShowColaborar(true)} className="of-tool of-tool-red" title="Cómo colaborar con el proyecto">
+                  <svg viewBox="0 0 64 64" className="of-tool-ico" aria-hidden="true"><circle cx="20" cy="24" r="7" fill="none" stroke="currentColor" strokeWidth="3"/><circle cx="44" cy="24" r="7" fill="none" stroke="currentColor" strokeWidth="3"/><path d="M8 50c2-8 8-12 14-12M56 50c-2-8-8-12-14-12" fill="none" stroke="currentColor" strokeWidth="3"/></svg>
+                  <span>{t('nav.collaborate')}</span>
+                </button>
+              </div>
+            </div>
+
+            <div className="of-footer">
+              <span className="of-footer-line" />
+              <div className="of-footer-mid">
+                <span>2026 OPENFUTBOL</span>
+                <span className="of-footer-dot">·</span>
+                <button onClick={() => setShowInstructions(true)} className="of-footer-link">DISCLAIMER</button>
+                <span className="of-footer-dot">·</span>
+                <a href="https://github.com/x1010x/openfutbol-public" target="_blank" rel="noreferrer" className="of-footer-link">GITHUB ↗</a>
+              </div>
+              <span className="of-footer-line" />
+            </div>
           </div>
         );
       }
@@ -2824,12 +2893,16 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
     );
   };
 
+  const isHomeMenu = !league.isStarted && !showPlayFlow && !showProManagerFlow && !showTournamentFlow && !showFantasyFlow
+    && view !== 'MANAGER_CAREER' && view !== 'EDITOR' && view !== 'BACKUP' && view !== 'PACK_LOADER' && view !== 'PACK_EDITOR'
+    && !showInstructions && !showColaborar;
+
   return (
     <PlayerTooltipProvider
       year={league?.year ?? selectedYear ?? new Date().getFullYear()}
       teams={tournament?.teams ?? league?.teams ?? []}
     >
-    <div className="min-h-screen bg-vga-black cool:bg-rc-bg overflow-x-hidden">
+    <div className="min-h-screen bg-vga-black cool:bg-rc-bg overflow-x-hidden of-bg">
       {showDisclaimer && <DisclaimerView onDismiss={dismissDisclaimer} />}
 
       {updateAvailable && (
@@ -2866,50 +2939,15 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
         </div>
       )}
       <div id="rc-screen">
-      <header className="mb-3 text-center w-full max-w-4xl">
-        <div className="bg-vga-blue border-4 border-vga-white p-2 vga-panel cool:bg-rc-panel cool:border-rc-primary overflow-hidden">
-          <h1 className="text-vga-yellow text-2xl tracking-widest font-bold keep-pixel cool:text-rc-primary">OPENFUTBOL</h1>
-          <div className="flex flex-wrap justify-between items-center mt-1 px-2 gap-y-0.5 min-w-0">
-            <button
-              type="button"
-              onClick={() => { setInstructionsScroll('changelog'); setShowInstructions(true); setHasNewVersion(false); }}
-              className="text-vga-cyan text-[8px] hover:text-vga-yellow underline decoration-dotted underline-offset-2 cool:text-rc-accent cool:hover:text-rc-primary flex items-center gap-1"
-              title="Ver cambios recientes"
-            >
-              OPENFUTBOL v1.9.0-{__BUILD_TIMESTAMP__}
-              {hasNewVersion && (
-                <span className="bg-vga-red text-vga-bright-white text-[7px] px-1 font-bold animate-pulse">
-                  NUEVO
-                </span>
-              )}
-            </button>
-            <button
-              type="button"
-              onClick={toggleMute}
-              title={muted ? 'Activar sonido' : 'Silenciar'}
-              className={`text-[7px] font-bold px-1.5 py-0.5 border ${muted ? 'border-vga-gray text-vga-gray hover:text-vga-bright-white hover:border-vga-bright-white' : theme === 'retrocool' ? 'border-rc-accent text-rc-accent hover:text-white hover:border-white' : 'border-vga-light-green text-vga-light-green hover:border-vga-bright-white hover:text-vga-bright-white'}`}
-            >
-              {muted ? 'SFX:OFF' : 'SFX:ON'}
-            </button>
-            <div className="flex items-center gap-1">
-              {getSupportedLangs().map(lang => (
-                <button
-                  key={lang}
-                  type="button"
-                  onClick={() => setLang(lang)}
-                  className={`text-[7px] font-bold px-1.5 py-0.5 border ${getLang() === lang ? 'border-vga-yellow text-vga-yellow' : 'border-vga-gray text-vga-gray hover:text-vga-bright-white hover:border-vga-bright-white'}`}
-                >
-                  {lang.toUpperCase()}
-                </button>
-              ))}
-            </div>
-            <span className="text-vga-bright-white text-[8px] uppercase cool:text-rc-accent min-w-0 truncate max-w-[80px] sm:max-w-none">
-              {league.isStarted ? league.teams.find(team => team.id === league.userTeamId)?.name : t('misc.waitingSelection')}
-            </span>
-          </div>
-        </div>
-      </header>
+      <div className="w-full max-w-[1600px] mx-auto px-2 mb-3">
+        <AppHeader
+          hasNewVersion={hasNewVersion}
+          onOpenChangelog={() => { setInstructionsScroll('changelog'); setShowInstructions(true); setHasNewVersion(false); }}
+          onOpenSettings={() => setView('BACKUP')}
+        />
+      </div>
 
+      {!isHomeMenu && (
       <div className="w-full max-w-4xl">
         <StatusBar
           league={league}
@@ -2920,6 +2958,7 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
           onCareer={league.gameMode === 'promanager' && (league.managerCareer?.length ?? 0) > 0 ? () => setView('MANAGER_CAREER') : undefined}
         />
       </div>
+      )}
 
       {!match ? renderMainContent() : (() => {
         const userBudget = league.teams.find(tm => tm.id === league.userTeamId)?.budget ?? 0;

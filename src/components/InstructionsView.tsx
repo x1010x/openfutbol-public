@@ -1018,18 +1018,11 @@ export const InstructionsView = ({ onBack, onColaborar, scrollTo }: Props) => {
   }, [scrollTo]);
 
   return (
-    <div className="w-full max-w-2xl flex flex-col gap-4 animate-in fade-in duration-500">
-      <div className="bg-vga-blue p-4 border-4 border-vga-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-vga-yellow text-sm underline decoration-double">
-            {isEN ? 'HELP' : 'AYUDA'}
-          </h2>
-          <button
-            onClick={onBack}
-            className="text-[8px] bg-vga-gray text-vga-black px-2 py-1 border border-vga-white hover:bg-vga-red hover:text-vga-bright-white"
-          >
-            {isEN ? 'BACK' : 'VOLVER'}
-          </button>
+    <div className="of-help w-full max-w-[1200px] mx-auto flex flex-col gap-4 animate-in fade-in duration-500">
+      <div className="of-help-panel">
+        <div className="of-help-head">
+          <h2 className="of-help-title">{isEN ? 'HELP' : 'AYUDA'}</h2>
+          <button onClick={onBack} className="of-help-back">{isEN ? '← BACK' : '← VOLVER'}</button>
         </div>
 
         {isEN
@@ -1038,7 +1031,7 @@ export const InstructionsView = ({ onBack, onColaborar, scrollTo }: Props) => {
         }
       </div>
 
-      <div className="bg-vga-magenta p-2 text-[8px] text-vga-bright-white text-center border-2 border-vga-white">
+      <div className="of-help-footer">
         {isEN ? 'THIS PAGE IS UPDATED AS THE GAME EVOLVES.' : 'ESTA PÁGINA SE ACTUALIZA A MEDIDA QUE EL JUEGO EVOLUCIONA.'}
       </div>
     </div>
