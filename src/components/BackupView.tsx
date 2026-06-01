@@ -18,7 +18,14 @@ interface Props {
 
 export const BackupView = ({ league, onRestore, onReset, onBack, onOpenPack }: Props) => {
   const t = useT();
-  const [tab, setTab] = useState<'backup' | 'slots' | 'engine' | 'pack' | 'dev'>('slots');
+  const [tab, setTab] = useState<'backup' | 'slots' | 'engine' | 'pack' | 'prefs' | 'dev'>('slots');
+  const [updateNotifs, setUpdateNotifs] = useState<boolean>(() => localStorage.getItem('openfutbol_update_notifs') === '1');
+
+  const handleToggleUpdateNotifs = (next: boolean) => {
+    setUpdateNotifs(next);
+    if (next) localStorage.setItem('openfutbol_update_notifs', '1');
+    else localStorage.removeItem('openfutbol_update_notifs');
+  };
   const [slots, setSlots] = useState<SaveSlot[]>(() => listSlots());
   const [activeId, setActiveIdState] = useState<string | null>(() => getActiveSlotId());
   const [renamingId, setRenamingId] = useState<string | null>(null);
@@ -169,6 +176,12 @@ export const BackupView = ({ league, onRestore, onReset, onBack, onOpenPack }: P
               </button>
             )}
             <button
+              onClick={() => setTab('prefs')}
+              className={`text-[7px] px-2 py-0.5 border font-bold uppercase ${tab === 'prefs' ? 'bg-vga-blue text-vga-bright-white border-vga-blue' : 'text-vga-gray border-vga-gray hover:text-vga-bright-white hover:border-vga-bright-white'}`}
+            >
+              PREFS
+            </button>
+            <button
               onClick={() => setTab('dev')}
               className={`text-[7px] px-2 py-0.5 border font-bold uppercase ${tab === 'dev' ? 'bg-vga-red text-vga-bright-white border-vga-red' : 'text-vga-gray border-vga-gray hover:text-vga-bright-white hover:border-vga-bright-white'}`}
             >
@@ -257,6 +270,26 @@ export const BackupView = ({ league, onRestore, onReset, onBack, onOpenPack }: P
           >
             GESTIONAR PACK
           </button>
+        </div>
+      )}
+
+      {tab === 'prefs' && (
+        <div className="bg-vga-gray border-4 border-vga-blue p-6 flex flex-col gap-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+          <h3 className="text-vga-blue text-[10px] font-bold border-b border-vga-blue pb-1 uppercase">Preferencias</h3>
+          <label className="flex items-start gap-3 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={updateNotifs}
+              onChange={(e) => handleToggleUpdateNotifs(e.target.checked)}
+              className="mt-0.5 w-4 h-4 accent-vga-blue cursor-pointer"
+            />
+            <div className="flex flex-col gap-1">
+              <span className="text-vga-black text-[9px] font-bold uppercase">Avisos de nueva versión</span>
+              <span className="text-vga-black text-[7px] opacity-80 leading-relaxed">
+                Muestra una barra amarilla cuando se publica una nueva versión del juego. Recarga para aplicarla.
+              </span>
+            </div>
+          </label>
         </div>
       )}
 
