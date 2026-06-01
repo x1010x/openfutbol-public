@@ -70,7 +70,7 @@ const StatCard = ({ label, primary, secondary, photoId, valueColor = 'text-vga-l
 export const EndOfSeasonView = ({ league, onContinueSameTeam, onAdvanceAndChangeTeam, onResetGame, onCellClick, onTeamClick, onPlayerClick, hideActions }: Props) => {
   const t = useT();
   const { teams, stats, userTeamId, teamRecords, transferLog, finances, gameMode, florentinometroPeak, florentinometroMin, boardObjective, boardWarnings, schedule } = league;
-  const year = teams[0]?.year ?? 0;
+  const year = league.year || teams[0]?.year || new Date().getFullYear();
   const atCap = year >= MAX_SEASON_YEAR;
 
   // ── Classification ───────────────────────────────────────────────────────
@@ -243,8 +243,53 @@ export const EndOfSeasonView = ({ league, onContinueSameTeam, onAdvanceAndChange
     }
   }
 
-  const mostTitles = [...champCount.entries()].sort((a, b) => b[1] - a[1])[0];
-  const titlesRanking = [...champCount.entries()].sort((a, b) => b[1] - a[1]).slice(0, 10);
+  // Include the just-finished season in the historical counters — leagueHistory
+  // is only appended when advancing to next season, but the user is seeing
+  // these records on the EOS screen of the current season.
+  if (championTeam) {
+    champCount.set(championTeam.name, (champCount.get(championTeam.name) ?? 0) + 1);
+  }
+  if (pichichi && pichichi.seasonStats.goals > 0) {
+    const k = pichichi.name;
+    const prev = pichichiCount.get(k);
+    pichichiCount.set(k, {
+      count: (prev?.count ?? 0) + 1,
+      goals: (prev?.goals ?? 0) + pichichi.seasonStats.goals,
+      lastTeam: pichichi.teamName,
+    });
+  }
+  if (zamora) {
+    const k = zamora.name;
+    const prev = zamoraCount.get(k);
+    zamoraCount.set(k, { count: (prev?.count ?? 0) + 1, lastTeam: zamora.teamName });
+  }
+  const championStat = sortedStats[0];
+  if (championStat && (!bestSeasonPts || championStat.points > bestSeasonPts.points)) {
+    bestSeasonPts = { teamName: champion?.teamId ? (teams.find(t => t.id === champion.teamId)?.name ?? '') : '', points: championStat.points, year: league.year };
+  }
+
+  // Track per-team championship years for the ranking table
+  const championYears = new Map<string, number[]>();
+  for (const entry of history) {
+    if (!entry.champion) continue;
+    const arr = championYears.get(entry.champion) ?? [];
+    arr.push(entry.year);
+    championYears.set(entry.champion, arr);
+  }
+  if (championTeam) {
+    const arr = championYears.get(championTeam.name) ?? [];
+    if (!arr.includes(year)) arr.push(year);
+    championYears.set(championTeam.name, arr);
+  }
+  for (const arr of championYears.values()) arr.sort((a, b) => a - b);
+
+  const titlesSorted = [...champCount.entries()].sort((a, b) => b[1] - a[1]);
+  const topTitleCount = titlesSorted[0]?.[1] ?? 0;
+  const mostTitlesTeams = titlesSorted.filter(([, c]) => c === topTitleCount).map(([n]) => n);
+  const mostTitles: [string, number] | undefined = topTitleCount > 0
+    ? [mostTitlesTeams.join(', '), topTitleCount]
+    : undefined;
+  const titlesRanking = titlesSorted.slice(0, 10);
   const mostPichichi = [...pichichiCount.entries()].sort((a, b) => b[1].count - a[1].count || b[1].goals - a[1].goals)[0];
   const mostZamora = [...zamoraCount.entries()].sort((a, b) => b[1].count - a[1].count)[0];
   const mostMejor = [...mejorCount.entries()].sort((a, b) => b[1].count - a[1].count)[0];
@@ -284,6 +329,36 @@ export const EndOfSeasonView = ({ league, onContinueSameTeam, onAdvanceAndChange
     }
     career.set(dbId, agg);
   }
+  // Merge the just-finished season's stats. playerHistory is only updated when
+  // advancing to next season, so we add the current season per-player here so
+  // historical records reflect what the user just saw.
+  for (const p of allPlayers) {
+    const key = (p as { dbId?: string }).dbId ?? p.id;
+    const seasonAlreadyCounted = (league.playerHistory?.[key] ?? []).some(r => r.year === year);
+    if (seasonAlreadyCounted) continue;
+    const ss = p.seasonStats;
+    const hasAny =
+      ss.appearances > 0 || ss.goals > 0 || ss.assists > 0 ||
+      ss.yellowCards > 0 || ss.redCards > 0 || (ss.minutes ?? 0) > 0;
+    if (!hasAny) continue;
+    const agg: CareerAgg = career.get(key) ?? {
+      name: p.name,
+      teams: new Set<string>(),
+      goals: 0, assists: 0, yellow: 0, red: 0,
+      minutes: 0, appearances: 0, seasons: 0,
+    };
+    agg.goals += ss.goals;
+    agg.assists += ss.assists;
+    agg.yellow += ss.yellowCards;
+    agg.red += ss.redCards;
+    agg.minutes += ss.minutes ?? 0;
+    agg.appearances += ss.appearances ?? 0;
+    agg.seasons += 1;
+    if (p.teamName) agg.teams.add(p.teamName);
+    agg.name = p.name; // prefer current display name
+    career.set(key, agg);
+  }
+
   const careerArr = [...career.values()];
   const topScorerCareer = [...careerArr].sort((a, b) => b.goals - a.goals)[0];
   const topAssisterCareer = [...careerArr].sort((a, b) => b.assists - a.assists)[0];
@@ -387,13 +462,13 @@ export const EndOfSeasonView = ({ league, onContinueSameTeam, onAdvanceAndChange
           </div>
         </div>
         {pichichi && pichichi.seasonStats.goals > 0 && (
-          <StatCard label="Pichichi" primary={pichichi.name} secondary={`${pichichi.teamName} · ${pichichi.seasonStats.goals} goles`} photoId={pichichi.source_id} size="lg" onClick={onPlayerClick ? () => onPlayerClick(pichichi.id) : undefined} player={pichichi} />
+          <StatCard label="Pichichi" primary={pichichi.name.split(' ').slice(-2).join(' ')} secondary={`${pichichi.seasonStats.goals}G · ${pichichi.teamName}`} photoId={pichichi.source_id} size="lg" onClick={onPlayerClick ? () => onPlayerClick(pichichi.id) : undefined} player={pichichi} />
         )}
         {zamora && (
-          <StatCard label="Zamora" primary={zamora.name} secondary={`${zamora.teamName} · ${(zamora.seasonStats.goalsAgainst / zamora.seasonStats.appearances).toFixed(2)} GC/p`} photoId={zamora.source_id} valueColor="text-vga-light-red" size="lg" onClick={onPlayerClick ? () => onPlayerClick(zamora.id) : undefined} player={zamora} />
+          <StatCard label="Zamora" primary={zamora.name.split(' ').slice(-2).join(' ')} secondary={`${(zamora.seasonStats.goalsAgainst / zamora.seasonStats.appearances).toFixed(2)} GC/p · ${zamora.teamName}`} photoId={zamora.source_id} valueColor="text-vga-light-red" size="lg" onClick={onPlayerClick ? () => onPlayerClick(zamora.id) : undefined} player={zamora} />
         )}
         {mvp && (
-          <StatCard label="MVP" primary={mvp.name} secondary={`${mvp.teamName} · ${mvpAvg} avg`} photoId={mvp.source_id} valueColor="text-vga-light-cyan" size="lg" onClick={onPlayerClick ? () => onPlayerClick(mvp.id) : undefined} player={mvp} />
+          <StatCard label="MVP" primary={mvp.name.split(' ').slice(-2).join(' ')} secondary={`${mvpAvg} avg · ${mvp.teamName}`} photoId={mvp.source_id} valueColor="text-vga-light-cyan" size="lg" onClick={onPlayerClick ? () => onPlayerClick(mvp.id) : undefined} player={mvp} />
         )}
       </div>
 
@@ -409,22 +484,24 @@ export const EndOfSeasonView = ({ league, onContinueSameTeam, onAdvanceAndChange
             {board.list.length === 0 ? (
               <div className="text-vga-gray text-[8px] p-3 text-center">Sin datos.</div>
             ) : (
-              <table className="w-full text-[9px]">
-                <tbody>
-                  {board.list.map((p, i) => (
-                    <tr
+              <div className="flex flex-col text-[9px]">
+                {board.list.map((p, i) => {
+                  const lastName = p.name.split(' ').slice(-2).join(' ');
+                  return (
+                    <div
                       key={p.id}
                       onClick={onPlayerClick ? () => onPlayerClick(p.id) : undefined}
-                      className={onPlayerClick ? 'cursor-pointer hover:bg-vga-blue/30' : ''}
+                      className={`grid grid-cols-[16px_1fr_70px_38px] items-center gap-1 px-2 py-0.5 ${onPlayerClick ? 'cursor-pointer hover:bg-vga-blue/30' : ''}`}
+                      title={`${p.name} · ${p.teamName}`}
                     >
-                      <td className={`pl-2 py-0.5 w-4 font-bold tabular-nums ${i === 0 ? 'text-vga-yellow' : 'text-vga-magenta'}`}>{i + 1}</td>
-                      <td className="text-vga-bright-white truncate max-w-[120px]"><PlayerName player={p} /></td>
-                      <td className="text-vga-cyan text-[7px] truncate max-w-[80px]">{p.teamName}</td>
-                      <td className={`text-right pr-2 font-bold tabular-nums ${board.color}`}>{board.valueOf(p)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                      <span className={`font-bold tabular-nums ${i === 0 ? 'text-vga-yellow' : 'text-vga-magenta'}`}>{i + 1}</span>
+                      <span className="text-vga-bright-white truncate min-w-0"><PlayerName player={p}>{lastName}</PlayerName></span>
+                      <span className="text-vga-cyan text-[7px] truncate" title={p.teamName}>{p.teamName}</span>
+                      <span className={`text-right font-bold tabular-nums ${board.color}`}>{board.valueOf(p)}</span>
+                    </div>
+                  );
+                })}
+              </div>
             )}
           </Panel>
         ))}
@@ -643,16 +720,22 @@ export const EndOfSeasonView = ({ league, onContinueSameTeam, onAdvanceAndChange
                   <th className="text-left px-1 py-0.5">#</th>
                   <th className="text-left px-1 py-0.5">Equipo</th>
                   <th className="text-right px-1 py-0.5">Títulos</th>
+                  <th className="text-right px-1 py-0.5">Años</th>
                 </tr>
               </thead>
               <tbody>
-                {titlesRanking.map(([teamName, count], i) => (
-                  <tr key={teamName} className={`border-b border-vga-blue/30 ${i === 0 ? 'bg-vga-yellow/10' : ''}`}>
-                    <td className={`px-1 py-0.5 font-bold ${i === 0 ? 'text-vga-yellow' : 'text-vga-gray'}`}>{i + 1}</td>
-                    <td className="px-1 py-0.5 text-vga-bright-white truncate">{teamName}</td>
-                    <td className="px-1 py-0.5 text-right text-vga-light-green font-bold">{count}</td>
-                  </tr>
-                ))}
+                {titlesRanking.map(([teamName, count], i) => {
+                  const ys = championYears.get(teamName) ?? [];
+                  const yearsLabel = ys.map(y => `${y}/${yy(y)}`).join(', ');
+                  return (
+                    <tr key={teamName} className={`border-b border-vga-blue/30 ${i === 0 ? 'bg-vga-yellow/10' : ''}`}>
+                      <td className={`px-1 py-0.5 font-bold ${i === 0 ? 'text-vga-yellow' : 'text-vga-gray'}`}>{i + 1}</td>
+                      <td className="px-1 py-0.5 text-vga-bright-white truncate">{teamName}</td>
+                      <td className="px-1 py-0.5 text-right text-vga-light-green font-bold">{count}</td>
+                      <td className="px-1 py-0.5 text-right text-vga-cyan truncate max-w-[140px]" title={yearsLabel}>{yearsLabel}</td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </Panel>

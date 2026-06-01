@@ -1,12 +1,27 @@
 import type { Pack, Club, Player, Position, Team } from '../types/game.d.ts';
 import { runtimePlayerFromPack } from './playerBuilder';
 import { pickBestFormation } from '../engine/formations';
+import { HARD_RETIREMENT_AGE } from '../engine/retirement';
 
 const MAX_SQUAD = 22;
 const MIN_GK = 3;
 const MIN_DEF = 6;
 const MIN_MID = 6;
 const MIN_FWD = 6;
+
+export const MIN_PLAYER_AGE = 17;
+
+/**
+ * Players younger than 17 or at/over the hard retirement age (38 outfield,
+ * 42 keepers) cannot be on a roster at league start. Returns true when the
+ * player's age in `year` is within the playable window.
+ */
+export const isAgeEligible = (birthYear: number, year: number, preferredPos?: Position): boolean => {
+  const age = year - birthYear;
+  if (age < MIN_PLAYER_AGE) return false;
+  const hard = preferredPos === 'POR' ? HARD_RETIREMENT_AGE.POR : HARD_RETIREMENT_AGE.default;
+  return age < hard;
+};
 
 const FORWARD_SLOTS: Position[] = ['DEL', 'AML', 'AMR'];
 
@@ -84,9 +99,9 @@ export const getPackTemplates = (pack: Pack): PackTeamTemplate[] => {
 export const buildTeamFromPackClub = (club: Club, pack: Pack, year: number): Team => {
   const clubPlayers = pack.players.filter(p => p.club_id === club.id);
   const countryById = new Map(pack.countries.map(c => [c.id, c.code?.toUpperCase()]));
-  const allPlayers: Player[] = clubPlayers.map((p, i) =>
-    runtimePlayerFromPack(p, i + 1, p.country_id ? countryById.get(p.country_id) : undefined)
-  );
+  const allPlayers: Player[] = clubPlayers
+    .map((p, i) => runtimePlayerFromPack(p, i + 1, p.country_id ? countryById.get(p.country_id) : undefined))
+    .filter(p => isAgeEligible(p.birthYear, year, p.preferredPos));
 
   const players = trimRoster(allPlayers);
   const eligible = players.filter(p => p.allowedPositions.length > 0);

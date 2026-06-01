@@ -126,8 +126,8 @@ const Tooltip = ({ player, x, y, year, team }: TooltipState & { year: number; te
   const goalsPer90 = totalMin > 0 ? ((s.goals * 90) / totalMin).toFixed(2) : '0';
   const assistsPer90 = totalMin > 0 ? ((s.assists * 90) / totalMin).toFixed(2) : '0';
 
-  const W = 320;
-  const H = 380;
+  const W = 380;
+  const H = 540;
   const left = x + W + 20 > window.innerWidth ? x - W - 8 : x + 16;
   const top = y + H > window.innerHeight ? Math.max(8, window.innerHeight - H - 8) : y - 8;
 

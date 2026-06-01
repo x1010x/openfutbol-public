@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { t, useT } from './i18n';
 
 import { getAvailableYears, getAvailableYearsWithStats, getTeamColorsForYear, migrateTeam, buildFreeAgentFromDB, buildTeamFromSeason, getTeamTemplatesForYear, getFantasyPool, buildFantasyTeam } from './data/mockTeams';
@@ -18,7 +18,7 @@ import { StatusBar } from './components/StatusBar';
 import { AppHeader } from './components/AppHeader';
 import { SquadView } from './components/SquadView';
 import { SquadViewCompact } from './components/SquadViewCompact';
-import { TeamSelection } from './components/TeamSelection';
+import { TeamPicker } from './components/TeamPicker';
 import { AlignmentView } from './components/AlignmentView';
 import { ResultsView } from './components/ResultsView';
 import { StatsView } from './components/StatsView';
@@ -65,7 +65,7 @@ import type { OfferResult } from './data/economy';
 import { PackLoaderView } from './components/PackLoaderView';
 import MatchScreen from './components/MatchScreen';
 import { usePack } from './state/PackContext';
-import { buildTeamFromPackClub, trimRoster } from './data/packTeamBuilder';
+import { buildTeamFromPackClub, trimRoster, isAgeEligible } from './data/packTeamBuilder';
 import { runtimePlayerFromPack, joinPlayerName } from './data/playerBuilder';
 
 type View = 'LEAGUE' | 'SQUAD' | 'ALIGNMENT' | 'RESULTS' | 'STATS' | 'FINANCES' | 'TRANSFERS' | 'JORNADA_RESULTS' | 'END_OF_SEASON' | 'PLAYER_DETAIL' | 'BACKUP' | 'EDITOR' | 'EQUIPO' | 'MANAGER_CAREER' | 'PACK_LOADER' | 'PACK_EDITOR';
@@ -74,6 +74,62 @@ type View = 'LEAGUE' | 'SQUAD' | 'ALIGNMENT' | 'RESULTS' | 'STATS' | 'FINANCES' 
 function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
   useT(); // subscribe to language changes so nav labels and messages re-render
   const { pack, loading: packLoading } = usePack();
+  const PICKER_YEARS = [2020, 2021, 2022, 2023, 2024, 2025, 2026];
+  const [pickerYear, setPickerYear] = useState<number>(PICKER_YEARS[PICKER_YEARS.length - 1]);
+  const pickerSummaries = useMemo(() => {
+    if (!pack) return [] as import('./components/TeamPicker').TeamSummary[];
+    const countryById = new Map(pack.countries.map(c => [c.id, c.code?.toUpperCase() ?? 'unknown']));
+    const leagueById = new Map(pack.leagues.map(l => [l.id, l]));
+    const playersByClub = new Map<string, typeof pack.players>();
+    for (const p of pack.players) {
+      if (!p.club_id) continue;
+      const arr = playersByClub.get(p.club_id) ?? [];
+      arr.push(p);
+      playersByClub.set(p.club_id, arr);
+    }
+    // Same age-curve the engine uses at runtime (calculateTeamStrength /
+    // simEngine): clamp(1 - |age - peakAge| * 0.02, 0.7, 1). peakAge defaults
+    // to 28 for all pack players (matches playerBuilder).
+    const PEAK = 28;
+    const ageMed = (p: typeof pack.players[number]) => {
+      const birthYear = parseInt(p.birth_date.slice(0, 4), 10);
+      const age = pickerYear - birthYear;
+      const factor = Math.min(1, Math.max(0.7, 1 - Math.abs(age - PEAK) * 0.02));
+      return Math.floor((p.current_ability * factor) / 2);
+    };
+    const ageOk = (p: typeof pack.players[number]) => {
+      const by = parseInt(p.birth_date.slice(0, 4), 10);
+      return isAgeEligible(by, pickerYear);
+    };
+    return pack.clubs.map(c => {
+      const players = (playersByClub.get(c.id) ?? []).filter(ageOk);
+      const withMed = players.map(p => ({ p, med: ageMed(p) }));
+      const sorted = [...withMed].sort((a, b) => b.med - a.med);
+      const core = sorted.slice(0, 18);
+      const avg = core.length ? core.reduce((s, x) => s + x.med, 0) / core.length : 0;
+      const med = Math.floor(avg);
+      const top = sorted[0];
+      const lg = c.league_id ? leagueById.get(c.league_id) : undefined;
+      return {
+        id: c.id,
+        name: c.name,
+        colors: c.colors ? [c.colors.background, c.colors.foreground] as [string, string] : undefined,
+        country: (lg?.country_id && countryById.get(lg.country_id)) || undefined,
+        league: lg?.name ?? null,
+        med,
+        playerCount: players.length,
+        topPlayerName: top ? `${top.p.first_name} ${top.p.last_name}` : undefined,
+        topPlayerMed: top?.med,
+      };
+    });
+  }, [pack, pickerYear]);
+  const buildPickerTeam = useMemo(
+    () => pack ? ((id: string) => {
+      const club = pack.clubs.find(c => c.id === id);
+      return club ? buildTeamFromPackClub(club, pack, pickerYear) : null;
+    }) : undefined,
+    [pack, pickerYear]
+  );
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
   const [league, setLeague] = useState<LeagueState>(() => {
     migrateLegacyKey();
@@ -315,7 +371,8 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
     setLeagueSetupDone(false);
   };
 
-  const handleLeagueSetupConfirm = (selectedTeamIds: string[], extraRawPlayers: import('./types/game.d.ts').RawPlayerDB[], importedRawTeams: import('./types/game.d.ts').RawTeamDB[]) => {
+  const handleLeagueSetupConfirm = (selectedTeamIds: string[], extraRawPlayers: import('./types/game.d.ts').RawPlayerDB[], importedRawTeams: import('./types/game.d.ts').RawTeamDB[], yearOverride?: number) => {
+    const yr = yearOverride ?? selectedYear!;
     const selectedSet = new Set(selectedTeamIds);
     let extraTeams: import('./types/game.d.ts').Team[] = [];
     let extraFreeAgents: import('./types/game.d.ts').Player[] = [];
@@ -324,10 +381,14 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
       // Build teams from pack clubs
       const packClubIds = new Set(pack.clubs.map(c => c.id));
       const selectedPackClubs = pack.clubs.filter(c => selectedSet.has(c.id));
-      extraTeams = selectedPackClubs.map(club => buildTeamFromPackClub(club, pack, selectedYear!));
+      extraTeams = selectedPackClubs.map(club => buildTeamFromPackClub(club, pack, yr));
       // Free agents: players not assigned to any selected club
       extraFreeAgents = pack.players
         .filter(p => !p.club_id || !packClubIds.has(p.club_id) || !selectedSet.has(p.club_id))
+        .filter(p => {
+          const by = parseInt(p.birth_date.slice(0, 4), 10);
+          return isAgeEligible(by, yr);
+        })
         .slice(0, 500) // cap to avoid bloat
         .map(p => runtimePlayerFromPack(p, 0));
     } else {
@@ -335,16 +396,16 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
       const importedTeams = importedRawTeams
         .filter(rt => selectedSet.has(rt.id))
         .flatMap(rt => {
-          const season = rt.seasons.find(s => s.year === selectedYear!) ?? rt.seasons[0];
+          const season = rt.seasons.find(s => s.year === yr) ?? rt.seasons[0];
           if (!season) return [];
           return [buildTeamFromSeason({ id: rt.id, name: rt.name, ...season })];
         });
-      const dbTeamIds = new Set(getTeamTemplatesForYear(selectedYear!).map(t => t.id));
+      const dbTeamIds = new Set(getTeamTemplatesForYear(yr).map(t => t.id));
       const importedRawIds = new Set(importedRawTeams.map(rt => rt.id));
       const editorTeams = league.teams.filter(t => !dbTeamIds.has(t.id) && !importedRawIds.has(t.id));
       extraTeams = [...importedTeams, ...editorTeams];
       extraFreeAgents = extraRawPlayers
-        .map(p => buildFreeAgentFromDB(p, selectedYear!))
+        .map(p => buildFreeAgentFromDB(p, yr))
         .filter((p): p is import('./types/game.d.ts').Player => p !== null);
     }
 
@@ -361,7 +422,7 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
     });
 
     setLeague(getInitialLeagueState(
-      selectedYear!,
+      yr,
       selectedTeamIds,
       [...extraFreeAgents, ...overflowFreeAgents],
       trimmedExtraTeams,
@@ -2221,10 +2282,6 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
     }
 
     if (!league.isStarted) {
-      const PACK_YEAR = new Date().getFullYear();
-      const packYearStats = pack ? [{ year: PACK_YEAR, teams: pack.clubs.length, leagues: pack.leagues.length, players: pack.players.length }] : [];
-      const availableYears = pack ? [PACK_YEAR] : getAvailableYears();
-
       const fantasyAvailable = getAvailableYears().length > 0;
       if (!showPlayFlow) {
         return (
@@ -2359,7 +2416,7 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
               <div className="of-footer-mid">
                 <span>2026 OPENFUTBOL</span>
                 <span className="of-footer-dot">·</span>
-                <button onClick={() => setShowInstructions(true)} className="of-footer-link">DISCLAIMER</button>
+                <button onClick={() => setShowDisclaimer(true)} className="of-footer-link">DISCLAIMER</button>
                 <span className="of-footer-dot">·</span>
                 <a href="https://github.com/x1010x/openfutbol-public" target="_blank" rel="noreferrer" className="of-footer-link">GITHUB ↗</a>
               </div>
@@ -2369,26 +2426,27 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
         );
       }
 
-      if (selectedYear && !leagueSetupDone) {
-        return (
-          <LeagueSetupView
-            year={selectedYear}
-            existingTeams={league.teams}
-            onConfirm={handleLeagueSetupConfirm}
-            onBack={() => handleSelectYear(0)}
-          />
-        );
-      }
-
+      // Single-screen team picker for PLAY mode. Teams + lookups are memoized
+      // at App level (see top of component) so we don't rebuild on every render.
       return (
-        <TeamSelection
-          teams={league.teams}
-          selectedYear={selectedYear}
-          availableYears={availableYears}
-          yearStats={packYearStats.length > 0 ? packYearStats : getAvailableYearsWithStats()}
-          onSelectYear={handleSelectYear}
-          onSelect={handleSelectTeam}
+        <TeamPicker
+          title={`PLAY · ${pickerYear}/${(pickerYear + 1).toString().slice(-2)}`}
+          year={pickerYear}
+          teams={pickerSummaries}
+          mode="play"
+          minTeams={4}
+          maxTeams={24}
+          allowSpectate={false}
+          buildTeam={buildPickerTeam}
+          availableYears={PICKER_YEARS}
+          onYearChange={setPickerYear}
           onBack={() => setShowPlayFlow(false)}
+          onConfirm={({ teamIds, userTeamId, spectate }) => {
+            handleSelectYear(pickerYear);
+            handleLeagueSetupConfirm(teamIds, [], [], pickerYear);
+            const startingTeam = userTeamId ?? (spectate ? teamIds[0] : null);
+            if (startingTeam) setTimeout(() => handleSelectTeam(startingTeam), 0);
+          }}
         />
       );
     }
@@ -3044,30 +3102,6 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
         );
       })()}
 
-      <footer className="mt-auto pt-8 text-vga-gray text-[8px] flex flex-col items-center gap-1 uppercase">
-        <p>2026 OPENFUTBOL</p>
-        <div className="flex gap-4">
-          <button
-            onClick={() => setShowDisclaimer(true)}
-            className="text-vga-gray hover:text-vga-bright-white underline decoration-dotted underline-offset-2 mt-1"
-          >
-            DISCLAIMER
-          </button>
-          <a
-            href="https://github.com/x1010x/openfutbol-public"
-            className="text-vga-cyan hover:text-vga-bright-white underline decoration-dotted underline-offset-2 mt-1"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            GITHUB
-          </a>
-        </div>
-        <p className="text-[6px] text-vga-gray/60 text-center max-w-md mt-1 normal-case leading-relaxed">
-          Proyecto de fans. Sin afiliación, patrocinio ni aval de ningún club, liga o asociación.
-          Todos los derechos de nombres de equipos, jugadores y competiciones pertenecen a sus respectivos dueños.
-          Solo usamos nombres como referencia y por temas recreativos. No es un servicio de apuestas.
-        </p>
-      </footer>
       </div>{/* #rc-screen */}
 
       {drillDown && (
