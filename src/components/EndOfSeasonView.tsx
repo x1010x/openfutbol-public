@@ -38,11 +38,12 @@ const Panel = ({ title, accent = 'text-vga-magenta', children, className = '' }:
   </div>
 );
 
-const StatCard = ({ label, primary, secondary, photoId, valueColor = 'text-vga-light-green', size = 'md', onClick, player }: {
+const StatCard = ({ label, primary, secondary, photoId, team, valueColor = 'text-vga-light-green', size = 'md', onClick, player }: {
   label: string;
   primary: string;
   secondary?: string;
   photoId?: number;
+  team?: { id: string; colors?: string[]; name: string };
   valueColor?: string;
   size?: 'md' | 'lg';
   onClick?: () => void;
@@ -61,7 +62,12 @@ const StatCard = ({ label, primary, secondary, photoId, valueColor = 'text-vga-l
         {player
           ? <div className={primaryClass}><PlayerName player={player} /></div>
           : <div className={primaryClass}>{primary}</div>}
-        {secondary && <div className={`${valueColor} text-[9px] truncate`}>{secondary}</div>}
+        {(team || secondary) && (
+          <div className={`${valueColor} text-[9px] truncate flex items-center gap-1.5`}>
+            {team && <TeamCrest size="xs" teamId={team.id} colors={team.colors} title={team.name} />}
+            {secondary && <span className="truncate">{secondary}</span>}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -462,13 +468,13 @@ export const EndOfSeasonView = ({ league, onContinueSameTeam, onAdvanceAndChange
           </div>
         </div>
         {pichichi && pichichi.seasonStats.goals > 0 && (
-          <StatCard label="Pichichi" primary={pichichi.name.split(' ').slice(-2).join(' ')} secondary={`${pichichi.seasonStats.goals}G · ${pichichi.teamName}`} photoId={pichichi.source_id} size="lg" onClick={onPlayerClick ? () => onPlayerClick(pichichi.id) : undefined} player={pichichi} />
+          <StatCard label="Pichichi" primary={pichichi.name.split(' ').slice(-2).join(' ')} secondary={`${pichichi.seasonStats.goals}G`} team={(() => { const tm = teams.find(t => t.id === pichichi.teamId); return tm ? { id: tm.id, colors: tm.colors, name: tm.name } : undefined; })()} photoId={pichichi.source_id} size="lg" onClick={onPlayerClick ? () => onPlayerClick(pichichi.id) : undefined} player={pichichi} />
         )}
         {zamora && (
-          <StatCard label="Zamora" primary={zamora.name.split(' ').slice(-2).join(' ')} secondary={`${(zamora.seasonStats.goalsAgainst / zamora.seasonStats.appearances).toFixed(2)} GC/p · ${zamora.teamName}`} photoId={zamora.source_id} valueColor="text-vga-light-red" size="lg" onClick={onPlayerClick ? () => onPlayerClick(zamora.id) : undefined} player={zamora} />
+          <StatCard label="Zamora" primary={zamora.name.split(' ').slice(-2).join(' ')} secondary={`${(zamora.seasonStats.goalsAgainst / zamora.seasonStats.appearances).toFixed(2)} GC/p`} team={(() => { const tm = teams.find(t => t.id === zamora.teamId); return tm ? { id: tm.id, colors: tm.colors, name: tm.name } : undefined; })()} photoId={zamora.source_id} valueColor="text-vga-light-red" size="lg" onClick={onPlayerClick ? () => onPlayerClick(zamora.id) : undefined} player={zamora} />
         )}
         {mvp && (
-          <StatCard label="MVP" primary={mvp.name.split(' ').slice(-2).join(' ')} secondary={`${mvpAvg} avg · ${mvp.teamName}`} photoId={mvp.source_id} valueColor="text-vga-light-cyan" size="lg" onClick={onPlayerClick ? () => onPlayerClick(mvp.id) : undefined} player={mvp} />
+          <StatCard label="MVP" primary={mvp.name.split(' ').slice(-2).join(' ')} secondary={`${mvpAvg} avg`} team={(() => { const tm = teams.find(t => t.id === mvp.teamId); return tm ? { id: tm.id, colors: tm.colors, name: tm.name } : undefined; })()} photoId={mvp.source_id} valueColor="text-vga-light-cyan" size="lg" onClick={onPlayerClick ? () => onPlayerClick(mvp.id) : undefined} player={mvp} />
         )}
       </div>
 
@@ -487,16 +493,19 @@ export const EndOfSeasonView = ({ league, onContinueSameTeam, onAdvanceAndChange
               <div className="flex flex-col text-[9px]">
                 {board.list.map((p, i) => {
                   const lastName = p.name.split(' ').slice(-2).join(' ');
+                  const team = teams.find(t => t.id === p.teamId);
                   return (
                     <div
                       key={p.id}
                       onClick={onPlayerClick ? () => onPlayerClick(p.id) : undefined}
-                      className={`grid grid-cols-[16px_1fr_70px_38px] items-center gap-1 px-2 py-0.5 ${onPlayerClick ? 'cursor-pointer hover:bg-vga-blue/30' : ''}`}
+                      className={`grid grid-cols-[16px_1fr_18px_44px] items-center gap-1.5 px-2 py-0.5 ${onPlayerClick ? 'cursor-pointer hover:bg-vga-blue/30' : ''}`}
                       title={`${p.name} · ${p.teamName}`}
                     >
                       <span className={`font-bold tabular-nums ${i === 0 ? 'text-vga-yellow' : 'text-vga-magenta'}`}>{i + 1}</span>
                       <span className="text-vga-bright-white truncate min-w-0"><PlayerName player={p}>{lastName}</PlayerName></span>
-                      <span className="text-vga-cyan text-[7px] truncate" title={p.teamName}>{p.teamName}</span>
+                      <span className="flex justify-center" title={p.teamName}>
+                        <TeamCrest size="xs" colors={team?.colors} teamId={p.teamId} title={p.teamName} />
+                      </span>
                       <span className={`text-right font-bold tabular-nums ${board.color}`}>{board.valueOf(p)}</span>
                     </div>
                   );
@@ -747,31 +756,35 @@ export const EndOfSeasonView = ({ league, onContinueSameTeam, onAdvanceAndChange
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
           {(() => {
             const click = (p: EnrichedPlayer) => onPlayerClick ? () => onPlayerClick(p.id) : undefined;
+            const teamOf = (p: EnrichedPlayer) => {
+              const tm = teams.find(t => t.id === p.teamId);
+              return tm ? { id: tm.id, colors: tm.colors, name: tm.name } : undefined;
+            };
             return (
               <>
                 {topAssister && topAssister.seasonStats.assists > 0 && (
-                  <StatCard label="Olé olé · asistencias" primary={topAssister.name} secondary={`${topAssister.teamName} · ${topAssister.seasonStats.assists} ast.`} photoId={topAssister.source_id} valueColor="text-vga-light-cyan" onClick={click(topAssister)} player={topAssister} />
+                  <StatCard label="Olé olé · asistencias" primary={topAssister.name} secondary={`${topAssister.seasonStats.assists} ast.`} team={teamOf(topAssister)} photoId={topAssister.source_id} valueColor="text-vga-light-cyan" onClick={click(topAssister)} player={topAssister} />
                 )}
                 {youngestRegular && (
-                  <StatCard label="Más joven (titular)" primary={youngestRegular.name} secondary={`${youngestRegular.teamName} · ${playerAge(youngestRegular, year)} años`} photoId={youngestRegular.source_id} valueColor="text-vga-light-green" onClick={click(youngestRegular)} player={youngestRegular} />
+                  <StatCard label="Más joven (titular)" primary={youngestRegular.name} secondary={`${playerAge(youngestRegular, year)} años`} team={teamOf(youngestRegular)} photoId={youngestRegular.source_id} valueColor="text-vga-light-green" onClick={click(youngestRegular)} player={youngestRegular} />
                 )}
                 {oldestActive && (
-                  <StatCard label="El abuelo" primary={oldestActive.name} secondary={`${oldestActive.teamName} · ${playerAge(oldestActive, year)} años`} photoId={oldestActive.source_id} valueColor="text-vga-light-cyan" onClick={click(oldestActive)} player={oldestActive} />
+                  <StatCard label="El abuelo" primary={oldestActive.name} secondary={`${playerAge(oldestActive, year)} años`} team={teamOf(oldestActive)} photoId={oldestActive.source_id} valueColor="text-vga-light-cyan" onClick={click(oldestActive)} player={oldestActive} />
                 )}
                 {oldestScorer && (
-                  <StatCard label="Joaquín Award" primary={oldestScorer.name} secondary={`${playerAge(oldestScorer, year)} años · ${oldestScorer.seasonStats.goals}G`} photoId={oldestScorer.source_id} valueColor="text-vga-light-cyan" onClick={click(oldestScorer)} player={oldestScorer} />
+                  <StatCard label="Joaquín Award" primary={oldestScorer.name} secondary={`${playerAge(oldestScorer, year)} años · ${oldestScorer.seasonStats.goals}G`} team={teamOf(oldestScorer)} photoId={oldestScorer.source_id} valueColor="text-vga-light-cyan" onClick={click(oldestScorer)} player={oldestScorer} />
                 )}
                 {youngestScorer && (
-                  <StatCard label="Goleador joven" primary={youngestScorer.name} secondary={`${playerAge(youngestScorer, year)} años · ${youngestScorer.seasonStats.goals}G`} photoId={youngestScorer.source_id} valueColor="text-vga-light-green" onClick={click(youngestScorer)} player={youngestScorer} />
+                  <StatCard label="Goleador joven" primary={youngestScorer.name} secondary={`${playerAge(youngestScorer, year)} años · ${youngestScorer.seasonStats.goals}G`} team={teamOf(youngestScorer)} photoId={youngestScorer.source_id} valueColor="text-vga-light-green" onClick={click(youngestScorer)} player={youngestScorer} />
                 )}
                 {mostYellows && mostYellows.seasonStats.yellowCards > 0 && (
-                  <StatCard label="El duro" primary={mostYellows.name} secondary={`${mostYellows.teamName} · ${mostYellows.seasonStats.yellowCards} TA`} photoId={mostYellows.source_id} valueColor="text-vga-yellow" onClick={click(mostYellows)} player={mostYellows} />
+                  <StatCard label="El duro" primary={mostYellows.name} secondary={`${mostYellows.seasonStats.yellowCards} TA`} team={teamOf(mostYellows)} photoId={mostYellows.source_id} valueColor="text-vga-yellow" onClick={click(mostYellows)} player={mostYellows} />
                 )}
                 {mostReds && mostReds.seasonStats.redCards > 0 && (
-                  <StatCard label="Sheriff" primary={mostReds.name} secondary={`${mostReds.teamName} · ${mostReds.seasonStats.redCards} TR`} photoId={mostReds.source_id} valueColor="text-vga-light-red" onClick={click(mostReds)} player={mostReds} />
+                  <StatCard label="Sheriff" primary={mostReds.name} secondary={`${mostReds.seasonStats.redCards} TR`} team={teamOf(mostReds)} photoId={mostReds.source_id} valueColor="text-vga-light-red" onClick={click(mostReds)} player={mostReds} />
                 )}
                 {phantom && (
-                  <StatCard label="El fantasma" primary={phantom.name} secondary={`${phantom.teamName} · ${phantom.seasonStats.appearances} PJ · 0G·0A`} photoId={phantom.source_id} valueColor="text-vga-gray" onClick={click(phantom)} player={phantom} />
+                  <StatCard label="El fantasma" primary={phantom.name} secondary={`${phantom.seasonStats.appearances} PJ · 0G·0A`} team={teamOf(phantom)} photoId={phantom.source_id} valueColor="text-vga-gray" onClick={click(phantom)} player={phantom} />
                 )}
               </>
             );
@@ -785,35 +798,35 @@ export const EndOfSeasonView = ({ league, onContinueSameTeam, onAdvanceAndChange
           {youngestTeam && (
             <div className="bg-vga-black border border-vga-blue p-2">
               <div className="text-vga-magenta text-[7px] uppercase">Equipo más joven</div>
-              <div className="text-vga-bright-white truncate">{youngestTeam.team.name}</div>
+              <div className="flex items-center gap-1.5 min-w-0"><TeamCrest size="xs" teamId={youngestTeam.team.id} colors={youngestTeam.team.colors} title={youngestTeam.team.name} /><span className="text-vga-bright-white truncate">{youngestTeam.team.name}</span></div>
               <div className="text-vga-light-green">{youngestTeam.avgAge.toFixed(1)} años</div>
             </div>
           )}
           {oldestTeam && (
             <div className="bg-vga-black border border-vga-blue p-2">
               <div className="text-vga-magenta text-[7px] uppercase">Equipo más veterano</div>
-              <div className="text-vga-bright-white truncate">{oldestTeam.team.name}</div>
+              <div className="flex items-center gap-1.5 min-w-0"><TeamCrest size="xs" teamId={oldestTeam.team.id} colors={oldestTeam.team.colors} title={oldestTeam.team.name} /><span className="text-vga-bright-white truncate">{oldestTeam.team.name}</span></div>
               <div className="text-vga-light-cyan">{oldestTeam.avgAge.toFixed(1)} años</div>
             </div>
           )}
           {mostFair && (
             <div className="bg-vga-black border border-vga-blue p-2">
               <div className="text-vga-magenta text-[7px] uppercase">Juego limpio</div>
-              <div className="text-vga-bright-white truncate">{mostFair.team.name}</div>
+              <div className="flex items-center gap-1.5 min-w-0"><TeamCrest size="xs" teamId={mostFair.team.id} colors={mostFair.team.colors} title={mostFair.team.name} /><span className="text-vga-bright-white truncate">{mostFair.team.name}</span></div>
               <div className="text-vga-light-green">{mostFair.yellow} TA · {mostFair.red} TR</div>
             </div>
           )}
           {mostViolent && (
             <div className="bg-vga-black border border-vga-blue p-2">
               <div className="text-vga-magenta text-[7px] uppercase">Molino de tarjetas</div>
-              <div className="text-vga-bright-white truncate">{mostViolent.team.name}</div>
+              <div className="flex items-center gap-1.5 min-w-0"><TeamCrest size="xs" teamId={mostViolent.team.id} colors={mostViolent.team.colors} title={mostViolent.team.name} /><span className="text-vga-bright-white truncate">{mostViolent.team.name}</span></div>
               <div className="text-vga-light-red">{mostViolent.yellow} TA · {mostViolent.red} TR</div>
             </div>
           )}
           {mostForeign && mostForeign.distinct > 0 && (
             <div className="bg-vga-black border border-vga-blue p-2">
               <div className="text-vga-magenta text-[7px] uppercase">Extranjerización</div>
-              <div className="text-vga-bright-white truncate">{mostForeign.team.name}</div>
+              <div className="flex items-center gap-1.5 min-w-0"><TeamCrest size="xs" teamId={mostForeign.team.id} colors={mostForeign.team.colors} title={mostForeign.team.name} /><span className="text-vga-bright-white truncate">{mostForeign.team.name}</span></div>
               <div className="text-vga-light-cyan">{mostForeign.distinct} países</div>
             </div>
           )}
@@ -825,28 +838,28 @@ export const EndOfSeasonView = ({ league, onContinueSameTeam, onAdvanceAndChange
           {richestSquad && (
             <div className="bg-vga-black border border-vga-blue p-2">
               <div className="text-vga-magenta text-[7px] uppercase">Equipo más valioso</div>
-              <div className="text-vga-bright-white truncate">{richestSquad.team.name}</div>
+              <div className="flex items-center gap-1.5 min-w-0"><TeamCrest size="xs" teamId={richestSquad.team.id} colors={richestSquad.team.colors} title={richestSquad.team.name} /><span className="text-vga-bright-white truncate">{richestSquad.team.name}</span></div>
               <div className="text-vga-light-green">{fmtEur(richestSquad.squadValue)}</div>
             </div>
           )}
           {biggestPayroll && (
             <div className="bg-vga-black border border-vga-blue p-2">
               <div className="text-vga-magenta text-[7px] uppercase">El jeque</div>
-              <div className="text-vga-bright-white truncate">{biggestPayroll.team.name}</div>
+              <div className="flex items-center gap-1.5 min-w-0"><TeamCrest size="xs" teamId={biggestPayroll.team.id} colors={biggestPayroll.team.colors} title={biggestPayroll.team.name} /><span className="text-vga-bright-white truncate">{biggestPayroll.team.name}</span></div>
               <div className="text-vga-yellow">{fmtEur(biggestPayroll.payroll)}/sem</div>
             </div>
           )}
           {tightestPayroll && (
             <div className="bg-vga-black border border-vga-blue p-2">
               <div className="text-vga-magenta text-[7px] uppercase">El tacaño</div>
-              <div className="text-vga-bright-white truncate">{tightestPayroll.team.name}</div>
+              <div className="flex items-center gap-1.5 min-w-0"><TeamCrest size="xs" teamId={tightestPayroll.team.id} colors={tightestPayroll.team.colors} title={tightestPayroll.team.name} /><span className="text-vga-bright-white truncate">{tightestPayroll.team.name}</span></div>
               <div className="text-vga-gray">{fmtEur(tightestPayroll.payroll)}/sem</div>
             </div>
           )}
           {richestEarner && (
             <div className="bg-vga-black border border-vga-blue p-2">
               <div className="text-vga-magenta text-[7px] uppercase">Más ingresos</div>
-              <div className="text-vga-bright-white truncate">{richestEarner.team.name}</div>
+              <div className="flex items-center gap-1.5 min-w-0"><TeamCrest size="xs" teamId={richestEarner.team.id} colors={richestEarner.team.colors} title={richestEarner.team.name} /><span className="text-vga-bright-white truncate">{richestEarner.team.name}</span></div>
               <div className="text-vga-light-green">{fmtEur(richestEarner.income)}</div>
             </div>
           )}

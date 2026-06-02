@@ -9,7 +9,7 @@ import { FORMATIONS, pickBestXI } from './engine/formations';
 import { getInitialLeagueState, getFantasyLeagueState, updateLeagueStats, deductWeeklySalaries, generateIncomingOffers, autoListAiPlayers, simulateAiMarketSignings, advanceSeason, simulateAiTrades, simulateAiFreeAgentSignings, simulateAiClausulazos, simulateAiInterClausulazos, appendTransfer, decrementSuspensions, signingBlockKey, transferredKey, squadNeeds, groupFor, repickAiFormations, writebackMatchStamina, decayTeamStaminaAfterMatch, decrementInjuries, applyStaminaRecovery, computeTvBonus, applyTvBonus, isTransferWindowOpen, windowJornadasLeft, jornadasUntilWindowOpen } from './store/leagueStore';
 import type { TransferRecord, ManagerSeasonRecord, IncomingOffer } from './store/leagueStore';
 import type { LeagueState } from './store/leagueStore';
-import { migrateLegacyKey, getActiveSlotId, saveSlot, createSlotFromCurrent } from './store/saveSlots';
+import { migrateLegacyKey, getActiveSlotId, saveSlot, createSlotFromCurrent, listSlots, setActiveSlot } from './store/saveSlots';
 import { computeBoardObjective, computeTransferDelta, firingChance, applyMeterDelta, isObjectiveMet, computeMatchMeterDelta, computeMatchReputationDelta, computeSeasonReputationDelta, computeSeasonMeterDelta } from './engine/florentinometro';
 import { engineSettings, loadEngineSettings } from './engine/engineSettings';
 loadEngineSettings();
@@ -30,6 +30,7 @@ import { TransfersView } from './components/TransfersView';
 import { JornadaResultsView } from './components/JornadaResultsView';
 import { PlayerDetailView } from './components/PlayerDetailView';
 import { BackupView } from './components/BackupView';
+import { LoadGameModal } from './components/LoadGameModal';
 import { EditorView } from './components/EditorView';
 import { LeagueSetupView } from './components/LeagueSetupView';
 import { ManagerCareerView } from './components/ManagerCareerView';
@@ -62,13 +63,12 @@ import { computePrice, evaluateOffer, formatEuros, computeClausulazoPrice, compu
 import { PlayerTooltipProvider } from './contexts/PlayerTooltipContext';
 import { formatJornadaDate } from './engine/calendar';
 import type { OfferResult } from './data/economy';
-import { PackLoaderView } from './components/PackLoaderView';
 import MatchScreen from './components/MatchScreen';
 import { usePack } from './state/PackContext';
 import { buildTeamFromPackClub, trimRoster, isAgeEligible } from './data/packTeamBuilder';
 import { runtimePlayerFromPack, joinPlayerName } from './data/playerBuilder';
 
-type View = 'LEAGUE' | 'SQUAD' | 'ALIGNMENT' | 'RESULTS' | 'STATS' | 'FINANCES' | 'TRANSFERS' | 'JORNADA_RESULTS' | 'END_OF_SEASON' | 'PLAYER_DETAIL' | 'BACKUP' | 'EDITOR' | 'EQUIPO' | 'MANAGER_CAREER' | 'PACK_LOADER' | 'PACK_EDITOR';
+type View = 'LEAGUE' | 'SQUAD' | 'ALIGNMENT' | 'RESULTS' | 'STATS' | 'FINANCES' | 'TRANSFERS' | 'JORNADA_RESULTS' | 'END_OF_SEASON' | 'PLAYER_DETAIL' | 'BACKUP' | 'EDITOR' | 'EQUIPO' | 'MANAGER_CAREER' | 'PACK_EDITOR';
 
 
 function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
@@ -253,6 +253,7 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
   const [previewSwapSlot, setPreviewSwapSlot] = useState<number | null>(null);
   const [showFantasyFlow, setShowFantasyFlow] = useState(false);
   const [showProManagerFlow, setShowProManagerFlow] = useState(false);
+  const [loadModeFilter, setLoadModeFilter] = useState<'classic' | 'promanager' | null>(null);
   const [showProManagerTutorial, setShowProManagerTutorial] = useState(false);
   const [fantasyYear, setFantasyYear] = useState(0);
   const [fantasyConfig, setFantasyConfig] = useState<{ teamIds: string[]; userTeamId: string; cap: number | null } | null>(null);
@@ -1236,12 +1237,24 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
       const randMinute = () => Math.floor(Math.random() * 90) + 1;
       const addEvents = (team: Team, score: number) => {
         const lineup = team.players.filter(p => team.lineup.includes(p.id));
+        const gkId = team.lineup[0];
+        const gk = lineup.find(p => p.id === gkId);
+        const fieldPlayers = lineup.filter(p => p.id !== gkId);
         for(let i=0; i<score; i++) {
-          const scorer = lineup[Math.floor(Math.random() * lineup.length)];
+          let scorer: Player | undefined;
+          if (gk && Math.random() < 0.005) scorer = gk;
+          else if (fieldPlayers.length > 0) scorer = fieldPlayers[Math.floor(Math.random() * fieldPlayers.length)];
+          else scorer = lineup[Math.floor(Math.random() * lineup.length)];
+          if (!scorer) continue;
           const minute = randMinute();
           simulatedEvents.push({ minute, type: 'goal', playerId: scorer.id });
           if(Math.random() < 0.7) {
-            const asst = lineup.filter(p => p.id !== scorer.id)[Math.floor(Math.random() * (lineup.length-1))];
+            let asst: Player | undefined;
+            if (gk && gk.id !== scorer.id && Math.random() < 0.01) asst = gk;
+            else {
+              const pool = fieldPlayers.filter(p => p.id !== scorer.id);
+              if (pool.length > 0) asst = pool[Math.floor(Math.random() * pool.length)];
+            }
             if(asst) simulatedEvents.push({ minute, type: 'commentary', description: '', assistantId: asst.id, playerId: scorer.id });
           }
         }
@@ -1997,10 +2010,6 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
       );
     }
 
-    if (view === 'PACK_LOADER') {
-      return <PackLoaderView onBack={() => setView('BACKUP')} />;
-    }
-
     if (view === 'PACK_EDITOR') {
       return <PackEditorView onBack={() => setView('LEAGUE')} />;
     }
@@ -2172,7 +2181,6 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
           onRestore={(newState) => { setLeague(newState); setView('LEAGUE'); }}
           onReset={() => { setLeague(getInitialLeagueState()); setView('LEAGUE'); }}
           onBack={() => setView('LEAGUE')}
-          onOpenPack={() => setView('PACK_LOADER')}
         />
       );
     }
@@ -2291,7 +2299,7 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
             <div className="of-home-stadium" aria-hidden="true" />
 
             <div className="of-home-grid">
-              <button onClick={() => setShowPlayFlow(true)} className="of-mode of-mode-pink" title="Modo Liga">
+              <div className="of-mode of-mode-pink" title="Modo Liga">
                 <span className="of-mode-corner of-mode-corner-tl" />
                 <span className="of-mode-corner of-mode-corner-tr" />
                 <span className="of-mode-corner of-mode-corner-bl" />
@@ -2303,10 +2311,13 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
                     <div className="of-mode-desc">Elige un año y un club, gestiona la plantilla y compite jornada a jornada en una liga completa.</div>
                   </div>
                 </div>
-                <div className="of-mode-cta">ENTRAR →</div>
-              </button>
+                <div className="of-mode-ctas">
+                  <button className="of-mode-cta-btn" onClick={() => setShowPlayFlow(true)}>ENTRAR →</button>
+                  <button className="of-mode-cta-btn" onClick={() => setLoadModeFilter('classic')} title="Cargar o importar partida">CARGAR</button>
+                </div>
+              </div>
 
-              <button onClick={() => setShowProManagerFlow(true)} className="of-mode of-mode-cyan" title="Carrera de entrenador">
+              <div className="of-mode of-mode-cyan" title="Carrera de entrenador">
                 <span className="of-mode-corner of-mode-corner-tl" />
                 <span className="of-mode-corner of-mode-corner-tr" />
                 <span className="of-mode-corner of-mode-corner-bl" />
@@ -2318,10 +2329,13 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
                     <div className="of-mode-desc">Carrera de entrenador: ofertas, objetivos y reputación. Si no cumples, te despiden a mitad de temporada.</div>
                   </div>
                 </div>
-                <div className="of-mode-cta">ENTRAR →</div>
-              </button>
+                <div className="of-mode-ctas">
+                  <button className="of-mode-cta-btn" onClick={() => setShowProManagerFlow(true)}>ENTRAR →</button>
+                  <button className="of-mode-cta-btn" onClick={() => setLoadModeFilter('promanager')} title="Cargar o importar partida">CARGAR</button>
+                </div>
+              </div>
 
-              <button onClick={() => setShowTournamentFlow(true)} className="of-mode of-mode-yellow" title="Crear torneo">
+              <div className="of-mode of-mode-yellow" title="Crear torneo">
                 <span className="of-mode-corner of-mode-corner-tl" />
                 <span className="of-mode-corner of-mode-corner-tr" />
                 <span className="of-mode-corner of-mode-corner-bl" />
@@ -2333,8 +2347,10 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
                     <div className="of-mode-desc">Diseña una competición a tu medida: liga corta, grupos o eliminatoria directa con los equipos que elijas.</div>
                   </div>
                 </div>
-                <div className="of-mode-cta">ENTRAR →</div>
-              </button>
+                <div className="of-mode-ctas">
+                  <button className="of-mode-cta-btn" onClick={() => setShowTournamentFlow(true)}>ENTRAR →</button>
+                </div>
+              </div>
             </div>
 
             {(fantasyAvailable || (league.managerCareer?.length ?? 0) > 0) && (
@@ -2365,11 +2381,11 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
             )}
 
             <div className="of-status">
-              <div className="of-status-label">ESTADO ACTUAL</div>
+              <div className="of-status-label">PACK DE DATOS</div>
               <div className="of-status-cells">
                 <div className="of-status-cell">
                   <svg viewBox="0 0 64 64" className="of-status-ico" aria-hidden="true"><circle cx="32" cy="22" r="10" fill="none" stroke="currentColor" strokeWidth="3"/><path d="M14 54c2-10 10-14 18-14s16 4 18 14" fill="none" stroke="currentColor" strokeWidth="3"/></svg>
-                  <div className="of-status-text"><div className="of-status-key">Modo actual</div><div className="of-status-val">{pack ? 'Pack cargado' : 'No iniciado'}</div></div>
+                  <div className="of-status-text"><div className="of-status-key">Nombre de Pack</div><div className="of-status-val">{pack ? `${pack.meta.name}${pack.meta.version ? ' ' + pack.meta.version : ''}` : '—'}</div></div>
                 </div>
                 <div className="of-status-cell">
                   <svg viewBox="0 0 64 64" className="of-status-ico" aria-hidden="true"><rect x="8" y="20" width="48" height="24" rx="2" fill="none" stroke="currentColor" strokeWidth="3"/><path d="M20 20 V44 M44 20 V44" stroke="currentColor" strokeWidth="3"/></svg>
@@ -2385,7 +2401,7 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
                 </div>
                 <div className="of-status-cell">
                   <svg viewBox="0 0 64 64" className="of-status-ico" aria-hidden="true"><path d="M8 50 L24 34 L34 44 L56 18" fill="none" stroke="currentColor" strokeWidth="3"/><path d="M44 18 H56 V30" fill="none" stroke="currentColor" strokeWidth="3"/></svg>
-                  <div className="of-status-text"><div className="of-status-key">Última partida</div><div className="of-status-val">-- / -- / ----</div></div>
+                  <div className="of-status-text"><div className="of-status-key">Última actualización</div><div className="of-status-val">{pack?.meta.imported_at ? new Date(pack.meta.imported_at).toLocaleDateString('es-ES') : '—'}</div></div>
                 </div>
               </div>
             </div>
@@ -2426,6 +2442,18 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
               </div>
               <span className="of-footer-line" />
             </div>
+
+            {loadModeFilter && (
+              <LoadGameModal
+                mode={loadModeFilter}
+                onClose={() => setLoadModeFilter(null)}
+                onLoad={(state) => {
+                  setLeague(state);
+                  setLoadModeFilter(null);
+                  setView('LEAGUE');
+                }}
+              />
+            )}
           </div>
         );
       }
@@ -2685,7 +2713,6 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
             setView('LEAGUE');
           }}
           onBack={() => setView('LEAGUE')}
-          onOpenPack={() => setView('PACK_LOADER')}
         />
       );
     }
@@ -2955,7 +2982,7 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
   };
 
   const isHomeMenu = !league.isStarted && !showPlayFlow && !showProManagerFlow && !showTournamentFlow && !showFantasyFlow
-    && view !== 'MANAGER_CAREER' && view !== 'EDITOR' && view !== 'BACKUP' && view !== 'PACK_LOADER' && view !== 'PACK_EDITOR'
+    && view !== 'MANAGER_CAREER' && view !== 'EDITOR' && view !== 'BACKUP' && view !== 'PACK_EDITOR'
     && !showInstructions && !showColaborar;
 
   return (
@@ -3005,6 +3032,40 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
           hasNewVersion={hasNewVersion}
           onOpenChangelog={() => { setInstructionsScroll('changelog'); setShowInstructions(true); setHasNewVersion(false); }}
           onOpenSettings={() => setView('BACKUP')}
+          onSaveGame={league.isStarted ? () => {
+            const userTeamName = league.teams.find(t => t.id === league.userTeamId)?.name;
+            const defaultName = userTeamName ? `Carrera de ${userTeamName}` : `Carrera ${league.year}`;
+            const name = prompt('Nombre de la partida (si ya existe una con ese nombre, se sobrescribirá):', defaultName);
+            const trimmed = name?.trim();
+            if (!trimmed) return;
+            try {
+              const existing = listSlots().find(s => s.name === trimmed);
+              if (existing) {
+                if (!confirm(`Ya existe una partida llamada "${trimmed}". ¿Sobrescribir?`)) return;
+                saveSlot(existing.id, league, trimmed);
+                setActiveSlot(existing.id);
+              } else {
+                createSlotFromCurrent(league, trimmed);
+              }
+              alert('Partida guardada.');
+            } catch {
+              alert('No se pudo guardar (puede que el almacenamiento esté lleno).');
+            }
+          } : undefined}
+          username={
+            tournament
+              ? (league.managerName || tournament.teams.find(t => t.id === tournament.userTeamId)?.name || undefined)
+              : (league.isStarted
+                  ? (league.managerName || league.teams.find(t => t.id === league.userTeamId)?.name || undefined)
+                  : undefined)
+          }
+          mode={
+            tournament
+              ? 'TORNEO'
+              : (league.isStarted
+                  ? (league.gameMode === 'promanager' ? 'PROMANAGER' : 'CLASICO')
+                  : undefined)
+          }
         />
       </div>
 

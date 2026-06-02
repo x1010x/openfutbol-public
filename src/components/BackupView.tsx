@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import type { LeagueState } from '../store/leagueStore';
 import { encodeBackup, decodeBackup } from '../utils/backupUtils';
-import { useT } from '../i18n';
+import { useT, getLang, setLang, getSupportedLangs } from '../i18n';
 import { EngineSettingsView } from './EngineSettingsView';
+import { PackLoaderView } from './PackLoaderView';
+import { ScreenHeader } from './ScreenHeader';
 import {
   listSlots, getActiveSlotId, loadSlot, saveSlot, renameSlot, deleteSlot, setActiveSlot,
   type SaveSlot,
@@ -13,13 +15,15 @@ interface Props {
   onRestore: (newState: LeagueState) => void;
   onReset: () => void;
   onBack: () => void;
-  onOpenPack?: () => void;
 }
 
-export const BackupView = ({ league, onRestore, onReset, onBack, onOpenPack }: Props) => {
+export const BackupView = ({ league, onRestore, onReset, onBack }: Props) => {
   const t = useT();
-  const [tab, setTab] = useState<'backup' | 'slots' | 'engine' | 'pack' | 'prefs' | 'dev'>('slots');
+  const [tab, setTab] = useState<'backup' | 'slots' | 'engine' | 'pack' | 'prefs'>('prefs');
   const [updateNotifs, setUpdateNotifs] = useState<boolean>(() => localStorage.getItem('openfutbol_update_notifs') === '1');
+  const [lang, setLangState] = useState<string>(() => getLang());
+  const handleLangChange = (next: string) => { setLang(next); setLangState(next); };
+  const supportedLangs = getSupportedLangs();
 
   const handleToggleUpdateNotifs = (next: boolean) => {
     setUpdateNotifs(next);
@@ -144,54 +148,17 @@ export const BackupView = ({ league, onRestore, onReset, onBack, onOpenPack }: P
   };
 
   return (
-    <div className="w-full max-w-2xl flex flex-col gap-4 animate-in fade-in duration-300">
-      <div className="bg-vga-blue p-2 border-2 border-vga-white flex justify-between items-center vga-panel">
-        <div className="flex items-center gap-2">
-          <h2 className="text-vga-yellow text-xs uppercase font-bold">{t('section.backup')}</h2>
-          <div className="flex gap-1">
-            <button
-              onClick={() => setTab('slots')}
-              className={`text-[7px] px-2 py-0.5 border font-bold uppercase ${tab === 'slots' ? 'bg-vga-magenta text-vga-bright-white border-vga-magenta' : 'text-vga-gray border-vga-gray hover:text-vga-bright-white hover:border-vga-bright-white'}`}
-            >
-              PARTIDAS
-            </button>
-            <button
-              onClick={() => setTab('backup')}
-              className={`text-[7px] px-2 py-0.5 border font-bold uppercase ${tab === 'backup' ? 'bg-vga-yellow text-vga-black border-vga-yellow' : 'text-vga-gray border-vga-gray hover:text-vga-bright-white hover:border-vga-bright-white'}`}
-            >
-              BACKUP
-            </button>
-            <button
-              onClick={() => setTab('engine')}
-              className={`text-[7px] px-2 py-0.5 border font-bold uppercase ${tab === 'engine' ? 'bg-vga-cyan text-vga-black border-vga-cyan' : 'text-vga-gray border-vga-gray hover:text-vga-bright-white hover:border-vga-bright-white'}`}
-            >
-              ENGINE
-            </button>
-            {onOpenPack && (
-              <button
-                onClick={() => setTab('pack')}
-                className={`text-[7px] px-2 py-0.5 border font-bold uppercase ${tab === 'pack' ? 'bg-vga-green text-vga-black border-vga-green' : 'text-vga-gray border-vga-gray hover:text-vga-bright-white hover:border-vga-bright-white'}`}
-              >
-                PACK
-              </button>
-            )}
-            <button
-              onClick={() => setTab('prefs')}
-              className={`text-[7px] px-2 py-0.5 border font-bold uppercase ${tab === 'prefs' ? 'bg-vga-blue text-vga-bright-white border-vga-blue' : 'text-vga-gray border-vga-gray hover:text-vga-bright-white hover:border-vga-bright-white'}`}
-            >
-              PREFS
-            </button>
-            <button
-              onClick={() => setTab('dev')}
-              className={`text-[7px] px-2 py-0.5 border font-bold uppercase ${tab === 'dev' ? 'bg-vga-red text-vga-bright-white border-vga-red' : 'text-vga-gray border-vga-gray hover:text-vga-bright-white hover:border-vga-bright-white'}`}
-            >
-              DEV
-            </button>
-          </div>
-        </div>
-        <button onClick={onBack} className="bg-vga-red text-vga-bright-white px-3 py-1 text-[8px] border border-vga-black hover:bg-vga-light-red">
-          {t('btn.back')}
-        </button>
+    <div className="w-full max-w-[1600px] mx-auto px-2 flex flex-col gap-4 animate-in fade-in duration-300">
+      <ScreenHeader title={t('section.backup')} onBack={onBack} backLabel={t('btn.back')} />
+
+      <div className="of-tabs">
+        {league.isStarted && (
+          <button onClick={handleReset} className="of-tab of-tab--warn" title={t('section.resetGame')}>SALIR</button>
+        )}
+        <button onClick={() => setTab('prefs')} className={`of-tab ${tab === 'prefs' ? 'is-active' : ''}`}>PREFS</button>
+        <button onClick={() => setTab('engine')} className={`of-tab ${tab === 'engine' ? 'is-active' : ''}`}>ENGINE</button>
+        <button onClick={() => setTab('backup')} className={`of-tab ${tab === 'backup' ? 'is-active' : ''}`}>BACKUP</button>
+        <button onClick={() => setTab('pack')} className={`of-tab ${tab === 'pack' ? 'is-active' : ''}`}>PACK</button>
       </div>
 
       {tab === 'slots' && (
@@ -260,93 +227,78 @@ export const BackupView = ({ league, onRestore, onReset, onBack, onOpenPack }: P
         </div>
       )}
 
-      {tab === 'pack' && onOpenPack && (
-        <div className="bg-vga-gray border-4 border-vga-blue p-6 flex flex-col gap-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-          <h3 className="text-vga-blue text-[10px] font-bold border-b border-vga-blue pb-1 uppercase">Pack de datos</h3>
-          <p className="text-vga-black text-[8px] leading-relaxed">Importa un pack externo o gestiona el pack activo.</p>
-          <button
-            onClick={onOpenPack}
-            className="bg-vga-green hover:opacity-90 text-vga-bright-white py-2 px-4 border-b-4 border-r-4 border-vga-black text-[10px] font-bold uppercase tracking-wider"
-          >
-            GESTIONAR PACK
-          </button>
-        </div>
-      )}
+      {tab === 'pack' && <PackLoaderView />}
 
       {tab === 'prefs' && (
-        <div className="bg-vga-gray border-4 border-vga-blue p-6 flex flex-col gap-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-          <h3 className="text-vga-blue text-[10px] font-bold border-b border-vga-blue pb-1 uppercase">Preferencias</h3>
-          <label className="flex items-start gap-3 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={updateNotifs}
-              onChange={(e) => handleToggleUpdateNotifs(e.target.checked)}
-              className="mt-0.5 w-4 h-4 accent-vga-blue cursor-pointer"
-            />
-            <div className="flex flex-col gap-1">
-              <span className="text-vga-black text-[9px] font-bold uppercase">Avisos de nueva versión</span>
-              <span className="text-vga-black text-[7px] opacity-80 leading-relaxed">
-                Muestra una barra amarilla cuando se publica una nueva versión del juego. Recarga para aplicarla.
-              </span>
+        <div className="flex flex-col gap-3">
+          <div className="of-card">
+            <h3 className="of-card-title">Preferencias</h3>
+
+            <div className="flex items-center gap-3 flex-wrap">
+              <span className="text-vga-bright-white text-[9px] font-bold uppercase tracking-wider min-w-[7rem]">Idioma</span>
+              <div className="flex gap-1">
+                {supportedLangs.map(code => (
+                  <button
+                    key={code}
+                    onClick={() => handleLangChange(code)}
+                    className={`of-tab ${lang === code ? 'is-active' : ''}`}
+                  >
+                    {code.toUpperCase()}
+                  </button>
+                ))}
+              </div>
             </div>
-          </label>
+
+            <label className="flex items-start gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={updateNotifs}
+                onChange={(e) => handleToggleUpdateNotifs(e.target.checked)}
+                className="mt-0.5 w-4 h-4 accent-cyan-400 cursor-pointer"
+              />
+              <div className="flex flex-col gap-1">
+                <span className="text-vga-bright-white text-[9px] font-bold uppercase tracking-wider">Avisos de nueva versión</span>
+                <span className="of-card-desc">
+                  Muestra una barra amarilla cuando se publica una nueva versión del juego. Recarga para aplicarla.
+                </span>
+              </div>
+            </label>
+          </div>
+
+          <div className="of-card" style={{ borderColor: '#ff5c8a' }}>
+            <h3 className="of-card-title" style={{ color: '#ff5c8a', textShadow: '0 0 6px rgba(255, 92, 138, 0.7)', borderBottomColor: 'rgba(255, 92, 138, 0.35)' }}>Factory Reset</h3>
+            <p className="of-card-desc">
+              Borra todo el estado guardado en el navegador: ligas, packs importados, configuración, IndexedDB y caches del Service Worker. Útil para empezar desde cero como un usuario nuevo. <span className="of-card-warn">Esta acción es irreversible.</span>
+            </p>
+            <button onClick={handleHardReset} className="of-btn-neon of-btn-neon--red self-start">
+              ■ BORRAR TODO Y RECARGAR
+            </button>
+          </div>
         </div>
       )}
 
-      {tab === 'dev' && (
-        <div className="bg-vga-gray border-4 border-vga-red p-6 flex flex-col gap-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-          <h3 className="text-vga-red text-[10px] font-bold border-b border-vga-red pb-1 uppercase">Developer Options</h3>
-          <p className="text-vga-black text-[8px] leading-relaxed">
-            Borra todo el estado guardado en el navegador: ligas, packs importados, configuración, IndexedDB y caches del Service Worker. Útil para empezar desde cero como un usuario nuevo.<br/>
-            <span className="text-vga-red font-bold uppercase underline">Esta acción es irreversible.</span>
-          </p>
-          <button
-            onClick={handleHardReset}
-            className="bg-vga-red hover:bg-vga-light-red text-vga-bright-white py-2 px-4 border-b-4 border-r-4 border-vga-black active:border-0 text-[10px] font-bold mt-2 uppercase tracking-wider"
-          >
-            ■ BORRAR TODO Y RECARGAR
-          </button>
+      {tab === 'backup' && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div className="of-card">
+            <h3 className="of-card-title">{t('section.exportGame')}</h3>
+            <p className="of-card-desc">{t('backup.exportDesc')}</p>
+            <button onClick={handleExport} className="of-btn-neon of-btn-neon--green mt-auto">
+              {t('btn.downloadBackup')}
+            </button>
+          </div>
+
+          <div className="of-card">
+            <h3 className="of-card-title">{t('section.importGame')}</h3>
+            <p className="of-card-desc">
+              {t('backup.importDesc')} <span className="of-card-warn">{t('backup.importWarn')}</span>
+            </p>
+            <label className="of-btn-neon of-btn-neon--cyan mt-auto cursor-pointer">
+              {t('btn.uploadBackup')}
+              <input type="file" accept=".ofb" onChange={handleImport} className="hidden" />
+            </label>
+          </div>
         </div>
       )}
-
-      {tab === 'backup' && <div className="bg-vga-gray border-4 border-vga-blue p-6 flex flex-col gap-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-        <div className="flex flex-col gap-2">
-          <h3 className="text-vga-blue text-[10px] font-bold border-b border-vga-blue pb-1 uppercase">{t('section.exportGame')}</h3>
-          <p className="text-vga-black text-[8px] leading-relaxed">{t('backup.exportDesc')}</p>
-          <button
-            onClick={handleExport}
-            className="bg-vga-green hover:bg-vga-light-green text-vga-bright-white py-2 px-4 border-b-4 border-r-4 border-vga-black active:border-0 text-[10px] font-bold mt-2 uppercase tracking-wider"
-          >
-            {t('btn.downloadBackup')}
-          </button>
-        </div>
-
-        <div className="flex flex-col gap-2 border-t-2 border-vga-blue pt-4">
-          <h3 className="text-vga-blue text-[10px] font-bold border-b border-vga-blue pb-1 uppercase">{t('section.importGame')}</h3>
-          <p className="text-vga-black text-[8px] leading-relaxed">
-            {t('backup.importDesc')}<br/>
-            <span className="text-vga-red font-bold uppercase underline">{t('backup.importWarn')}</span>
-          </p>
-          <label className="cursor-pointer bg-vga-blue hover:bg-vga-light-blue text-vga-bright-white py-2 px-4 border-b-4 border-r-4 border-vga-black active:border-0 text-[10px] font-bold text-center mt-2 uppercase tracking-wider block">
-            {t('btn.uploadBackup')}
-            <input type="file" accept=".ofb" onChange={handleImport} className="hidden" />
-          </label>
-        </div>
-
-        <div className="flex flex-col gap-2 border-t-2 border-vga-red pt-4">
-          <h3 className="text-vga-red text-[10px] font-bold border-b border-vga-red pb-1 uppercase">{t('section.resetGame')}</h3>
-          <p className="text-vga-black text-[8px] leading-relaxed">
-            {t('backup.resetDesc')}<br/>
-            <span className="text-vga-red font-bold uppercase underline">{t('backup.resetWarn')}</span>
-          </p>
-          <button
-            onClick={handleReset}
-            className="bg-vga-red hover:bg-vga-light-red text-vga-bright-white py-2 px-4 border-b-4 border-r-4 border-vga-black active:border-0 text-[10px] font-bold mt-2 uppercase tracking-wider"
-          >
-            {t('btn.resetLeague')}
-          </button>
-        </div>
-      </div>}
     </div>
   );
 };
