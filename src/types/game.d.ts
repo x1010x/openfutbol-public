@@ -1,3 +1,12 @@
+// ── Canonical types (new) ────────────────────────────────────────────────
+export type PositionCode =
+  | 'GK' | 'DC' | 'DL' | 'DR' | 'WBL' | 'WBR'
+  | 'DMC' | 'MC' | 'ML' | 'MR'
+  | 'AMC' | 'AML' | 'AMR' | 'FC';
+
+export interface PlayerPositionEntry { code: PositionCode; level: number; } // 1-20
+
+// ── Legacy compat (kept so UI compiles; derived at construction) ─────────
 export type Position = 'POR' | 'DEF' | 'MED' | 'DEL' | 'AML' | 'AMR';
 
 export interface PlayerStats {
@@ -8,6 +17,15 @@ export interface PlayerStats {
   defending: number;
   physical: number;
   goalkeeping: number;
+}
+
+// Legacy pack types — components reference these inline; Phase 4 removes them.
+export interface PackMeta {
+  type: 'player_pack' | 'team_pack' | 'combined_pack';
+  name: string;
+  version: string;
+  author?: string;
+  source_url?: string;
 }
 
 export interface RawPlayerDB {
@@ -41,7 +59,7 @@ export interface TeamSeasonData {
   stadiumCapacity: number;
   ticketPrice: number;
   budget: number;
-  players: RosterEntry[] | RawPlayer[]; // RosterEntry in new DB format; RawPlayer in legacy packs — mockTeams.ts handles both
+  players: RosterEntry[] | RawPlayer[]; // RosterEntry in new DB format; RawPlayer in legacy packs
 }
 
 export interface RawTeamDB {
@@ -51,48 +69,9 @@ export interface RawTeamDB {
   seasons: TeamSeasonData[];
 }
 
-// Internal flattened form used by the loader
 export interface RawTeamSeason extends TeamSeasonData {
   id: string;
   name: string;
-}
-
-export interface Player {
-  id: string;
-  name: string;
-  fullName: string;
-  position: Position;
-  preferredPos: Position;
-  allowedPositions: Position[];
-  number: number;
-  stats: PlayerStats;
-  media: number;
-  birthYear: number;
-  peakAge: number;
-  clubHistory?: { club: string; league_key: string; from_year: number }[];
-  forSale?: boolean;
-  seasonStats: {
-    goals: number;
-    assists: number;
-    yellowCards: number;
-    redCards: number;
-    appearances: number;
-    minutes: number;
-    ratingSum: number;
-    cleanSheets: number;
-    goalsAgainst: number;
-  };
-  suspensionMatches: number;
-  stamina: number;              // 1-99, resets to 99 each season
-  injuryWeeksRemaining: number; // 0 = healthy
-}
-
-export interface PackMeta {
-  type: 'player_pack' | 'team_pack' | 'combined_pack';
-  name: string;
-  version: string;
-  author?: string;
-  source_url?: string;
 }
 
 export interface PlayerPack {
@@ -106,6 +85,121 @@ export interface TeamPack {
   players?: RawPlayerDB[];
 }
 
+// ── New pack shapes (mirrors scripts/import-pack/types.ts) ───────────────
+export interface DataPackMeta {
+  name: string;
+  version: string;
+  source_url: string;
+  source_commit: string | null;
+  imported_at: string;
+  schema_version: 1;
+}
+
+export interface Continent { id: string; source_id: number; name: string; }
+
+export interface Country {
+  id: string; source_id: number;
+  code: string; slug: string; name: string;
+  continent_id: string; reputation: number;
+}
+
+export interface League {
+  id: string; source_id: number; country_id: string;
+  slug: string; name: string;
+  reputation: number; tier: number;
+  promotion_spots: number; relegation_spots: number;
+}
+
+export interface Club {
+  id: string; source_id: number; league_id: string;
+  name: string;
+  colors: { background: string; foreground: string } | null;
+  rivals_source_ids: number[];
+}
+
+export interface PackPlayer {
+  id: string; source_id: number;
+  club_id: string | null; country_id: string;
+  first_name: string; last_name: string;
+  birth_date: string;
+  positions: PlayerPositionEntry[];
+  current_ability: number; potential_ability: number;
+  value: number;
+  contract: { salary: number; expiration: string } | null;
+}
+
+export interface Pack {
+  meta: DataPackMeta;
+  continents: Continent[]; countries: Country[];
+  leagues: League[]; clubs: Club[]; players: PackPlayer[];
+}
+
+// Stats packs are a parallel importable: they carry per-player ratings keyed
+// by the data pack's `source_id`. No names or PII — pure stat data.
+export interface StatsPackMeta {
+  name: string;
+  version: string;
+  source: string;
+  generated_at: string;
+  schema_version: 1;
+  count: number;
+}
+export interface StatsPack {
+  meta: StatsPackMeta;
+  entries: Record<string, unknown>; // shape validated by the consumer (e.g. StatsEntry)
+}
+
+// ── Runtime Player (canonical + legacy shim) ─────────────────────────────
+// Canonical fields are optional only because legacy code paths (EditorView's
+// inline createPlayer, etc.) still build players in the old shape. Pack-built
+// players via playerBuilder always populate them. Phase 4 makes them required.
+export interface Player {
+  // Canonical (new)
+  id: string;
+  source_id?: number;
+  club_id?: string | null;
+  country_id?: string;
+  country_code?: string;          // uppercase ISO-ish code (ES, GB, BR…)
+  first_name?: string;
+  last_name?: string;
+  birth_date?: string;            // ISO YYYY-MM-DD
+  positions?: PlayerPositionEntry[];
+  current_ability?: number;       // 1-200
+  potential_ability?: number;     // 1-200
+  value?: number;
+  contract?: { salary: number; expiration: string } | null;
+  attributes?: import('../data/playerAttributes').PlayerAttributes;
+  stats_year?: number; // when stats sourced from a stats pack
+
+  // Runtime/game state
+  number: number;
+  stamina: number;               // 1-99
+  injuryWeeksRemaining: number;
+  suspensionMatches: number;
+  forSale?: boolean;
+  clubHistory?: { club: string; league_key: string; from_year: number }[];
+  seasonStats: {
+    goals: number; assists: number;
+    yellowCards: number; redCards: number;
+    appearances: number; minutes: number;
+    ratingSum: number;
+    cleanSheets: number; goalsAgainst: number;
+  };
+
+  // Legacy compat shim — derived from canonical fields; UI reads these.
+  // Phase 4 will delete them once UI migrates.
+  name: string;
+  fullName: string;
+  birthYear: number;
+  peakAge: number;
+  position: Position;
+  preferredPos: Position;
+  allowedPositions: Position[];
+  stats: PlayerStats;
+  media: number;
+}
+
+// ── Team / Match types ────────────────────────────────────────────────────
 export type FormationId = '4-4-2' | '5-3-2' | '4-3-3' | '4-2-4' | '5-4-1' | '3-4-3';
 
 export type KitStyle = 'solid' | 'stripes' | 'sash';
@@ -141,7 +235,7 @@ export interface MatchEvent {
   teamId?: string;
   playerId?: string;
   assistantId?: string;
-  playerOffId?: string; // sub events: player who came off
+  playerOffId?: string;
 }
 
 export interface MatchState {
@@ -176,4 +270,9 @@ export interface MatchState {
   awayStartingLineup: string[];
   stoppageTime1: number;
   stoppageTime2: number;
+  attendance?: {
+    count: number;
+    capacity: number;
+    fillPct: number;
+  };
 }

@@ -99,7 +99,7 @@ const PoolRow = ({
         canPick ? 'hover:bg-vga-blue cursor-pointer' : 'cursor-default opacity-40'
       }`}
     >
-      <PlayerPhoto playerId={player.id} size="xs" className="shrink-0 border border-vga-gray" />
+      <PlayerPhoto sourceId={player.source_id} size="xs" className="shrink-0 border border-vga-gray" />
       <span className={`text-[7px] font-bold px-1 shrink-0 ${POS_BADGE[pos]}`}>{posLabel(pos)}</span>
       <span className="text-vga-bright-white text-[8px] flex-1 min-w-0">{player.fullName}</span>
       <div className="hidden sm:flex items-center gap-2 shrink-0">
@@ -150,7 +150,7 @@ const SquadPanel = ({ picks, label, isUser, cap, spent }: {
                 {group.map(p => (
                   <div key={p.id} className="flex items-center gap-1.5 px-2 py-1 border-b border-vga-gray last:border-0"
                     onMouseMove={e => show(p, e.clientX, e.clientY)} onMouseLeave={hide}>
-                    <PlayerPhoto playerId={p.id} size="xs" className="shrink-0" />
+                    <PlayerPhoto sourceId={p.source_id} size="xs" className="shrink-0" />
                     <span className="text-vga-bright-white text-[7px] flex-1 min-w-0 truncate">{p.fullName}</span>
                     <span className="text-vga-yellow text-[7px] shrink-0">{p.media}</span>
                   </div>
@@ -193,7 +193,7 @@ const RivalPanel = ({ team, picks, isCurrent }: {
                 {group.map(p => (
                   <div key={p.id} className="flex items-center gap-1.5 px-2 py-0.5 border-b border-vga-gray last:border-0"
                     onMouseMove={e => show(p, e.clientX, e.clientY)} onMouseLeave={hide}>
-                    <PlayerPhoto playerId={p.id} size="xs" className="shrink-0" />
+                    <PlayerPhoto sourceId={p.source_id} size="xs" className="shrink-0" />
                     <span className="text-[7px] text-vga-bright-white flex-1 min-w-0 truncate">{p.fullName}</span>
                     <span className="text-[7px] text-vga-yellow shrink-0">{p.media}</span>
                   </div>

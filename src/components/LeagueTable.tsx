@@ -106,16 +106,18 @@ export const LeagueTable = ({ stats, schedule, userTeamId, teams, onCellClick, o
                 {cell(team.teamId, 'points', team.points, 'text-vga-yellow font-bold')}
                 {schedule && (
                   <td className="p-1 border border-vga-white text-center">
-                    <div className="flex justify-center gap-px">
+                    <div className="flex justify-center gap-0.5">
                       {form.length === 0 ? (
                         <span className="text-vga-gray text-[7px]">—</span>
                       ) : (
                         form.map((c, i) => (
-                          <div
+                          <span
                             key={i}
-                            className={`w-2 h-2 ${formColor(c)} border border-vga-black`}
+                            className={`${formColor(c)} w-2.5 h-2.5 text-vga-black text-[6px] font-bold flex items-center justify-center leading-none`}
                             title={c}
-                          />
+                          >
+                            {c}
+                          </span>
                         ))
                       )}
                     </div>

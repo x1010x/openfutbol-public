@@ -44,9 +44,11 @@ const ContentES = ({ onColaborar, changelogRef, engineRef }: {
         <span className="text-vga-cyan">Florentinómetro</span> (0–10). Gana partidos, haz buenos fichajes
         y cúmplete el objetivo marcado para mantenerlos contentos. Si el medidor cae demasiado,
         Florentino llama por teléfono. La primera vez avisa. La segunda avisa más fuerte.
-        La tercera… recoges tus cosas. Cuando te echan (o acabas la temporada) recibes
-        ofertas de nuevos clubes según tu historial. Buenas temporadas abren puertas a equipos mejores.
-        Si llegas a 9 puntos, Florentino te regala Marbella y da bonus a los jugadores.
+        La tercera… recoges tus cosas. Cuando te echan recibes ofertas de nuevos clubes según tu historial:
+        los clubes que ya te despidieron <span className="text-vga-light-red">nunca</span> volverán a llamarte.
+        Si nadie quiere saber nada de ti, fin de carrera. Si llegas a 9 puntos en el medidor,
+        Florentino te regala Marbella y da bonus a los jugadores. Tu carrera entera vive en una vista
+        propia con cada temporada desglosada (posición, W/D/L, puntos, Florentinómetro y balance de fichajes).
       </p>
       <p>
         <span className="text-vga-yellow">FANTASY</span> — Crea tu propia liga y haz un draft de jugadores
@@ -58,6 +60,12 @@ const ContentES = ({ onColaborar, changelogRef, engineRef }: {
         <span className="text-vga-yellow">EDITOR</span> — Crea equipos desde cero, ponle un nombre ridículo,
         unos colores horribles y compártelo. Los equipos del editor se pueden meter directamente en una liga
         FANTASY para hacerle la vida imposible a tus amigos.
+      </p>
+      <p>
+        <span className="text-vga-yellow">VARIAS CARRERAS A LA VEZ</span> — Cualquiera de estos modos
+        vive en una partida guardada propia. Puedes tener una Pro Manager en serio, una de prueba
+        para experimentar, y una FANTASY con amigos, todas en paralelo. Cambias entre ellas desde
+        COPIA → PARTIDAS sin perder nada.
       </p>
     </Section>
 
@@ -79,9 +87,16 @@ const ContentES = ({ onColaborar, changelogRef, engineRef }: {
         Los primeros 5 partidos tras llegar a un club son de gracia — la junta espera a ver cómo respondes.
       </p>
       <p>
+        <span className="text-vga-light-red font-bold">Memoria de los clubes:</span> los clubes
+        que te despiden no te volverán a ofrecer trabajo. Cada despido reduce tu lista de
+        opciones futuras. Si ningún club quiere ya saber de ti, la carrera termina ahí y solo
+        queda retirarte.
+      </p>
+      <p>
         Los mensajes de la junta aparecen después del resultado del partido.
         Puedes releerlos pinchando en el icono de advertencia ⚠ en la barra de estado.
-        Tu nombre de entrenador en la barra también es un acceso directo a tu carrera.
+        Tu nombre de entrenador en la barra también es un acceso directo a tu carrera, donde
+        verás cada temporada con su posición, W/D/L, puntos, Florentinómetro y balance de fichajes.
       </p>
     </Section>
 
@@ -129,6 +144,33 @@ const ContentES = ({ onColaborar, changelogRef, engineRef }: {
       <p>
         La EDAD también influye. Cerca de su pico (varía por posición) el jugador
         rinde al máximo. Alejarse del prime penaliza el rendimiento, pero nunca por debajo del 70%.
+      </p>
+    </Section>
+
+    <Section title="POSICIONES">
+      <p>
+        Cada posición pondera las estadísticas de forma distinta, así que un mismo número en
+        TIR vale mucho más para un delantero que para un central. Estas son las posiciones que
+        usa el motor y los atributos que más pesan en cada una:
+      </p>
+      <ul className="list-disc pl-5 space-y-1">
+        <li><span className="text-vga-yellow">POR</span> — Portero. Solo cuenta su estadística de portero; defender goles es lo único que importa.</li>
+        <li><span className="text-vga-yellow">DEF</span> — Defensa. DEF y FIS pesan mucho; PAS y VEL ayudan al juego de salida. Los defensas agresivos cometen más faltas.</li>
+        <li><span className="text-vga-yellow">MED</span> — Centrocampista. PAS, REG y FIS equilibrados. La pieza que más toca el balón.</li>
+        <li><span className="text-vga-yellow">AML / AMR</span> — Extremos. REG y VEL mandan. Generan ocasiones y pueden rematar. Una de las posiciones más rentables.</li>
+        <li><span className="text-vga-yellow">DEL</span> — Delantero. TIR por encima de todo. Cada disparo se enfrenta al portero rival y la defensa.</li>
+      </ul>
+      <p>
+        <span className="text-vga-light-red">Jugar fuera de posición</span> baja todas las
+        estadísticas en torno al 82% (ajustable en AJUSTES DEL MOTOR). En el caso del portero
+        la penalización es aún mayor: poner un jugador de campo en la portería es prácticamente
+        regalar goles. AUTO-FIX 11 elige el mejor XI respetando posiciones naturales siempre que
+        puede.
+      </p>
+      <p>
+        Cada jugador puede tener varias posiciones permitidas (por ejemplo, un MED que también
+        rinde como AML). Las posiciones permitidas vienen del pack importado o se calculan a
+        partir de las stats del jugador. Verás todas las posiciones de un jugador en su ficha.
       </p>
     </Section>
 
@@ -190,7 +232,19 @@ const ContentES = ({ onColaborar, changelogRef, engineRef }: {
       <p>
         Hasta 3 cambios por partido. El juego se pausa al llegar al descanso
         y abre el panel automáticamente. También puedes abrirlo en cualquier momento
-        con el botón CAMBIOS. Haz todos los cambios que quieras y pulsa CONTINUAR cuando termines.
+        con el botón CAMBIOS. El partido no se reanuda hasta que pulsas CONTINUAR.
+      </p>
+      <p>
+        Los cambios son <span className="text-vga-yellow">provisionales</span> hasta que pulsas CONTINUAR:
+        si sacas a un jugador y lo vuelves a meter antes de continuar, no se gasta cambio.
+        Pulsa <span className="text-vga-yellow">CANCELAR</span> para deshacer todos los cambios provisionales.
+        Los jugadores que vayan a entrar se marcan con un círculo cian en el campo.
+      </p>
+      <p>
+        Si pinchas a un titular y luego a otro titular en el campo, intercambian posición —
+        no cuenta como cambio. Si tienes un hueco vacío en el once (porque empezaste con menos
+        de 11 o por una expulsión), puedes rellenarlo desde el banquillo y eso sí gasta un cambio.
+        Un jugador que ha sido sustituido <span className="text-vga-light-red">no puede volver al campo</span>.
       </p>
       <p>
         En el panel también puedes cambiar la <span className="text-vga-yellow">FORMACIÓN</span>,
@@ -219,10 +273,19 @@ const ContentES = ({ onColaborar, changelogRef, engineRef }: {
         Los jóvenes con proyección valen más que un veterano de la misma media.
       </p>
       <p>
-        Los rivales mandan ofertas por tus jugadores y pueden aceptar o rechazar
-        las tuyas. Las ofertas se agrupan por jugador en PLANTILLA — ábrelas para
-        ver todos los clubes interesados. La bolsa de fichajes rota cada jornada
-        con libres y jugadores en venta.
+        <span className="text-vga-cyan font-bold">MERCADO DE FICHAJES:</span> la pantalla muestra
+        una tabla ordenable con todos los jugadores disponibles (en venta y libres). Filtra por
+        tipo o posición, busca por nombre y ordena por edad, OVR, club o precio. Al pinchar
+        una fila se abre la ficha del jugador en el panel lateral con foto, estadísticas y
+        botones de acción. A su lado tienes el feed de ACTIVIDAD DEL MERCADO con todos los
+        movimientos de la temporada (fichajes, clausulazos y retiros).
+      </p>
+      <p>
+        Las ofertas entrantes por tus jugadores se gestionan desde PLANTILLA. Pulsa
+        <span className="text-vga-yellow"> VER OFERTA</span> para abrir el modal de negociación con
+        los escudos de los dos clubes, los entrenadores, la ficha completa del jugador,
+        el desglose económico (incluyendo jugadores incluidos en el trato) y los botones de
+        ACEPTAR / CONTRAOFERTA / RECHAZAR.
       </p>
       <p>
         <span className="text-vga-yellow">Oferta normal</span> — jugadores en venta o agentes libres.
@@ -230,9 +293,74 @@ const ContentES = ({ onColaborar, changelogRef, engineRef }: {
       </p>
       <p>
         <span className="text-vga-light-red font-bold">CLAUSULAZO TEBAS</span> — si quieres fichar
-        a un jugador que no está en el mercado, puedes activar su cláusula de rescisión.
-        El coste es el doble de su valor base y el traspaso es inmediato sin negociación.
-        No aplica a jugadores en venta ni a agentes libres.
+        a un jugador que no está en el mercado, puedes activar su cláusula de rescisión desde
+        su ficha en PLANTILLA del rival. El coste es el doble de su valor base.
+      </p>
+      <p>
+        <span className="text-vga-cyan font-bold">NEGOCIAR CON EL JUGADOR:</span> aunque los clubes
+        se pongan de acuerdo, el jugador todavía tiene que aceptar las condiciones. Al fichar
+        (cláusula u oferta a un rival) tú decides el sueldo semanal y los años de contrato;
+        cuando vendes a uno de los tuyos, el club comprador negocia con el jugador y verás
+        el resultado en vivo. Si las condiciones no le convencen, el fichaje se cae aunque
+        hubieras pagado.
+      </p>
+      <p>
+        <span className="text-vga-cyan font-bold">PREMIOS DE LIGA:</span> al final de cada temporada
+        se reparten 100M € entre todos los equipos según su posición. El campeón se lleva la mayor
+        parte, el subcampeón menos, y el resto se prorratea del tercero al último.
+      </p>
+    </Section>
+
+    <Section title="PARTIDAS GUARDADAS">
+      <p>
+        Puedes tener varias carreras a la vez. En COPIA → pestaña PARTIDAS gestionas todas
+        tus partidas: cargar, renombrar, borrar y crear una nueva desde cero. La partida
+        activa se autoguarda mientras juegas, así que basta con cambiar de slot para volver
+        donde lo dejaste en otra carrera.
+      </p>
+      <p>
+        Para mayor seguridad, exporta tus partidas importantes a un archivo desde la pestaña
+        BACKUP. Las partidas se guardan en este navegador, así que un borrado de datos del
+        sitio o cambiar de máquina las hace desaparecer.
+      </p>
+    </Section>
+
+    <Section title="PACKS DE DATOS Y STATS">
+      <p>
+        OpenFutbol viene con un modelo propio de jugadores. También puedes importar packs
+        de datos externos disponibles públicamente (equipos, jugadores) y opcionalmente un
+        pack de stats para usar tu base de datos preferida. El motor está pensado para que
+        la simulación funcione con cualquier set compatible.
+      </p>
+      <p>
+        Cuando un jugador tiene stats de un pack importado, su año aparece como una pequeña
+        etiqueta en la esquina de la ficha.
+      </p>
+    </Section>
+
+    <Section title="FIN DE TEMPORADA Y RANKINGS">
+      <p>
+        Al cerrar la temporada se abre un resumen completo: campeón con escudo, Pichichi,
+        Zamora y MVP con fotos, clasificación final clicable (cada celda abre un drilldown
+        con los partidos que la generaron) y récords del año (goleada, ridículo, partido loco
+        y rachas).
+      </p>
+      <p>
+        Debajo hay paneles con datos curiosos de jugadores y equipos (más joven, más veterano,
+        Joaquín Award al goleador más mayor, juego limpio, molino de tarjetas, equipo más
+        valioso, etc.), un panel de mercado con el fichaje del año, y una lista de BAJAS con
+        los jugadores retirados esta temporada — los de campo se retiran sobre los 35–38 y
+        los porteros sobre los 38–42 con un poco de aleatoriedad determinista.
+      </p>
+      <p>
+        El drilldown de cada partido muestra los tiros, tarjetas, el MVP del encuentro
+        (calculado por goles + asistencias menos tarjetas) y un timeline cronológico con
+        autoría de gol y asistente. Pasa el ratón sobre cualquier jugador para ver su tarjeta.
+      </p>
+      <p>
+        ESTADÍSTICAS muestra el podio de máximos goleadores y asistentes con fotos, la tabla
+        completa del top 10, micro-rankings de mejor media, G+A, minutos jugados y porterías
+        a cero, además del ranking disciplinario con tarjetas de cada infractor.
       </p>
     </Section>
 
@@ -252,6 +380,32 @@ const ContentES = ({ onColaborar, changelogRef, engineRef }: {
       </p>
     </Section>
     </div>
+
+    <Section title="AJUSTES DEL MOTOR">
+      <p>
+        En COPIA → ENGINE tienes un panel con todas las constantes de equilibrio del juego.
+        Cada cambio se guarda en tu navegador y afecta de inmediato a la siguiente
+        situación relevante. Puedes exportarlos a un archivo para compartir tu preset, o
+        resetear cualquier deslizador a su valor por defecto con el botón ↺.
+      </p>
+      <p>
+        Los grupos disponibles:
+      </p>
+      <ul className="list-disc pl-5 space-y-1">
+        <li><span className="text-vga-cyan">Junta y Presión</span> — recompensas/castigos del Florentinómetro por victoria, empate, derrota, fichajes, semana, objetivo cumplido.</li>
+        <li><span className="text-vga-cyan">Reputación</span> — multiplicadores sobre la reputación ganada y perdida en Pro Manager.</li>
+        <li><span className="text-vga-cyan">Simulación de Partido</span> — probabilidad de gol, lesiones, decay y recuperación de la condición física, severidad arbitral, exponente de posesión, tasa de eventos y de asistencias, y ventaja del local.</li>
+        <li><span className="text-vga-cyan">Jugadores y Táctica</span> — penalización por jugar fuera de posición, bonus/penalización de moral en titulares y suplentes.</li>
+        <li><span className="text-vga-cyan">Mercado de Fichajes</span> — agresividad de la IA al activar clausulazos, hacer intercambios y firmar nuevos jugadores.</li>
+        <li><span className="text-vga-cyan">Negociaciones</span> — qué tan bajo es "insultante", probabilidad de que una oferta insultante o rechazada bloquee al jugador, umbral de aceptación automática, anchura del rango de negociación y coste del clausulazo.</li>
+        <li><span className="text-vga-cyan">Economía</span> — inflación de precios, multiplicador de salarios, ingresos por taquilla y bonus de prima edad para jugadores jóvenes.</li>
+        <li><span className="text-vga-cyan">Interfaz</span> — anchura máxima de la pantalla de partido.</li>
+      </ul>
+      <p>
+        Sube las negociaciones al máximo para una experiencia brutal, baja el clausulazo a 1.2× para
+        un mercado salvaje, o multiplica los salarios por 3 para arruinarte. Lo que quieras.
+      </p>
+    </Section>
 
     <Section title="CONSEJOS PARA GANAR">
       <Tip>Pon siempre a cada jugador en su posición natural. Un delantero de centrocampista es MED tirada.</Tip>
@@ -275,6 +429,36 @@ const ContentES = ({ onColaborar, changelogRef, engineRef }: {
     <div ref={changelogRef} id="changelog">
       <Section title="CAMBIOS RECIENTES">
         <ul className="list-disc pl-5 space-y-1">
+          <li>
+            <span className="text-vga-cyan">v1.8.0</span> — Negociaciones, cambios y premios.
+            <ul className="list-disc pl-5 mt-1 space-y-1">
+              <li><span className="text-vga-yellow">Modal de negociación:</span> VER OFERTA abre una pantalla con los escudos y entrenadores de los dos clubes, ficha completa del jugador, desglose económico con jugadores incluidos y botones ACEPTAR / CONTRAOFERTA / RECHAZAR.</li>
+              <li><span className="text-vga-yellow">Negociación con el jugador:</span> tras el acuerdo entre clubes, el jugador todavía decide. Al fichar tú eliges sueldo y años de contrato; al vender, el club comprador negocia con el jugador y ves el resultado en vivo. Si no llegáis a un acuerdo, la operación se cae.</li>
+              <li><span className="text-vga-yellow">Cambios en directo rediseñados:</span> los cambios son provisionales hasta que pulsas CONTINUAR — sacar y meter al mismo no gasta cambio, dos pinchazos en el campo son un cambio de posición sin coste, los huecos vacíos del once se pueden rellenar y un jugador sustituido no vuelve a entrar. Botón CANCELAR para deshacer.</li>
+              <li><span className="text-vga-yellow">Minutos con descuento:</span> los minutos del descuento del primer y segundo tiempo cuentan a los jugadores que estaban en el campo.</li>
+              <li><span className="text-vga-yellow">Sueldos reales:</span> todos los jugadores tienen un sueldo semanal que se descuenta del presupuesto cada jornada. Los jugadores sin contrato cargan uno generado según su calidad y edad.</li>
+              <li><span className="text-vga-yellow">Entrenadores de la IA:</span> cada club rival tiene su propio entrenador con nombre.</li>
+              <li><span className="text-vga-yellow">MVP del equipo:</span> nueva tarjeta en EQUIPO con el mejor jugador de la temporada según media de calificación. Se actualiza cada jornada.</li>
+              <li><span className="text-vga-yellow">Premios de liga:</span> al final de la temporada se reparten 100M € entre todos los equipos según su posición. El campeón se lleva la mayor parte, el subcampeón la siguiente, y el resto se prorratea del tercero al último.</li>
+              <li><span className="text-vga-yellow">Tabla completa de estadísticas:</span> en el fin de temporada, una tabla ordenable con todos los jugadores que han jugado: partidos, minutos, goles, asistencias, tarjetas, porterías a cero y media. Filtros por posición y búsqueda.</li>
+            </ul>
+          </li>
+          <li>
+            <span className="text-vga-cyan">v1.7.0</span> — Gran actualización: partidas guardadas,
+            fin de temporada totalmente rediseñado, mercado nuevo, rankings con fotos y carrera
+            con detalle por temporada.
+            <ul className="list-disc pl-5 mt-1 space-y-1">
+              <li><span className="text-vga-yellow">Partidas guardadas:</span> varias carreras a la vez, con cargar/renombrar/borrar y autoguardado. Pestaña PARTIDAS dentro de COPIA.</li>
+              <li><span className="text-vga-yellow">Bug serio arreglado:</span> los equipos ya no se vacían al pasar de temporada. Los jugadores de campo se retiran entre los 35 y 38 años, los porteros entre 38 y 42, con un poco de aleatoriedad determinista por jugador.</li>
+              <li><span className="text-vga-yellow">Fin de temporada nuevo:</span> resumen a pantalla completa con campeón y escudo, podio de Pichichi/Zamora/MVP con fotos, clasificación final clicable con drilldown por celda, récords del año (goleada, ridículo, partido loco, rachas), datos curiosos de jugadores y equipos, mercado del año y lista de BAJAS por retiro.</li>
+              <li><span className="text-vga-yellow">Drilldown de partido:</span> al pinchar en una celda de la clasificación se abre la lista de partidos. Cada uno muestra tiros, tarjetas, MVP del encuentro (calculado por goles + asistencias menos tarjetas) y un timeline cronológico con autor del gol y asistente. Hover sobre cualquier jugador para ver su tarjeta.</li>
+              <li><span className="text-vga-yellow">Mercado de fichajes rediseñado:</span> tabla ordenable con filtros por tipo y posición, búsqueda, badges CHOLLO/★, ficha del jugador con foto en el panel lateral con OFERTAR y feed de ACTIVIDAD DEL MERCADO al lado (todos los movimientos: fichajes, clausulazos, retiros).</li>
+              <li><span className="text-vga-yellow">Estadísticas rediseñadas:</span> podio top 3 de goleadores y asistentes con fotos, tabla completa del top 10, micro-rankings de mejor media, G+A, minutos y porterías a cero, ranking disciplinario con glifos de tarjetas.</li>
+              <li><span className="text-vga-yellow">Carrera como entrenador:</span> nueva vista detallada por temporada (posición con barra visual, W/D/L con barra, puntos y % victorias, Florentinómetro con rango min→peak, balance fichajes), tarjetas de campeón/despido/descenso, mejor y peor temporada destacadas.</li>
+              <li><span className="text-vga-yellow">Pro Manager:</span> los clubes que te despiden no vuelven a ofrecerte trabajo. Si todos te han descartado, la carrera termina y solo queda retirarte.</li>
+              <li><span className="text-vga-yellow">Packs de stats:</span> OpenFutbol acepta packs de datos públicos de terceros para usar tu base de datos preferida. El año del pack aparece como etiqueta junto al jugador.</li>
+            </ul>
+          </li>
           <li>
             <span className="text-vga-cyan">v1.5.1</span> — Reglas Tebas y carrera en tiempo real.
             Límite Tebas de clausulazos recibidos por equipo (máx. 2 por temporada). En Pro Manager,
@@ -361,9 +545,11 @@ const ContentEN = ({ onColaborar, changelogRef, engineRef }: {
         <span className="text-vga-cyan">Florentinometer</span> (0–10). Win matches, make smart signings,
         and meet your objective to keep them happy. If the meter drops too low, Florentino calls.
         First time he warns you. Second time he's blunter. Third time — pack your things.
-        When you're sacked (or finish the season) you get new offers based on your track record.
-        Good seasons open doors to better clubs. Hit 9 on the meter and Florentino gives you Marbella,
-        hands out bonuses to the players, and wires €2M to the club.
+        When you're sacked you get new offers based on your track record, but any club that already
+        fired you <span className="text-vga-light-red">never</span> calls again. If nobody wants you
+        anymore, career's over. Hit 9 on the meter and Florentino gives you Marbella,
+        hands out bonuses, and wires €2M to the club. Your full career lives in a dedicated view
+        with every season broken down (position, W/D/L, points, Florentinometer and transfer balance).
       </p>
       <p>
         <span className="text-vga-yellow">FANTASY</span> — Build your own league and run a player draft
@@ -375,6 +561,11 @@ const ContentEN = ({ onColaborar, changelogRef, engineRef }: {
         <span className="text-vga-yellow">EDITOR</span> — Create teams from scratch, give them a ridiculous
         name, horrible colours, and share them. Editor teams can be dropped straight into a FANTASY league
         to ruin your friends' evenings.
+      </p>
+      <p>
+        <span className="text-vga-yellow">MULTIPLE CAREERS</span> — Each of the modes above lives in
+        its own save. Run a serious Pro Manager, a sandbox PLAY save and a FANTASY league with friends
+        in parallel. Switch between them in BACKUP → PARTIDAS without losing anything.
       </p>
     </Section>
 
@@ -396,9 +587,15 @@ const ContentEN = ({ onColaborar, changelogRef, engineRef }: {
         Your first 5 matches at a new club are a grace period — the board waits to see how you respond.
       </p>
       <p>
+        <span className="text-vga-light-red font-bold">Clubs remember:</span> any club that fires
+        you will never offer you a job again. Each firing shrinks your future options. If no club
+        wants you anymore, your career ends and you can only retire.
+      </p>
+      <p>
         Board messages appear after the match result screen.
         You can re-read them by tapping the ⚠ warning icon in the status bar.
-        Your manager name in the status bar is also a shortcut to your career stats.
+        Your manager name in the status bar is also a shortcut to your career stats, where every
+        season is broken down by position, W/D/L, points, Florentinometer and transfer balance.
       </p>
     </Section>
 
@@ -444,6 +641,32 @@ const ContentEN = ({ onColaborar, changelogRef, engineRef }: {
       <p>
         <span className="text-vga-yellow">AGE</span> matters too. Near their peak (which varies by position)
         a player performs at their best. Drifting from their prime hurts performance, but never below 70%.
+      </p>
+    </Section>
+
+    <Section title="POSITIONS">
+      <p>
+        Each position weights the base stats differently, so the same TIR number is far more
+        valuable to a striker than to a centre-back. These are the positions the engine uses
+        and what matters most in each:
+      </p>
+      <ul className="list-disc pl-5 space-y-1">
+        <li><span className="text-vga-yellow">POR</span> — Goalkeeper. Only the goalkeeping stat matters; stopping goals is the only job.</li>
+        <li><span className="text-vga-yellow">DEF</span> — Defender. DEF and FIS dominate; PAS and VEL help with build-up. Aggressive defenders commit more fouls.</li>
+        <li><span className="text-vga-yellow">MED</span> — Midfielder. Balanced PAS, REG and FIS. The most-on-the-ball role.</li>
+        <li><span className="text-vga-yellow">AML / AMR</span> — Wingers. REG and VEL rule. They create chances and can finish — one of the highest-value roles.</li>
+        <li><span className="text-vga-yellow">DEL</span> — Striker. TIR above all. Every shot duels the rival keeper and defence.</li>
+      </ul>
+      <p>
+        <span className="text-vga-light-red">Playing out of position</span> cuts every stat to
+        about 82% (tunable in ENGINE SETTINGS). The penalty is even harsher for goalkeepers —
+        slotting an outfielder in goal is basically gifting goals. AUTO-FIX 11 picks the best XI
+        respecting natural positions whenever possible.
+      </p>
+      <p>
+        Each player can have several allowed positions (e.g. a MED who can also play AML).
+        Allowed positions come from the imported pack or are derived from the player's stats.
+        You'll see every position a player can fill on their card.
       </p>
     </Section>
 
@@ -501,8 +724,20 @@ const ContentEN = ({ onColaborar, changelogRef, engineRef }: {
     <Section title="SUBSTITUTIONS & LIVE TACTICS">
       <p>
         Up to 3 substitutions per match. The game pauses at half-time and opens the panel automatically.
-        You can also open it at any time with the SUBS button. Make as many changes as you like,
-        then press CONTINUE when you're done.
+        You can also open it at any time with the SUBS button. The match does not resume until you
+        press CONTINUE.
+      </p>
+      <p>
+        Changes stay <span className="text-vga-yellow">pending</span> until you press CONTINUE:
+        if you sub a player out and back in before continuing, no sub is used.
+        Press <span className="text-vga-yellow">CANCEL</span> to discard all pending changes.
+        Players who are about to come on are marked with a cyan ring on the pitch.
+      </p>
+      <p>
+        Click a starter then another starter on the pitch to swap positions — that doesn't use a sub.
+        If you have an empty slot in your XI (because you started with fewer than 11 or because of a
+        sending-off), you can fill it from the bench and that does use one sub.
+        A player who has been subbed off <span className="text-vga-light-red">can't return</span> to the field.
       </p>
       <p>
         From the panel you can also change the <span className="text-vga-yellow">FORMATION</span>,
@@ -529,9 +764,17 @@ const ContentEN = ({ onColaborar, changelogRef, engineRef }: {
         Young players with potential are worth more than an older player at the same rating.
       </p>
       <p>
-        Rivals will send offers for your players, and they can accept or reject yours.
-        Offers are grouped by player in SQUAD — open them to see all interested clubs.
-        The transfer market rotates each round with free agents and listed players.
+        <span className="text-vga-cyan font-bold">TRANSFER MARKET:</span> a sortable table of every
+        available player (listed and free agents). Filter by type or position, search by name, and
+        sort by age, OVR, club or price. Click a row to open the player file in the side inspector
+        with photo, season stats and action buttons. Next to it, a live MARKET ACTIVITY feed lists
+        every move of the season — signings, buyouts and retirements.
+      </p>
+      <p>
+        Incoming offers for your players are managed from SQUAD. Press
+        <span className="text-vga-yellow"> VIEW OFFER</span> to open the negotiation modal with
+        both club crests, both managers, the full player card, the financial breakdown (including
+        any players included in the deal) and ACCEPT / COUNTER / REJECT buttons.
       </p>
       <p>
         <span className="text-vga-yellow">Standard offer</span> — for listed players or free agents.
@@ -539,8 +782,69 @@ const ContentEN = ({ onColaborar, changelogRef, engineRef }: {
       </p>
       <p>
         <span className="text-vga-light-red font-bold">BUYOUT CLAUSE</span> — if you want a player
-        who isn't on the market, you can trigger their release clause. The cost is double their base
-        value and the transfer is instant — no negotiation. Doesn't apply to listed players or free agents.
+        who isn't on the market, trigger their release clause from their card on the rival's SQUAD
+        view. The cost is double their base value.
+      </p>
+      <p>
+        <span className="text-vga-cyan font-bold">PLAYER NEGOTIATION:</span> even when both clubs
+        agree, the player still has to accept the terms. When you sign someone (clause or offer to
+        a rival) you set the weekly wage and contract length yourself; when you sell one of yours,
+        the buying club negotiates with the player and you see the outcome live. If the terms aren't
+        good enough, the deal falls through even after you paid.
+      </p>
+      <p>
+        <span className="text-vga-cyan font-bold">LEAGUE PRIZES:</span> at the end of every season
+        100M € is distributed across all teams by final position. The champion gets the biggest
+        share, the runner-up the next, and the rest prorated from third place down to last.
+      </p>
+    </Section>
+
+    <Section title="SAVE SLOTS">
+      <p>
+        You can keep several careers at once. In BACKUP → PARTIDAS tab you can load, rename,
+        delete and create new save slots. The active save autosaves while you play, so switching
+        slots takes you straight back where you left off in another career.
+      </p>
+      <p>
+        For safety, export important saves to a file from the BACKUP tab. Saves live in this
+        browser, so clearing site data or moving machine will lose them.
+      </p>
+    </Section>
+
+    <Section title="DATA & STATS PACKS">
+      <p>
+        OpenFutbol ships with its own player model. You can also import external, publicly
+        available data packs (teams, players) and optionally a stats pack to use your preferred
+        database. The engine is designed to run the simulation on any compatible dataset.
+      </p>
+      <p>
+        When a player has stats from an imported pack, the pack year shows as a small badge
+        in the corner of their file.
+      </p>
+    </Section>
+
+    <Section title="END OF SEASON & RANKINGS">
+      <p>
+        Closing a season opens a full summary: champion with crest, Pichichi, Zamora and MVP
+        with photos, clickable final standings (each cell opens a drilldown of the matches it
+        came from) and the year's records (biggest win, heaviest defeat, craziest match,
+        unbeaten and winning runs).
+      </p>
+      <p>
+        Below that, player and team curiosities (youngest, oldest, Joaquín Award for the oldest
+        scorer, fair play, card mill, richest squad, etc.), a transfer-of-the-year panel, and a
+        RETIROS list with every player who retired this season — outfielders retire between 35
+        and 38, goalkeepers between 38 and 42, with a small deterministic random band.
+      </p>
+      <p>
+        The per-match drilldown shows shots, cards, the match MVP (computed from goals +
+        assists minus cards) and a chronological timeline with goal scorer and assist provider.
+        Hover any player to pop their card.
+      </p>
+      <p>
+        RANKINGS shows a top-3 podium for scorers and assisters with photos, the full top-10
+        table, micro-rankings for best average rating, G+A, minutes and clean sheets, plus a
+        disciplinary ranking with card glyphs for each offender.
       </p>
     </Section>
 
@@ -558,6 +862,30 @@ const ContentEN = ({ onColaborar, changelogRef, engineRef }: {
       </p>
     </Section>
     </div>
+
+    <Section title="ENGINE SETTINGS">
+      <p>
+        Under BACKUP → ENGINE you'll find a panel with every balance constant in the game.
+        Changes are persisted in your browser and take effect immediately on the next relevant
+        event. Export your tweaks to a file to share a preset, or reset any individual slider
+        with the ↺ button.
+      </p>
+      <p>Available groups:</p>
+      <ul className="list-disc pl-5 space-y-1">
+        <li><span className="text-vga-cyan">Board & Pressure</span> — Florentinometer rewards/penalties for win, draw, loss, signings, weekly drift, season objective.</li>
+        <li><span className="text-vga-cyan">Reputation</span> — multipliers on reputation gained and lost in Pro Manager.</li>
+        <li><span className="text-vga-cyan">Match Simulation</span> — goal chance, injuries, stamina decay and recovery, referee strictness, possession exponent, event and assist rates, plus home advantage.</li>
+        <li><span className="text-vga-cyan">Player & Tactics</span> — out-of-position penalty, mood lineup bonus and bench penalty.</li>
+        <li><span className="text-vga-cyan">Transfer Market</span> — AI aggressiveness on buyouts, trades and new signings.</li>
+        <li><span className="text-vga-cyan">Negotiations</span> — what counts as insulting, chance an insulting/rejected offer blocks the player, auto-accept multiplier, negotiation window width and buyout-clause cost.</li>
+        <li><span className="text-vga-cyan">Economy</span> — price inflation, salary multiplier, ticket revenue and the prime-age bonus.</li>
+        <li><span className="text-vga-cyan">Interface</span> — match screen max width.</li>
+      </ul>
+      <p>
+        Crank negotiations to max for brutal mode, drop the buyout multiplier to 1.2× for a wild
+        market, or triple salaries to go bankrupt on purpose. Knock yourself out.
+      </p>
+    </Section>
 
     <Section title="TIPS TO WIN">
       <Tip>Always play each player in their natural position. A striker in midfield is wasted MED.</Tip>
@@ -581,6 +909,36 @@ const ContentEN = ({ onColaborar, changelogRef, engineRef }: {
     <div ref={changelogRef} id="changelog">
       <Section title="RECENT CHANGES">
         <ul className="list-disc pl-5 space-y-1">
+          <li>
+            <span className="text-vga-cyan">v1.8.0</span> — Negotiations, subs and prizes.
+            <ul className="list-disc pl-5 mt-1 space-y-1">
+              <li><span className="text-vga-yellow">Negotiation modal:</span> VIEW OFFER opens a screen with both club crests, both managers, the full player card, financial breakdown with included players and ACCEPT / COUNTER / REJECT buttons.</li>
+              <li><span className="text-vga-yellow">Player negotiation:</span> after the clubs agree, the player still decides. When signing you set wage and contract length; when selling, the buying club negotiates with the player and you watch it unfold live. If you don't reach an agreement the deal falls through.</li>
+              <li><span className="text-vga-yellow">Live subs reworked:</span> changes are pending until you press CONTINUE — subbing out and back in costs nothing, two clicks on the pitch is a free position swap, empty XI slots can be filled, and a subbed-off player can't return. CANCEL discards everything.</li>
+              <li><span className="text-vga-yellow">Stoppage minutes:</span> first and second half stoppage time count toward players on the pitch.</li>
+              <li><span className="text-vga-yellow">Real wages:</span> every player has a weekly wage that hits the budget each round. Players without a contract get one synthesized from their quality and age.</li>
+              <li><span className="text-vga-yellow">AI managers:</span> every rival club now has its own named manager.</li>
+              <li><span className="text-vga-yellow">Team MVP:</span> new card on TEAM showing the best player by average rating. Updates every round.</li>
+              <li><span className="text-vga-yellow">League prizes:</span> at the end of every season 100M € is distributed across all teams by position. Champion takes the biggest share, runner-up next, and the rest prorated from third down to last.</li>
+              <li><span className="text-vga-yellow">Full stats table:</span> end of season ships a sortable table of every player who played — apps, minutes, goals, assists, cards, clean sheets and avg rating. Position filter and search.</li>
+            </ul>
+          </li>
+          <li>
+            <span className="text-vga-cyan">v1.7.0</span> — Massive update: save slots,
+            end-of-season fully redesigned, new market, rankings with photos and a detailed
+            per-season manager career.
+            <ul className="list-disc pl-5 mt-1 space-y-1">
+              <li><span className="text-vga-yellow">Save slots:</span> keep several careers at once with load/rename/delete and autosave. PARTIDAS tab inside BACKUP.</li>
+              <li><span className="text-vga-yellow">Critical bug fix:</span> teams no longer empty out at season's end. Outfielders retire between 35 and 38, goalkeepers between 38 and 42, with a small deterministic random band per player.</li>
+              <li><span className="text-vga-yellow">New end-of-season screen:</span> full-width summary with champion + crest, Pichichi/Zamora/MVP podium with photos, clickable final standings with per-cell drilldown, year records (biggest win, heaviest defeat, craziest match, runs), player and team curiosities, a market panel and a RETIROS list.</li>
+              <li><span className="text-vga-yellow">Match drilldown:</span> clicking any cell of the standings opens its match list. Each one shows shots, cards, the match MVP (computed from goals + assists minus cards) and a chronological timeline with goal scorer and assist provider. Hover any name for the player card.</li>
+              <li><span className="text-vga-yellow">Redesigned transfer market:</span> sortable table with type and position filters, search, CHOLLO/★ badges, side-panel player file with photo and OFERTAR, and a live MARKET ACTIVITY feed (every signing, buyout and retirement).</li>
+              <li><span className="text-vga-yellow">Redesigned rankings:</span> top-3 podium for scorers and assisters with photos, full top-10 table, micro-rankings for best avg rating, G+A, minutes and clean sheets, disciplinary ranking with card glyphs.</li>
+              <li><span className="text-vga-yellow">Manager career view:</span> new detailed per-season view (position with visual bar, W/D/L bar, points and win %, Florentinometer range min→peak, transfer balance), champion/fired/relegation chips, best and worst season highlighted.</li>
+              <li><span className="text-vga-yellow">Pro Manager:</span> clubs that fire you never offer you another job. If every club has dropped you, your career ends and you can only retire.</li>
+              <li><span className="text-vga-yellow">Stats packs:</span> OpenFutbol supports publicly available third-party data packs so you can use your preferred database. The pack year shows as a small badge next to a player.</li>
+            </ul>
+          </li>
           <li>
             <span className="text-vga-cyan">v1.5.1</span> — Tebas rules and live career screen.
             Tebas buyout limit: each team can only receive 2 buyout clauses per season. In Pro Manager

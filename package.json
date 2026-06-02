@@ -1,13 +1,15 @@
 {
   "name": "openfutbol",
   "private": true,
-  "version": "1.5.0",
+  "version": "1.8.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "import-pack": "tsx scripts/import-pack/index.ts",
+    "build-default-pack": "node scripts/build-default-pack/index.js"
   },
   "dependencies": {
     "pixi.js": "^8.18.1",
@@ -31,6 +33,7 @@
     "tailwindcss": "^4.3.0",
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.59.2",
+    "tsx": "^4.19.4",
     "vite": "^8.0.12"
   }
 }

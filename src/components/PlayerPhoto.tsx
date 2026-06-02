@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
-import { extractDbId } from '../data/mockTeams';
 
 interface Props {
-  playerId: string;
-  size?: 'xs' | 'sm' | 'md' | 'lg';
+  sourceId?: number;
+  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
   className?: string;
 }
 
@@ -12,33 +11,25 @@ const SIZE: Record<NonNullable<Props['size']>, string> = {
   sm: 'w-6 h-6',
   md: 'w-9 h-9',
   lg: 'w-16 h-16',
+  xl: 'w-24 h-24',
 };
 
-type Attempt = 'png' | 'jpeg' | 'jpg' | 'ico' | 'unknown';
-const EXTS: Attempt[] = ['png', 'jpeg', 'jpg', 'ico'];
+// TODO swap to self-hosted CDN once available.
+const PHOTO_BASE = 'https://open-football.org/player';
 
-export const PlayerPhoto = ({ playerId, size = 'sm', className = '' }: Props) => {
-  const dbId = extractDbId(playerId);
-  const [attempt, setAttempt] = useState<Attempt>('png');
+export const PlayerPhoto = ({ sourceId, size = 'sm', className = '' }: Props) => {
+  const [failed, setFailed] = useState(false);
 
-  useEffect(() => { setAttempt('png'); }, [dbId]);
+  useEffect(() => { setFailed(false); }, [sourceId]);
 
   const base = import.meta.env.BASE_URL;
-  const src =
-    attempt === 'unknown'
-      ? `${base}assets/players/unknown.jpeg`
-      : `${base}assets/players/${dbId}.${attempt}`;
-
-  const handleError = () => {
-    const idx = EXTS.indexOf(attempt);
-    if (idx !== -1 && idx < EXTS.length - 1) setAttempt(EXTS[idx + 1]);
-    else setAttempt('unknown');
-  };
+  const fallback = `${base}assets/players/unknown.jpeg`;
+  const src = !sourceId || failed ? fallback : `${PHOTO_BASE}/${sourceId}.png`;
 
   return (
     <img
       src={src}
-      onError={handleError}
+      onError={() => setFailed(true)}
       alt=""
       className={`${SIZE[size]} shrink-0 object-cover ${className}`}
     />

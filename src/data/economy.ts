@@ -1,4 +1,5 @@
 import type { Player, Team } from '../types/game.d.ts';
+import { engineSettings } from '../engine/engineSettings';
 
 const TOP_PLAYER_PRICE_EUR = 70_000_000;
 
@@ -6,20 +7,32 @@ const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(ma
 
 export const ageMultiplier = (player: Player, seasonYear: number): number => {
   const age = seasonYear - player.birthYear;
-  if (age < player.peakAge) return 1.2;
+  if (age < player.peakAge) return engineSettings.agePeakBonusMult;
   if (age <= player.peakAge + 2) return 1.0;
   return clamp(1 - (age - player.peakAge - 2) * 0.1, 0.4, 1.0);
 };
 
 export const computePrice = (player: Player, seasonYear: number): number => {
   const base = Math.pow(player.media / 99, 3) * TOP_PLAYER_PRICE_EUR;
-  const price = base * ageMultiplier(player, seasonYear);
+  const price = base * ageMultiplier(player, seasonYear) * engineSettings.transferPriceMult;
   return Math.round(price / 100_000) * 100_000;
 };
 
 export const computeWeeklySalary = (price: number): number => {
-  return Math.round(price / 2000 / 10) * 10;
+  return Math.round((price / 2000) * engineSettings.salaryMult / 10) * 10;
 };
+
+// Prefer the player's actual contract.salary (weekly). Fall back to derived from
+// market price when contract is missing. Single source of truth for both the
+// inspector display and the weekly wage deduction.
+export const playerWeeklySalary = (player: Player, seasonYear: number): number => {
+  const fromContract = player.contract?.salary;
+  if (fromContract && fromContract > 0) return fromContract;
+  return computeWeeklySalary(computePrice(player, seasonYear));
+};
+
+export const computeClausulazoPrice = (price: number): number =>
+  Math.round(price * engineSettings.clausulazoMult / 100_000) * 100_000;
 
 export const formatEuros = (amount: number): string => {
   return new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(amount);
@@ -34,9 +47,14 @@ export interface OfferResult {
 }
 
 export const evaluateOffer = (price: number, offerAmount: number): OfferResult => {
-  if (offerAmount < price * 0.7) {
-    // Insulting offer: high chance the club refuses further talks this season.
-    const blocked = Math.random() < 0.7;
+  const insultT = engineSettings.offerInsultThreshold;
+  const insultBlock = engineSettings.offerInsultBlockProb;
+  const instantAccept = engineSettings.offerInstantAcceptMult;
+  const negRange = engineSettings.offerNegotiationRange;
+  const rejectBlock = engineSettings.offerRejectBlockProb;
+
+  if (offerAmount < price * insultT) {
+    const blocked = Math.random() < insultBlock;
     return {
       accepted: false,
       blocked,
@@ -45,15 +63,14 @@ export const evaluateOffer = (price: number, offerAmount: number): OfferResult =
         : 'Oferta inaceptable: muy por debajo del valor.',
     };
   }
-  if (offerAmount >= price * 2) {
+  if (offerAmount >= price * instantAccept) {
     return { accepted: true, message: '¡Oferta aceptada! El club no podía dejar pasar esa cifra.' };
   }
-  const threshold = price * (0.7 + Math.random() * 1.3);
+  const threshold = price * (insultT + Math.random() * negRange);
   if (offerAmount >= threshold) {
     return { accepted: true, message: '¡Oferta aceptada!' };
   }
-  // Reasonable but rejected offer: moderate chance the club closes the door.
-  const blocked = Math.random() < 0.3;
+  const blocked = Math.random() < rejectBlock;
   return {
     accepted: false,
     blocked,
@@ -97,8 +114,31 @@ export const computeAttendance = (homeTeam: Team, awayTeam: Team): AttendanceRes
 };
 
 export const teamWeeklySalary = (team: Team, seasonYear: number): number => {
-  return team.players.reduce(
-    (sum, p) => sum + computeWeeklySalary(computePrice(p, seasonYear)),
-    0
-  );
+  return team.players.reduce((sum, p) => sum + playerWeeklySalary(p, seasonYear), 0);
+};
+
+// End-of-season prize money. Fixed pot of 100M split: 30M to the champion,
+// 20M to the runner-up, and the remaining 50M prorated linearly from 3rd
+// down to last (3rd gets the most, last gets the least).
+// Returns euros (rounded to 100k for tidy numbers in the UI).
+export const SEASON_PRIZE_POOL = 100_000_000;
+export const SEASON_PRIZE_FIRST = 30_000_000;
+export const SEASON_PRIZE_SECOND = 20_000_000;
+export const computeSeasonPrizes = (teamIdsByStanding: string[]): Record<string, number> => {
+  const out: Record<string, number> = {};
+  const n = teamIdsByStanding.length;
+  if (n === 0) return out;
+  if (n >= 1) out[teamIdsByStanding[0]] = SEASON_PRIZE_FIRST;
+  if (n >= 2) out[teamIdsByStanding[1]] = SEASON_PRIZE_SECOND;
+  const rest = teamIdsByStanding.slice(2);
+  if (rest.length === 0) return out;
+  const remaining = SEASON_PRIZE_POOL - SEASON_PRIZE_FIRST - (n >= 2 ? SEASON_PRIZE_SECOND : 0);
+  const k = rest.length;
+  // Linear weights k, k-1, ..., 1 — top of the rest takes the largest share.
+  const sumWeights = (k * (k + 1)) / 2;
+  rest.forEach((id, i) => {
+    const w = k - i;
+    out[id] = Math.round((remaining * (w / sumWeights)) / 100_000) * 100_000;
+  });
+  return out;
 };

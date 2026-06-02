@@ -2,13 +2,14 @@ import { useState, useEffect, useRef } from 'react';
 import { t, useT, getLang, setLang, getSupportedLangs } from './i18n';
 
 import { getAvailableYears, getAvailableYearsWithStats, getTeamColorsForYear, migrateTeam, buildFreeAgentFromDB, buildTeamFromSeason, getTeamTemplatesForYear, getFantasyPool, buildFantasyTeam } from './data/mockTeams';
-import type { FormationId, MatchEvent, MatchState, Team } from './types/game.d.ts';
+import type { FormationId, MatchEvent, MatchState, Player, Team } from './types/game.d.ts';
 import { applyMoodToTeam } from './engine/playerMood';
 import { simulateMinute, calculateTeamStrength, staminaDecayPerMin } from './engine/simEngine';
-import { FORMATIONS } from './engine/formations';
-import { getInitialLeagueState, getFantasyLeagueState, updateLeagueStats, deductWeeklySalaries, generateIncomingOffers, autoListAiPlayers, simulateAiMarketSignings, advanceSeason, simulateAiTrades, simulateAiFreeAgentSignings, simulateAiClausulazos, appendTransfer, decrementSuspensions, signingBlockKey, transferredKey, squadNeeds, groupFor, repickAiFormations, writebackMatchStamina, decayTeamStaminaAfterMatch, decrementInjuries, applyStaminaRecovery, computeTvBonus, applyTvBonus, isTransferWindowOpen, windowJornadasLeft, jornadasUntilWindowOpen } from './store/leagueStore';
-import type { TransferRecord, ManagerSeasonRecord } from './store/leagueStore';
+import { FORMATIONS, pickBestXI } from './engine/formations';
+import { getInitialLeagueState, getFantasyLeagueState, updateLeagueStats, deductWeeklySalaries, generateIncomingOffers, autoListAiPlayers, simulateAiMarketSignings, advanceSeason, simulateAiTrades, simulateAiFreeAgentSignings, simulateAiClausulazos, simulateAiInterClausulazos, appendTransfer, decrementSuspensions, signingBlockKey, transferredKey, squadNeeds, groupFor, repickAiFormations, writebackMatchStamina, decayTeamStaminaAfterMatch, decrementInjuries, applyStaminaRecovery, computeTvBonus, applyTvBonus, isTransferWindowOpen, windowJornadasLeft, jornadasUntilWindowOpen } from './store/leagueStore';
+import type { TransferRecord, ManagerSeasonRecord, IncomingOffer } from './store/leagueStore';
 import type { LeagueState } from './store/leagueStore';
+import { migrateLegacyKey, getActiveSlotId, saveSlot, createSlotFromCurrent } from './store/saveSlots';
 import { computeBoardObjective, computeTransferDelta, firingChance, applyMeterDelta, isObjectiveMet, computeMatchMeterDelta, computeMatchReputationDelta, computeSeasonReputationDelta, computeSeasonMeterDelta } from './engine/florentinometro';
 import { engineSettings, loadEngineSettings } from './engine/engineSettings';
 loadEngineSettings();
@@ -23,6 +24,7 @@ import type { MatchTimeline } from './types/match';
 import { LeagueTable } from './components/LeagueTable';
 import { StatusBar } from './components/StatusBar';
 import { SquadView } from './components/SquadView';
+import { SquadViewCompact } from './components/SquadViewCompact';
 import { TeamSelection } from './components/TeamSelection';
 import { AlignmentView } from './components/AlignmentView';
 import { ResultsView } from './components/ResultsView';
@@ -46,6 +48,7 @@ import { TeamCrest } from './components/TeamCrest';
 import { PitchDiagram } from './components/PitchDiagram';
 import { StatDrillDown } from './components/StatDrillDown';
 import { MessageModal } from './components/MessageModal';
+import { PlayerNegotiationModal } from './components/PlayerNegotiationModal';
 import { BoardAlertModal } from './components/BoardAlertModal';
 import { DisclaimerView } from './components/DisclaimerView';
 import { SwapModal } from './components/SwapModal';
@@ -53,18 +56,26 @@ import { FantasySetupView } from './components/FantasySetupView';
 import { FantasyDraftView } from './components/FantasyDraftView';
 import type { StatKey } from './components/StatDrillDown';
 import { extractDbId } from './data/mockTeams';
-import { computePrice, evaluateOffer, formatEuros } from './data/economy';
+import { startAmbiance, stopAmbiance, fadeOutAmbiance, setAmbianceMuted, playGoalSignal, playGoalWithCelebration, playMissed, playWhistle, playWhistleEnd } from './sfx';
+import { computePrice, evaluateOffer, formatEuros, computeClausulazoPrice, computeAttendance } from './data/economy';
 import { PlayerTooltipProvider } from './contexts/PlayerTooltipContext';
-import { PlayerName } from './components/PlayerName';
 import { formatJornadaDate } from './engine/calendar';
 import type { OfferResult } from './data/economy';
+import { PackLoaderView } from './components/PackLoaderView';
+import MatchScreen from './components/MatchScreen';
+import { usePack } from './state/PackContext';
+import { buildTeamFromPackClub, trimRoster } from './data/packTeamBuilder';
+import { runtimePlayerFromPack, joinPlayerName } from './data/playerBuilder';
 
-type View = 'LEAGUE' | 'SQUAD' | 'ALIGNMENT' | 'RESULTS' | 'STATS' | 'FINANCES' | 'TRANSFERS' | 'JORNADA_RESULTS' | 'END_OF_SEASON' | 'PLAYER_DETAIL' | 'BACKUP' | 'EDITOR' | 'EQUIPO' | 'MANAGER_CAREER';
+type View = 'LEAGUE' | 'SQUAD' | 'ALIGNMENT' | 'RESULTS' | 'STATS' | 'FINANCES' | 'TRANSFERS' | 'JORNADA_RESULTS' | 'END_OF_SEASON' | 'PLAYER_DETAIL' | 'BACKUP' | 'EDITOR' | 'EQUIPO' | 'MANAGER_CAREER' | 'PACK_LOADER';
+
 
 function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
   useT(); // subscribe to language changes so nav labels and messages re-render
+  const { pack, loading: packLoading } = usePack();
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
   const [league, setLeague] = useState<LeagueState>(() => {
+    migrateLegacyKey();
     const saved = localStorage.getItem('openfutbol_league');
     if (saved) {
       const parsed = JSON.parse(saved);
@@ -75,6 +86,7 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
       // trying to patch a broken state. Add a check here whenever LeagueState
       // gains a required field that old saves won't have.
       const needsReset =
+        (parsed.schema_version ?? 1) !== 2 ||       // schema_version mismatch — wipe
         parsed.isStarted === undefined ||           // pre-isStarted saves
         !parsed.schedule ||                         // pre-schedule saves
         !parsed.year ||                             // pre-multi-year saves
@@ -97,6 +109,11 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
       const hydratedTeams = parsed.teams.map((t: Team) => migrateTeam({
         ...t,
         colors: t.colors ?? colorsByTeamId.get(t.id),
+        players: (t.players ?? []).map(p => {
+          if (!p.first_name || !p.last_name) return p;
+          const joined = joinPlayerName(p.first_name, p.last_name);
+          return { ...p, name: joined, fullName: joined };
+        }),
       }));
       const teamRecords: Record<string, import('./store/leagueStore').TeamRecords> = parsed.teamRecords && typeof parsed.teamRecords === 'object' ? parsed.teamRecords : {};
       hydratedTeams.forEach((t: Team) => {
@@ -168,7 +185,7 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
   // Players unavailable for selection in the in-game changes screen (red cards /
   // injuries up to the pause), computed when the screen opens so the render
   // doesn't read refs/timeline directly.
-  const [changes2dCtx, setChanges2dCtx] = useState<{ sentOff: string[]; injuredIds: string[] }>({ sentOff: [], injuredIds: [] });
+  const [changes2dCtx, setChanges2dCtx] = useState<{ sentOff: string[]; injuredIds: string[]; subbedOffIds: string[] }>({ sentOff: [], injuredIds: [], subbedOffIds: [] });
   const [showPreview, setShowPreview] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [showPlayFlow, setShowPlayFlow] = useState(false);
@@ -181,10 +198,28 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
   const [previousView, setPreviousView] = useState<View>('LEAGUE');
   const [viewingTeamId, setViewingTeamId] = useState<string | null>(null);
   const [message, setMessage] = useState<{ title: string; body: string; tone?: 'info' | 'danger' | 'warning' } | null>(null);
+  const [saleNegotiation, setSaleNegotiation] = useState<{ offer: IncomingOffer; player: Player; buyer: Team; seller: Team } | null>(null);
+  const [clausulaNegotiation, setClausulaNegotiation] = useState<{ player: Player; buyer: Team; seller: Team; cost: number; fromTeamId: string } | null>(null);
+  const [outgoingNegotiation, setOutgoingNegotiation] = useState<{ player: Player; buyer: Team; seller: Team; amount: number; fromTeamId: string; offeredPlayerIds: string[] } | null>(null);
   const [boardAlert, setBoardAlert] = useState<{ title: string; body: string; tone: 'danger' | 'warning' | 'success' } | null>(null);
   const [lastBoardAlert, setLastBoardAlert] = useState<{ title: string; body: string; tone: 'danger' | 'warning' | 'success' } | null>(null);
   const [htPaused, setHtPaused] = useState(false);
   const [showSubPanel, setShowSubPanel] = useState(false);
+  const [preselectedSubPlayerId, setPreselectedSubPlayerId] = useState<string | null>(null);
+  const [isCelebrating, setIsCelebrating] = useState(false);
+  const [squadCompact, setSquadCompact] = useState<boolean>(() => {
+    try {
+      const v = localStorage.getItem('openfutbol_squad_compact');
+      return v === null ? true : v === '1';
+    } catch { return true; }
+  });
+  const toggleSquadCompact = () => {
+    setSquadCompact(prev => {
+      const next = !prev;
+      try { localStorage.setItem('openfutbol_squad_compact', next ? '1' : '0'); } catch { /* noop */ }
+      return next;
+    });
+  };
   const [previewSwapSlot, setPreviewSwapSlot] = useState<number | null>(null);
   const [showFantasyFlow, setShowFantasyFlow] = useState(false);
   const [showProManagerFlow, setShowProManagerFlow] = useState(false);
@@ -256,13 +291,9 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
   const [muted, setMuted] = useState<boolean>(() => localStorage.getItem('openfutbol_muted') === '1');
   const toggleMute = () => setMuted(m => { localStorage.setItem('openfutbol_muted', m ? '0' : '1'); return !m; });
 
-  const [theme, setThemeState] = useState<'retrocutre' | 'retrocool'>(() =>
+  const [theme] = useState<'retrocutre' | 'retrocool'>(() =>
     (localStorage.getItem('openfutbol_theme') as 'retrocutre' | 'retrocool') ?? 'retrocool'
   );
-  const setTheme = (t: 'retrocutre' | 'retrocool') => {
-    localStorage.setItem('openfutbol_theme', t);
-    setThemeState(t);
-  };
   useEffect(() => {
     if (theme === 'retrocool') {
       document.body.dataset.theme = 'retrocool';
@@ -282,6 +313,14 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
   const didNotifyReady = useRef(false);
   useEffect(() => {
     localStorage.setItem('openfutbol_league', JSON.stringify(league));
+    if (league.isStarted) {
+      const activeId = getActiveSlotId();
+      if (activeId) {
+        try { saveSlot(activeId, league); } catch (e) { console.warn('saveSlot failed', e); }
+      } else {
+        try { createSlotFromCurrent(league); } catch (e) { console.warn('createSlotFromCurrent failed', e); }
+      }
+    }
     if (league.isStarted && !didNotifyReady.current) {
       didNotifyReady.current = true;
       onLeagueReady?.();
@@ -302,21 +341,55 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
 
   const handleLeagueSetupConfirm = (selectedTeamIds: string[], extraRawPlayers: import('./types/game.d.ts').RawPlayerDB[], importedRawTeams: import('./types/game.d.ts').RawTeamDB[]) => {
     const selectedSet = new Set(selectedTeamIds);
-    const importedTeams = importedRawTeams
-      .filter(rt => selectedSet.has(rt.id))
-      .flatMap(rt => {
-        const season = rt.seasons.find(s => s.year === selectedYear!) ?? rt.seasons[0];
-        if (!season) return [];
-        return [buildTeamFromSeason({ id: rt.id, name: rt.name, ...season })];
-      });
-    const dbTeamIds = new Set(getTeamTemplatesForYear(selectedYear!).map(t => t.id));
-    const importedRawIds = new Set(importedRawTeams.map(rt => rt.id));
-    const editorTeams = league.teams.filter(t => !dbTeamIds.has(t.id) && !importedRawIds.has(t.id));
-    const extraTeams = [...importedTeams, ...editorTeams];
-    const extraFreeAgents = extraRawPlayers
-      .map(p => buildFreeAgentFromDB(p, selectedYear!))
-      .filter((p): p is import('./types/game.d.ts').Player => p !== null);
-    setLeague(getInitialLeagueState(selectedYear!, selectedTeamIds, extraFreeAgents, extraTeams));
+    let extraTeams: import('./types/game.d.ts').Team[] = [];
+    let extraFreeAgents: import('./types/game.d.ts').Player[] = [];
+
+    if (pack) {
+      // Build teams from pack clubs
+      const packClubIds = new Set(pack.clubs.map(c => c.id));
+      const selectedPackClubs = pack.clubs.filter(c => selectedSet.has(c.id));
+      extraTeams = selectedPackClubs.map(club => buildTeamFromPackClub(club, pack, selectedYear!));
+      // Free agents: players not assigned to any selected club
+      extraFreeAgents = pack.players
+        .filter(p => !p.club_id || !packClubIds.has(p.club_id) || !selectedSet.has(p.club_id))
+        .slice(0, 500) // cap to avoid bloat
+        .map(p => runtimePlayerFromPack(p, 0));
+    } else {
+      // Legacy: build from imported raw teams + editor teams
+      const importedTeams = importedRawTeams
+        .filter(rt => selectedSet.has(rt.id))
+        .flatMap(rt => {
+          const season = rt.seasons.find(s => s.year === selectedYear!) ?? rt.seasons[0];
+          if (!season) return [];
+          return [buildTeamFromSeason({ id: rt.id, name: rt.name, ...season })];
+        });
+      const dbTeamIds = new Set(getTeamTemplatesForYear(selectedYear!).map(t => t.id));
+      const importedRawIds = new Set(importedRawTeams.map(rt => rt.id));
+      const editorTeams = league.teams.filter(t => !dbTeamIds.has(t.id) && !importedRawIds.has(t.id));
+      extraTeams = [...importedTeams, ...editorTeams];
+      extraFreeAgents = extraRawPlayers
+        .map(p => buildFreeAgentFromDB(p, selectedYear!))
+        .filter((p): p is import('./types/game.d.ts').Player => p !== null);
+    }
+
+    // Belt-and-suspenders: enforce 22-player cap at selection time. Any squad
+    // overflow becomes free agents so they're not lost.
+    const overflowFreeAgents: import('./types/game.d.ts').Player[] = [];
+    const trimmedExtraTeams = extraTeams.map(t => {
+      const kept = trimRoster(t.players);
+      if (kept.length < t.players.length) {
+        const keptIds = new Set(kept.map(p => p.id));
+        overflowFreeAgents.push(...t.players.filter(p => !keptIds.has(p.id)));
+      }
+      return { ...t, players: kept, lineup: t.lineup.filter(id => kept.some(p => p.id === id)) };
+    });
+
+    setLeague(getInitialLeagueState(
+      selectedYear!,
+      selectedTeamIds,
+      [...extraFreeAgents, ...overflowFreeAgents],
+      trimmedExtraTeams,
+    ));
     setLeagueSetupDone(true);
   };
 
@@ -335,11 +408,11 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
   const handleProManagerSelectYear = (year: number) => {
     if (year === 0) {
       setSelectedYear(null);
+      setLeagueSetupDone(false);
       return;
     }
     setSelectedYear(year);
-    const allTeamIds = getTeamTemplatesForYear(year).map(t => t.id);
-    setLeague(getInitialLeagueState(year, allTeamIds, [], []));
+    setLeagueSetupDone(false);
   };
 
   const handleSelectTeamProManager = (teamId: string, managerName: string) => {
@@ -555,11 +628,25 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
       }
       return result;
     }
+    // AI seller accepted the fee. Now open the player negotiation modal —
+    // the player still has to want the move and we (the buyer) set the terms.
+    setOutgoingNegotiation({ player, buyer, seller, amount, fromTeamId, offeredPlayerIds });
+    return { accepted: true, message: '¡Club acepta! Negociando con el jugador...' };
+  };
 
+  const commitOutgoingOfferAccept = (
+    player: Player, fromTeamId: string, amount: number,
+    offeredPlayerIds: string[], agreedSalary: number, years: number,
+  ) => {
     setLeague(prev => {
-      const buyerTeam = prev.teams.find(t => t.id === prev.userTeamId);
+      const seller = prev.teams.find(tm => tm.id === fromTeamId);
+      const buyerTeam = prev.teams.find(tm => tm.id === prev.userTeamId);
+      if (!seller || !buyerTeam) return prev;
+      const offeredPlayers = offeredPlayerIds
+        .map(id => buyerTeam.players.find(p => p.id === id))
+        .filter((p): p is NonNullable<typeof p> => Boolean(p));
       const tradeId = offeredPlayers.length > 0
-        ? `usr_trade_${prev.currentJornada}_${playerId}_${Date.now()}`
+        ? `usr_trade_${prev.currentJornada}_${player.id}_${Date.now()}`
         : undefined;
       const records: TransferRecord[] = [];
       records.push({
@@ -569,7 +656,7 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
         playerName: player.name,
         playerPosition: player.position,
         fromTeamName: seller.name,
-        toTeamName: buyerTeam?.name ?? '',
+        toTeamName: buyerTeam.name,
         amount,
         tradeId,
       });
@@ -580,7 +667,7 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
           year: prev.year,
           playerName: op.name,
           playerPosition: op.position,
-          fromTeamName: buyerTeam?.name ?? '',
+          fromTeamName: buyerTeam.name,
           toTeamName: seller.name,
           amount: 0,
           tradeId,
@@ -593,30 +680,32 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
         ? computeTransferDelta(player, amount, marketValue, true, prev.year)
         : 0;
       const newMeter = florentinoDelta !== 0 ? applyMeterDelta(prev.florentinometro ?? 5, florentinoDelta) : (prev.florentinometro ?? 5);
+      const expYear = prev.year + years;
+      const newContract = { salary: agreedSalary, expiration: `${expYear}-06-30` };
       return {
         ...prev,
-        teams: prev.teams.map(t => {
-          if (t.id === fromTeamId) {
+        teams: prev.teams.map(tm => {
+          if (tm.id === fromTeamId) {
             return {
-              ...t,
-              players: t.players
-                .filter(p => p.id !== playerId)
+              ...tm,
+              players: tm.players
+                .filter(p => p.id !== player.id)
                 .concat(offeredPlayers.map(p => ({ ...p, forSale: false }))),
-              lineup: t.lineup.filter(id => id !== playerId),
-              budget: t.budget + amount,
+              lineup: tm.lineup.filter(id => id !== player.id),
+              budget: tm.budget + amount,
             };
           }
-          if (t.id === prev.userTeamId) {
+          if (tm.id === prev.userTeamId) {
             return {
-              ...t,
-              players: t.players
+              ...tm,
+              players: tm.players
                 .filter(p => !offeredIdSet.has(p.id))
-                .concat({ ...player, forSale: false }),
-              lineup: t.lineup.filter(id => !offeredIdSet.has(id)),
-              budget: t.budget - amount,
+                .concat({ ...player, forSale: false, contract: newContract }),
+              lineup: tm.lineup.filter(id => !offeredIdSet.has(id)),
+              budget: tm.budget - amount,
             };
           }
-          return t;
+          return tm;
         }),
         transferLog: records.reduce((log, rec) => appendTransfer(log, rec), prev.transferLog),
         florentinometro: newMeter,
@@ -624,12 +713,11 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
         florentinometroMin: Math.min(prev.florentinometroMin ?? 5, newMeter),
         seasonTransferSpent: (prev.seasonTransferSpent ?? 0) + amount,
         blockedSignings: [...prev.blockedSignings,
-          transferredKey(playerId),
+          transferredKey(player.id),
           ...offeredPlayers.map(p => transferredKey(p.id)),
         ],
       };
     });
-    return result;
   };
 
   const handleClausula = (playerId: string, fromTeamId: string): OfferResult => {
@@ -663,12 +751,27 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
     const buyer = league.teams.find(t => t.id === league.userTeamId);
     if (!seller || !player || !buyer) return { accepted: false, message: 'Operación inválida.' };
     const price = computePrice(player, league.year);
-    const clausulaCost = price * 2;
+    const clausulaCost = computeClausulazoPrice(price);
     if (buyer.budget < clausulaCost) return { accepted: false, message: 'No tienes presupuesto suficiente para la cláusula.' };
+    // Clubs side: clausulazo amount is established. Open the player
+    // negotiation modal; the actual commit waits for the modal outcome.
+    setClausulaNegotiation({ player, buyer, seller, cost: clausulaCost, fromTeamId });
+    return { accepted: true, message: 'Negociando con el jugador...' };
+  };
 
+  const commitClausula = (player: Player, fromTeamId: string, clausulaCost: number, agreedSalary: number, years: number) => {
     setLeague(prev => {
+      const seller = prev.teams.find(tm => tm.id === fromTeamId);
+      const buyer = prev.teams.find(tm => tm.id === prev.userTeamId);
+      if (!seller || !buyer) return prev;
+      const expYear = prev.year + years;
+      const playerWithContract: Player = {
+        ...player,
+        forSale: false,
+        contract: { salary: agreedSalary, expiration: `${expYear}-06-30` },
+      };
       const entry: TransferRecord = {
-        id: `clausula_${prev.currentJornada}_${playerId}_${Date.now()}`,
+        id: `clausula_${prev.currentJornada}_${player.id}_${Date.now()}`,
         jornada: prev.currentJornada, year: prev.year,
         playerName: player.name, playerPosition: player.position,
         fromTeamName: seller.name, toTeamName: buyer.name,
@@ -682,22 +785,21 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
       const prevRec = prev.seasonClausulazosReceived ?? {};
       return {
         ...prev,
-        teams: prev.teams.map(t => {
-          if (t.id === fromTeamId) return { ...t, players: t.players.filter(p => p.id !== playerId), lineup: t.lineup.filter(id => id !== playerId) };
-          if (t.id === prev.userTeamId) return { ...t, players: [...t.players, { ...player, forSale: false }], budget: t.budget - clausulaCost };
-          return t;
+        teams: prev.teams.map(tm => {
+          if (tm.id === fromTeamId) return { ...tm, players: tm.players.filter(p => p.id !== player.id), lineup: tm.lineup.filter(id => id !== player.id) };
+          if (tm.id === prev.userTeamId) return { ...tm, players: [...tm.players, playerWithContract], budget: tm.budget - clausulaCost };
+          return tm;
         }),
         transferLog: appendTransfer(prev.transferLog, entry),
         florentinometro: newMeter,
         florentinometroPeak: Math.max(prev.florentinometroPeak ?? 5, newMeter),
         florentinometroMin: Math.min(prev.florentinometroMin ?? 5, newMeter),
         seasonTransferSpent: (prev.seasonTransferSpent ?? 0) + clausulaCost,
-        blockedSignings: [...prev.blockedSignings, transferredKey(playerId)],
+        blockedSignings: [...prev.blockedSignings, transferredKey(player.id)],
         seasonClausulazosMade: (prev.seasonClausulazosMade ?? 0) + 1,
         seasonClausulazosReceived: { ...prevRec, [fromTeamId]: (prevRec[fromTeamId] ?? 0) + 1 },
       };
     });
-    return { accepted: true, message: `Cláusula ejecutada. ${formatEuros(clausulaCost)} pagados a TEBAS.` };
   };
 
   const handleToggleForSale = (playerId: string) => {
@@ -771,6 +873,21 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
       setMessage({ title: t('msg.minSquadRival.title'), body: t('msg.minSquadRival.body', { team: buyer.name, n: String(buyerFinalSize) }), tone: 'warning' });
       return;
     }
+    // Clubs have agreed. Open a visible negotiation modal: the AI buyer talks
+    // to the player. The actual transfer commit waits for the modal outcome.
+    setSaleNegotiation({ offer, player, buyer, seller: userTeam });
+    return;
+  };
+
+  const commitIncomingOfferAccept = (offer: IncomingOffer, agreedSalary: number, years: number) => {
+    const userTeam = league.teams.find(t => t.id === league.userTeamId);
+    const buyer = league.teams.find(t => t.id === offer.fromTeamId);
+    const player = userTeam?.players.find(p => p.id === offer.playerId);
+    if (!userTeam || !buyer || !player) return;
+    const offeredIds = offer.offeredPlayerIds ?? [];
+    const offeredPlayers = offeredIds
+      .map(id => buyer.players.find(p => p.id === id))
+      .filter((p): p is NonNullable<typeof p> => Boolean(p));
     setLeague(prev => {
 
       const tradeId = offeredPlayers.length > 0
@@ -822,11 +939,12 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
             };
           }
           if (t.id === offer.fromTeamId) {
+            const expYear = prev.year + years;
             return {
               ...t,
               players: t.players
                 .filter(p => !offeredIdSet.has(p.id))
-                .concat({ ...player, forSale: false }),
+                .concat({ ...player, forSale: false, contract: { salary: agreedSalary, expiration: `${expYear}-06-30` } }),
               lineup: t.lineup.filter(id => !offeredIdSet.has(id)),
               budget: t.budget - offer.amount,
             };
@@ -1029,7 +1147,7 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
       awayShotsOnTarget: 0,
       homeFouls: 0,
       awayFouls: 0,
-      homeBoost: 1.05 + Math.random() * 0.15,
+      homeBoost: 1 + ((0.05 + Math.random() * 0.15) * engineSettings.homeAdvantageMult),
       homeStamina: Object.fromEntries(homeTeam.players.map(p => [p.id, p.stamina ?? 99])),
       awayStamina: Object.fromEntries(awayTeam.players.map(p => [p.id, p.stamina ?? 99])),
       homeSubsUsed: 0,
@@ -1040,6 +1158,7 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
       awayStartingLineup: [...awayTeam.lineup],
       stoppageTime1: 0,
       stoppageTime2: 0,
+      attendance: computeAttendance(homeTeam, awayTeam),
     };
 
     setHtPaused(false);
@@ -1128,7 +1247,10 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
     const injuredIds = timeline2d.events
       .filter(e => e.kind === 'injury' && e.side === side && e.t <= gameTimeMs)
       .map(e => e.actor).filter((id): id is string => !!id);
-    setChanges2dCtx({ sentOff, injuredIds });
+    // Players already subbed off this match can't return (computed here so the
+    // changes panel reads state, not the ref, during render).
+    const subbedOffIds = inp.subs.map(s => s.outId);
+    setChanges2dCtx({ sentOff, injuredIds, subbedOffIds });
     // Working copy of the user team whose lineup reflects subs made so far this
     // match (the real squad is only mutated on finalize). Seeds from the base
     // team on first open.
@@ -1224,7 +1346,7 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
       if (m.homeId === userTeamId || m.awayId === userTeamId) return;
       const hTeam = applyMoodToTeam(league.teams.find(t => t.id === m.homeId)!);
       const aTeam = applyMoodToTeam(league.teams.find(t => t.id === m.awayId)!);
-      const homeBoost = 1.05 + Math.random() * 0.15;
+      const homeBoost = 1 + ((0.05 + Math.random() * 0.15) * engineSettings.homeAdvantageMult);
       const hStr = calculateTeamStrength(hTeam) * homeBoost;
       const aStr = calculateTeamStrength(aTeam);
 
@@ -1313,7 +1435,8 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
     newLeague = simulateAiMarketSignings(newLeague);
     newLeague = simulateAiTrades(newLeague);
     newLeague = simulateAiFreeAgentSignings(newLeague);
-    const afterClausulazo = simulateAiClausulazos(newLeague);
+    const afterInter = simulateAiInterClausulazos(newLeague);
+    const afterClausulazo = simulateAiClausulazos(afterInter);
     const clausulazoNews = afterClausulazo.aiClausulazoNews ?? [];
     const clausulazoWasLastDay = windowJornadasLeft(playedJornada, newLeague.schedule.length) === 1;
     newLeague = { ...afterClausulazo, aiClausulazoNews: [] };
@@ -1349,7 +1472,8 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
         if (chance > 0 && Math.random() < chance) {
           const warnings = (newLeague.boardWarnings ?? 0) + 1;
           if (warnings >= FIRE_THRESHOLD) {
-            newLeague = { ...newLeague, boardFired: true, boardWarnings: warnings, seasonFinished: true };
+            const firedTeams = Array.from(new Set([...(newLeague.firedByTeamIds ?? []), newLeague.userTeamId]));
+            newLeague = { ...newLeague, boardFired: true, boardWarnings: warnings, seasonFinished: true, firedByTeamIds: firedTeams };
             const firedIdx = Math.floor(Math.random() * 4);
             const firedMsg = { title: t('florentino.fired'), body: t(`florentino.firedBody.${firedIdx}`), tone: 'danger' as const };
             setTimeout(() => { setBoardAlert(firedMsg); setLastBoardAlert(firedMsg); }, 100);
@@ -1435,6 +1559,8 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
       finalMatch.events,
       finalMatch.homeStartingLineup,
       finalMatch.awayStartingLineup,
+      finalMatch.stoppageTime1 ?? 0,
+      finalMatch.stoppageTime2 ?? 0,
     );
     newLeague = applyTvBonus(newLeague, league.userTeamId, tvBonus);
     // Florentinometro + reputation: context-aware match delta
@@ -1715,19 +1841,100 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
 
   useEffect(() => {
     let interval: number;
-    if (isPlaying && match && !match.isFinished) {
+    if (isPlaying && match && !match.isFinished && !isCelebrating) {
       interval = window.setInterval(() => {
         setMatch(prev => prev ? simulateMinute(prev, league.userTeamId) : null);
       }, match.matchSpeed);
     }
     return () => clearInterval(interval);
-  }, [isPlaying, match]);
+  }, [isPlaying, match, isCelebrating]);
 
   useEffect(() => {
     if (eventLogRef.current) {
       eventLogRef.current.scrollTop = eventLogRef.current.scrollHeight;
     }
   }, [match?.events]);
+
+  // Ambiance: loops in the background while a live match is in progress.
+  // Volume scales with the home stadium capacity (bigger venue → louder crowd).
+  // When the match ends we fade out instead of cutting; when the user leaves
+  // the match (match becomes null) we stop immediately.
+  useEffect(() => {
+    if (match && !match.isFinished) {
+      if (!muted) startAmbiance(match.homeTeam?.stadiumCapacity);
+    } else if (match && match.isFinished) {
+      fadeOutAmbiance(2.5);
+    } else {
+      stopAmbiance();
+    }
+  }, [match?.isFinished, !!match, match?.homeTeam?.stadiumCapacity, muted]);
+
+  // React to mute toggle without restarting ambiance.
+  useEffect(() => {
+    if (muted) { stopAmbiance(); }
+    else if (match && !match.isFinished) { startAmbiance(match.homeTeam?.stadiumCapacity); }
+    setAmbianceMuted(muted);
+  }, [muted]);
+
+  // Watch match events for new goals, missed chances, fouls / cards, halftime
+  // and full-time so we can fire the right sound effect.
+  // - Home-team goals get the crowd celebration (pauses the tick loop)
+  // - Away-team goals only get the basic goal sound
+  // - Cards (yellow/red) trigger a foul whistle
+  // - Halftime fires the whistle once when htPaused flips true
+  // - Full-time fires the end whistle and the ambiance fade-out runs in parallel
+  const lastGoalCountRef = useRef<number>(0);
+  const lastShotCountRef = useRef<number>(0);
+  const lastCardCountRef = useRef<number>(0);
+  const lastHtPausedRef = useRef<boolean>(false);
+  const lastFinishedRef = useRef<boolean>(false);
+  useEffect(() => {
+    if (!match) {
+      lastGoalCountRef.current = 0;
+      lastShotCountRef.current = 0;
+      lastCardCountRef.current = 0;
+      lastHtPausedRef.current = false;
+      lastFinishedRef.current = false;
+      return;
+    }
+    const events = match.events;
+    const goals = events.filter(e => e.type === 'goal');
+    const shots = events.filter(e => e.type === 'shot');
+    const cards = events.filter(e => e.type === 'yellow' || e.type === 'red');
+
+    if (goals.length > lastGoalCountRef.current) {
+      const newest = goals[goals.length - 1];
+      lastGoalCountRef.current = goals.length;
+      // Always pause the tick loop until the goal sound has been heard. Home
+      // team gets the full crowd celebration; away team only gets the basic
+      // signal but the clock still freezes for the duration of that signal.
+      setIsCelebrating(true);
+      const goalSequence = newest.teamId === match.homeTeam.id
+        ? playGoalWithCelebration()
+        : playGoalSignal();
+      goalSequence.finally(() => setIsCelebrating(false));
+    }
+
+    if (shots.length > lastShotCountRef.current) {
+      lastShotCountRef.current = shots.length;
+      playMissed();
+    }
+
+    if (cards.length > lastCardCountRef.current) {
+      lastCardCountRef.current = cards.length;
+      playWhistle();
+    }
+
+    if (htPaused && !lastHtPausedRef.current) {
+      playWhistle();
+    }
+    lastHtPausedRef.current = htPaused;
+
+    if (match.isFinished && !lastFinishedRef.current) {
+      playWhistleEnd();
+    }
+    lastFinishedRef.current = match.isFinished;
+  }, [match?.events.length, match, htPaused]);
 
   // Auto-pause at halftime for user subs
   useEffect(() => {
@@ -1749,6 +1956,27 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
       const sentOff = isHome ? next.homeSentOff : next.awaySentOff;
       const injured = isHome ? next.homeInjuredInMatch : next.awayInjuredInMatch;
       const stamMap = isHome ? next.homeStamina : next.awayStamina;
+      const ownScore = isHome ? next.homeScore : next.awayScore;
+      const oppScore = isHome ? next.awayScore : next.homeScore;
+      const scoreDiff = ownScore - oppScore;
+
+      // Threshold scales with match state:
+      // - Losing or drawing → only sub really exhausted players (<60 stam) and don't bench stars
+      // - Winning by 1 → mild rotation (<70 stam)
+      // - Winning by 2+ → comfortable lead, rest stars more aggressively (<80 stam)
+      // - Behind by 3+ → emergency, push fresh legs even at <85 stam (try to chase the game)
+      const stamThreshold =
+        scoreDiff >= 2 ? 80 :
+        scoreDiff >= 1 ? 70 :
+        scoreDiff <= -3 ? 85 :
+        60;
+      // When winning comfortably, allow swapping in slightly weaker subs to rest stars.
+      // When losing, refuse to swap in significantly weaker players.
+      const mediaTolerance =
+        scoreDiff >= 2 ? 12 :
+        scoreDiff >= 1 ? 8 :
+        scoreDiff <= -3 ? 10 :
+        5;
 
       const inLineup = new Set(team.lineup);
       const starters = team.lineup
@@ -1757,13 +1985,13 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
           const p = team.players.find(x => x.id === pid);
           return { pid, stam: stamMap[pid] ?? 99, media: p?.media ?? 0 };
         })
-        .filter(s => s.stam < 70) // Only consider subbing if below 70 stamina at halftime
+        .filter(s => s.stam < stamThreshold)
         .sort((a, b) => a.stam - b.stam);
 
       const bench = team.players
         .filter(p => !inLineup.has(p.id) && !injured.includes(p.id) && !sentOff.includes(p.id) && (p.injuryWeeksRemaining ?? 0) === 0 && p.suspensionMatches === 0)
         .map(p => ({ p, stam: stamMap[p.id] ?? (p.stamina ?? 99) }))
-        .filter(b => b.stam > 90) // Only sub in fresh players
+        .filter(b => b.stam > 85)
         .sort((a, b) => b.p.media - a.p.media);
 
       const toMake = Math.min(3 - subsUsed, starters.length, bench.length);
@@ -1772,9 +2000,12 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
       const newStamMap = { ...stamMap };
 
       for (let i = 0; i < toMake; i++) {
-        // Only sub if bench player is not significantly worse than the tired starter (max 5 points difference)
-        if (bench[i].p.media < starters[i].media - 5) continue;
-        
+        // Refuse to sub a clearly better starter for a weaker bench player —
+        // unless the team is comfortably winning and the swap rests a star.
+        if (bench[i].p.media < starters[i].media - mediaTolerance) continue;
+        // Never bench a star (CA-equivalent media ≥ 80) unless they're truly gassed (<50 stam).
+        if (starters[i].media >= 80 && starters[i].stam >= 50) continue;
+
         newLineup = newLineup.map(id => id === starters[i].pid ? bench[i].p.id : id);
         newStamMap[bench[i].p.id] = bench[i].stam;
         newSubsUsed++;
@@ -1790,56 +2021,70 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
     return next;
   };
 
-  const performUserSub = (playerOutId: string, playerInId: string) => {
+  // Commit a batch of staged substitutions from the in-game AlignmentView.
+  // stagedLineup is the new final lineup; subPairs are the (out, in) pairs
+  // that count as subs (position swaps and net-zero shuffles are excluded).
+  const commitUserSubs = (stagedLineup: string[], subPairs: { outId: string; inId: string }[]) => {
     if (!match) return;
     const isUserHome = match.homeTeam.id === league.userTeamId;
     const team = isUserHome ? match.homeTeam : match.awayTeam;
     const subsUsed = isUserHome ? match.homeSubsUsed : match.awaySubsUsed;
-    if (subsUsed >= 3) return;
+    if (subPairs.length === 0 && stagedLineup.join(',') === team.lineup.join(',')) return;
 
-    const playerOut = team.players.find(p => p.id === playerOutId);
-    const playerIn = team.players.find(p => p.id === playerInId);
-    if (!playerOut || !playerIn) return;
-
-    const newLineup = team.lineup.map(id => id === playerOutId ? playerInId : id);
-    const newTeam = { ...team, lineup: newLineup };
     const stamMap = isUserHome ? { ...match.homeStamina } : { ...match.awayStamina };
-    stamMap[playerInId] = playerIn.stamina ?? 99;
+    const newEvents: MatchEvent[] = [];
+    for (const { outId, inId } of subPairs) {
+      const pIn = team.players.find(p => p.id === inId);
+      const pOut = outId ? team.players.find(p => p.id === outId) : undefined;
+      if (!pIn) continue;
+      stamMap[pIn.id] = pIn.stamina ?? 99;
+      newEvents.push({
+        minute: match.minute,
+        type: 'sub',
+        description: pOut
+          ? `Cambio: entra ${pIn.fullName}, sale ${pOut.fullName}.`
+          : `Entra ${pIn.fullName}.`,
+        teamId: team.id,
+        playerId: inId,
+        playerOffId: outId || undefined,
+      });
+    }
+    const newSubsUsed = subsUsed + subPairs.length;
+    if (newSubsUsed > 3) return; // hard guard
 
-    const subEvent: MatchEvent = {
-      minute: match.minute,
-      type: 'sub',
-      description: `Cambio: entra ${playerIn.fullName}, sale ${playerOut.fullName}.`,
-      teamId: team.id,
-      playerId: playerInId,
-      playerOffId: playerOutId,
-    };
-
+    const newTeam = { ...team, lineup: stagedLineup };
     if (isUserHome) {
       setMatch(prev => prev ? {
         ...prev,
         homeTeam: newTeam,
         homeStamina: stamMap,
-        homeSubsUsed: subsUsed + 1,
-        events: [...prev.events, subEvent],
+        homeSubsUsed: newSubsUsed,
+        events: [...prev.events, ...newEvents],
       } : null);
     } else {
       setMatch(prev => prev ? {
         ...prev,
         awayTeam: newTeam,
         awayStamina: stamMap,
-        awaySubsUsed: subsUsed + 1,
-        events: [...prev.events, subEvent],
+        awaySubsUsed: newSubsUsed,
+        events: [...prev.events, ...newEvents],
       } : null);
-    }
-    const newSubsUsed = subsUsed + 1;
-    if (newSubsUsed >= 3) {
-      setShowSubPanel(false);
-      setIsPlaying(true);
     }
   };
 
   const renderMainContent = () => {
+    if (packLoading) {
+      return (
+        <div className="w-full max-w-sm flex flex-col items-center gap-3 animate-in fade-in duration-300">
+          <div className="text-vga-cyan text-[10px] uppercase tracking-widest cool:text-rc-accent">CARGANDO...</div>
+        </div>
+      );
+    }
+
+    if (view === 'PACK_LOADER') {
+      return <PackLoaderView onBack={() => setView('BACKUP')} />;
+    }
+
     if (showInstructions) {
       return <InstructionsView onBack={() => { setShowInstructions(false); setInstructionsScroll(undefined); }} onColaborar={() => { setShowInstructions(false); setShowColaborar(true); }} scrollTo={instructionsScroll} />;
     }
@@ -1868,6 +2113,7 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
           onRestore={(newState) => { setLeague(newState); setView('LEAGUE'); }}
           onReset={() => { setLeague(getInitialLeagueState()); setView('LEAGUE'); }}
           onBack={() => setView('LEAGUE')}
+          onOpenPack={() => setView('PACK_LOADER')}
         />
       );
     }
@@ -1943,25 +2189,46 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
     }
 
     if (showProManagerFlow) {
+      const PACK_YEAR = new Date().getFullYear();
+      const proYearStats = pack
+        ? [{ year: PACK_YEAR, teams: pack.clubs.length, leagues: pack.leagues.length, players: pack.players.length }]
+        : getAvailableYearsWithStats();
+
+      // After year is picked, route through the same team-selection view used by Liga
+      // mode. Once teams are confirmed, ProManagerSetupView renders the offers screen.
+      if (selectedYear && !leagueSetupDone) {
+        return (
+          <LeagueSetupView
+            year={selectedYear}
+            existingTeams={league.teams}
+            onConfirm={handleLeagueSetupConfirm}
+            onBack={() => handleProManagerSelectYear(0)}
+          />
+        );
+      }
+
       return (
         <ProManagerSetupView
           teams={league.teams}
           managerName={league.managerName ?? ''}
           managerCareer={league.managerCareer ?? []}
           managerReputation={league.managerReputation ?? 50}
-          yearStats={getAvailableYearsWithStats()}
+          yearStats={proYearStats}
           selectedYear={selectedYear}
           onSelectYear={handleProManagerSelectYear}
           onSelectTeam={handleSelectTeamProManager}
           onImport={handleImportCareer}
-          onBack={() => { setShowProManagerFlow(false); setSelectedYear(null); }}
+          onBack={() => { setShowProManagerFlow(false); setSelectedYear(null); setLeagueSetupDone(false); }}
         />
       );
     }
 
     if (!league.isStarted) {
-      const availableYears = getAvailableYears();
+      const PACK_YEAR = new Date().getFullYear();
+      const packYearStats = pack ? [{ year: PACK_YEAR, teams: pack.clubs.length, leagues: pack.leagues.length, players: pack.players.length }] : [];
+      const availableYears = pack ? [PACK_YEAR] : getAvailableYears();
 
+      const fantasyAvailable = getAvailableYears().length > 0;
       if (!showPlayFlow) {
         return (
           <div className="w-full max-w-sm flex flex-col gap-3 animate-in fade-in duration-300 rc-menu">
@@ -1975,12 +2242,14 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
             >
               {t('btn.play')}
             </button>
+            {fantasyAvailable && (
             <button
               onClick={() => setShowFantasyFlow(true)}
               className="w-full bg-vga-yellow text-vga-black py-4 text-sm border-b-4 border-r-4 border-vga-black font-bold uppercase tracking-widest hover:opacity-90 rc-btn-fantasy"
             >
               {t('btn.fantasy')}
             </button>
+            )}
             <button
               onClick={() => setShowProManagerFlow(true)}
               className="w-full bg-vga-magenta text-vga-bright-white py-4 text-sm border-b-4 border-r-4 border-vga-black font-bold uppercase tracking-widest hover:opacity-90"
@@ -2039,7 +2308,7 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
           teams={league.teams}
           selectedYear={selectedYear}
           availableYears={availableYears}
-          yearStats={getAvailableYearsWithStats()}
+          yearStats={packYearStats.length > 0 ? packYearStats : getAvailableYearsWithStats()}
           onSelectYear={handleSelectYear}
           onSelect={handleSelectTeam}
           onBack={() => setShowPlayFlow(false)}
@@ -2052,28 +2321,39 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
     if (view === 'END_OF_SEASON') {
       if (league.gameMode === 'promanager') {
         return (
-          <ProManagerEndView
-            teams={league.teams}
-            stats={league.stats}
-            userTeamId={league.userTeamId}
-            managerName={league.managerName ?? ''}
-            florentinometro={league.florentinometro ?? 5}
-            boardObjective={league.boardObjective ?? 'avoid_relegation'}
-            managerReputation={league.managerReputation ?? 50}
-            year={league.year}
-            onPickTeam={handleProManagerPickTeam}
-            onRetire={handleProManagerRetire}
-          />
+          <div className="w-full flex flex-col gap-3">
+            <EndOfSeasonView
+              league={league}
+              hideActions
+              onCellClick={(teamId, stat) => setDrillDown({ teamId, stat })}
+              onTeamClick={(teamId) => { setViewingTeamId(teamId); setView('SQUAD'); }}
+              onPlayerClick={(playerId) => showPlayerDetail(playerId)}
+            />
+            <ProManagerEndView
+              teams={league.teams}
+              stats={league.stats}
+              userTeamId={league.userTeamId}
+              managerName={league.managerName ?? ''}
+              florentinometro={league.florentinometro ?? 5}
+              boardObjective={league.boardObjective ?? 'avoid_relegation'}
+              managerReputation={league.managerReputation ?? 50}
+              year={league.year}
+              firedByTeamIds={league.firedByTeamIds}
+              onPickTeam={handleProManagerPickTeam}
+              onRetire={handleProManagerRetire}
+            />
+          </div>
         );
       }
       return (
         <EndOfSeasonView
-          teams={league.teams}
-          stats={league.stats}
-          userTeamId={league.userTeamId}
+          league={league}
           onContinueSameTeam={handleAdvanceSameTeam}
           onAdvanceAndChangeTeam={handleAdvanceChangeTeam}
           onResetGame={handleResetGame}
+          onCellClick={(teamId, stat) => setDrillDown({ teamId, stat })}
+          onTeamClick={(teamId) => { setViewingTeamId(teamId); setView('SQUAD'); }}
+          onPlayerClick={(playerId) => showPlayerDetail(playerId)}
         />
       );
     }
@@ -2093,6 +2373,30 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
     if (view === 'SQUAD') {
       const viewedTeam = (viewingTeamId && league.teams.find(t => t.id === viewingTeamId)) || userTeam;
       const isOpponent = viewedTeam.id !== userTeam.id;
+      if (squadCompact) {
+        return (
+          <SquadViewCompact
+            team={viewedTeam}
+            seasonYear={league.year}
+            currentJornada={league.currentJornada}
+            onToggleForSale={handleToggleForSale}
+            onPlayerClick={showPlayerDetail}
+            onBack={() => { setViewingTeamId(null); setView('LEAGUE'); }}
+            readOnly={isOpponent}
+            incomingOffers={league.incomingOffers}
+            teams={league.teams}
+            userTeam={userTeam}
+            windowOpen={windowOpen}
+            blockedSignings={league.blockedSignings}
+            onAcceptIncomingOffer={isOpponent ? undefined : handleAcceptIncomingOffer}
+            onRejectIncomingOffer={isOpponent ? undefined : handleRejectIncomingOffer}
+            onCounterIncomingOffer={isOpponent ? undefined : handleCounterIncomingOffer}
+            onOffer={isOpponent ? (pid, amount) => handleOfferForPlayer(pid, viewedTeam.id, amount) : undefined}
+            onPayClausula={isOpponent ? (pid) => handleClausula(pid, viewedTeam.id) : undefined}
+            onSwitchClassic={toggleSquadCompact}
+          />
+        );
+      }
       return (
         <SquadView
           team={viewedTeam}
@@ -2107,6 +2411,7 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
           onAcceptIncomingOffer={isOpponent ? undefined : handleAcceptIncomingOffer}
           onRejectIncomingOffer={isOpponent ? undefined : handleRejectIncomingOffer}
           onCounterIncomingOffer={isOpponent ? undefined : handleCounterIncomingOffer}
+          onSwitchCompact={toggleSquadCompact}
         />
       );
     }
@@ -2229,6 +2534,7 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
             setView('LEAGUE');
           }}
           onBack={() => setView('LEAGUE')}
+          onOpenPack={() => setView('PACK_LOADER')}
         />
       );
     }
@@ -2364,7 +2670,7 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
                           <div className="text-center mb-1">
                             <TeamCrest colors={team.colors} size="lg" title={team.name} teamId={team.id} />
                             <div className={`text-[8px] font-bold text-center leading-tight ${i === 0 ? 'text-vga-light-red' : 'text-vga-light-cyan'}`}>{team.name}</div>
-                            <div className="text-[7px] text-vga-cyan">{team.formation} · {calculateTeamStrength(team).toFixed(0)}</div>
+                            <div className="text-[7px] text-vga-cyan">{team.formation} · MED {Math.floor(calculateTeamStrength(team) / 2)}</div>
                           </div>
                           <PitchDiagram
                             team={team}
@@ -2423,6 +2729,19 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
                     ) : null;
                   })()}
                   <button
+                    onClick={() => {
+                      const { lineup } = pickBestXI(userTeam.players, userTeam.formation, new Set(), userTeam.tacticalDiscipline ?? true);
+                      setLeague(prev => ({
+                        ...prev,
+                        teams: prev.teams.map(t => t.id === userTeam.id ? { ...t, lineup } : t),
+                      }));
+                      setPreviewSwapSlot(null);
+                    }}
+                    className="w-full text-[8px] font-bold text-vga-black bg-vga-yellow border border-vga-bright-white py-1 mb-1 hover:bg-vga-bright-white uppercase tracking-wider"
+                  >
+                    ★ Auto-Fix XI ({userTeam.formation})
+                  </button>
+                  <button
                     onClick={() => setView('ALIGNMENT')}
                     className="w-full text-[7px] text-vga-cyan border border-vga-cyan py-1 mb-2 hover:bg-vga-cyan hover:text-vga-black"
                   >
@@ -2430,14 +2749,20 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
                   </button>
                   <div className="mb-3">
                     <label className="text-[8px] block mb-1 font-bold text-vga-blue">{t('misc.durationSecs')}</label>
-                    <div className="grid grid-cols-7 gap-1">
-                      {[0, 10, 20, 30, 40, 50, 60].map((sec) => (
+                    <div className="grid grid-cols-4 gap-1">
+                      {[
+                        { sec: 0,   label: 'INSTANTE' },
+                        { sec: 30,  label: 'RÁPIDO' },
+                        { sec: 60,  label: 'NORMAL' },
+                        { sec: 120, label: 'LARGO' },
+                      ].map(({ sec, label }) => (
                         <button
                           key={sec}
                           onClick={() => setMatchDuration(sec)}
-                          className={`text-[7px] py-1 border font-bold ${matchDuration === sec ? 'bg-vga-blue text-vga-bright-white border-vga-bright-white' : 'bg-vga-black text-vga-bright-white border-vga-gray hover:border-vga-light-green'}`}
+                          className={`text-[8px] py-1.5 border font-bold uppercase ${matchDuration === sec ? 'bg-vga-blue text-vga-bright-white border-vga-bright-white' : 'bg-vga-black text-vga-bright-white border-vga-gray hover:border-vga-light-green'}`}
                         >
-                          {sec === 0 ? t('misc.instant') : sec}
+                          {label}
+                          <div className="text-[6px] text-vga-cyan font-normal">{sec === 0 ? '—' : `${sec}s`}</div>
                         </button>
                       ))}
                     </div>
@@ -2575,9 +2900,20 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
               maxSubs: 3,
               injuredIds: changes2dCtx.injuredIds,
               sentOff: changes2dCtx.sentOff,
+              // Players already subbed off in this match can't come back on.
+              subbedOffIds: changes2dCtx.subbedOffIds,
               htPaused: false,
-              onSubstitute: handle2DSubstitute,
-              onContinue: handle2DContinue,
+              // Staged-subs model: AlignmentView commits the net (outId,inId)
+              // pairs on Continue. Apply each as a 2D substitution (records the
+              // engine injection + updates the working XI), then resume the
+              // match — tactical edits (formation/offsets) already flowed
+              // through onUpdate into watch2dRef.tacticalChanges.
+              onCommit: (_stagedLineup, subPairs) => {
+                subPairs.forEach(({ outId, inId }) => {
+                  if (outId && inId) handle2DSubstitute(outId, inId);
+                });
+                handle2DContinue();
+              },
             }}
           />
         </div>
@@ -2628,7 +2964,7 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
               className="text-vga-cyan text-[8px] hover:text-vga-yellow underline decoration-dotted underline-offset-2 cool:text-rc-accent cool:hover:text-rc-primary flex items-center gap-1"
               title="Ver cambios recientes"
             >
-              OPENFUTBOL v1.3.0-{__BUILD_TIMESTAMP__}
+              OPENFUTBOL v1.8.0-{__BUILD_TIMESTAMP__}
               {hasNewVersion && (
                 <span className="bg-vga-red text-vga-bright-white text-[7px] px-1 font-bold animate-pulse">
                   NUEVO
@@ -2642,14 +2978,6 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
               className={`text-[7px] font-bold px-1.5 py-0.5 border ${muted ? 'border-vga-gray text-vga-gray hover:text-vga-bright-white hover:border-vga-bright-white' : theme === 'retrocool' ? 'border-rc-accent text-rc-accent hover:text-white hover:border-white' : 'border-vga-light-green text-vga-light-green hover:border-vga-bright-white hover:text-vga-bright-white'}`}
             >
               {muted ? 'SFX:OFF' : 'SFX:ON'}
-            </button>
-            <button
-              type="button"
-              onClick={() => setTheme(theme === 'retrocool' ? 'retrocutre' : 'retrocool')}
-              title="Cambiar tema visual"
-              className={`text-[7px] font-bold px-1.5 py-0.5 border ${theme === 'retrocool' ? 'border-rc-hot text-rc-hot hover:text-white hover:border-white' : 'border-vga-gray text-vga-gray hover:text-vga-bright-white hover:border-vga-bright-white'}`}
-            >
-              {theme === 'retrocool' ? 'RETROCOOL' : 'RETROCUTRE'}
             </button>
             <div className="flex items-center gap-1">
               {getSupportedLangs().map(lang => (
@@ -2682,156 +3010,27 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
       </div>
 
       {!match ? renderMainContent() : (() => {
-        const homeMED = Math.floor(calculateTeamStrength(match.homeTeam, match.homeSentOff, match.homeStamina));
-        const awayMED = Math.floor(calculateTeamStrength(match.awayTeam, match.awaySentOff, match.awayStamina));
-
-        const teamSummary = (team: typeof match.homeTeam, colorClass: string) => {
-          const goals = match.events.filter(e => e.type === 'goal' && e.teamId === team.id);
-          const yellows = match.events.filter(e => e.type === 'yellow' && e.teamId === team.id);
-          const reds = match.events.filter(e => e.type === 'red' && e.teamId === team.id);
-          const findP = (id?: string) => team.players.find(p => p.id === id);
-          return (
-            <div className="bg-vga-black border-2 border-vga-gray p-2 text-[8px]">
-              <div className={`${colorClass} font-bold mb-1 border-b border-vga-gray pb-1 truncate`}>{team.name}</div>
-              {goals.length === 0 && yellows.length === 0 && reds.length === 0 && (
-                <div className="text-vga-gray text-[7px]">{t('misc.noIncidents')}</div>
-              )}
-              {goals.length > 0 && (
-                <div className="mb-1">
-                  <div className="text-vga-yellow text-[7px] uppercase mb-0.5">{t('label.goals')}</div>
-                  {goals.map((g, i) => {
-                    const scorer = findP(g.playerId);
-                    const asst = findP(g.assistantId);
-                    return (
-                      <div key={`g${i}`} className="text-vga-bright-white">
-                        {g.minute}' {scorer ? <PlayerName player={scorer} /> : '—'}{asst ? <> ({t('misc.asist')} <PlayerName player={asst} />)</> : ''}
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-              {(yellows.length > 0 || reds.length > 0) && (
-                <div>
-                  <div className="text-vga-yellow text-[7px] uppercase mb-0.5">{t('misc.tarjetas')}</div>
-                  {yellows.map((c, i) => (
-                    <div key={`y${i}`} className="flex items-center gap-1 text-vga-bright-white">
-                      <div className="w-1.5 h-2.5 bg-vga-yellow border border-black flex-shrink-0"></div>
-                      <span>{c.minute}' {(() => { const pl = findP(c.playerId); return pl ? <PlayerName player={pl} /> : '—'; })()}</span>
-                    </div>
-                  ))}
-                  {reds.map((c, i) => (
-                    <div key={`r${i}`} className="flex items-center gap-1 text-vga-bright-white">
-                      <div className="w-1.5 h-2.5 bg-vga-red border border-black flex-shrink-0"></div>
-                      <span>{c.minute}' {(() => { const pl = findP(c.playerId); return pl ? <PlayerName player={pl} /> : '—'; })()}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          );
-        };
-
-        const totalPossForBar = match.homePossession + match.awayPossession;
-        const homePossPct = totalPossForBar === 0 ? 50 : Math.round((match.homePossession / totalPossForBar) * 100);
-        const awayPossPct = 100 - homePossPct;
-
+        const userBudget = league.teams.find(tm => tm.id === league.userTeamId)?.budget ?? 0;
         return (
-          <div className="w-full max-w-4xl border-4 border-vga-white bg-vga-blue p-4 vga-panel">
-            <div className="bg-vga-black border-2 border-vga-gray vga-panel-inset p-4 mb-2">
-              <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
-                <div className="flex items-center gap-3 justify-end min-w-0">
-                  <div className="text-right min-w-0">
-                    <p className="text-vga-light-red text-[8px] mb-1 truncate uppercase">{match.homeTeam.name}</p>
-                    <p className="text-vga-cyan text-[7px]">MED {homeMED}</p>
-                  </div>
-                  <TeamCrest colors={match.homeTeam.colors} size="xl" title={match.homeTeam.name} teamId={match.homeTeam.id} />
-                </div>
-                <div className="text-center px-2">
-                  <p className="text-3xl text-vga-bright-white tracking-wider">
-                    <span className="text-vga-light-red">{match.homeScore}</span>
-                    <span className="text-vga-gray mx-2">:</span>
-                    <span className="text-vga-light-cyan">{match.awayScore}</span>
-                  </p>
-                  <p className="text-vga-yellow text-[8px] mt-1">{match.minute}'</p>
-                </div>
-                <div className="flex items-center gap-3 justify-start min-w-0">
-                  <TeamCrest colors={match.awayTeam.colors} size="xl" title={match.awayTeam.name} teamId={match.awayTeam.id} />
-                  <div className="text-left min-w-0">
-                    <p className="text-vga-light-cyan text-[8px] mb-1 truncate uppercase">{match.awayTeam.name}</p>
-                    <p className="text-vga-cyan text-[7px]">MED {awayMED}</p>
-                  </div>
-                </div>
-              </div>
+          <div className="w-full flex flex-col gap-2">
+            <MatchScreen
+              match={match}
+              userTeamId={league.userTeamId}
+              year={league.year}
+              currentJornada={league.currentJornada}
+              budget={userBudget}
+              isPlaying={isPlaying}
+              showSubPanel={showSubPanel}
+              htPaused={htPaused}
+              onPlay={() => setIsPlaying(true)}
+              onPause={() => setIsPlaying(false)}
+              onShowSubs={() => { setIsPlaying(false); setPreselectedSubPlayerId(null); setShowSubPanel(true); }}
+              onPlayerClick={(pid) => { setIsPlaying(false); setPreselectedSubPlayerId(pid); setShowSubPanel(true); }}
+              onContinue={handleMatchEnd}
+              stats={league.stats}
+              schedule={league.schedule}
+            />
 
-              <div className="mt-3">
-                <div className="flex h-3 border border-vga-gray vga-panel-inset">
-                  <div className="bg-vga-light-red h-full" style={{ width: `${homePossPct}%` }} />
-                  <div className="bg-vga-light-cyan h-full" style={{ width: `${awayPossPct}%` }} />
-                </div>
-                <div className="flex justify-between text-[7px] mt-0.5">
-                  <span className="text-vga-light-red">{homePossPct}%</span>
-                  <span className="text-vga-cyan uppercase">{t('label.possession')}</span>
-                  <span className="text-vga-light-cyan">{awayPossPct}%</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-2 mb-3">
-              {teamSummary(match.homeTeam, 'text-vga-light-red')}
-              {teamSummary(match.awayTeam, 'text-vga-light-cyan')}
-            </div>
-
-            <div ref={eventLogRef} className="bg-vga-black h-48 overflow-y-auto p-3 border-2 border-vga-gray font-mono text-[10px] leading-relaxed">
-              {match.events.map((event, i) => (
-                <div key={i} className={`mb-2 ${event.type === 'goal' ? 'text-vga-light-green animate-pulse' : 'text-vga-white'}`}>
-                  <span className="text-vga-yellow mr-2">[{event.minute}']</span>
-                  {event.description}
-                </div>
-              ))}
-            </div>
-
-            {!match.isFinished && (() => {
-              const isUserHome = match.homeTeam.id === league.userTeamId;
-              const userSubsUsed = isUserHome ? match.homeSubsUsed : match.awaySubsUsed;
-              const canSub = userSubsUsed < 3;
-              return (
-                <div className="mt-3 flex gap-2">
-                  {canSub && (
-                    <button
-                      onClick={() => { setIsPlaying(false); setShowSubPanel(true); }}
-                      className="flex-1 bg-vga-yellow text-vga-black py-1 px-2 text-[8px] border border-vga-black hover:bg-vga-bright-white font-bold uppercase"
-                    >
-                      {t('misc.subsCountFmt', { used: String(userSubsUsed), max: '3' })}
-                    </button>
-                  )}
-                  {!isPlaying && !showSubPanel && (
-                    <button
-                      onClick={() => setIsPlaying(true)}
-                      className="flex-1 bg-vga-green text-vga-bright-white py-1 px-2 text-[8px] border border-vga-black hover:bg-vga-light-green font-bold uppercase"
-                    >
-                      {t('btn.resume')}
-                    </button>
-                  )}
-                  {isPlaying && (
-                    <button
-                      onClick={() => setIsPlaying(false)}
-                      className="bg-vga-gray text-vga-black py-1 px-2 text-[8px] border border-vga-black hover:bg-vga-white font-bold uppercase"
-                    >
-                      {t('btn.pause')}
-                    </button>
-                  )}
-                </div>
-              );
-            })()}
-
-            {match.isFinished && (
-              <button
-                onClick={handleMatchEnd}
-                className="mt-4 w-full bg-vga-red hover:bg-vga-light-red text-vga-bright-white py-2 px-4 border-b-4 border-r-4 border-vga-black text-xs"
-              >
-                {t('btn.continue')}
-              </button>
-            )}
 
             {showSubPanel && !match.isFinished && (() => {
               const isUserHome = match.homeTeam.id === league.userTeamId;
@@ -2859,7 +3058,7 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
                         return isHome ? { ...prev, homeTeam: updated } : { ...prev, awayTeam: updated };
                       });
                     }}
-                    onBack={() => { setShowSubPanel(false); setIsPlaying(true); }}
+                    onBack={() => { setShowSubPanel(false); setPreselectedSubPlayerId(null); setIsPlaying(true); }}
                     onToggleDiscipline={() => {
                       setMatch(prev => {
                         if (!prev) return null;
@@ -2873,40 +3072,24 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
                       maxSubs: 3,
                       injuredIds,
                       sentOff,
+                      subbedOffIds: match.events
+                        .filter(e => e.type === 'sub' && e.teamId === userTeamInMatch.id && e.playerOffId)
+                        .map(e => e.playerOffId as string),
                       htPaused,
-                      onSubstitute: (outId, inId) => performUserSub(outId, inId),
-                      onContinue: () => { setShowSubPanel(false); setIsPlaying(true); },
+                      onCommit: (stagedLineup, subPairs) => {
+                        commitUserSubs(stagedLineup, subPairs);
+                        setShowSubPanel(false);
+                        setPreselectedSubPlayerId(null);
+                        setIsPlaying(true);
+                      },
+                      initialSelectedPlayerId: preselectedSubPlayerId,
                     }}
                   />
                 </div>
               );
             })()}
 
-            {(() => {
-              const rows: [string, string | number, string | number][] = [
-                ['Tiros', match.homeShots, match.awayShots],
-                ['A puerta', match.homeShotsOnTarget, match.awayShotsOnTarget],
-                ['Faltas', match.homeFouls, match.awayFouls],
-              ];
-              return (
-                <div className="mt-4 bg-vga-black border-2 border-vga-gray p-2 text-[8px]">
-                  <div className="text-[7px] text-vga-yellow uppercase mb-1 text-center border-b border-vga-gray pb-1">
-                    Estadísticas
-                  </div>
-                  <div className="grid grid-cols-3 gap-x-2 gap-y-0.5 font-mono">
-                    {rows.map(([label, h, a]) => (
-                      <div key={label} className="contents">
-                        <div className="text-vga-light-red text-right">{h}</div>
-                        <div className="text-vga-gray text-center text-[7px] uppercase">{label}</div>
-                        <div className="text-vga-light-cyan">{a}</div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              );
-            })()}
-
-            {/* Alineaciones eliminadas */}
+            {/* Stats and lineups now live inside MatchScreen */}
           </div>
         );
       })()}
@@ -2969,6 +3152,93 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
         <ProManagerTutorialModal
           managerName={league.managerName ?? ''}
           onClose={() => setShowProManagerTutorial(false)}
+        />
+      )}
+
+      {saleNegotiation && (
+        <PlayerNegotiationModal
+          player={saleNegotiation.player}
+          buyerTeam={saleNegotiation.buyer}
+          sellerTeam={saleNegotiation.seller}
+          feePaid={saleNegotiation.offer.amount}
+          seasonYear={league.year}
+          mode="user-selling"
+          onAccept={(salary, years) => {
+            commitIncomingOfferAccept(saleNegotiation.offer, salary, years);
+            setSaleNegotiation(null);
+          }}
+          onReject={() => {
+            // Player refused; withdraw the offer so it doesn't sit forever.
+            const offerId = saleNegotiation.offer.id;
+            setLeague(prev => ({ ...prev, incomingOffers: prev.incomingOffers.filter(o => o.id !== offerId) }));
+            setSaleNegotiation(null);
+          }}
+          onClose={() => setSaleNegotiation(null)}
+        />
+      )}
+
+      {outgoingNegotiation && (
+        <PlayerNegotiationModal
+          player={outgoingNegotiation.player}
+          buyerTeam={outgoingNegotiation.buyer}
+          sellerTeam={outgoingNegotiation.seller}
+          feePaid={outgoingNegotiation.amount}
+          seasonYear={league.year}
+          mode="user-buying"
+          onAccept={(salary, years) => {
+            commitOutgoingOfferAccept(
+              outgoingNegotiation.player,
+              outgoingNegotiation.fromTeamId,
+              outgoingNegotiation.amount,
+              outgoingNegotiation.offeredPlayerIds,
+              salary,
+              years,
+            );
+            setOutgoingNegotiation(null);
+            setMessage({
+              title: 'Fichaje cerrado',
+              body: `${outgoingNegotiation.player.name} firma por ${outgoingNegotiation.buyer.name}.`,
+              tone: 'info',
+            });
+          }}
+          onReject={() => {
+            setOutgoingNegotiation(null);
+            setMessage({
+              title: 'Negociación fallida',
+              body: `${outgoingNegotiation.player.name} no aceptó tus condiciones. La operación se cae.`,
+              tone: 'warning',
+            });
+          }}
+          onClose={() => setOutgoingNegotiation(null)}
+        />
+      )}
+
+      {clausulaNegotiation && (
+        <PlayerNegotiationModal
+          player={clausulaNegotiation.player}
+          buyerTeam={clausulaNegotiation.buyer}
+          sellerTeam={clausulaNegotiation.seller}
+          feePaid={clausulaNegotiation.cost}
+          seasonYear={league.year}
+          mode="user-buying"
+          onAccept={(salary, years) => {
+            commitClausula(clausulaNegotiation.player, clausulaNegotiation.fromTeamId, clausulaNegotiation.cost, salary, years);
+            setClausulaNegotiation(null);
+            setMessage({
+              title: 'Fichaje cerrado',
+              body: `${clausulaNegotiation.player.name} firma por ${clausulaNegotiation.buyer.name}. ${formatEuros(clausulaNegotiation.cost)} pagados.`,
+              tone: 'info',
+            });
+          }}
+          onReject={() => {
+            setClausulaNegotiation(null);
+            setMessage({
+              title: 'Negociación fallida',
+              body: `${clausulaNegotiation.player.name} no aceptó tus condiciones. La cláusula no se ejecuta.`,
+              tone: 'warning',
+            });
+          }}
+          onClose={() => setClausulaNegotiation(null)}
         />
       )}
     </div>
