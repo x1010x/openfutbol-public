@@ -237,6 +237,46 @@ export const pickBestFormation = (
   return { formation: bestFormation, lineup: bestLineup };
 };
 
+// Repara una alineación sustituyendo, EN SU SLOT, a los jugadores no disponibles
+// (p.ej. recién expulsados) por el mejor suplente disponible para la posición de
+// ese slot — así un equipo no arranca el siguiente partido con 10 por un hueco.
+// Conserva la estructura posicional; un slot sin reemplazo posible queda ''.
+// `unavailableIds` fuerza la salida de esos ids aunque su `suspensionMatches`
+// todavía no lo refleje (la roja se aplica en el mismo tick que esta reparación).
+export const fillLineupGaps = (team: Team, unavailableIds: Set<string> = new Set()): string[] => {
+  const slots = FORMATIONS[team.formation];
+  if (!slots) return team.lineup;
+  const lineup: string[] = [];
+  for (let i = 0; i < slots.length; i++) lineup.push(team.lineup[i] ?? '');
+
+  const available = (p: Player): boolean =>
+    (p.suspensionMatches ?? 0) === 0 &&
+    (p.injuryWeeksRemaining ?? 0) === 0 &&
+    !unavailableIds.has(p.id);
+  const inLineup = new Set(lineup.filter(id => id && !unavailableIds.has(id)));
+
+  for (let i = 0; i < slots.length; i++) {
+    const id = lineup[i];
+    if (id && !unavailableIds.has(id)) continue; // slot ya ocupado por jugador válido
+    const slotPos = slots[i];
+    let best: Player | null = null;
+    let bestScore = -Infinity;
+    for (const p of team.players) {
+      if (inLineup.has(p.id) || !available(p)) continue;
+      const score = effectiveMedia(p, slotPos);
+      if (score > bestScore) { bestScore = score; best = p; }
+    }
+    if (best) { lineup[i] = best.id; inLineup.add(best.id); }
+    else lineup[i] = '';
+  }
+  // Recortar '' finales para mantener el almacenamiento compacto (como reslotLineup).
+  while (lineup.length > 0 && lineup[lineup.length - 1] === '') lineup.pop();
+  return lineup;
+};
+
+// Reordena un conjunto fijo de titulares en los slots de una formación dada.
+// El resultado es disperso (longitud 11, '' para slots vacantes) para que los índices
+// de slot se correspondan siempre con la formación.
 export const reslotLineup = (
   team: Team,
   titularIds: string[],

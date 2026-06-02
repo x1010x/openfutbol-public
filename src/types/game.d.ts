@@ -202,10 +202,20 @@ export interface Player {
 // ── Team / Match types ────────────────────────────────────────────────────
 export type FormationId = '4-4-2' | '5-3-2' | '4-3-3' | '4-2-4' | '5-4-1' | '3-4-3';
 
+export type KitStyle = 'solid' | 'stripes' | 'sash';
+
 export interface Team {
   id: string;
   name: string;
   colors?: string[];
+  // Shirt pattern for the 2D viewer. Absent → 'solid' (plain shirt). The kit
+  // colours come from `colors` ([primary, secondary, ...]); the style only
+  // selects which sprite (JUGALISO/JUGARAYA/JUGARAYO) is drawn.
+  kitStyle?: KitStyle;
+  // Per-slot drag adjustment for the 2D viewer (user team only). Keyed by
+  // formation slot index; (dx,dy) shifts that slot's off-ball anchor in
+  // engine-space (x = along the pitch, +x toward the opponent goal for home).
+  lineupOffsets?: Record<number, { dx: number; dy: number }>;
   year: number;
   manager?: string;
   stadiumName?: string;

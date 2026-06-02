@@ -25,7 +25,7 @@ interface IngameProps {
 
 interface Props {
   team: Team;
-  onUpdate: (patch: { lineup: string[]; formation: FormationId }) => void;
+  onUpdate: (patch: { lineup: string[]; formation: FormationId; lineupOffsets?: Record<number, { dx: number; dy: number }> }) => void;
   onBack: () => void;
   onToggleDiscipline: () => void;
   ingame?: IngameProps;
@@ -287,8 +287,25 @@ export const AlignmentView = ({ team, onUpdate, onBack, onToggleDiscipline, inga
   const handleFormationChange = (f: FormationId) => {
     if (f === team.formation) return;
     const newLineup = reslotLineup(team, currentTitulars, f);
-    onUpdate({ lineup: newLineup, formation: f });
+    // Slot layout changes meaning across formations — drop any drag offsets so
+    // they don't carry over onto unrelated slots.
+    onUpdate({ lineup: newLineup, formation: f, lineupOffsets: {} });
   };
+
+  // Persist a single slot's drag adjustment (engine-space offset). User team,
+  // pre-match only — the 2D engine reads team.lineupOffsets as the off-ball
+  // anchor for that slot.
+  const handleDragOffset = (slotIdx: number, off: { dx: number; dy: number }) => {
+    const next = { ...(team.lineupOffsets ?? {}) };
+    if (Math.abs(off.dx) < 0.005 && Math.abs(off.dy) < 0.005) delete next[slotIdx];
+    else next[slotIdx] = off;
+    onUpdate({ lineup: team.lineup, formation: team.formation, lineupOffsets: next });
+  };
+
+  const resetOffsets = () => {
+    onUpdate({ lineup: team.lineup, formation: team.formation, lineupOffsets: {} });
+  };
+  const hasOffsets = !!team.lineupOffsets && Object.keys(team.lineupOffsets).length > 0;
 
   const handleAutoFix = () => {
     const excl = ingame ? new Set([...ingame.sentOff, ...ingame.injuredIds]) : new Set<string>();
@@ -300,6 +317,10 @@ export const AlignmentView = ({ team, onUpdate, onBack, onToggleDiscipline, inga
     if (ingame) {
       // In-game mode: stage the change. Position swaps cost no sub; bringing
       // a bench player on costs 1 (computed at commit time via pendingSubs).
+      // Sent-off slots are locked — once a player is expelled no replacement
+      // comes on (one man down); the gap is covered by repositioning the ten.
+      const outId = team.lineup[slotIdx];
+      if (outId && ingame.sentOff.includes(outId)) { setSelectedSlot(null); return; }
       const newLineup = [...stagedLineup];
       while (newLineup.length < slots.length) newLineup.push('');
       if (playerId === null) {
@@ -507,6 +528,11 @@ export const AlignmentView = ({ team, onUpdate, onBack, onToggleDiscipline, inga
               {t('misc.auto11')}
             </CmdButton>
           )}
+          {!ingame && hasOffsets && (
+            <CmdButton onClick={resetOffsets} color="#ffaa55" hoverBg="#aa5500">
+              ■ {t('misc.resetPositions')}
+            </CmdButton>
+          )}
           <CmdButton
             onClick={onToggleDiscipline}
             color={team.tacticalDiscipline ? '#55ffff' : '#ff55ff'}
@@ -539,9 +565,21 @@ export const AlignmentView = ({ team, onUpdate, onBack, onToggleDiscipline, inga
               selectedSlot={selectedSlot}
               highlightIds={ingame ? pendingSubs.map(p => p.inId).filter(Boolean) : undefined}
               onSlotClick={(idx) => {
-                if (ingame && effectiveSubsUsed >= ingame.maxSubs && !stagedLineup[idx]) return;
+                if (ingame) {
+                  // Sent-off slots are locked: that gap can only be covered by
+                  // repositioning the ten, not by a fresh substitute.
+                  const pid = team.lineup[idx];
+                  if (pid && ingame.sentOff.includes(pid)) return;
+                  // Budget exhausted: still allow repositioning existing players
+                  // (a filled staged slot), but not opening an empty slot.
+                  if (effectiveSubsUsed >= ingame.maxSubs && !stagedLineup[idx]) return;
+                }
                 setSelectedSlot(idx === selectedSlot ? null : idx);
               }}
+              draggable={true}
+              offsets={team.lineupOffsets}
+              onDragOffset={handleDragOffset}
+              sentOffIds={ingame?.sentOff}
             />
             {inPickMode && currentSlotPlayerId && !ingame && (
               <button

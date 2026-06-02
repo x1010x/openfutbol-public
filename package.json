@@ -12,6 +12,7 @@
     "build-default-pack": "node scripts/build-default-pack/index.js"
   },
   "dependencies": {
+    "pixi.js": "^8.18.1",
     "react": "^19.2.6",
     "react-dom": "^19.2.6"
   },
