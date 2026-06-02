@@ -1,6 +1,7 @@
 import type { MatchTimeline, PlayerId, Vec2, TeamSide } from '../types/match';
 import type { MatchState } from './types';
 import type { SlotRole, SlotTag } from './zones';
+import type { EngineAttributes } from './attributes';
 import {
   createInitialState,
   emit as stateEmit,
@@ -38,6 +39,10 @@ export interface EnginePlayer {
   defending: number;
   physical: number;
   goalkeeping: number;
+  // Rich FM-derived traits (engine/attributes.ts), populated by the bridge from
+  // the manager's PlayerAttributes. OPTIONAL: sandbox presets omit it and every
+  // effector falls back to the 7 stats above, keeping scenarios byte-identical.
+  attr?: EngineAttributes;
   // Disciplinary / fitness state — mutated as the match runs.
   // foulsCommitted counts only fouls *committed* (the tackler in a
   // foulCommitted roll), not received. yellowCount is 0 or 1; second yellow

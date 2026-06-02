@@ -113,7 +113,7 @@ export function simulateBallTick(state: MatchState, t: number, deps: BallTickDep
     // A better keeper covers more of the goal when fully stretched: the dive
     // reach scales with goalkeeping (≈0.072 at 30 → ≈0.098 at 99). The standing
     // catch radius (R_GK) is unchanged.
-    const diveReach = 0.066 + 0.032 * (p.goalkeeping / 99);
+    const diveReach = 0.066 + 0.032 * (p.attr?.gkReflex ?? p.goalkeeping / 99);
     const radius = isGKp
       ? (isDiving ? diveReach : R_GK)
       : (p.id === state.intendedReceiver ? R_RECEIVER : R_OTHER);
@@ -144,7 +144,7 @@ export function simulateBallTick(state: MatchState, t: number, deps: BallTickDep
       } else {
         const ballSpeed = Math.hypot(state.ballVel.x, state.ballVel.y);
         const catchProb = clamp(
-          0.60 + 0.30 * (p.goalkeeping / 99) - 12.0 * ballSpeed - (isDiving ? 0.35 : 0),
+          0.60 + 0.30 * (p.attr?.gkReflex ?? p.goalkeeping / 99) - 12.0 * ballSpeed - (isDiving ? 0.35 : 0),
           0.05, 0.85,
         );
         if (state.rng() < catchProb) {

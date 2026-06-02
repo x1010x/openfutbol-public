@@ -6,6 +6,7 @@ import type { EnginePlayer } from './zoneEngine';
 import type { MatchTimeline, PlayerId } from '../types/match';
 import type { SlotRole, SlotTag } from './zones';
 import { buildLineupLayout } from './lineup';
+import { engineAttributesFrom } from './attributes';
 
 // Natural engine role for a manager position — used to seed bench players so the
 // AI sub picker matches a replacement to the slot it's covering.
@@ -18,7 +19,7 @@ const POS_TO_ROLE: Record<Position, SlotRole> = {
 // and the live-substitution path so a bench player who comes on is scaled the
 // same way. See teamToEnginePlayers for the fatigue rationale.
 export function engineStatsFromPlayer(p: Player): Pick<EnginePlayer,
-  'speed' | 'dribbling' | 'passing' | 'shooting' | 'defending' | 'physical' | 'goalkeeping' | 'stamina' | 'enduranceBase'> {
+  'speed' | 'dribbling' | 'passing' | 'shooting' | 'defending' | 'physical' | 'goalkeeping' | 'stamina' | 'enduranceBase' | 'attr'> {
   const stamina = Number.isFinite(p.stamina) ? Math.max(0, Math.min(99, p.stamina)) : 99;
   const fitness = 0.85 + 0.15 * (stamina / 99);
   return {
@@ -29,6 +30,11 @@ export function engineStatsFromPlayer(p: Player): Pick<EnginePlayer,
     defending: p.stats.defending,
     physical: p.stats.physical * fitness,
     goalkeeping: p.stats.goalkeeping,
+    // Rich FM traits feed the effectors directly (engine/attributes.ts). The 7
+    // stats above stay as the fitness-scaled fallback / coarse signals (e.g. the
+    // fatigue model still decays speed/physical). When the player carries no FM
+    // attributes (legacy data), attr is undefined and effectors use the stats.
+    attr: p.attributes ? engineAttributesFrom(p.attributes) : undefined,
     // Inputs for the engine's in-match fatigue model (engine/fatigue.ts): the
     // decay RATE combines the físico (enduranceBase = raw permanent stat, how
     // well they last 90') with the day's freshness (stamina = current

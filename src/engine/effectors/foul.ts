@@ -59,11 +59,16 @@ function detectSeverity(
 
   // RECKLESS — defender lunged in: big speed gap, low defending stat, tackler
   // arrived from behind. Models the "agresión" path (straight red).
-  const speedGap = carrier.speed - opp.speed;
+  // Beaten-for-pace gap uses acceleration (the burst that leaves a defender
+  // lunging) and the defender's reading (markSkill); flat stats for legacy data.
+  const carrierPace = carrier.attr ? carrier.attr.acceleration * 99 : carrier.speed;
+  const oppPace = opp.attr ? opp.attr.acceleration * 99 : opp.speed;
+  const oppRead = opp.attr ? opp.attr.markSkill * 99 : opp.defending;
+  const speedGap = carrierPace - oppPace;
   const tacklerBehind = cSide === 'home'
     ? state.pos[opp.id].x < cpos.x - 0.005
     : state.pos[opp.id].x > cpos.x + 0.005;
-  if (speedGap > 15 && opp.defending < 70 && tacklerBehind) return 'reckless';
+  if (speedGap > 15 && oppRead < 70 && tacklerBehind) return 'reckless';
 
   // CYNICAL — professional foul stopping a breakaway. Carrier was sprinting
   // forward and no other rival was within ~0.15 (covering distance).
@@ -138,7 +143,7 @@ export function executeFoul(
                        : severity === 'dogso'    ? 0.10
                        : severity === 'cynical'  ? 0.06
                                                  : 0.03;
-      const physicalFactor = 1 - (victim.physical / 99);
+      const physicalFactor = 1 - (victim.attr?.resilience ?? victim.physical / 99);
       const injuryProb = clamp(injuryBase * (0.5 + physicalFactor), 0, 0.5);
       if (state.rng() < injuryProb) {
         victim.injured = true;

@@ -58,7 +58,7 @@ export function applyGKForces(
         // Dive responsiveness scales with goalkeeping: a 99-rated keeper
         // closes onto the predicted cross point noticeably faster (≈0.40)
         // than a 30-rated one (≈0.29), so good keepers reach more shots.
-        gkGain    = 0.24 + 0.16 * (p.goalkeeping / 99);
+        gkGain    = 0.24 + 0.16 * (p.attr?.gkReflex ?? p.goalkeeping / 99);
         const dive = state.gkDive[p.id];
         const isNew = !dive || t > dive.until;
         const needsLateral = Math.abs(gkTargetY - ppos.y) > 0.03;

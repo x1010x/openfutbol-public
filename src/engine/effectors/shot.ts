@@ -15,13 +15,16 @@ export function resolveShot(state: MatchState, t: number, delayed?: boolean): vo
 
   const goalLineX = cSide === 'home' ? 1.0 : 0.0;
 
+  // Shot accuracy is driven by finishing/composure/technique (heading folded in
+  // for aerial finishes); fallback to the flat shooting stat for legacy data.
+  const aimSkill = carrier.attr?.finishingSkill ?? carrier.shooting / 99;
   const cornerY = state.rng() > 0.5 ? 0.445 : 0.555;
   const intendedTarget = {
     x: goalLineX,
-    y: 0.50 + (cornerY - 0.50) * clamp(0.55 + 0.45 * (carrier.shooting / 99), 0.55, 1.0)
+    y: 0.50 + (cornerY - 0.50) * clamp(0.55 + 0.45 * aimSkill, 0.55, 1.0)
   };
 
-  const aimErrorY = (state.rng() - 0.5) * (1 - carrier.shooting / 99) * 0.12;
+  const aimErrorY = (state.rng() - 0.5) * (1 - aimSkill) * 0.12;
   const actualTarget = { x: intendedTarget.x, y: intendedTarget.y + aimErrorY };
 
   // Anchor the ball at the carrier's exact position before computing the
@@ -44,7 +47,7 @@ export function resolveShot(state: MatchState, t: number, delayed?: boolean): vo
     shotSpeed = 0.055;
     shotHeightVel = 0.005;
   } else {
-    shotSpeed = 0.065 + 0.025 * (carrier.shooting / 99);
+    shotSpeed = 0.065 + 0.025 * (carrier.attr?.shotPower ?? carrier.shooting / 99);
     shotHeightVel = clamp(dist * 0.08, 0.012, 0.032);
   }
 
@@ -57,13 +60,13 @@ export function resolveShot(state: MatchState, t: number, delayed?: boolean): vo
     const isPenalty = state.foulVariant === 'penalty';
     if (isPenalty) {
       // Penalty shot: low driven ball, no wall to clear.
-      shotHeightVel = clamp(0.004 + (carrier.shooting / 99) * 0.008, 0.004, 0.012);
+      shotHeightVel = clamp(0.004 + (carrier.attr?.penaltySkill ?? carrier.shooting / 99) * 0.008, 0.004, 0.012);
     } else {
       // Free-kick: loft over the wall. Height modulated by shooter skill:
       //   shooting 99 → 0.033 (clears reliably)
       //   shooting 60 → 0.026 (clears marginally)
       //   shooting 30 → 0.022 (often blocked by wall)
-      shotHeightVel = clamp(0.018 + (carrier.shooting / 99) * 0.015, 0.018, 0.033);
+      shotHeightVel = clamp(0.018 + (carrier.attr?.setPieceSkill ?? carrier.shooting / 99) * 0.015, 0.018, 0.033);
     }
     state.pendingImpulse = {
       vel: newBallVel,

@@ -317,7 +317,13 @@ export function resolvePass(state: MatchState, t: number, deps: EffectorDeps, hi
     Math.min(acc, distToSegment(state.pos[o.id], cpos, tpos)), Infinity);
   const isCrossTarget = isCrossingZone && (cSide === 'home' ? tpos.x > 0.80 : tpos.x < 0.20) && tpos.y > 0.25 && tpos.y < 0.75;
 
-  let passSuccessProb = carrier.passing / 100.0;
+  // A cross into the box leans on crossing/technique; everything else on the
+  // general passing composite (passing/decisions/vision/technique). Legacy data
+  // with no FM attributes falls back to the flat passing stat.
+  const passTrait = isCrossTarget
+    ? (carrier.attr?.crossSkill ?? carrier.passing / 100.0)
+    : (carrier.attr?.passSkill ?? carrier.passing / 100.0);
+  let passSuccessProb = passTrait;
   if (lineThreatDist < 0.045) passSuccessProb -= 0.50;
   else if (lineThreatDist < 0.10) passSuccessProb -= 0.25;
   passSuccessProb = Math.max(0.05, Math.min(0.95, passSuccessProb));
@@ -363,7 +369,7 @@ export function resolvePass(state: MatchState, t: number, deps: EffectorDeps, hi
   const aimError = (() => {
     const baseErr = (state.rng() - 0.5) * (1 - passSuccessProb) * 0.25;
     if (isThrowIn || isGKDistribute || isGoalKickPass || isCornerPass || isFoulPass) return baseErr;
-    const skillMiss = 1 - carrier.passing / 99;
+    const skillMiss = 1 - (carrier.attr?.passSkill ?? carrier.passing / 99);
     const isLongLateral = !strictAhead && passDist > 0.25;
     const isLongForward = strictAhead && passDist > 0.30;
     const shankProb = isLongLateral ? 0.14 + 0.20 * skillMiss : isLongForward ? 0.08 + 0.14 * skillMiss : 0;
@@ -399,7 +405,7 @@ export function resolvePass(state: MatchState, t: number, deps: EffectorDeps, hi
     if (isFoulCross)   heightVelInit = clamp(passDist * 0.08, 0.030, 0.050);
     if (isCrossTarget) heightVelInit = clamp(passDist * 0.08, 0.030, 0.050);
 
-    const skillFactor = carrier.passing / 99;
+    const skillFactor = carrier.attr?.passSkill ?? carrier.passing / 99;
     if (skillFactor > 0.75 && !isCrossTarget && !isCornerPass) heightVelInit *= 0.85;
 
     const N = (heightVelInit * 2) / 0.005;

@@ -30,12 +30,18 @@ export function checkTackle(state: MatchState, t: number, deps: EffectorDeps): b
     const d = Math.hypot(state.pos[opp.id].x - state.ball.x, state.pos[opp.id].y - state.ball.y);
     if (d > TACKLE_DIST) continue;
 
-    const defRating = (opp.defending * 0.65 + opp.physical * 0.35) / 99;
-    const atkRating = (carrier.dribbling * 0.60 + carrier.speed * 0.40) / 99;
+    // Challenge outcome: tackling/strength (defender) vs dribbling/acceleration
+    // (carrier). FM traits when present, flat stats otherwise.
+    const defRating = opp.attr ? opp.attr.tackleSkill * 0.65 + opp.attr.strength * 0.35
+                               : (opp.defending * 0.65 + opp.physical * 0.35) / 99;
+    const atkRating = carrier.attr ? carrier.attr.dribbleSkill * 0.60 + carrier.attr.acceleration * 0.40
+                                   : (carrier.dribbling * 0.60 + carrier.speed * 0.40) / 99;
     const tackleProb = clamp(0.30 + (defRating - atkRating) * 0.55, 0.08, 0.78);
 
     if (state.rng() < tackleProb) {
-      if (foulCommitted(state.rng, opp.physical)) {
+      // Cleanliness (tackling/composure/anticipation, less aggression) decides
+      // whether the won challenge is a clean tackle or a foul. Higher → cleaner.
+      if (foulCommitted(state.rng, opp.attr ? opp.attr.tackleCleanliness * 99 : opp.physical)) {
         // Anchor the ball before executeFoul moves things: the carrier-follow
         // offset puts state.ball ~0.022 ahead of the carrier, so a snap here
         // before the spot is fixed avoids a visible ball jump back to the
@@ -122,7 +128,12 @@ export function checkOffBallAggression(state: MatchState, t: number, deps: Effec
       if (d < bestD) { bestD = d; victim = o; }
     }
     if (!victim || bestD > AGGRESSION_RADIUS) continue;
-    if (state.rng() >= AGGRESSION_TICK_PROB) continue;
+    // Aggressive players (high FM aggression, low composure) are likelier to
+    // lash out off the ball. Scale the per-tick chance by the defender's
+    // aggression trait (≈0.5×..1.5×); legacy data with no attr keeps ×1, so the
+    // rng() draw is still consumed once per tick and sandbox stays identical.
+    const aggMult = def.attr ? 1.5 - def.attr.tackleCleanliness : 1;
+    if (state.rng() >= AGGRESSION_TICK_PROB * aggMult) continue;
 
     // Aggression fires. Delegate everything (injury roll, card decision,
     // pendingFoul stash, walk-off start, events) to executeFoul with the

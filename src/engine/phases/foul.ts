@@ -416,11 +416,16 @@ function pickFoulKicker(state: MatchState, atkSide: TeamSide, variant: FoulVaria
   const team = atkSide === 'home' ? state.homePlayers : state.awayPlayers;
   const candidates = team.filter(p => p.slotIndex !== 0 && !state.expelledIds.has(p.id));
   if (candidates.length === 0) return team[0].id;
-  const score = variant === 'shoot' || variant === 'penalty'
-    ? (p: EnginePlayer) => p.shooting * 0.8 + p.passing * 0.2
+  // Pick the best specialist for the dead ball: penalty taker, free-kick
+  // shooter, crosser or short-pass option. FM traits when available (consistent
+  // within a team, so the 0..1 vs 0..99 scale never mixes), flat stats otherwise.
+  const score = variant === 'penalty'
+    ? (p: EnginePlayer) => p.attr?.penaltySkill ?? (p.shooting * 0.8 + p.passing * 0.2)
+    : variant === 'shoot'
+    ? (p: EnginePlayer) => p.attr?.setPieceSkill ?? (p.shooting * 0.8 + p.passing * 0.2)
     : variant === 'cross'
-    ? (p: EnginePlayer) => p.passing * 0.7 + p.shooting * 0.3
-    : (p: EnginePlayer) => p.passing;
+    ? (p: EnginePlayer) => p.attr?.crossSkill ?? (p.passing * 0.7 + p.shooting * 0.3)
+    : (p: EnginePlayer) => p.attr?.passSkill ?? p.passing;
   return candidates.reduce((best, p) => score(p) > score(best) ? p : best).id;
 }
 
@@ -455,7 +460,7 @@ export function decideFoulShoot(state: MatchState): boolean {
   const distGoal_m = distToGoalCenter_m(state.foulSpot, kSide);
   // Linear from 17m (0.85) down to 30m (0.20), clamped.
   const base = 0.85 - ((distGoal_m - 17) / 13) * 0.65;
-  const skillBonus = (kicker.shooting / 99) * 0.15 - 0.075;
+  const skillBonus = (kicker.attr?.setPieceSkill ?? kicker.shooting / 99) * 0.15 - 0.075;
   const finalProb = Math.max(0.05, Math.min(0.92, base + skillBonus));
   return state.rng() < finalProb;
 }
