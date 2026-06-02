@@ -1008,6 +1008,54 @@ body[data-theme="retrocool"] .rc-btn-primary {
 .of-btn-neon:disabled { opacity: 0.35; cursor: not-allowed; }
 .of-btn-neon:disabled:hover { background: transparent; color: currentColor; box-shadow: none; }
 
+.of-input-neon {
+  background: rgba(9, 0, 20, 0.85);
+  border: 1px solid #44476a;
+  color: #ffffff;
+  font-family: 'VT323', monospace;
+  font-size: 18px;
+  letter-spacing: 0.06em;
+  padding: 0.6rem 0.85rem;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px);
+}
+.of-input-neon:focus { border-color: #33f3ff; box-shadow: 0 0 12px rgba(51, 243, 255, 0.45); }
+.of-input-neon::placeholder { color: #5a5a7a; }
+
+.of-year-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.8rem 1rem;
+  background: rgba(9, 0, 20, 0.7);
+  border: 1px solid #44476a;
+  color: #b8b8d8;
+  font-family: 'Press Start 2P', monospace;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-align: left;
+  clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px);
+}
+.of-year-tile:hover:not(:disabled) {
+  border-color: #ff4df8;
+  background: rgba(255, 77, 248, 0.08);
+  box-shadow: 0 0 14px rgba(255, 77, 248, 0.35), inset 0 0 18px rgba(255, 77, 248, 0.08);
+}
+.of-year-tile:disabled { opacity: 0.35; cursor: not-allowed; }
+.of-year-tile-year {
+  font-size: 14px;
+  color: #ff4df8;
+  text-shadow: 0 0 7px rgba(255, 77, 248, 0.7);
+  letter-spacing: 0.08em;
+}
+.of-year-tile-meta {
+  font-family: 'VT323', monospace;
+  font-size: 14px;
+  letter-spacing: 0.05em;
+  color: #8a8aa8;
+}
+
 .of-pill-yellow {
   font-family: 'VT323', monospace;
   font-size: 14px;

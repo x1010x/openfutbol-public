@@ -7,6 +7,7 @@ import { calculateTeamStrength } from '../engine/simEngine';
 import { TeamCrest } from './TeamCrest';
 import { formatEuros } from '../data/economy';
 import { useT } from '../i18n';
+import { ScreenHeader } from './ScreenHeader';
 
 const MAX_OFFERS = 10;
 
@@ -74,74 +75,139 @@ export const ProManagerSetupView = ({
 
   // Year / name selection screen
   if (!selectedYear) {
+    const nameReady = name.trim().length > 0;
+    const hasCareer = managerCareer.length > 0;
+    const totalSeasons = managerCareer.length;
+    const uniqueTeams = new Set(managerCareer.map(r => r.teamId)).size;
+    const trophies = managerCareer.filter(r => r.finalPosition === 1).length;
+    const totalWins = managerCareer.reduce((a, r) => a + r.wins, 0);
+    const totalDraws = managerCareer.reduce((a, r) => a + r.draws, 0);
+    const totalLosses = managerCareer.reduce((a, r) => a + r.losses, 0);
+    const totalGames = totalWins + totalDraws + totalLosses;
+    const winPct = totalGames > 0 ? Math.round((totalWins / totalGames) * 100) : 0;
+    const fires = managerCareer.filter(r => r.fired).length;
+    const bestSeason = hasCareer ? [...managerCareer].sort((a, b) => a.finalPosition - b.finalPosition)[0] : null;
+    const worstSeason = hasCareer ? [...managerCareer].sort((a, b) => b.finalPosition - a.finalPosition)[0] : null;
     return (
-      <div className="w-full max-w-2xl flex flex-col gap-6 animate-in fade-in duration-500">
-        <div className="bg-vga-black p-4 border-4 border-vga-magenta shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-vga-magenta text-sm underline decoration-double uppercase">
-              {t('promanager.title')}
-            </h2>
-            <div className="flex gap-2 items-center">
-              {onImport && (
-                <>
-                  <button
-                    onClick={() => fileRef.current?.click()}
-                    className="text-[8px] bg-vga-black text-vga-magenta px-2 py-1 border border-vga-magenta hover:bg-vga-magenta hover:text-vga-bright-white font-bold uppercase"
-                  >
-                    {t('btn.importManager')}
-                  </button>
-                  <input ref={fileRef} type="file" accept=".json" className="hidden" onChange={handleImportFile} />
-                </>
+      <div className="w-full max-w-[1600px] mx-auto px-2 flex flex-col gap-3 animate-in fade-in duration-300">
+        <ScreenHeader
+          title={t('promanager.title')}
+          onBack={onBack}
+          backLabel={t('btn.back')}
+          actions={onImport ? (
+            <>
+              <button
+                onClick={() => fileRef.current?.click()}
+                className="of-btn-neon of-btn-neon--magenta"
+                style={{ fontSize: 9, padding: '0.45rem 0.8rem' }}
+              >
+                {t('btn.importManager')}
+              </button>
+              <input ref={fileRef} type="file" accept=".json" className="hidden" onChange={handleImportFile} />
+            </>
+          ) : undefined}
+        />
+
+        <div className={`grid grid-cols-1 gap-3 ${hasCareer ? 'lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1.4fr)]' : 'lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)]'}`}>
+          <div className="of-card" style={{ borderColor: '#33f3ff' }}>
+            <h3 className="of-card-title">{t('promanager.nameLabel')}</h3>
+            <input
+              type="text"
+              value={name}
+              onChange={e => setName(e.target.value)}
+              placeholder={t('promanager.namePlaceholder')}
+              className="of-input-neon w-full"
+              maxLength={30}
+              autoFocus
+            />
+            <p className="of-card-desc">{t('promanager.hint')}</p>
+          </div>
+
+          {hasCareer && (
+            <div className="of-card" style={{ borderColor: '#6dff9b' }}>
+              <h3 className="of-card-title" style={{ color: '#6dff9b', textShadow: '0 0 6px rgba(109, 255, 155, 0.7)', borderBottomColor: 'rgba(109, 255, 155, 0.35)' }}>
+                Carrera del mánager
+              </h3>
+              <div className="flex items-center gap-2">
+                <div className="flex-1">
+                  <div className="of-card-desc" style={{ fontSize: 12, color: '#8a8aa8' }}>Reputación</div>
+                  <div className="h-2 mt-1" style={{ background: 'rgba(9, 0, 20, 0.8)', border: '1px solid #44476a' }}>
+                    <div className="h-full" style={{
+                      width: `${managerReputation}%`,
+                      background: managerReputation >= 70 ? '#6dff9b' : managerReputation >= 45 ? '#ffe94d' : '#ff5c8a',
+                      boxShadow: `0 0 8px ${managerReputation >= 70 ? '#6dff9b' : managerReputation >= 45 ? '#ffe94d' : '#ff5c8a'}`,
+                    }} />
+                  </div>
+                </div>
+                <span style={{
+                  fontFamily: "'Press Start 2P', monospace",
+                  fontSize: 14,
+                  color: managerReputation >= 70 ? '#6dff9b' : managerReputation >= 45 ? '#ffe94d' : '#ff5c8a',
+                  textShadow: `0 0 6px ${managerReputation >= 70 ? '#6dff9b' : managerReputation >= 45 ? '#ffe94d' : '#ff5c8a'}99`,
+                }}>
+                  {Math.round(managerReputation)}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-3 gap-1.5">
+                <CareerStat label="Temporadas" value={totalSeasons} />
+                <CareerStat label="Equipos" value={uniqueTeams} />
+                <CareerStat label="Trofeos" value={trophies} color="#ffe94d" />
+                <CareerStat label="V" value={totalWins} color="#6dff9b" />
+                <CareerStat label="E" value={totalDraws} color="#ffe94d" />
+                <CareerStat label="D" value={totalLosses} color="#ff5c8a" />
+              </div>
+
+              <div className="flex justify-between items-center gap-2 pt-1" style={{ borderTop: '1px solid rgba(109, 255, 155, 0.18)' }}>
+                <span className="of-card-desc" style={{ fontSize: 12 }}>% Victorias</span>
+                <span style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 12, color: '#6dff9b', textShadow: '0 0 5px rgba(109, 255, 155, 0.6)' }}>{winPct}%</span>
+              </div>
+              <div className="flex justify-between items-center gap-2">
+                <span className="of-card-desc" style={{ fontSize: 12 }}>Despidos</span>
+                <span style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 12, color: fires > 0 ? '#ff5c8a' : '#8a8aa8' }}>{fires}</span>
+              </div>
+              {bestSeason && (
+                <div className="flex justify-between items-baseline gap-2">
+                  <span className="of-card-desc" style={{ fontSize: 12 }}>Mejor</span>
+                  <span className="of-card-desc" style={{ fontSize: 12, color: '#6dff9b', textAlign: 'right' }}>
+                    {bestSeason.finalPosition}º · {bestSeason.teamName} · {bestSeason.year}
+                  </span>
+                </div>
               )}
-              <button
-                onClick={onBack}
-                className="text-[8px] bg-vga-gray text-vga-black px-2 py-1 border border-vga-white hover:bg-vga-red hover:text-vga-bright-white"
-              >
-                {t('btn.back')}
-              </button>
+              {worstSeason && totalSeasons > 1 && (
+                <div className="flex justify-between items-baseline gap-2">
+                  <span className="of-card-desc" style={{ fontSize: 12 }}>Peor</span>
+                  <span className="of-card-desc" style={{ fontSize: 12, color: '#ff5c8a', textAlign: 'right' }}>
+                    {worstSeason.finalPosition}º · {worstSeason.teamName} · {worstSeason.year}
+                  </span>
+                </div>
+              )}
+            </div>
+          )}
+
+          <div className="of-card" style={{ borderColor: '#ff4df8' }}>
+            <h3 className="of-card-title" style={{ color: '#ff4df8', textShadow: '0 0 6px rgba(255, 77, 248, 0.7)', borderBottomColor: 'rgba(255, 77, 248, 0.35)' }}>
+              Elige temporada
+            </h3>
+            {!nameReady && (
+              <div className="of-pill-yellow">Escribe tu nombre primero para elegir temporada.</div>
+            )}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-[400px] overflow-y-auto pr-1">
+              {yearStats.map(({ year, teams: tc, leagues: l, players: p }) => (
+                <button
+                  key={year}
+                  onClick={() => { if (nameReady) onSelectYear(year); }}
+                  disabled={!nameReady}
+                  className="of-year-tile"
+                >
+                  <span className="of-year-tile-year">{year}/{(year + 1).toString().slice(-2)}</span>
+                  <span className="of-year-tile-meta">
+                    {t('setup.teamsCount', { n: tc.toLocaleString('es-ES') })} · {l} {t('setup.leagues')} · {p.toLocaleString('es-ES')} {t('setup.playersShort')}
+                  </span>
+                </button>
+              ))}
             </div>
           </div>
-
-          <div className="flex flex-col gap-4 mb-6">
-            <div>
-              <label className="block text-vga-cyan text-[8px] uppercase mb-1">{t('promanager.nameLabel')}</label>
-              <input
-                type="text"
-                value={name}
-                onChange={e => setName(e.target.value)}
-                placeholder={t('promanager.namePlaceholder')}
-                className="w-full bg-vga-blue border-2 border-vga-white text-vga-bright-white px-3 py-2 text-[10px] font-mono outline-none focus:border-vga-cyan"
-                maxLength={30}
-              />
-            </div>
-            <p className="text-vga-gray text-[7px]">{t('promanager.hint')}</p>
-          </div>
-
-          <div className="flex flex-col gap-2 max-h-[300px] overflow-y-auto pr-1">
-            {yearStats.map(({ year, teams: tc, leagues: l, players: p }) => (
-              <button
-                key={year}
-                onClick={() => { if (name.trim()) onSelectYear(year); }}
-                disabled={!name.trim()}
-                className={`bg-vga-black border-2 px-3 py-2 text-left transition-colors flex flex-col gap-1 ${name.trim() ? 'border-vga-gray hover:border-vga-magenta cursor-pointer' : 'border-vga-gray opacity-50 cursor-not-allowed'}`}
-              >
-                <span className="text-vga-bright-white text-xs">
-                  {year}/{(year + 1).toString().slice(-2)}
-                </span>
-                <span className="text-[7px] text-vga-gray">
-                  <span className="text-vga-yellow">{t('setup.teamsCount', { n: String(tc) })}</span>
-                  {'  ·  '}
-                  <span className="text-vga-cyan">{l} {t('setup.leagues')}</span>
-                  {'  ·  '}
-                  {p.toLocaleString()} {t('setup.playersShort')}
-                </span>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="bg-vga-magenta p-2 text-[8px] text-vga-bright-white text-center border-2 border-vga-white">
-          {t('promanager.hint')}
         </div>
       </div>
     );
@@ -332,3 +398,10 @@ export const ProManagerSetupView = ({
     </div>
   );
 };
+
+const CareerStat = ({ label, value, color = '#ffffff' }: { label: string; value: number; color?: string }) => (
+  <div style={{ background: 'rgba(9, 0, 20, 0.5)', border: '1px solid #44476a', padding: '0.4rem 0.5rem', textAlign: 'center', clipPath: 'polygon(5px 0, 100% 0, 100% calc(100% - 5px), calc(100% - 5px) 100%, 0 100%, 0 5px)' }}>
+    <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 8, color: '#8a8aa8', letterSpacing: '0.12em' }}>{label}</div>
+    <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 14, color, textShadow: `0 0 5px ${color}99`, marginTop: 4 }}>{value}</div>
+  </div>
+);

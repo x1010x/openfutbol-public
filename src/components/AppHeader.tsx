@@ -29,7 +29,7 @@ export const AppHeader = ({ hasNewVersion, onOpenChangelog, onOpenSettings, onSa
         <div className="of-home-corner-text">
           <div className="of-home-corner-title">OPENFUTBOL</div>
           <div className="of-home-corner-sub">
-            v1.10.0 · {__BUILD_TIMESTAMP__}
+            v1.11.0 · {__BUILD_TIMESTAMP__}
             {hasNewVersion && <span className="of-home-version-new">NUEVO</span>}
           </div>
         </div>

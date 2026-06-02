@@ -351,9 +351,13 @@ export default function MatchScreen({
       <div className="flex items-center justify-between border border-vga-blue bg-vga-black px-3 py-1 text-[8px] uppercase">
         <div className="flex items-center gap-3 text-vga-cyan flex-wrap">
           <span className="text-vga-yellow">[*]</span>
-          <span className="text-vga-bright-white">Liga {year}/{(year + 1) % 100}</span>
-          <span className="text-vga-magenta">|</span>
-          <span>Jornada {currentJornada}</span>
+          <span className="text-vga-bright-white">{currentJornada > 0 ? `Liga ${year}/${(year + 1) % 100}` : `Temporada ${year}/${(year + 1) % 100}`}</span>
+          {currentJornada > 0 && (
+            <>
+              <span className="text-vga-magenta">|</span>
+              <span>Jornada {currentJornada}</span>
+            </>
+          )}
           <span className="text-vga-magenta">|</span>
           <span>{dateStr}</span>
           <span className="text-vga-magenta">|</span>

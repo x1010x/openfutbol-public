@@ -163,8 +163,8 @@ export const TeamPicker = ({
 
   const n = selected.size;
   const inRange = n >= minTeams && n <= maxTeams;
-  const userOk = spectate || !!userTeamId;
-  void mode;
+  const isPromanagerSetup = mode === 'promanager';
+  const userOk = isPromanagerSetup || spectate || !!userTeamId;
   const canConfirm = inRange && userOk;
 
   const confirm = () => {
@@ -346,7 +346,7 @@ export const TeamPicker = ({
             <div className="of-tp-side-count">{n}/{maxTeams}</div>
           </div>
 
-          {allowSpectate && (
+          {allowSpectate && !isPromanagerSetup && (
             <button
               onClick={toggleSpectate}
               className={`of-tp-spectate ${spectate ? 'is-on' : ''}`}
@@ -354,6 +354,11 @@ export const TeamPicker = ({
             >
               <span className="of-tp-spectate-led" /> ESPECTADOR
             </button>
+          )}
+          {isPromanagerSetup && (
+            <div className="of-tp-spectate" style={{ cursor: 'default', opacity: 0.85 }} title="Tu club se decide tras recibir ofertas">
+              <span className="of-tp-spectate-led" style={{ background: '#ff4df8' }} /> OFERTAS
+            </div>
           )}
 
           <div className="of-tp-side-list">
@@ -367,14 +372,16 @@ export const TeamPicker = ({
                   <TeamCrest colors={team.colors} size="sm" title={team.name} teamId={team.id} />
                   <div className="of-tp-row-name">{team.name}</div>
                   <div className="of-tp-row-med">MED {team.med}</div>
-                  <button
-                    onClick={() => setYo(team.id)}
-                    disabled={spectate}
-                    className={`of-tp-row-yo ${isYo ? 'is-on' : ''}`}
-                    title="Marcar como mi equipo"
-                  >
-                    {isYo ? 'YO' : '·'}
-                  </button>
+                  {!isPromanagerSetup && (
+                    <button
+                      onClick={() => setYo(team.id)}
+                      disabled={spectate}
+                      className={`of-tp-row-yo ${isYo ? 'is-on' : ''}`}
+                      title="Marcar como mi equipo"
+                    >
+                      {isYo ? 'YO' : '·'}
+                    </button>
+                  )}
                   <button
                     onClick={() => toggleTeam(team.id)}
                     className="of-tp-row-rm"
@@ -394,7 +401,10 @@ export const TeamPicker = ({
             {inRange && !userOk && (
               <div className="of-tp-warn">Elige un equipo o marca «Espectador»</div>
             )}
-            {canConfirm && (
+            {canConfirm && isPromanagerSetup && (
+              <div className="of-tp-ok">Listo · Ver ofertas →</div>
+            )}
+            {canConfirm && !isPromanagerSetup && (
               <div className="of-tp-ok">
                 Listo · {spectate ? 'Espectador' : `Controlas ${selectedTeams.find(t => t.id === userTeamId)?.name}`}
               </div>

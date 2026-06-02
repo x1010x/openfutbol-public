@@ -32,7 +32,6 @@ import { PlayerDetailView } from './components/PlayerDetailView';
 import { BackupView } from './components/BackupView';
 import { LoadGameModal } from './components/LoadGameModal';
 import { EditorView } from './components/EditorView';
-import { LeagueSetupView } from './components/LeagueSetupView';
 import { ManagerCareerView } from './components/ManagerCareerView';
 import { ProManagerEndView } from './components/ProManagerEndView';
 import { ProManagerSetupView } from './components/ProManagerSetupView';
@@ -1235,6 +1234,21 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
 
       const simulatedEvents: MatchEvent[] = [];
       const randMinute = () => Math.floor(Math.random() * 90) + 1;
+      const SCORER_W: Record<string, number> = { DEL: 4, AML: 3, AMR: 3, MED: 2, DEF: 0.6 };
+      const ASSIST_W: Record<string, number> = { MED: 3, AML: 2.5, AMR: 2.5, DEL: 1.5, DEF: 0.5 };
+      const pickWeighted = (pool: Player[], weights: Record<string, number>): Player | undefined => {
+        if (pool.length === 0) return undefined;
+        const ws = pool.map(p => weights[p.position] ?? 1);
+        const total = ws.reduce((a, b) => a + b, 0);
+        if (total <= 0) return pool[Math.floor(Math.random() * pool.length)];
+        let r = Math.random() * total;
+        for (let i = 0; i < pool.length; i++) {
+          r -= ws[i];
+          if (r <= 0) return pool[i];
+        }
+        return pool[pool.length - 1];
+      };
+
       const addEvents = (team: Team, score: number) => {
         const lineup = team.players.filter(p => team.lineup.includes(p.id));
         const gkId = team.lineup[0];
@@ -1243,18 +1257,14 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
         for(let i=0; i<score; i++) {
           let scorer: Player | undefined;
           if (gk && Math.random() < 0.005) scorer = gk;
-          else if (fieldPlayers.length > 0) scorer = fieldPlayers[Math.floor(Math.random() * fieldPlayers.length)];
-          else scorer = lineup[Math.floor(Math.random() * lineup.length)];
+          else scorer = pickWeighted(fieldPlayers, SCORER_W);
           if (!scorer) continue;
           const minute = randMinute();
           simulatedEvents.push({ minute, type: 'goal', playerId: scorer.id });
           if(Math.random() < 0.7) {
             let asst: Player | undefined;
             if (gk && gk.id !== scorer.id && Math.random() < 0.01) asst = gk;
-            else {
-              const pool = fieldPlayers.filter(p => p.id !== scorer.id);
-              if (pool.length > 0) asst = pool[Math.floor(Math.random() * pool.length)];
-            }
+            else asst = pickWeighted(fieldPlayers.filter(p => p.id !== scorer.id), ASSIST_W);
             if(asst) simulatedEvents.push({ minute, type: 'commentary', description: '', assistantId: asst.id, playerId: scorer.id });
           }
         }
@@ -2261,15 +2271,22 @@ function App({ onLeagueReady }: { onLeagueReady?: () => void } = {}) {
         ? [{ year: PACK_YEAR, teams: pack.clubs.length, leagues: pack.leagues.length, players: pack.players.length }]
         : getAvailableYearsWithStats();
 
-      // After year is picked, route through the same team-selection view used by Liga
-      // mode. Once teams are confirmed, ProManagerSetupView renders the offers screen.
+      // After year is picked, use the single-screen TeamPicker (same as PLAY)
+      // to choose which clubs play in this league. The user team is decided
+      // afterwards in the offers screen.
       if (selectedYear && !leagueSetupDone) {
         return (
-          <LeagueSetupView
+          <TeamPicker
+            title={`PRO MANAGER · ${selectedYear}/${(selectedYear + 1).toString().slice(-2)}`}
             year={selectedYear}
-            existingTeams={league.teams}
-            onConfirm={handleLeagueSetupConfirm}
+            teams={pickerSummaries}
+            mode="promanager"
+            minTeams={4}
+            maxTeams={24}
+            allowSpectate={false}
+            buildTeam={buildPickerTeam}
             onBack={() => handleProManagerSelectYear(0)}
+            onConfirm={({ teamIds }) => handleLeagueSetupConfirm(teamIds, [], [], selectedYear)}
           />
         );
       }

@@ -1,6 +1,7 @@
 import type { Player, Team } from '../types/game.d.ts';
 import { PlayerName } from './PlayerName';
 import { PlayerPhoto } from './PlayerPhoto';
+import { TeamCrest } from './TeamCrest';
 import { useT } from '../i18n';
 
 interface Props {
@@ -9,7 +10,7 @@ interface Props {
   onBack: () => void;
 }
 
-type EnrichedPlayer = Player & { teamName: string; teamId: string };
+type EnrichedPlayer = Player & { teamName: string; teamId: string; teamColors?: string[] };
 
 const Panel = ({ title, accent = 'text-vga-magenta', children, className = '' }: {
   title: string; accent?: string; children: React.ReactNode; className?: string;
@@ -33,9 +34,9 @@ const PodiumCard = ({ rank, player, value, valueColor, onClick }: {
   >
     <div className={`text-[14px] font-bold w-5 text-center ${rank === 1 ? 'text-vga-yellow' : rank === 2 ? 'text-vga-cyan' : 'text-vga-magenta'}`}>{rank}</div>
     <PlayerPhoto sourceId={player.source_id} size="md" className="border border-vga-blue" />
-    <div className="min-w-0 flex-1">
+    <div className="min-w-0 flex-1 flex items-center gap-1.5">
+      <TeamCrest size="xs" teamId={player.teamId} colors={player.teamColors} title={player.teamName} />
       <div className="text-vga-bright-white text-[9px] truncate"><PlayerName player={player} /></div>
-      <div className="text-vga-cyan text-[7px] truncate">{player.teamName}</div>
     </div>
     <div className={`${valueColor} text-[12px] font-bold tabular-nums`}>{value}</div>
   </div>
@@ -51,14 +52,32 @@ const RankRow = ({ rank, player, value, valueColor, onClick }: {
   <tr onClick={onClick} className={`${onClick ? 'cursor-pointer hover:bg-vga-blue/30' : ''}`}>
     <td className="text-vga-magenta pl-2 py-0.5 w-5">{rank}</td>
     <td className="text-vga-bright-white truncate max-w-[160px]"><PlayerName player={player} /></td>
-    <td className="text-vga-cyan text-[7px] truncate max-w-[120px]">{player.teamName}</td>
+    <td className="py-0.5 w-5" title={player.teamName}>
+      <TeamCrest size="xs" teamId={player.teamId} colors={player.teamColors} title={player.teamName} />
+    </td>
     <td className={`text-right pr-2 font-bold tabular-nums ${valueColor}`}>{value}</td>
+  </tr>
+);
+
+const MiniRankRow = ({ rank, player, valueNode, onPlayerClick }: {
+  rank: number;
+  player: EnrichedPlayer;
+  valueNode: React.ReactNode;
+  onPlayerClick?: (id: string) => void;
+}) => (
+  <tr onClick={onPlayerClick ? () => onPlayerClick(player.id) : undefined} className={onPlayerClick ? 'cursor-pointer hover:bg-vga-blue/30' : ''}>
+    <td className="pl-2 text-vga-magenta py-0.5 w-5">{rank}</td>
+    <td className="text-vga-bright-white truncate max-w-[120px]"><PlayerName player={player} /></td>
+    <td className="py-0.5 w-5" title={player.teamName}>
+      <TeamCrest size="xs" teamId={player.teamId} colors={player.teamColors} title={player.teamName} />
+    </td>
+    <td className="text-right pr-2">{valueNode}</td>
   </tr>
 );
 
 export const StatsView = ({ teams, onPlayerClick, onBack }: Props) => {
   const t = useT();
-  const allPlayers: EnrichedPlayer[] = teams.flatMap(team => team.players.map(p => ({ ...p, teamName: team.name, teamId: team.id })));
+  const allPlayers: EnrichedPlayer[] = teams.flatMap(team => team.players.map(p => ({ ...p, teamName: team.name, teamId: team.id, teamColors: team.colors })));
   const withApps = allPlayers.filter(p => p.seasonStats.appearances > 0);
   // Scale the "regular" threshold to the season's progress: the most-used
   // player gives us an upper bound on matches played, so a regular needs at
@@ -123,7 +142,7 @@ export const StatsView = ({ teams, onPlayerClick, onBack }: Props) => {
         <Panel title={`Máximos goleadores · top 10`}>
           <table className="w-full text-[9px]">
             <thead><tr className="text-vga-magenta text-[7px] uppercase">
-              <th className="pl-2 text-left">#</th><th className="text-left">Jugador</th><th className="text-left">Club</th><th className="text-right pr-2">G</th>
+              <th className="pl-2 text-left">#</th><th className="text-left">Jugador</th><th></th><th className="text-right pr-2">G</th>
             </tr></thead>
             <tbody>
               {goalsRanked.slice(0, 10).map((p, i) => (
@@ -135,7 +154,7 @@ export const StatsView = ({ teams, onPlayerClick, onBack }: Props) => {
         <Panel title="Máximos asistentes · top 10">
           <table className="w-full text-[9px]">
             <thead><tr className="text-vga-magenta text-[7px] uppercase">
-              <th className="pl-2 text-left">#</th><th className="text-left">Jugador</th><th className="text-left">Club</th><th className="text-right pr-2">A</th>
+              <th className="pl-2 text-left">#</th><th className="text-left">Jugador</th><th></th><th className="text-right pr-2">A</th>
             </tr></thead>
             <tbody>
               {assistsRanked.slice(0, 10).map((p, i) => (
@@ -150,93 +169,81 @@ export const StatsView = ({ teams, onPlayerClick, onBack }: Props) => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">
         <Panel title="Mejor media">
           <table className="w-full text-[9px]">
-            <thead><tr className="text-vga-magenta text-[7px] uppercase"><th className="pl-2 text-left">#</th><th className="text-left">Jugador</th><th className="text-right pr-2">Avg</th></tr></thead>
+            <thead><tr className="text-vga-magenta text-[7px] uppercase"><th className="pl-2 text-left">#</th><th className="text-left">Jugador</th><th></th><th className="text-right pr-2">Avg</th></tr></thead>
             <tbody>
               {ratingRanked.slice(0, 8).map((p, i) => (
-                <tr key={p.id} onClick={handlePlayer(p.id)} className={onPlayerClick ? 'cursor-pointer hover:bg-vga-blue/30' : ''}>
-                  <td className="pl-2 text-vga-magenta py-0.5">{i + 1}</td>
-                  <td className="text-vga-bright-white truncate max-w-[120px]"><PlayerName player={p} /></td>
-                  <td className="text-right pr-2 text-vga-yellow font-bold tabular-nums">{(p.seasonStats.ratingSum / p.seasonStats.appearances).toFixed(2)}</td>
-                </tr>
+                <MiniRankRow key={p.id} rank={i + 1} player={p} onPlayerClick={onPlayerClick}
+                  valueNode={<span className="text-vga-yellow font-bold tabular-nums">{(p.seasonStats.ratingSum / p.seasonStats.appearances).toFixed(2)}</span>}
+                />
               ))}
             </tbody>
           </table>
         </Panel>
         <Panel title="G + A">
           <table className="w-full text-[9px]">
-            <thead><tr className="text-vga-magenta text-[7px] uppercase"><th className="pl-2 text-left">#</th><th className="text-left">Jugador</th><th className="text-right pr-2">G+A</th></tr></thead>
+            <thead><tr className="text-vga-magenta text-[7px] uppercase"><th className="pl-2 text-left">#</th><th className="text-left">Jugador</th><th></th><th className="text-right pr-2">G+A</th></tr></thead>
             <tbody>
               {goalContribRanked.slice(0, 8).map((p, i) => (
-                <tr key={p.id} onClick={handlePlayer(p.id)} className={onPlayerClick ? 'cursor-pointer hover:bg-vga-blue/30' : ''}>
-                  <td className="pl-2 text-vga-magenta py-0.5">{i + 1}</td>
-                  <td className="text-vga-bright-white truncate max-w-[120px]"><PlayerName player={p} /></td>
-                  <td className="text-right pr-2 text-vga-light-green font-bold tabular-nums">{p.seasonStats.goals + p.seasonStats.assists}</td>
-                </tr>
+                <MiniRankRow key={p.id} rank={i + 1} player={p} onPlayerClick={onPlayerClick}
+                  valueNode={<span className="text-vga-light-green font-bold tabular-nums">{p.seasonStats.goals + p.seasonStats.assists}</span>}
+                />
               ))}
             </tbody>
           </table>
         </Panel>
         <Panel title="Más minutos">
           <table className="w-full text-[9px]">
-            <thead><tr className="text-vga-magenta text-[7px] uppercase"><th className="pl-2 text-left">#</th><th className="text-left">Jugador</th><th className="text-right pr-2">Min</th></tr></thead>
+            <thead><tr className="text-vga-magenta text-[7px] uppercase"><th className="pl-2 text-left">#</th><th className="text-left">Jugador</th><th></th><th className="text-right pr-2">Min</th></tr></thead>
             <tbody>
               {minutesRanked.slice(0, 8).map((p, i) => (
-                <tr key={p.id} onClick={handlePlayer(p.id)} className={onPlayerClick ? 'cursor-pointer hover:bg-vga-blue/30' : ''}>
-                  <td className="pl-2 text-vga-magenta py-0.5">{i + 1}</td>
-                  <td className="text-vga-bright-white truncate max-w-[120px]"><PlayerName player={p} /></td>
-                  <td className="text-right pr-2 text-vga-light-cyan font-bold tabular-nums">{p.seasonStats.minutes}'</td>
-                </tr>
+                <MiniRankRow key={p.id} rank={i + 1} player={p} onPlayerClick={onPlayerClick}
+                  valueNode={<span className="text-vga-light-cyan font-bold tabular-nums">{p.seasonStats.minutes}'</span>}
+                />
               ))}
             </tbody>
           </table>
         </Panel>
         <Panel title="Porterías a cero">
           <table className="w-full text-[9px]">
-            <thead><tr className="text-vga-magenta text-[7px] uppercase"><th className="pl-2 text-left">#</th><th className="text-left">Portero</th><th className="text-right pr-2">CS</th></tr></thead>
+            <thead><tr className="text-vga-magenta text-[7px] uppercase"><th className="pl-2 text-left">#</th><th className="text-left">Portero</th><th></th><th className="text-right pr-2">CS</th></tr></thead>
             <tbody>
               {cleanSheetsRanked.slice(0, 8).map((p, i) => (
-                <tr key={p.id} onClick={handlePlayer(p.id)} className={onPlayerClick ? 'cursor-pointer hover:bg-vga-blue/30' : ''}>
-                  <td className="pl-2 text-vga-magenta py-0.5">{i + 1}</td>
-                  <td className="text-vga-bright-white truncate max-w-[120px]"><PlayerName player={p} /></td>
-                  <td className="text-right pr-2 text-vga-light-green font-bold tabular-nums">{p.seasonStats.cleanSheets}</td>
-                </tr>
+                <MiniRankRow key={p.id} rank={i + 1} player={p} onPlayerClick={onPlayerClick}
+                  valueNode={<span className="text-vga-light-green font-bold tabular-nums">{p.seasonStats.cleanSheets}</span>}
+                />
               ))}
               {cleanSheetsRanked.length === 0 && (
-                <tr><td colSpan={3} className="text-vga-gray text-[8px] text-center p-2">Aún ningún portero ha dejado la portería a cero.</td></tr>
+                <tr><td colSpan={4} className="text-vga-gray text-[8px] text-center p-2">Aún ningún portero ha dejado la portería a cero.</td></tr>
               )}
             </tbody>
           </table>
         </Panel>
       </div>
 
-      {/* Disciplina */}
+      {/* Disciplina — same table format as mini rankings above */}
       <Panel title="Ranking disciplinario" accent="text-vga-light-red">
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 p-2">
-          {cardsRanked.slice(0, 10).map(p => (
-            <div
-              key={p.id}
-              onClick={handlePlayer(p.id)}
-              className={`bg-vga-black border border-vga-blue p-2 flex items-center gap-2 ${onPlayerClick ? 'cursor-pointer hover:border-vga-magenta' : ''}`}
-            >
-              <PlayerPhoto sourceId={p.source_id} size="sm" className="border border-vga-blue" />
-              <div className="min-w-0 flex-1">
-                <div className="text-vga-bright-white text-[8px] truncate"><PlayerName player={p} /></div>
-                <div className="text-vga-cyan text-[7px] truncate">{p.teamName}</div>
-              </div>
-              <div className="flex gap-1 text-[9px] font-bold tabular-nums">
-                {p.seasonStats.yellowCards > 0 && (
-                  <span className="text-vga-yellow flex items-center gap-0.5"><span className="w-1.5 h-2 bg-vga-yellow inline-block" />{p.seasonStats.yellowCards}</span>
-                )}
-                {p.seasonStats.redCards > 0 && (
-                  <span className="text-vga-light-red flex items-center gap-0.5"><span className="w-1.5 h-2 bg-vga-light-red inline-block" />{p.seasonStats.redCards}</span>
-                )}
-              </div>
-            </div>
-          ))}
-          {cardsRanked.length === 0 && (
-            <div className="text-vga-gray text-[8px] col-span-full text-center p-2">Liga ejemplar: nadie ha visto una tarjeta todavía.</div>
-          )}
-        </div>
+        <table className="w-full text-[9px]">
+          <thead><tr className="text-vga-light-red text-[7px] uppercase"><th className="pl-2 text-left">#</th><th className="text-left">Jugador</th><th></th><th className="text-right pr-2">Tarjetas</th></tr></thead>
+          <tbody>
+            {cardsRanked.slice(0, 10).map((p, i) => (
+              <MiniRankRow key={p.id} rank={i + 1} player={p} onPlayerClick={onPlayerClick}
+                valueNode={
+                  <span className="inline-flex gap-1.5 font-bold tabular-nums">
+                    {p.seasonStats.yellowCards > 0 && (
+                      <span className="text-vga-yellow flex items-center gap-0.5"><span className="w-1.5 h-2 bg-vga-yellow inline-block border border-black" />{p.seasonStats.yellowCards}</span>
+                    )}
+                    {p.seasonStats.redCards > 0 && (
+                      <span className="text-vga-light-red flex items-center gap-0.5"><span className="w-1.5 h-2 bg-vga-light-red inline-block border border-black" />{p.seasonStats.redCards}</span>
+                    )}
+                  </span>
+                }
+              />
+            ))}
+            {cardsRanked.length === 0 && (
+              <tr><td colSpan={4} className="text-vga-gray text-[8px] text-center p-2">Liga ejemplar: nadie ha visto una tarjeta todavía.</td></tr>
+            )}
+          </tbody>
+        </table>
       </Panel>
     </div>
   );

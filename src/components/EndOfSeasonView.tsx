@@ -152,16 +152,16 @@ export const EndOfSeasonView = ({ league, onContinueSameTeam, onAdvanceAndChange
     return `${ownTeamName} ${a}-${b} ${teamNameById(rec.opponentId)} (J${rec.jornada})`;
   };
 
-  let biggestWin: { ownerName: string; rec: NonNullable<TeamRecords['biggestWin']> } | null = null;
-  let heaviestDefeat: { ownerName: string; rec: NonNullable<TeamRecords['heaviestDefeat']> } | null = null;
+  let biggestWin: { ownerId: string; ownerName: string; rec: NonNullable<TeamRecords['biggestWin']> } | null = null;
+  let heaviestDefeat: { ownerId: string; ownerName: string; rec: NonNullable<TeamRecords['heaviestDefeat']> } | null = null;
   let craziestMatch: { ownerName: string; rec: NonNullable<TeamRecords['mostGoalsInMatch']> } | null = null;
   let longestUnbeaten: { teamName: string; runs: number } | null = null;
   let longestWinning: { teamName: string; runs: number } | null = null;
 
   // All-time variants (don't filter by current year) — fed by both
   // teamRecords (per-team) and leagueHistory (per-season).
-  let allTimeBiggestWin: { ownerName: string; rec: NonNullable<TeamRecords['biggestWin']> } | null = null;
-  let allTimeHeaviest: { ownerName: string; rec: NonNullable<TeamRecords['heaviestDefeat']> } | null = null;
+  let allTimeBiggestWin: { ownerId: string; ownerName: string; rec: NonNullable<TeamRecords['biggestWin']> } | null = null;
+  let allTimeHeaviest: { ownerId: string; ownerName: string; rec: NonNullable<TeamRecords['heaviestDefeat']> } | null = null;
   let allTimeCraziest: { ownerName: string; rec: NonNullable<TeamRecords['mostGoalsInMatch']> } | null = null;
   let allTimeUnbeaten: { teamName: string; runs: number } | null = null;
   let allTimeWinning: { teamName: string; runs: number } | null = null;
@@ -172,22 +172,22 @@ export const EndOfSeasonView = ({ league, onContinueSameTeam, onAdvanceAndChange
     if (rec.biggestWin && rec.biggestWin.year === year) {
       const diff = rec.biggestWin.gf - rec.biggestWin.ga;
       const curDiff = biggestWin ? biggestWin.rec.gf - biggestWin.rec.ga : -1;
-      if (diff > curDiff) biggestWin = { ownerName: team.name, rec: rec.biggestWin };
+      if (diff > curDiff) biggestWin = { ownerId: team.id, ownerName: team.name, rec: rec.biggestWin };
     }
     if (rec.biggestWin) {
       const diff = rec.biggestWin.gf - rec.biggestWin.ga;
       const curDiff = allTimeBiggestWin ? allTimeBiggestWin.rec.gf - allTimeBiggestWin.rec.ga : -1;
-      if (diff > curDiff) allTimeBiggestWin = { ownerName: team.name, rec: rec.biggestWin };
+      if (diff > curDiff) allTimeBiggestWin = { ownerId: team.id, ownerName: team.name, rec: rec.biggestWin };
     }
     if (rec.heaviestDefeat && rec.heaviestDefeat.year === year) {
       const diff = rec.heaviestDefeat.ga - rec.heaviestDefeat.gf;
       const curDiff = heaviestDefeat ? heaviestDefeat.rec.ga - heaviestDefeat.rec.gf : -1;
-      if (diff > curDiff) heaviestDefeat = { ownerName: team.name, rec: rec.heaviestDefeat };
+      if (diff > curDiff) heaviestDefeat = { ownerId: team.id, ownerName: team.name, rec: rec.heaviestDefeat };
     }
     if (rec.heaviestDefeat) {
       const diff = rec.heaviestDefeat.ga - rec.heaviestDefeat.gf;
       const curDiff = allTimeHeaviest ? allTimeHeaviest.rec.ga - allTimeHeaviest.rec.gf : -1;
-      if (diff > curDiff) allTimeHeaviest = { ownerName: team.name, rec: rec.heaviestDefeat };
+      if (diff > curDiff) allTimeHeaviest = { ownerId: team.id, ownerName: team.name, rec: rec.heaviestDefeat };
     }
     if (rec.mostGoalsInMatch && rec.mostGoalsInMatch.year === year) {
       const total = rec.mostGoalsInMatch.gf + rec.mostGoalsInMatch.ga;
@@ -562,7 +562,12 @@ export const EndOfSeasonView = ({ league, onContinueSameTeam, onAdvanceAndChange
                 <div className="text-vga-bright-white truncate">{fmtScoreVs(biggestWin.rec, biggestWin.ownerName, true)}</div>
               </div>
             )}
-            {heaviestDefeat && (
+            {heaviestDefeat && !(biggestWin
+              && heaviestDefeat.rec.year === biggestWin.rec.year
+              && heaviestDefeat.rec.jornada === biggestWin.rec.jornada
+              && heaviestDefeat.ownerId === biggestWin.rec.opponentId
+              && heaviestDefeat.rec.opponentId === biggestWin.ownerId
+            ) && (
               <div>
                 <div className="text-vga-magenta text-[7px] uppercase">Ridículo del año</div>
                 <div className="text-vga-bright-white truncate">{fmtScoreVs(heaviestDefeat.rec, heaviestDefeat.ownerName, false)}</div>
@@ -645,7 +650,12 @@ export const EndOfSeasonView = ({ league, onContinueSameTeam, onAdvanceAndChange
                 <div className="text-vga-bright-white truncate">{fmtScoreVs(allTimeBiggestWin.rec, allTimeBiggestWin.ownerName, true)} <span className="text-vga-gray">({allTimeBiggestWin.rec.year})</span></div>
               </div>
             )}
-            {allTimeHeaviest && (
+            {allTimeHeaviest && !(allTimeBiggestWin
+              && allTimeHeaviest.rec.year === allTimeBiggestWin.rec.year
+              && allTimeHeaviest.rec.jornada === allTimeBiggestWin.rec.jornada
+              && allTimeHeaviest.ownerId === allTimeBiggestWin.rec.opponentId
+              && allTimeHeaviest.rec.opponentId === allTimeBiggestWin.ownerId
+            ) && (
               <div>
                 <div className="text-vga-yellow text-[7px] uppercase">Ridículo histórico</div>
                 <div className="text-vga-bright-white truncate">{fmtScoreVs(allTimeHeaviest.rec, allTimeHeaviest.ownerName, false)} <span className="text-vga-gray">({allTimeHeaviest.rec.year})</span></div>
